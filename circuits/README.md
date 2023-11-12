@@ -20,7 +20,7 @@ https://betterprogramming.pub/zero-knowledge-proofs-using-snarkjs-and-circom-fac
 
 #### Generating proving key (zkey):
 
-`npx snarkjs groth16 setup build/*.r1cs ../*.ptau *.zkey` in the circuit's folder
+`npx snarkjs groth16 setup build/*.r1cs ../*.ptau circuit_0000.zkey` in the circuit's folder, zkey name is whatever you choose
 
 #### Proof generation (adjust input values and circuit/key folder/file names as appropriate, pass integer inputs as strings to avoid problems w/BigInt):
 
