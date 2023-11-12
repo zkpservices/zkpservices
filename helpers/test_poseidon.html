@@ -12,7 +12,7 @@
 
     async function hashValue() {
         const inputs = [];
-        const inputCount = 4; // Change this to adjust the number of input fields
+        const inputCount = 5; // Change this to adjust the number of input fields
 
         for (let i = 1; i <= inputCount; i++) {
             const input = document.getElementById("input" + i).value;
@@ -46,6 +46,8 @@
     <input type="text" id="input3" value="91"><br>
     <label for="input4">Input 4:</label>
     <input type="text" id="input4" value=""><br>
+    <label for="input5">Input 5:</label>
+    <input type="text" id="input5" value=""><br>
     <!-- Add more input fields (input5, input6, ...) if needed -->
 
     <button onclick="hashValue()">Calculate Hash</button>

@@ -6,7 +6,8 @@ import "../interfaces/IGroth16VerifierP2.sol";
 contract ZKPServicesVRF2FA {
 
     IVRF private vrf;
-    IGroth16VerifierP2 private verifier;
+    IGroth16VerifierP2 private responseVerifier;
+    IGroth16VerifierP2 private passwordChangeVerifier;
 
     struct TwoFactorData {
         bool success;
@@ -19,9 +20,10 @@ contract ZKPServicesVRF2FA {
     mapping(uint256 => uint256) public requestIds; // 2FA ID => VRF request ID
     mapping(uint256 => address) private requesters; // 2FA ID => address of the requester
 
-    constructor(address _vrfAddress, address _verifierAddress) { 
+    constructor(address _vrfAddress, address _responseVerifierAddress, address _passwordChangeVerifierAddress) { 
         vrf = IVRF(_vrfAddress);
-        verifier = IGroth16VerifierP2(_verifierAddress); 
+        responseVerifier = IGroth16VerifierP2(_responseVerifierAddress); 
+        passwordChangeVerifier = IGroth16VerifierP2(_passwordChangeVerifierAddress);
     }
 
     function generate2FA(uint256 _id, bytes32 _oneTimeKeyHash) external {
@@ -60,16 +62,32 @@ contract ZKPServicesVRF2FA {
         require(_pubSignals[0] == _randomNumber, "Public signal for random number mismatch");
         require(_pubSignals[1] == _userSecretHash, "Public signal for user secret hash mismatch");
 
-        bool proofVerified = verifier.verifyProof(_pA, _pB, _pC, _pubSignals);
+        bool proofVerified = responseVerifier.verifyProof(_pA, _pB, _pC, _pubSignals);
         require(proofVerified, "Invalid proof");
 
         twoFactorData[_id].success = true;
         twoFactorData[_id].timestamp = block.timestamp;
     }
 
-    // User method to store their 2FA secret
+    // User method to store initialize 2FA secret
     function setSecret(uint256 _userSecretHash) external {
         userSecrets[msg.sender] = _userSecretHash;
     }
 
+    // Method for users to update their 2FA secret.
+    // A Zero-Knowledge Proof (ZKP) is required to ensure secure secret update.
+    // If a user's account is compromised, the ZKP prevents the attacker from updating the user's secret without knowledge of the existing secret.
+    // Thus, ZKP provides an extra layer of security and privacy to users during secret update, making the process robust against potential attacks.
+    function updateSecret(uint256 _oldSecretHash, uint256 _newSecretHash, uint[2] calldata _pA, uint[2][2] calldata _pB, uint[2] calldata _pC, uint[2] calldata _pubSignals) external {
+        require(_pubSignals.length == 2, "Invalid public signals length");
+        require(userSecrets[msg.sender] == _oldSecretHash, "Invalid old secret");
+        require(_pubSignals[0] == _oldSecretHash, "Public signal for old secret hash mismatch");
+        require(_pubSignals[1] == _newSecretHash, "Public signal for new secret hash mismatch");
+
+        bool proofVerified = passwordChangeVerifier.verifyProof(_pA, _pB, _pC, _pubSignals);
+        require(proofVerified, "Invalid proof");
+
+        // update the user's secret
+        userSecrets[msg.sender] = _newSecretHash;
+    }
 }

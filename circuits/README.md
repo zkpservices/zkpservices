@@ -66,3 +66,13 @@ Exposing the hash functions in the browser client-side
 `npx snarkjs zkey export solidityverifier *.zkey verifier.sol` in the circuit's folder - you can name the Solidity file differently
 
 to prove with solidity, the proof and publicSignals need to be supplied to the smart contract
+
+#### Combined:
+
+- `mkdir build` 
+- `circom *.circom --wasm --r1cs -o ./build`
+- `npx snarkjs groth16 setup build/*.r1cs ../*.ptau circuit.zkey`
+- `npx snarkjs zkey export verificationkey *.zkey verification_key.json`
+- `npx snarkjs zkey export solidityverifier *.zkey verifier.sol`
+
+Or, navigate to the target circuit folder and run `snark_setup.sh`
