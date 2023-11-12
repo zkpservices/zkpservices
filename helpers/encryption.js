@@ -37,7 +37,6 @@ async function importAESKey() {
     }
 }
 
-
 async function generateRSAKeys() {
     rsaKeyPair = await window.crypto.subtle.generateKey(
         {
@@ -49,14 +48,15 @@ async function generateRSAKeys() {
         true,
         ["encrypt", "decrypt"]
     );
+
     let publicKey = await window.crypto.subtle.exportKey("spki", rsaKeyPair.publicKey);
     let privateKey = await window.crypto.subtle.exportKey("pkcs8", rsaKeyPair.privateKey);
+
     let publicKeyString = arrayBufferToBase64(publicKey);
     let privateKeyString = arrayBufferToBase64(privateKey);
+
     document.getElementById("publicKeyOutput").textContent = publicKeyString;
     document.getElementById("privateKeyOutput").textContent = privateKeyString;
-    rsaKeyPair.publicKey = await importPublicKey(publicKeyString);
-    rsaKeyPair.privateKey = await importPrivateKey(privateKeyString);
 }
 
 async function importPublicKey(publicKeyString) {

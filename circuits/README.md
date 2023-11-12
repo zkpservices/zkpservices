@@ -46,12 +46,20 @@ see the `/helpers` directory for examples directly in the browser (client-side)
 
 #### Hash computation:
 
-leverage calls to public view hash functions in the helper smart contracts in `/contracts/hashers/` directory to make them accessible in the browser more easily (client-side only)
+Circomlibjs is not very easily exposed in the browser, however it's relatively easy to use with Node:
 
 `const poseidon = await circomlibjs.buildPoseidon();`
 `const hash = poseidon.F.toString(poseidon([10]));` where `10` is a random integer input that can be expressed with 253 bits or fewer and can be `[a,b,c,d]`, etc. to hash multiple values
 
 to be safe, each of a, b, c, etc. can be a 30-byte string that is cast to a uint256 input to the function - pass large integers like 10**20 inside quotes
+
+Exposing the hash functions in the browser client-side
+
+1. **Use Keccak256 Function from Modern Web3 Libraries and Poseidon Function via WASM**:
+   This option offers a more secure and efficient approach to compute hashes directly on the client-side. You can leverage the `keccak256` function provided by modern Web3 libraries to calculate Keccak256 hashes within the web browser. Additionally, you can use the Poseidon function exposed through WebAssembly (WASM) available in the `/helpers/poseidon` directory to compute Poseidon hashes directly within the client-side code. This option is recommended for production use.
+
+2. **Use Public View Hash Functions in Helper Smart Contracts (For Testing Only)**:
+   An alternative option is to utilize calls to public view hash functions available in the helper smart contracts located in the `/contracts/hashers/` directory. However, it's crucial to emphasize that these functions are generally intended for testing purposes only. Relying on them in production may not be recommended due to potential security concerns. It's preferable to opt for the first option when computing hashes in a production environment.
 
 #### Solidity verifier: 
 
