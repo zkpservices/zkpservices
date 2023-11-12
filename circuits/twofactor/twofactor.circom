@@ -25,7 +25,7 @@ template TwoFactor () {
   	//log(hash.out);
   
    	random_number === random_number;
-	hash.out === secret_hash;
+	  hash.out === secret_hash;
 }
 
 component main { public [ random_number, secret_hash ] } = TwoFactor();
