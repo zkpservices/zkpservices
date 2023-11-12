@@ -14,7 +14,7 @@ template ZKPServicesVRF2FAPasswordChange () {
 
     signal input old_secret;
   	signal input old_secret_hash;
-	signal input new_secret;
+	  signal input new_secret;
   	signal input new_secret_hash;
   
     //log(old_secret);
