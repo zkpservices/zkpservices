@@ -20,11 +20,11 @@
         "two_factor_secret": document.getElementById("two_factor_secret").value,
         "secret_hash": document.getElementById("secret_hash").value,
       };
-      const circuitWasm = "../circuits/twofactor/build/twofactor_js/twofactor.wasm";
-      const circuitZkey = "../circuits/twofactor/circuit_0000.zkey";
+      const circuitWasm = "../circuits/ZKPServicesVRF2FAResponse/build/ZKPServicesVRF2FAResponse_js/ZKPServicesVRF2FAResponse.wasm";
+      const circuitZkey = "../circuits/ZKPServicesVRF2FAResponse/circuit.zkey";
 
       // Fetch the vKey JSON from the file
-      const response = await fetch('../circuits/twofactor/verification_key.json');
+      const response = await fetch('../circuits/ZKPServicesVRF2FAResponse/verification_key.json');
       const vKey = await response.json();
 
       try {
