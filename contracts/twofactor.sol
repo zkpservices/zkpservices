@@ -11,7 +11,6 @@ contract twofactor {
     struct TwoFactorData {
         bool success;
         uint256 timestamp;
-        bool expired;
     }
 
     mapping(uint256 => TwoFactorData) public twoFactorData; // 2FA ID => (boolean indicating success, timestamp, expired)
@@ -29,13 +28,12 @@ contract twofactor {
     function generate2FA(uint256 _id, bytes32 _oneTimeKeyHash) external {
         require(twoFactorData[_id].timestamp == 0, "2FA ID already used");
         oneTimeKeyHashes[_id] = _oneTimeKeyHash;
-        twoFactorData[_id] = TwoFactorData({ success: false, timestamp: block.timestamp, expired: false });
+        twoFactorData[_id] = TwoFactorData({ success: false, timestamp: block.timestamp});
     }
 
     function requestRandomNumber(uint256 _id, bytes calldata _oneTimeKey) external {
-        require(!twoFactorData[_id].expired, "2FA ID expired");
         require(oneTimeKeyHashes[_id] == keccak256(_oneTimeKey), "Invalid one-time key");
-        require(requesters[_id] == address(0) || requesters[_id] == msg.sender, "Random number already requested");
+        require(requesters[_id] == address(0), "Random number already requested");
 
         uint256 requestId = VRF.requestRandomWords(); // Call the VRF contract
         requestIds[_id] = requestId; // Store the request ID
@@ -51,7 +49,6 @@ contract twofactor {
 
     function verifyProof(uint256 _id, uint256 _randomNumber, bytes32 _userSecretHash, uint[2] calldata _pA, uint[2][2] calldata _pB, uint[2] calldata _pC, uint[2] calldata _pubSignals) public {
         require(msg.sender == requesters[_id], "Unauthorized");
-        require(!twoFactorData[_id].expired, "2FA ID expired");
 
         // Get the random words from VRF
         uint256[] memory randomWords = getRandomWords(_id);
@@ -69,7 +66,6 @@ contract twofactor {
 
         twoFactorData[_id].success = true;
         twoFactorData[_id].timestamp = block.timestamp;
-        twoFactorData[_id].expired = true;
     }
 
     // User method to store their 2FA secret
