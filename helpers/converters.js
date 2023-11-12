@@ -1,6 +1,6 @@
 function stringToBigInt(str) {
-    if (str.length > 63) {
-        throw new Error("String length must be 62 characters or less.");
+    if (str.length > 25) {
+        throw new Error("String length must be 25 characters or less.");
     }
     let numStr = '';
     for (let i = 0; i < str.length; i++) {
