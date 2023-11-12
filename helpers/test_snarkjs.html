@@ -33,6 +33,15 @@
 
         if (isValid) {
           document.getElementById("result").innerText = "Verification OK";
+          const _pA = [proof.pi_a[0], proof.pi_a[1]];
+          const _pB = [[proof.pi_b[0][1], proof.pi_b[0][0]], [proof.pi_b[1][1], proof.pi_b[1][0]]];
+          const _pC = [proof.pi_c[0], proof.pi_c[1]];
+          const _pubSignals = publicSignals;
+
+          console.log("_pA:", JSON.stringify(_pA));
+          console.log("_pB:", JSON.stringify(_pB));
+          console.log("_pC:", JSON.stringify(_pC));
+          console.log("_pubSignals:", JSON.stringify(_pubSignals));
         } else {
           document.getElementById("result").innerText = "Invalid proof";
         }
