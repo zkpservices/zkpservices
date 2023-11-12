@@ -28,3 +28,24 @@ The `ITwoFactorStatus` interface in this repository enables other contracts to l
 ### Final Thoughts
 
 This example demonstrates just one of many potential ways to implement secure 2FA using Chainlink's VRF. However, the possibilities for secure custom 2FA are expanded greatly with the use of Chainlink's oracles and external adapters. These tools offer the capability to create advanced authentication methods, such as biometric checks, demonstrating the vast potential applications of Chainlink for enhancing user authentication security.
+
+### Chainlink VRF setup
+
+- [Guide for VRF variables for smart contract](https://docs.chain.link/vrf/v2/subscription/supported-networks)
+- [Guide to set up the random number generation smart contract](https://docs.chain.link/vrf/v2/subscription/examples/get-a-random-number)
+- [VRF Subscription manager](https://vrf.chain.link/fantom-testnet)
+
+#### Faucets:
+
+[Fantom](https://faucet.fantom.network)
+
+[Chainlink](https://faucets.chain.link/fantom-testnet)
+
+#### Creating a VRF consumer
+
+-  Create a new subscription: https://vrf.chain.link/fantom-testnet/new
+-  Navigate to subscription in subscriptions view
+-  Fund the subscription with LINK
+-  Deploy `vrf.sol` with the subscription ID
+-  Add deployed contract as consumer in subscription view
+-  Set the `authorized` dictionary bool to `true` for other addresses that may use the random number retrieval functionality
