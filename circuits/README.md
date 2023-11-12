@@ -41,3 +41,9 @@ https://betterprogramming.pub/zero-knowledge-proofs-using-snarkjs-and-circom-fac
 `const hash = poseidon.F.toString(poseidon([10]));` where `10` is a random integer input that can be expressed with 253 bits or fewer and can be `[a,b,c,d]`, etc. to hash multiple values
 
 to be safe, each of a, b, c, etc. can be a 30-byte string that is cast to a uint256 input to the function - pass large integers like 10**20 inside quotes
+
+#### Solidity verifier: 
+
+`npx snarkjs zkey export solidityverifier *.zkey verifier.sol` in the circuit's folder
+
+to prove with solidity, the proof and publicSignals need to be supplied to the smart contract
