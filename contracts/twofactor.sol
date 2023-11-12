@@ -15,7 +15,7 @@ contract twofactor {
 
     mapping(uint256 => TwoFactorData) public twoFactorData; // 2FA ID => (boolean indicating success, timestamp, expired)
     mapping(uint256 => bytes32) public oneTimeKeyHashes; // 2FA ID => hash of one time key for 2FA request
-    mapping(address => bytes32) public userSecrets; // address => hash of 2FA secret/password
+    mapping(address => uint256) public userSecrets; // address => hash of 2FA secret/password
     mapping(uint256 => uint256) public requestIds; // 2FA ID => VRF request ID
     mapping(uint256 => uint256) public randomNumbers; // 2FA ID => random number
     mapping(uint256 => address) private requesters; // 2FA ID => address of the requester
@@ -31,8 +31,8 @@ contract twofactor {
         twoFactorData[_id] = TwoFactorData({ success: false, timestamp: block.timestamp});
     }
 
-    function requestRandomNumber(uint256 _id, bytes calldata _oneTimeKey) external {
-        require(oneTimeKeyHashes[_id] == keccak256(_oneTimeKey), "Invalid one-time key");
+    function requestRandomNumber(uint256 _id, string memory _oneTimeKey) external {
+        require(oneTimeKeyHashes[_id] == keccak256(bytes(_oneTimeKey)), "Invalid one-time key");
         require(requesters[_id] == address(0), "Random number already requested");
 
         uint256 requestId = VRF.requestRandomWords(); // Call the VRF contract
@@ -47,7 +47,7 @@ contract twofactor {
         return randomWords;
     }
 
-    function verifyProof(uint256 _id, uint256 _randomNumber, bytes32 _userSecretHash, uint[2] calldata _pA, uint[2][2] calldata _pB, uint[2] calldata _pC, uint[2] calldata _pubSignals) public {
+    function verifyProof(uint256 _id, uint256 _randomNumber, uint256 _userSecretHash, uint[2] calldata _pA, uint[2][2] calldata _pB, uint[2] calldata _pC, uint[2] calldata _pubSignals) public {
         require(msg.sender == requesters[_id], "Unauthorized");
 
         // Get the random words from VRF
@@ -59,7 +59,7 @@ contract twofactor {
 
         require(_pubSignals.length >= 2, "Insufficient public signals");
         require(_pubSignals[0] == _randomNumber, "Public signal for random number mismatch");
-        require(_pubSignals[1] == uint256(_userSecretHash), "Public signal for user secret hash mismatch");
+        require(_pubSignals[1] == _userSecretHash, "Public signal for user secret hash mismatch");
 
         bool proofVerified = verifier.verifyProof(_pA, _pB, _pC, _pubSignals); 
         require(proofVerified, "Invalid proof");
@@ -69,7 +69,7 @@ contract twofactor {
     }
 
     // User method to store their 2FA secret
-    function setSecret(bytes32 _userSecretHash) external {
+    function setSecret(uint256 _userSecretHash) external {
         userSecrets[msg.sender] = _userSecretHash;
     }
 
