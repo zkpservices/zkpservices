@@ -141,7 +141,8 @@
 
         let computedRootHash = await hashSHA256(allHashes.join(''));
         let verificationResult = rootHash === computedRootHash;
-        document.getElementById("allVerificationResult").textContent = `Verification result: ${verificationResult}`;
+        document.getElementById("allVerificationResult").textContent = `Verification result: ${verificationResult}, ${computedRootHash}`;
+
     }
 
     </script>

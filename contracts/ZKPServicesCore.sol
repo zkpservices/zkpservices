@@ -43,38 +43,71 @@ contract ZKPServicesCore is ERC20Burnable, Ownable {
         Signature signature;
     }
 
+    struct Response {
+        uint256 dataLocation;
+    }
+
+    /* 
+     CCIP | Cross-Chain Compatible Variables:
+        rsaKeys
+        obfuscatedData
+        responses
+
+    Partially Compatible Variables:
+        dataRequests
+        updateRequests
+
+            due to the fact that selected 2FA providers would 
+            need to be able to support equivalent logic and 
+            addresses on the destination chain (this is 
+            available with ZKPServicesVRF2FA but may not
+            be for others)
+
+    Incompatible Variables:
+        _2FAProviders
+        _2FAProviderOwners
+
+            these are either redundant or incompatible to 
+            sync across chains as the 2FA providers in 
+            question would need to be able to support
+            equivalent logic and addresses across chains,
+            which may not be guaranteed
+    */
+
+    //ZKP Solidity verifier
     IGroth16VerifierP2 public responseVerifier;
+
+    //CCIP compatible variables
     mapping(address => RSAKey) public rsaKeys;
-    mapping(uint256 => Data) public obfuscatedData;  
+    mapping(uint256 => Data) public obfuscatedData;
+    mapping(uint256 => Response) public responses;
+    //CCIP partially compatible variables
     mapping(uint256 => DataRequest) public dataRequests;
     mapping(uint256 => UpdateRequest) public updateRequests;
-    mapping(address => uint256) public vaultBalance;
+
+    mapping(uint256 => bool) public usedRequestIds;
+    mapping(uint256 => bool) public usedResponseIds;    
     mapping(address => ITwoFactor) public _2FAProviders;
     mapping(address => address) public _2FAProviderOwners; 
 
-
+    //note: proper tokenomics not implemented, only token utility demonstrated
     uint256 private constant TOTAL_SUPPLY = 10000000000;
-    uint256 private constant VAULT_AMOUNT = (TOTAL_SUPPLY * 99 ) / 100;
+    //99.9999% put into the vault, 0.0001% transferred to deploying wallet
+    uint256 private constant VAULT_AMOUNT = (TOTAL_SUPPLY * 999999 ) / 1000000;
 
     constructor(address _groth16Verifier) ERC20("ZKPServices", "ZKP") {
         responseVerifier = IGroth16VerifierP2(_groth16Verifier);
         _mint(msg.sender, TOTAL_SUPPLY - VAULT_AMOUNT);
         _mint(address(this), VAULT_AMOUNT);
         requestFee = 1 ether;  
-        responseFee = 1 ether; 
     }
 
     function requestVaultTokens() external {
-        vaultBalance[msg.sender] += 200;
         _transfer(address(this), msg.sender, 200);
     }
 
     function setRSAKey(string memory rsaKey) external {
         rsaKeys[msg.sender] = RSAKey(rsaKey);
-    }
-
-    function setObfuscatedData(uint256 hashedField, string memory dataHash, Signature memory signature) external {
-        obfuscatedData[hashedField] = Data(dataHash, signature);
     }
 
     function register2FAProvider(address provider) external {
@@ -97,6 +130,7 @@ contract ZKPServicesCore is ERC20Burnable, Ownable {
         address _2FAProvider,
         uint256 responseFeeAmount
     ) external {
+        require(!usedRequestIds[requestId], "This requestId has already been used.");
         require(balanceOf(msg.sender) >= requestFee, "Not enough ZKP tokens for request fee.");
         _burn(msg.sender, requestFee);
         dataRequests[requestId] = DataRequest(encryptedRequest, encryptedKey, block.timestamp + timeLimit, _2FAProvider, msg.sender, responseFeeAmount);
@@ -112,6 +146,7 @@ contract ZKPServicesCore is ERC20Burnable, Ownable {
         string memory newHash,
         Signature memory signature
     ) external {
+        require(!usedRequestIds[requestId], "This requestId has already been used.");
         require(balanceOf(msg.sender) >= requestFee, "Not enough ZKP tokens for request fee.");
         _burn(msg.sender, requestFee);
         updateRequests[requestId] = UpdateRequest(encryptedRequest, encryptedKey, block.timestamp + timeLimit, _2FAProvider, msg.sender, responseFeeAmount, newHash, signature);
@@ -127,6 +162,8 @@ contract ZKPServicesCore is ERC20Burnable, Ownable {
         uint[2] calldata _pubSignals,
         bool isUpdate
     ) external {
+        require(!usedResponseIds[requestId], "This responseId has already been used.");
+        
         uint256 requiredFee = isUpdate ? updateRequests[requestId].responseFeeAmount : dataRequests[requestId].responseFeeAmount; 
         require(balanceOf(msg.sender) >= requiredFee, "Not enough ZKP tokens for response fee.");
 
@@ -157,6 +194,9 @@ contract ZKPServicesCore is ERC20Burnable, Ownable {
         }
 
         address requester = isUpdate ? updateRequests[requestId].requester : dataRequests[requestId].requester;  
-        _transfer(msg.sender, requester, requiredFee);  
+        _transfer(msg.sender, requester, requiredFee);
+
+        usedResponseIds[requestId] = true;
+        responses[requestId] = Response({dataLocation: dataLocation});  
     }
 }
