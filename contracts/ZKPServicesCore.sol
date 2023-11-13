@@ -1,4 +1,4 @@
-pragma solidity 0.8.21;
+pragma solidity 0.8.19;
 
 import {IRouterClient} from "@chainlink/contracts-ccip/src/v0.8/ccip/interfaces/IRouterClient.sol";
 import {Client} from "@chainlink/contracts-ccip/src/v0.8/ccip/libraries/Client.sol";
@@ -25,7 +25,7 @@ import "./interfaces/IGroth16VerifierP2.sol";
                                                     
 */
 
-contract ZKPServicesCore is ERC20Burnable, Ownable {
+contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
     uint256 public requestFee;
     uint256 public responseFee;
 
@@ -115,7 +115,10 @@ contract ZKPServicesCore is ERC20Burnable, Ownable {
     //99.9999% put into the vault, 0.0001% transferred to deploying wallet
     uint256 private constant VAULT_AMOUNT = (TOTAL_SUPPLY * 999999) / 1000000;
 
-    constructor(address _groth16Verifier) ERC20("ZKPServices", "ZKP") {
+    constructor(address _groth16Verifier, address _receiverRouter)
+        ERC20("ZKPServices", "ZKP")
+        CCIPReceiver(_receiverRouter)
+    {
         responseVerifier = IGroth16VerifierP2(_groth16Verifier);
         _mint(msg.sender, TOTAL_SUPPLY - VAULT_AMOUNT);
         _mint(address(this), VAULT_AMOUNT);
@@ -284,8 +287,7 @@ contract ZKPServicesCore is ERC20Burnable, Ownable {
 
     IRouterClient public senderRouter;
     LinkTokenInterface public senderToken;
-    mapping(string => CCIPReceiver) public receivers;
-    mapping(string => uint64) public receiverDestinations;
+    mapping(string => uint64) public receivers;
     mapping(uint64 => bool) public originPolicy;
 
     function setSender(address routerAddress, address linkAddress)
@@ -296,13 +298,11 @@ contract ZKPServicesCore is ERC20Burnable, Ownable {
         senderToken = LinkTokenInterface(linkAddress);
     }
 
-    function addReceiver(
-        string calldata receiver,
-        address routerReceiverAddress,
-        uint64 destinationChain
-    ) external onlyOwner {
-        receivers[receiver] = CCIPReceiver(routerReceiverAddress);
-        receiverDestinations[receiver] = destinationChain;
+    function addReceiver(string calldata receiver, uint64 destinationChain)
+        external
+        onlyOwner
+    {
+        receivers[receiver] = destinationChain;
     }
 
     function setOriginPolicy(uint64 origin, bool policy) external onlyOwner {
@@ -318,10 +318,7 @@ contract ZKPServicesCore is ERC20Burnable, Ownable {
             senderRouter != IRouterClient(address(0)),
             "Sender not registered"
         );
-        require(
-            receivers[receiver] != CCIPReceiver(address(0)),
-            "Receiver not registered"
-        );
+        require(receivers[receiver] != 0, "Receiver not registered");
         require(
             dataTypes.length == data.length,
             "Mismatch in dataTypes and data arrays length"
@@ -345,12 +342,9 @@ contract ZKPServicesCore is ERC20Burnable, Ownable {
             senderRouter != IRouterClient(address(0)),
             "Sender not registered"
         );
-        require(
-            receivers[receiver] != CCIPReceiver(address(0)),
-            "Receiver not registered"
-        );
+        require(receivers[receiver] != 0, "Receiver not registered");
 
-        uint64 destinationChainSelector = receiverDestinations[receiver];
+        uint64 destinationChainSelector = receivers[receiver];
         require(
             destinationChainSelector != 0,
             "Destination chain not set for receiver"
@@ -403,7 +397,7 @@ contract ZKPServicesCore is ERC20Burnable, Ownable {
         }
 
         Client.EVM2AnyMessage memory evm2AnyMessage = Client.EVM2AnyMessage({
-            receiver: abi.encode(receivers[receiver]),
+            receiver: abi.encode(address(this)),
             data: dataBytes,
             tokenAmounts: new Client.EVMTokenAmount[](0),
             extraArgs: Client._argsToBytes(
@@ -417,11 +411,16 @@ contract ZKPServicesCore is ERC20Burnable, Ownable {
             evm2AnyMessage
         );
         require(
-            fees <= senderToken.balanceOf(address(this)),
+            fees <= senderToken.balanceOf(msg.sender),
             "Insufficient LINK balance"
         );
 
+        // Transfer the fees from the sender to the contract.
+        senderToken.transferFrom(msg.sender, address(this), fees);
+
+        // Approve the router to spend the contract's tokens
         senderToken.approve(address(senderRouter), fees);
+
         messageId = senderRouter.ccipSend(
             destinationChainSelector,
             evm2AnyMessage
@@ -439,10 +438,7 @@ contract ZKPServicesCore is ERC20Burnable, Ownable {
             senderRouter != IRouterClient(address(0)),
             "Sender not registered"
         );
-        require(
-            receivers[receiver] != CCIPReceiver(address(0)),
-            "Receiver not registered"
-        );
+        require(receivers[receiver] != 0, "Receiver not registered");
         require(
             dataTypes.length == data.length,
             "Mismatch in dataTypes and data arrays length"
@@ -467,12 +463,9 @@ contract ZKPServicesCore is ERC20Burnable, Ownable {
             senderRouter != IRouterClient(address(0)),
             "Sender not registered"
         );
-        require(
-            receivers[receiver] != CCIPReceiver(address(0)),
-            "Receiver not registered"
-        );
+        require(receivers[receiver] != 0, "Receiver not registered");
 
-        uint64 destinationChainSelector = receiverDestinations[receiver];
+        uint64 destinationChainSelector = receivers[receiver];
         require(
             destinationChainSelector != 0,
             "Destination chain not set for receiver"
@@ -491,10 +484,10 @@ contract ZKPServicesCore is ERC20Burnable, Ownable {
         return senderRouter.getFee(destinationChainSelector, evm2AnyMessage);
     }
 
-    function _ccipReceive(Client.Any2EVMMessage memory any2EvmMessage) public {
-        uint8 dataType = uint8(any2EvmMessage.data[0]);
-        bytes memory data = sliceBytes(any2EvmMessage.data, 1);
-
+    function _ccipReceive(Client.Any2EVMMessage memory any2EvmMessage)
+        internal
+        override
+    {
         // strictly trust messages received from trusted chains
         uint64 sourceChain = any2EvmMessage.sourceChainSelector;
         require(originPolicy[sourceChain], "source chain not trusted");
@@ -507,6 +500,9 @@ contract ZKPServicesCore is ERC20Burnable, Ownable {
             sourceChainAddress == address(this),
             "messages must originate from the same contract address on other chains"
         );
+
+        uint8 dataType = uint8(any2EvmMessage.data[0]);
+        bytes memory data = sliceBytes(any2EvmMessage.data, 1);
 
         if (dataType == 0x01) {
             // RSA key can be overwritten as we check the msg.sender requests the change in sendMessage
