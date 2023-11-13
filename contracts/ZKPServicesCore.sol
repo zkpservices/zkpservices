@@ -26,8 +26,8 @@ contract ZKPServicesCore is ERC20Burnable, Ownable {
     struct DataRequest {
         string encryptedRequest;            // AES encrypted request
         string encryptedKey;                // AES key encrypted with RSA public key of recipient
-        uint256 timeLimit;
-        address _2FAProvider;                // Address of 2FA provider
+        uint256 timeLimit;                  // Time limit in seconds for response
+        address _2FAProvider;               // Address of 2FA provider
         address requester;  
         uint256 responseFeeAmount;  
     }
@@ -35,12 +35,12 @@ contract ZKPServicesCore is ERC20Burnable, Ownable {
     struct UpdateRequest {
         string encryptedRequest;            // AES encrypted request
         string encryptedKey;                // AES key encrypted with RSA public key of recipient
+        uint256 timeLimit;                  // Time limit in seconds for response
+        address _2FAProvider;               // Address of 2FA provider
+        address requester;
+        uint256 responseFeeAmount; 
         string newHash;
         Signature signature;
-        uint256 timeLimit;
-        address _2FAProvider;                // Address of 2FA provider
-        address requester;
-        uint256 responseFeeAmount;  
     }
 
     IGroth16VerifierP2 public responseVerifier;
@@ -54,11 +54,11 @@ contract ZKPServicesCore is ERC20Burnable, Ownable {
 
 
     uint256 private constant TOTAL_SUPPLY = 10000000000;
-    uint256 private constant VAULT_AMOUNT = TOTAL_SUPPLY / 2;
+    uint256 private constant VAULT_AMOUNT = (TOTAL_SUPPLY * 99 ) / 100;
 
     constructor(address _groth16Verifier) ERC20("ZKPServices", "ZKP") {
         responseVerifier = IGroth16VerifierP2(_groth16Verifier);
-        _mint(msg.sender, VAULT_AMOUNT);
+        _mint(msg.sender, TOTAL_SUPPLY - VAULT_AMOUNT);
         _mint(address(this), VAULT_AMOUNT);
         requestFee = 1 ether;  
         responseFee = 1 ether; 
@@ -77,13 +77,13 @@ contract ZKPServicesCore is ERC20Burnable, Ownable {
         obfuscatedData[hashedField] = Data(dataHash, signature);
     }
 
-    function addTwoFAProvider(address provider) external {
+    function register2FAProvider(address provider) external {
         require(_2FAProviders[provider] == ITwoFactor(address(0)), "Provider already exists");
         _2FAProviders[provider] = ITwoFactor(provider);
         _2FAProviderOwners[provider] = msg.sender;
     }
 
-    function removeTwoFAProvider(address provider) external {
+    function deregister2FAProvider(address provider) external {
         require(msg.sender == _2FAProviderOwners[provider], "Not owner of this 2FA provider");
         delete _2FAProviders[provider];
         delete _2FAProviderOwners[provider];
@@ -103,18 +103,18 @@ contract ZKPServicesCore is ERC20Burnable, Ownable {
     }
 
     function requestUpdate(
-        uint256 dataLocation,
+        uint256 requestId,
         string memory encryptedRequest,
-        string memory newHash,
-        Signature memory signature,
-        uint256 timeLimit,
         string memory encryptedKey,
+        uint256 timeLimit,
         address _2FAProvider,
-        uint256 responseFeeAmount
+        uint256 responseFeeAmount,
+        string memory newHash,
+        Signature memory signature
     ) external {
         require(balanceOf(msg.sender) >= requestFee, "Not enough ZKP tokens for request fee.");
         _burn(msg.sender, requestFee);
-        updateRequests[dataLocation] = UpdateRequest(encryptedRequest, encryptedKey, newHash, signature, block.timestamp + timeLimit, _2FAProvider, msg.sender, responseFeeAmount);
+        updateRequests[requestId] = UpdateRequest(encryptedRequest, encryptedKey, block.timestamp + timeLimit, _2FAProvider, msg.sender, responseFeeAmount, newHash, signature);
     }
 
     function respond(
@@ -129,11 +129,11 @@ contract ZKPServicesCore is ERC20Burnable, Ownable {
     ) external {
         uint256 requiredFee = isUpdate ? updateRequests[requestId].responseFeeAmount : dataRequests[requestId].responseFeeAmount; 
         require(balanceOf(msg.sender) >= requiredFee, "Not enough ZKP tokens for response fee.");
+
         uint256 requestTimeLimit = isUpdate ? updateRequests[requestId].timeLimit : dataRequests[requestId].timeLimit;
-        address _2FAProvider = isUpdate ? updateRequests[requestId]._2FAProvider : dataRequests[requestId]._2FAProvider;
-
         require(requestTimeLimit >= block.timestamp, "Request has expired.");
-
+ 
+        address _2FAProvider = isUpdate ? updateRequests[requestId]._2FAProvider : dataRequests[requestId]._2FAProvider;
         if (_2FAProvider != address(0)) {
             ITwoFactor.TwoFactorData memory twoFactorData = ITwoFactor(_2FAProvider).twoFactorData(twoFactorId);
             require(twoFactorData.success, "2FA failed.");
