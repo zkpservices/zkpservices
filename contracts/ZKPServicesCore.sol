@@ -1,4 +1,4 @@
-pragma solidity 0.8.19;
+pragma solidity 0.8.21;
 
 import {IRouterClient} from "@chainlink/contracts-ccip/src/v0.8/ccip/interfaces/IRouterClient.sol";
 import {Client} from "@chainlink/contracts-ccip/src/v0.8/ccip/libraries/Client.sol";
@@ -30,29 +30,29 @@ contract ZKPServicesCore is ERC20Burnable, Ownable {
     uint256 public responseFee;
 
     struct RSAKey {
-        string key;                         // RSA Public Key
+        string key; // RSA Public Key
     }
 
     struct Data {
-        string dataHash;                    // SHA256 of associated data
+        string dataHash; // SHA256 of associated data
     }
 
     struct DataRequest {
-        string encryptedRequest;            // AES encrypted request
-        string encryptedKey;                // AES key encrypted with RSA public key of recipient
-        uint256 timeLimit;                  // Time limit in seconds for response
-        address _2FAProvider;               // Address of 2FA provider
-        address requester;  
-        uint256 responseFeeAmount;  
+        string encryptedRequest; // AES encrypted request
+        string encryptedKey; // AES key encrypted with RSA public key of recipient
+        uint256 timeLimit; // Time limit in seconds for response
+        address _2FAProvider; // Address of 2FA provider
+        address requester;
+        uint256 responseFeeAmount;
     }
 
     struct UpdateRequest {
-        string encryptedRequest;            // AES encrypted request
-        string encryptedKey;                // AES key encrypted with RSA public key of recipient
-        uint256 timeLimit;                  // Time limit in seconds for response
-        address _2FAProvider;               // Address of 2FA provider
+        string encryptedRequest; // AES encrypted request
+        string encryptedKey; // AES key encrypted with RSA public key of recipient
+        uint256 timeLimit; // Time limit in seconds for response
+        address _2FAProvider; // Address of 2FA provider
         address requester;
-        uint256 responseFeeAmount; 
+        uint256 responseFeeAmount;
         string newHash;
     }
 
@@ -106,20 +106,20 @@ contract ZKPServicesCore is ERC20Burnable, Ownable {
     mapping(uint256 => UpdateRequest) public updateRequests;
 
     mapping(uint256 => bool) public usedRequestIds;
-    mapping(uint256 => bool) public usedResponseIds;    
+    mapping(uint256 => bool) public usedResponseIds;
     mapping(address => ITwoFactor) public _2FAProviders;
-    mapping(address => address) public _2FAProviderOwners; 
+    mapping(address => address) public _2FAProviderOwners;
 
     //note: proper tokenomics not implemented, only token utility demonstrated
     uint256 private constant TOTAL_SUPPLY = 10000000000;
     //99.9999% put into the vault, 0.0001% transferred to deploying wallet
-    uint256 private constant VAULT_AMOUNT = (TOTAL_SUPPLY * 999999 ) / 1000000;
+    uint256 private constant VAULT_AMOUNT = (TOTAL_SUPPLY * 999999) / 1000000;
 
     constructor(address _groth16Verifier) ERC20("ZKPServices", "ZKP") {
         responseVerifier = IGroth16VerifierP2(_groth16Verifier);
         _mint(msg.sender, TOTAL_SUPPLY - VAULT_AMOUNT);
         _mint(address(this), VAULT_AMOUNT);
-        requestFee = 1 ether;  
+        requestFee = 1 ether;
     }
 
     function requestVaultTokens() external {
@@ -131,13 +131,19 @@ contract ZKPServicesCore is ERC20Burnable, Ownable {
     }
 
     function register2FAProvider(address provider) external {
-        require(_2FAProviders[provider] == ITwoFactor(address(0)), "Provider already exists");
+        require(
+            _2FAProviders[provider] == ITwoFactor(address(0)),
+            "Provider already exists"
+        );
         _2FAProviders[provider] = ITwoFactor(provider);
         _2FAProviderOwners[provider] = msg.sender;
     }
 
     function deregister2FAProvider(address provider) external {
-        require(msg.sender == _2FAProviderOwners[provider], "Not owner of this 2FA provider");
+        require(
+            msg.sender == _2FAProviderOwners[provider],
+            "Not owner of this 2FA provider"
+        );
         delete _2FAProviders[provider];
         delete _2FAProviderOwners[provider];
     }
@@ -150,12 +156,23 @@ contract ZKPServicesCore is ERC20Burnable, Ownable {
         address _2FAProvider,
         uint256 responseFeeAmount
     ) external {
-        require(!usedRequestIds[requestId], "This requestId has already been used.");
-        require(balanceOf(msg.sender) >= requestFee, "Not enough ZKP tokens for request fee.");
+        require(
+            !usedRequestIds[requestId],
+            "This requestId has already been used."
+        );
+        require(
+            balanceOf(msg.sender) >= requestFee,
+            "Not enough ZKP tokens for request fee."
+        );
         _burn(msg.sender, requestFee);
-        dataRequests[requestId] = DataRequest(encryptedRequest, encryptedKey, 
-                                                block.timestamp + timeLimit, _2FAProvider, 
-                                                msg.sender, responseFeeAmount);
+        dataRequests[requestId] = DataRequest(
+            encryptedRequest,
+            encryptedKey,
+            block.timestamp + timeLimit,
+            _2FAProvider,
+            msg.sender,
+            responseFeeAmount
+        );
     }
 
     function requestUpdate(
@@ -167,65 +184,89 @@ contract ZKPServicesCore is ERC20Burnable, Ownable {
         uint256 responseFeeAmount,
         string memory newHash
     ) external {
-        require(!usedRequestIds[requestId], "This requestId has already been used.");
-        require(balanceOf(msg.sender) >= requestFee, "Not enough ZKP tokens for request fee.");
+        require(
+            !usedRequestIds[requestId],
+            "This requestId has already been used."
+        );
+        require(
+            balanceOf(msg.sender) >= requestFee,
+            "Not enough ZKP tokens for request fee."
+        );
         _burn(msg.sender, requestFee);
-        updateRequests[requestId] = UpdateRequest(encryptedRequest, encryptedKey, 
-                                                    block.timestamp + timeLimit, _2FAProvider, 
-                                                    msg.sender, responseFeeAmount, newHash);
+        updateRequests[requestId] = UpdateRequest(
+            encryptedRequest,
+            encryptedKey,
+            block.timestamp + timeLimit,
+            _2FAProvider,
+            msg.sender,
+            responseFeeAmount,
+            newHash
+        );
     }
 
     function respond(
         uint256 requestId,
         uint256 twoFactorId,
         uint256 dataLocation,
-        uint[2] calldata _pA,
-        uint[2][2] calldata _pB,
-        uint[2] calldata _pC,
-        uint[2] calldata _pubSignals,
+        uint256[2] calldata _pA,
+        uint256[2][2] calldata _pB,
+        uint256[2] calldata _pC,
+        uint256[2] calldata _pubSignals,
         bool isUpdate
     ) external {
-        require(!usedResponseIds[requestId], "This responseId has already been used.");
-        
-        uint256 requiredFee = isUpdate ? updateRequests[requestId].responseFeeAmount : 
-                                            dataRequests[requestId].responseFeeAmount; 
-        require(balanceOf(msg.sender) >= requiredFee, "Not enough ZKP tokens for response fee.");
+        require(
+            !usedResponseIds[requestId],
+            "This responseId has already been used."
+        );
 
-        uint256 requestTimeLimit = isUpdate ? updateRequests[requestId].timeLimit : 
-                                                dataRequests[requestId].timeLimit;
+        uint256 requiredFee = isUpdate
+            ? updateRequests[requestId].responseFeeAmount
+            : dataRequests[requestId].responseFeeAmount;
+        require(
+            balanceOf(msg.sender) >= requiredFee,
+            "Not enough ZKP tokens for response fee."
+        );
+
+        uint256 requestTimeLimit = isUpdate
+            ? updateRequests[requestId].timeLimit
+            : dataRequests[requestId].timeLimit;
         require(requestTimeLimit >= block.timestamp, "Request has expired.");
- 
-        address _2FAProvider = isUpdate ? updateRequests[requestId]._2FAProvider : 
-                                            dataRequests[requestId]._2FAProvider;
+
+        address _2FAProvider = isUpdate
+            ? updateRequests[requestId]._2FAProvider
+            : dataRequests[requestId]._2FAProvider;
         if (_2FAProvider != address(0)) {
-            ITwoFactor.TwoFactorData memory twoFactorData = 
-                ITwoFactor(_2FAProvider).twoFactorData(twoFactorId);
+            ITwoFactor.TwoFactorData memory twoFactorData = ITwoFactor(
+                _2FAProvider
+            ).twoFactorData(twoFactorId);
             require(twoFactorData.success, "2FA failed.");
         }
 
         require(
             _pubSignals[0] == requestId &&
-            _pubSignals[1] == dataLocation &&
-            responseVerifier.verifyProof(_pA, _pB, _pC, _pubSignals),
+                _pubSignals[1] == dataLocation &&
+                responseVerifier.verifyProof(_pA, _pB, _pC, _pubSignals),
             "ZKP verification failed."
         );
 
         require(
-            keccak256(bytes(obfuscatedData[dataLocation].dataHash)) == 
-            keccak256(bytes(string(abi.encodePacked(_pubSignals[1])))),
+            keccak256(bytes(obfuscatedData[dataLocation].dataHash)) ==
+                keccak256(bytes(string(abi.encodePacked(_pubSignals[1])))),
             "Mismatched data hash."
         );
 
         if (isUpdate) {
-            obfuscatedData[dataLocation].dataHash = updateRequests[requestId].newHash;
+            obfuscatedData[dataLocation].dataHash = updateRequests[requestId]
+                .newHash;
         }
 
-        address requester = isUpdate ? updateRequests[requestId].requester : 
-                                        dataRequests[requestId].requester;  
+        address requester = isUpdate
+            ? updateRequests[requestId].requester
+            : dataRequests[requestId].requester;
         _transfer(msg.sender, requester, requiredFee);
 
         usedResponseIds[requestId] = true;
-        responses[requestId] = Response({dataLocation: dataLocation});  
+        responses[requestId] = Response({dataLocation: dataLocation});
     }
 
 /*
@@ -239,38 +280,131 @@ contract ZKPServicesCore is ERC20Burnable, Ownable {
     |  $$$$$$/|  $$$$$$/ /$$$$$$| $$      
      \______/  \______/ |______/|__/      
                                         
-*/                                     
-                                      
+*/
+
     IRouterClient public senderRouter;
     LinkTokenInterface public senderToken;
     mapping(string => CCIPReceiver) public receivers;
     mapping(string => uint64) public receiverDestinations;
+    mapping(uint64 => bool) public originPolicy;
 
-    function setSender(address routerAddress, address linkAddress) 
-    external onlyOwner {
+    function setSender(address routerAddress, address linkAddress)
+        external
+        onlyOwner
+    {
         senderRouter = IRouterClient(routerAddress);
         senderToken = LinkTokenInterface(linkAddress);
     }
 
-    function addReceiver(string calldata receiver, address routerReceiverAddress, uint64 destinationChain) 
-    external onlyOwner {
+    function addReceiver(
+        string calldata receiver,
+        address routerReceiverAddress,
+        uint64 destinationChain
+    ) external onlyOwner {
         receivers[receiver] = CCIPReceiver(routerReceiverAddress);
-        receiverDestinations[receiver] = destinationChain; 
+        receiverDestinations[receiver] = destinationChain;
     }
 
-    function sendMessage(
-        string memory receiver,
-        string calldata text
-    ) external onlyOwner returns (bytes32 messageId) {
-        require(senderRouter != IRouterClient(address(0)), "Sender not registered");
-        require(receivers[receiver] != CCIPReceiver(address(0)), "Receiver not registered");
+    function setOriginPolicy(uint64 origin, bool policy) external onlyOwner {
+        originPolicy[origin] = policy;
+    }
 
-        uint64 destinationChainSelector = receiverDestinations[receiver]; 
-        require(destinationChainSelector != 0, "Destination chain not set for receiver");
+    function sendMultipleMessages(
+        string memory receiver,
+        bytes[] memory dataTypes,
+        bytes[] memory data
+    ) public returns (bytes32 messageId) {
+        require(
+            senderRouter != IRouterClient(address(0)),
+            "Sender not registered"
+        );
+        require(
+            receivers[receiver] != CCIPReceiver(address(0)),
+            "Receiver not registered"
+        );
+        require(
+            dataTypes.length == data.length,
+            "Mismatch in dataTypes and data arrays length"
+        );
+
+        bytes memory combinedData;
+
+        for (uint256 i = 0; i < data.length; i++) {
+            bytes memory currentData = abi.encodePacked(dataTypes[i], data[i]);
+            combinedData = abi.encodePacked(combinedData, currentData);
+        }
+
+        return sendMessage(receiver, combinedData);
+    }
+
+    function sendMessage(string memory receiver, bytes memory dataBytes)
+        public
+        returns (bytes32 messageId)
+    {
+        require(
+            senderRouter != IRouterClient(address(0)),
+            "Sender not registered"
+        );
+        require(
+            receivers[receiver] != CCIPReceiver(address(0)),
+            "Receiver not registered"
+        );
+
+        uint64 destinationChainSelector = receiverDestinations[receiver];
+        require(
+            destinationChainSelector != 0,
+            "Destination chain not set for receiver"
+        );
+
+        uint8 dataType = uint8(dataBytes[0]);
+        bytes memory data = sliceBytes(dataBytes, 1);
+
+        // verification that data being sent from this contract is not spurious
+        if (dataType == 0x01) {
+            (address key, RSAKey memory rsaKey) = decodeRSAKey(data);
+            require(msg.sender == key, "Sender must be the RSA key");
+            require(
+                keccak256(abi.encode(rsaKeys[key])) ==
+                    keccak256(abi.encode(rsaKey)),
+                "Mismatch between data key and data"
+            );
+        } else if (dataType == 0x02) {
+            (uint256 key, Data memory dataStruct) = decodeData(data);
+            require(
+                keccak256(abi.encode(obfuscatedData[key])) ==
+                    keccak256(abi.encode(dataStruct)),
+                "Mismatch between data and mapping"
+            );
+        } else if (dataType == 0x03) {
+            (uint256 key, DataRequest memory request) = decodeDataRequest(data);
+            require(
+                keccak256(abi.encode(dataRequests[key])) ==
+                    keccak256(abi.encode(request)),
+                "Mismatch between data request and mapping"
+            );
+        } else if (dataType == 0x04) {
+            (uint256 key, UpdateRequest memory request) = decodeUpdateRequest(
+                data
+            );
+            require(
+                keccak256(abi.encode(updateRequests[key])) ==
+                    keccak256(abi.encode(request)),
+                "Mismatch between update request and mapping"
+            );
+        } else if (dataType == 0x05) {
+            (uint256 key, Response memory response) = decodeResponse(data);
+            require(
+                keccak256(abi.encode(responses[key])) ==
+                    keccak256(abi.encode(response)),
+                "Mismatch between response and mapping"
+            );
+        } else {
+            revert("Invalid dataType");
+        }
 
         Client.EVM2AnyMessage memory evm2AnyMessage = Client.EVM2AnyMessage({
             receiver: abi.encode(receivers[receiver]),
-            data: abi.encode(text),
+            data: dataBytes,
             tokenAmounts: new Client.EVMTokenAmount[](0),
             extraArgs: Client._argsToBytes(
                 Client.EVMExtraArgsV1({gasLimit: 200_000, strict: false})
@@ -278,24 +412,75 @@ contract ZKPServicesCore is ERC20Burnable, Ownable {
             feeToken: address(senderToken)
         });
 
-        uint256 fees = senderRouter.getFee(destinationChainSelector, evm2AnyMessage);
-        require(fees <= senderToken.balanceOf(address(this)), "Insufficient LINK balance");
+        uint256 fees = senderRouter.getFee(
+            destinationChainSelector,
+            evm2AnyMessage
+        );
+        require(
+            fees <= senderToken.balanceOf(address(this)),
+            "Insufficient LINK balance"
+        );
 
         senderToken.approve(address(senderRouter), fees);
-        messageId = senderRouter.ccipSend(destinationChainSelector, evm2AnyMessage);
+        messageId = senderRouter.ccipSend(
+            destinationChainSelector,
+            evm2AnyMessage
+        );
 
         return messageId;
     }
 
-    function calculateRequestFees(
-        uint64 destinationChainSelector,
-        string calldata text
-    ) external view returns (uint256) {
-        require(senderRouter != IRouterClient(address(0)), "Sender not registered");
+    function estimateMultipleMessagesFees(
+        string memory receiver,
+        bytes[] memory dataTypes,
+        bytes[] memory data
+    ) public view returns (uint256 totalFees) {
+        require(
+            senderRouter != IRouterClient(address(0)),
+            "Sender not registered"
+        );
+        require(
+            receivers[receiver] != CCIPReceiver(address(0)),
+            "Receiver not registered"
+        );
+        require(
+            dataTypes.length == data.length,
+            "Mismatch in dataTypes and data arrays length"
+        );
+
+        totalFees = 0;
+
+        for (uint256 i = 0; i < data.length; i++) {
+            bytes memory currentData = abi.encodePacked(dataTypes[i], data[i]);
+            totalFees = totalFees + estimateMessageFee(receiver, currentData);
+        }
+
+        return totalFees;
+    }
+
+    function estimateMessageFee(string memory receiver, bytes memory dataBytes)
+        public
+        view
+        returns (uint256)
+    {
+        require(
+            senderRouter != IRouterClient(address(0)),
+            "Sender not registered"
+        );
+        require(
+            receivers[receiver] != CCIPReceiver(address(0)),
+            "Receiver not registered"
+        );
+
+        uint64 destinationChainSelector = receiverDestinations[receiver];
+        require(
+            destinationChainSelector != 0,
+            "Destination chain not set for receiver"
+        );
 
         Client.EVM2AnyMessage memory evm2AnyMessage = Client.EVM2AnyMessage({
-            receiver: abi.encode(address(0)),
-            data: abi.encode(text),
+            receiver: abi.encode(receivers[receiver]),
+            data: dataBytes,
             tokenAmounts: new Client.EVMTokenAmount[](0),
             extraArgs: Client._argsToBytes(
                 Client.EVMExtraArgsV1({gasLimit: 200_000, strict: false})
@@ -306,11 +491,131 @@ contract ZKPServicesCore is ERC20Burnable, Ownable {
         return senderRouter.getFee(destinationChainSelector, evm2AnyMessage);
     }
 
-    bytes32 private lastReceivedMessageId;
-    string private lastReceivedText;
+    function _ccipReceive(Client.Any2EVMMessage memory any2EvmMessage) public {
+        uint8 dataType = uint8(any2EvmMessage.data[0]);
+        bytes memory data = sliceBytes(any2EvmMessage.data, 1);
 
-    function _ccipReceive(Client.Any2EVMMessage memory any2EvmMessage) internal {
-        lastReceivedMessageId = any2EvmMessage.messageId;
-        lastReceivedText = abi.decode(any2EvmMessage.data, (string));
+        // strictly trust messages received from trusted chains
+        uint64 sourceChain = any2EvmMessage.sourceChainSelector;
+        require(originPolicy[sourceChain], "source chain not trusted");
+        // strictly trust the the contract with the exact same address as this one (deployed by same wallet with same nonce)
+        address sourceChainAddress = abi.decode(
+            any2EvmMessage.sender,
+            (address)
+        );
+        require(
+            sourceChainAddress == address(this),
+            "messages must originate from the same contract address on other chains"
+        );
+
+        if (dataType == 0x01) {
+            // RSA key can be overwritten as we check the msg.sender requests the change in sendMessage
+            (address key, RSAKey memory rsaKey) = decodeRSAKey(data);
+            rsaKeys[key] = rsaKey;
+        } else if (dataType == 0x02) {
+            (uint256 key, Data memory dataStruct) = decodeData(data);
+            require(
+                bytes(obfuscatedData[key].dataHash).length == 0,
+                "Key already in use"
+            );
+            obfuscatedData[key] = dataStruct;
+        } else if (dataType == 0x03) {
+            (uint256 key, DataRequest memory request) = decodeDataRequest(data);
+            require(
+                bytes(dataRequests[key].encryptedRequest).length == 0,
+                "Key already in use"
+            );
+            dataRequests[key] = request;
+        } else if (dataType == 0x04) {
+            (uint256 key, UpdateRequest memory request) = decodeUpdateRequest(
+                data
+            );
+            require(
+                bytes(updateRequests[key].encryptedRequest).length == 0,
+                "Key already in use"
+            );
+            updateRequests[key] = request;
+        } else if (dataType == 0x05) {
+            (uint256 key, Response memory response) = decodeResponse(data);
+            require(responses[key].dataLocation == 0, "Key already in use");
+            responses[key] = response;
+        }
+    }
+
+    function encodeRSAKey(address key) public view returns (bytes memory) {
+        return abi.encode(key, rsaKeys[key]);
+    }
+
+    function encodeData(uint256 key) public view returns (bytes memory) {
+        return abi.encode(key, obfuscatedData[key]);
+    }
+
+    function encodeDataRequest(uint256 key) public view returns (bytes memory) {
+        return abi.encode(key, dataRequests[key]);
+    }
+
+    function encodeUpdateRequest(uint256 key)
+        public
+        view
+        returns (bytes memory)
+    {
+        return abi.encode(key, updateRequests[key]);
+    }
+
+    function encodeResponse(uint256 key) public view returns (bytes memory) {
+        return abi.encode(key, responses[key]);
+    }
+
+    function decodeRSAKey(bytes memory encodedData)
+        public
+        pure
+        returns (address, RSAKey memory)
+    {
+        return abi.decode(encodedData, (address, RSAKey));
+    }
+
+    function decodeData(bytes memory encodedData)
+        public
+        pure
+        returns (uint256, Data memory)
+    {
+        return abi.decode(encodedData, (uint256, Data));
+    }
+
+    function decodeDataRequest(bytes memory encodedData)
+        public
+        pure
+        returns (uint256, DataRequest memory)
+    {
+        return abi.decode(encodedData, (uint256, DataRequest));
+    }
+
+    function decodeUpdateRequest(bytes memory encodedData)
+        public
+        pure
+        returns (uint256, UpdateRequest memory)
+    {
+        return abi.decode(encodedData, (uint256, UpdateRequest));
+    }
+
+    function decodeResponse(bytes memory encodedData)
+        public
+        pure
+        returns (uint256, Response memory)
+    {
+        return abi.decode(encodedData, (uint256, Response));
+    }
+
+    function sliceBytes(bytes memory _bytes, uint256 start)
+        internal
+        pure
+        returns (bytes memory)
+    {
+        uint256 length = _bytes.length - start;
+        bytes memory slicedBytes = new bytes(length);
+        for (uint256 i = 0; i < length; i++) {
+            slicedBytes[i] = _bytes[i + start];
+        }
+        return slicedBytes;
     }
 }
