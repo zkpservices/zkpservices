@@ -1,4 +1,4 @@
-# README.md: ZKPServicesCore
+# ZKPServicesCore
 
 ## Overview
 ZKPServicesCore is a robust smart contract built on the Ethereum platform, written in Solidity ^0.8.7. The contract serves as an advanced data management system leveraging cryptographic proofs and two-factor authentication mechanisms. It blends the power of decentralized platforms with RSA and AES encryption techniques, providing a secure medium to request, update, and validate obfuscated data.
