@@ -5,7 +5,6 @@ import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 import "@chainlink/contracts/src/v0.8/ConfirmedOwner.sol";
 
 contract VRF is VRFConsumerBaseV2, ConfirmedOwner {
-
     mapping(address => bool) public authorized;
 
     modifier onlyAuthorized() {
@@ -26,8 +25,7 @@ contract VRF is VRFConsumerBaseV2, ConfirmedOwner {
         uint256[] randomWords;
     }
 
-    mapping(uint256 => RequestStatus)
-        public s_requests; /* requestId --> requestStatus */
+    mapping(uint256 => RequestStatus) public s_requests; /* requestId --> requestStatus */
     VRFCoordinatorV2Interface COORDINATOR;
 
     uint64 s_subscriptionId;
@@ -42,9 +40,7 @@ contract VRF is VRFConsumerBaseV2, ConfirmedOwner {
     uint16 requestConfirmations = 1;
     uint32 numWords = 1;
 
-    constructor(
-        uint64 subscriptionId
-    )
+    constructor(uint64 subscriptionId)
         VRFConsumerBaseV2(0xbd13f08b8352A3635218ab9418E340c60d6Eb418)
         ConfirmedOwner(msg.sender)
     {
@@ -88,9 +84,11 @@ contract VRF is VRFConsumerBaseV2, ConfirmedOwner {
         emit RequestFulfilled(_requestId, _randomWords);
     }
 
-    function getRequestStatus(
-        uint256 _requestId
-    ) external view returns (bool fulfilled, uint256[] memory randomWords) {
+    function getRequestStatus(uint256 _requestId)
+        external
+        view
+        returns (bool fulfilled, uint256[] memory randomWords)
+    {
         require(s_requests[_requestId].exists, "request not found");
         RequestStatus memory request = s_requests[_requestId];
         return (request.fulfilled, request.randomWords);

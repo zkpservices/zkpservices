@@ -4,7 +4,6 @@ import "../interfaces/IVRF.sol";
 import "../interfaces/IGroth16VerifierP2.sol";
 
 contract ZKPServicesVRF2FA {
-
     IVRF private vrf;
     IGroth16VerifierP2 private responseVerifier;
     IGroth16VerifierP2 private passwordChangeVerifier;
@@ -20,21 +19,38 @@ contract ZKPServicesVRF2FA {
     mapping(uint256 => uint256) public requestIds; // 2FA ID => VRF request ID
     mapping(uint256 => address) private requesters; // 2FA ID => address of the requester
 
-    constructor(address _vrfAddress, address _responseVerifierAddress, address _passwordChangeVerifierAddress) { 
+    constructor(
+        address _vrfAddress,
+        address _responseVerifierAddress,
+        address _passwordChangeVerifierAddress
+    ) {
         vrf = IVRF(_vrfAddress);
-        responseVerifier = IGroth16VerifierP2(_responseVerifierAddress); 
-        passwordChangeVerifier = IGroth16VerifierP2(_passwordChangeVerifierAddress);
+        responseVerifier = IGroth16VerifierP2(_responseVerifierAddress);
+        passwordChangeVerifier = IGroth16VerifierP2(
+            _passwordChangeVerifierAddress
+        );
     }
 
     function generate2FA(uint256 _id, bytes32 _oneTimeKeyHash) external {
         require(twoFactorData[_id].timestamp == 0, "2FA ID already used");
         oneTimeKeyHashes[_id] = _oneTimeKeyHash;
-        twoFactorData[_id] = TwoFactorData({ success: false, timestamp: block.timestamp});
+        twoFactorData[_id] = TwoFactorData({
+            success: false,
+            timestamp: block.timestamp
+        });
     }
 
-    function requestRandomNumber(uint256 _id, string memory _oneTimeKey) external {
-        require(oneTimeKeyHashes[_id] == keccak256(bytes(_oneTimeKey)), "Invalid one-time key");
-        require(requesters[_id] == address(0), "Random number already requested");
+    function requestRandomNumber(uint256 _id, string memory _oneTimeKey)
+        external
+    {
+        require(
+            oneTimeKeyHashes[_id] == keccak256(bytes(_oneTimeKey)),
+            "Invalid one-time key"
+        );
+        require(
+            requesters[_id] == address(0),
+            "Random number already requested"
+        );
 
         uint256 requestId = vrf.requestRandomWords(); // Call the VRF contract
         requestIds[_id] = requestId; // Store the request ID
@@ -43,26 +59,50 @@ contract ZKPServicesVRF2FA {
 
     function getRandomNumber(uint256 _id) public view returns (uint256) {
         uint256 requestId = requestIds[_id];
-        (bool fulfilled, uint256[] memory randomWords) = vrf.getRequestStatus(requestId);
+        (bool fulfilled, uint256[] memory randomWords) = vrf.getRequestStatus(
+            requestId
+        );
         require(fulfilled, "Random words not yet fulfilled");
         require(randomWords.length > 0, "No random words returned");
-        
+
         uint224 truncatedRandomNumber = uint224(randomWords[0]); // Truncate to 224 bits
         return uint256(truncatedRandomNumber); // Convert back to uint256
     }
 
-    function verifyProof(uint256 _id, uint256 _randomNumber, uint256 _userSecretHash, uint[2] calldata _pA, uint[2][2] calldata _pB, uint[2] calldata _pC, uint[2] calldata _pubSignals) public {
+    function verifyProof(
+        uint256 _id,
+        uint256 _randomNumber,
+        uint256 _userSecretHash,
+        uint256[2] calldata _pA,
+        uint256[2][2] calldata _pB,
+        uint256[2] calldata _pC,
+        uint256[2] calldata _pubSignals
+    ) public {
         require(msg.sender == requesters[_id], "Unauthorized");
         require(_pubSignals.length == 2, "Invalid public signals length");
 
         // Get the truncated random number from VRF
         uint256 randomNumber = getRandomNumber(_id);
         require(randomNumber == _randomNumber, "Invalid random number");
-        require(userSecrets[msg.sender] == _userSecretHash, "Invalid user secret");
-        require(_pubSignals[0] == _randomNumber, "Public signal for random number mismatch");
-        require(_pubSignals[1] == _userSecretHash, "Public signal for user secret hash mismatch");
+        require(
+            userSecrets[msg.sender] == _userSecretHash,
+            "Invalid user secret"
+        );
+        require(
+            _pubSignals[0] == _randomNumber,
+            "Public signal for random number mismatch"
+        );
+        require(
+            _pubSignals[1] == _userSecretHash,
+            "Public signal for user secret hash mismatch"
+        );
 
-        bool proofVerified = responseVerifier.verifyProof(_pA, _pB, _pC, _pubSignals);
+        bool proofVerified = responseVerifier.verifyProof(
+            _pA,
+            _pB,
+            _pC,
+            _pubSignals
+        );
         require(proofVerified, "Invalid proof");
 
         twoFactorData[_id].success = true;
@@ -78,13 +118,34 @@ contract ZKPServicesVRF2FA {
     // A Zero-Knowledge Proof (ZKP) is required to ensure secure secret update.
     // If a user's account is compromised, the ZKP prevents the attacker from updating the user's secret without knowledge of the existing secret.
     // Thus, ZKP provides an extra layer of security and privacy to users during secret update, making the process robust against potential attacks.
-    function updateSecret(uint256 _oldSecretHash, uint256 _newSecretHash, uint[2] calldata _pA, uint[2][2] calldata _pB, uint[2] calldata _pC, uint[2] calldata _pubSignals) external {
+    function updateSecret(
+        uint256 _oldSecretHash,
+        uint256 _newSecretHash,
+        uint256[2] calldata _pA,
+        uint256[2][2] calldata _pB,
+        uint256[2] calldata _pC,
+        uint256[2] calldata _pubSignals
+    ) external {
         require(_pubSignals.length == 2, "Invalid public signals length");
-        require(userSecrets[msg.sender] == _oldSecretHash, "Invalid old secret");
-        require(_pubSignals[0] == _oldSecretHash, "Public signal for old secret hash mismatch");
-        require(_pubSignals[1] == _newSecretHash, "Public signal for new secret hash mismatch");
+        require(
+            userSecrets[msg.sender] == _oldSecretHash,
+            "Invalid old secret"
+        );
+        require(
+            _pubSignals[0] == _oldSecretHash,
+            "Public signal for old secret hash mismatch"
+        );
+        require(
+            _pubSignals[1] == _newSecretHash,
+            "Public signal for new secret hash mismatch"
+        );
 
-        bool proofVerified = passwordChangeVerifier.verifyProof(_pA, _pB, _pC, _pubSignals);
+        bool proofVerified = passwordChangeVerifier.verifyProof(
+            _pA,
+            _pB,
+            _pC,
+            _pubSignals
+        );
         require(proofVerified, "Invalid proof");
 
         // update the user's secret

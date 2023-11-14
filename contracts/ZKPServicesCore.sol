@@ -125,15 +125,15 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
         requestFee = 1 ether;
     }
 
-    function requestVaultTokens() external {
+    function requestVaultTokens() public {
         _transfer(address(this), msg.sender, 200);
     }
 
-    function setRSAKey(string memory rsaKey) external {
+    function setRSAKey(string memory rsaKey) public {
         rsaKeys[msg.sender] = RSAKey(rsaKey);
     }
 
-    function register2FAProvider(address provider) external {
+    function register2FAProvider(address provider) public {
         require(
             _2FAProviders[provider] == ITwoFactor(address(0)),
             "Provider already exists"
@@ -142,7 +142,7 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
         _2FAProviderOwners[provider] = msg.sender;
     }
 
-    function deregister2FAProvider(address provider) external {
+    function deregister2FAProvider(address provider) public {
         require(
             msg.sender == _2FAProviderOwners[provider],
             "Not owner of this 2FA provider"
@@ -158,7 +158,7 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
         uint256 timeLimit,
         address _2FAProvider,
         uint256 responseFeeAmount
-    ) external {
+    ) public {
         require(
             !usedRequestIds[requestId],
             "This requestId has already been used."
@@ -186,7 +186,7 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
         address _2FAProvider,
         uint256 responseFeeAmount,
         string memory newHash
-    ) external {
+    ) public {
         require(
             !usedRequestIds[requestId],
             "This requestId has already been used."
@@ -216,7 +216,7 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
         uint256[2] calldata _pC,
         uint256[2] calldata _pubSignals,
         bool isUpdate
-    ) external {
+    ) public {
         require(
             !usedResponseIds[requestId],
             "This responseId has already been used."
@@ -291,7 +291,7 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
     mapping(uint64 => bool) public originPolicy;
 
     function setSender(address routerAddress, address linkAddress)
-        external
+        public
         onlyOwner
     {
         senderRouter = IRouterClient(routerAddress);
@@ -299,13 +299,13 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
     }
 
     function addReceiver(string calldata receiver, uint64 destinationChain)
-        external
+        public
         onlyOwner
     {
         receivers[receiver] = destinationChain;
     }
 
-    function setOriginPolicy(uint64 origin, bool policy) external onlyOwner {
+    function setOriginPolicy(uint64 origin, bool policy) public onlyOwner {
         originPolicy[origin] = policy;
     }
 
