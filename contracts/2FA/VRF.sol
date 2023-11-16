@@ -26,27 +26,27 @@ contract VRF is VRFConsumerBaseV2, ConfirmedOwner {
     }
 
     mapping(uint256 => RequestStatus) public s_requests; /* requestId --> requestStatus */
-    VRFCoordinatorV2Interface COORDINATOR;
+    VRFCoordinatorV2Interface public COORDINATOR;
 
-    uint64 s_subscriptionId;
+    uint64 public s_subscriptionId;
 
     uint256[] public requestIds;
     uint256 public lastRequestId;
-
-    bytes32 keyHash =
-        0x121a143066e0f2f08b620784af77cccb35c6242460b4a8ee251b4b416abaebd4;
+    bytes32 public keyHash;
 
     uint32 callbackGasLimit = 100000;
-    uint16 requestConfirmations = 1;
-    uint32 numWords = 1;
+    uint16 public requestConfirmations;
+    uint32 public numWords = 1;
 
-    constructor(uint64 subscriptionId)
-        VRFConsumerBaseV2(0xbd13f08b8352A3635218ab9418E340c60d6Eb418)
-        ConfirmedOwner(msg.sender)
-    {
-        COORDINATOR = VRFCoordinatorV2Interface(
-            0xbd13f08b8352A3635218ab9418E340c60d6Eb418
-        );
+    constructor(
+        bytes32 _keyHash,
+        uint64 subscriptionId,
+        address vrfCoordinator,
+        uint16 minimumConfirmations
+    ) VRFConsumerBaseV2(vrfCoordinator) ConfirmedOwner(msg.sender) {
+        keyHash = _keyHash;
+        COORDINATOR = VRFCoordinatorV2Interface(vrfCoordinator);
+        requestConfirmations = minimumConfirmations;
         s_subscriptionId = subscriptionId;
         authorized[msg.sender] = true;
     }

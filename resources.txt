@@ -18,16 +18,19 @@ chainlink variables:
 
 fantom testnet keyhash: 0x121a143066e0f2f08b620784af77cccb35c6242460b4a8ee251b4b416abaebd4
 fantom testnet VRF coordinator: 0xbd13f08b8352A3635218ab9418E340c60d6Eb418
+fantom testnet VRF minimum confirmations: 1
 fantom testnet LINK address: 0xfaFedb041c0DD4fA2Dc0d87a6B0979Ee6FA7af5F
 
 avalanche fuji keyhash: 0x354d2f95da55398f44b7cff77da56283d9c6c829a4bdf1bbcaf2ad6a4d081f61
 avalanche fuji VRF coordinator:0x2eD832Ba664535e5886b75D64C46EB9a228C2610
+avalanche fuji VRF minimum confirmations: 1
 avalanche fuji router address: 0x554472a2720E5E7D5D3C817529aBA05EEd5F82D8
 avalanche fuji chain selector: 14767482510784806043
 avalanche fuji LINK address: 0x0b9d5D9136855f6FEc3c0993feE6E9CE8a297846
 
 polygon mumbai keyhash: 0x4b09e658ed251bcafeebbc69400383d49f344ace09b9576fe248bb02c003fe9f
 polygon mumbai VRF coordinator: 0x7a1BaC17Ccc5b313516C5E16fb24f7659aA5ebed
+polygon mumbai VRF minimum confirmations: 3
 polygon mumbai router address: 0x70499c328e1E2a3c41108bd3730F6670a44595D1
 polygon mumbai chain selector: 12532609583862916517
 polygon mumbai LINK address: 0x326C977E6efc84E512bB9C30f76E30c160eD06FB
