@@ -111,7 +111,7 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
     mapping(address => address) public _2FAProviderOwners;
 
     //note: proper tokenomics not implemented, only token utility demonstrated
-    uint256 private constant TOTAL_SUPPLY = 10000000000;
+    uint256 private constant TOTAL_SUPPLY = 10000000000 * 10**18;
     //99.9999% put into the vault, 0.0001% transferred to deploying wallet
     uint256 private constant VAULT_AMOUNT = (TOTAL_SUPPLY * 999999) / 1000000;
 
@@ -122,11 +122,11 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
         responseVerifier = IGroth16VerifierP2(_coreResponseVerifierAddress);
         _mint(msg.sender, TOTAL_SUPPLY - VAULT_AMOUNT);
         _mint(address(this), VAULT_AMOUNT);
-        requestFee = 1 ether;
+        requestFee = 1 * 10**18;
     }
 
     function requestVaultTokens() public {
-        _transfer(address(this), msg.sender, 200);
+        _transfer(address(this), msg.sender, 200 * 10**18);
     }
 
     function setRSAKey(string memory rsaKey) public {

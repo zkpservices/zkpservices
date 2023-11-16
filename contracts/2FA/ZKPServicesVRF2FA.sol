@@ -79,6 +79,7 @@ contract ZKPServicesVRF2FA {
         uint256[2] calldata _pubSignals
     ) public {
         require(msg.sender == requesters[_id], "Unauthorized");
+        require(userSecrets[msg.sender] != 0, "User secret has not been set");
         require(_pubSignals.length == 2, "Invalid public signals length");
 
         // Get the truncated random number from VRF
@@ -111,6 +112,10 @@ contract ZKPServicesVRF2FA {
 
     // User method to store initialize 2FA secret
     function setSecret(uint256 _userSecretHash) external {
+        require(
+            userSecrets[msg.sender] == 0,
+            "User secret already set, use updateSecret instead"
+        );
         userSecrets[msg.sender] = _userSecretHash;
     }
 
