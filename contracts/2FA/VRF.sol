@@ -40,14 +40,14 @@ contract VRF is VRFConsumerBaseV2, ConfirmedOwner {
 
     constructor(
         bytes32 _keyHash,
-        uint64 subscriptionId,
-        address vrfCoordinator,
-        uint16 minimumConfirmations
-    ) VRFConsumerBaseV2(vrfCoordinator) ConfirmedOwner(msg.sender) {
+        uint64 _subscriptionId,
+        address _vrfCoordinator,
+        uint16 _minimumConfirmations
+    ) VRFConsumerBaseV2(_vrfCoordinator) ConfirmedOwner(msg.sender) {
         keyHash = _keyHash;
-        COORDINATOR = VRFCoordinatorV2Interface(vrfCoordinator);
-        requestConfirmations = minimumConfirmations;
-        s_subscriptionId = subscriptionId;
+        COORDINATOR = VRFCoordinatorV2Interface(_vrfCoordinator);
+        requestConfirmations = _minimumConfirmations;
+        s_subscriptionId = _subscriptionId;
         authorized[msg.sender] = true;
     }
 

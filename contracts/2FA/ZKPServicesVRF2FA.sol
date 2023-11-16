@@ -21,13 +21,13 @@ contract ZKPServicesVRF2FA {
 
     constructor(
         address _vrfAddress,
-        address _responseVerifierAddress,
-        address _passwordChangeVerifierAddress
+        address _vrf2FAResponseVerifierAddress,
+        address _vrf2FAPasswordChangeVerifierAddress
     ) {
         vrf = IVRF(_vrfAddress);
-        responseVerifier = IGroth16VerifierP2(_responseVerifierAddress);
+        responseVerifier = IGroth16VerifierP2(_vrf2FAResponseVerifierAddress);
         passwordChangeVerifier = IGroth16VerifierP2(
-            _passwordChangeVerifierAddress
+            _vrf2FAPasswordChangeVerifierAddress
         );
     }
 

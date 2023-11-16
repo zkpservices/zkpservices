@@ -115,11 +115,11 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
     //99.9999% put into the vault, 0.0001% transferred to deploying wallet
     uint256 private constant VAULT_AMOUNT = (TOTAL_SUPPLY * 999999) / 1000000;
 
-    constructor(address _groth16Verifier, address _receiverRouter)
+    constructor(address _coreResponseVerifierAddress, address _CCIPReceiverRouterAddress)
         ERC20("ZKPServices", "ZKP")
-        CCIPReceiver(_receiverRouter)
+        CCIPReceiver(_CCIPReceiverRouterAddress)
     {
-        responseVerifier = IGroth16VerifierP2(_groth16Verifier);
+        responseVerifier = IGroth16VerifierP2(_coreResponseVerifierAddress);
         _mint(msg.sender, TOTAL_SUPPLY - VAULT_AMOUNT);
         _mint(address(this), VAULT_AMOUNT);
         requestFee = 1 ether;
