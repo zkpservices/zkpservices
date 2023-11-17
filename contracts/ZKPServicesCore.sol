@@ -46,8 +46,8 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
         string encryptedRequest; // AES encrypted request
         string encryptedKey; // AES key encrypted with RSA public encryption key of recipient
         uint256 timeLimit; // Time limit in seconds for response
-        address _2FAProvider; // Address of 2FA provider
-        uint256 _2FAID; // 2FA request ID
+        address _2FAProvider; // (optional) Address of 2FA provider
+        uint256 _2FAID; // (optional) 2FA request ID
         address requester;
         uint256 responseFeeAmount;
     }
@@ -56,8 +56,8 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
         string encryptedRequest; // AES encrypted request
         string encryptedKey; // AES key encrypted with RSA public encryption key of recipient
         uint256 timeLimit; // Time limit in seconds for response
-        address _2FAProvider; // Address of 2FA provider
-        uint256 _2FAID; // 2FA request ID
+        address _2FAProvider; // (optional) Address of 2FA provider
+        uint256 _2FAID; // (optional) 2FA request ID
         address requester;
         uint256 responseFeeAmount;
         string dataHash;
@@ -65,7 +65,7 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
     }
 
     struct Response {
-        uint256 dataLocation;
+        string dataHash;
     }
 
     // this is an optional field which is used to house information about a
@@ -73,8 +73,8 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
     // number, etc. all of the information housed here is also verifiable with
     // a DataRequest if it is onboarded, but it is provided here for convenience and
     // to house alternative data not on the protocol potentially - for example, a
-    // wallet/vendor license combination could be more easily verified in an
-    // alternative manner such as a trusted government website lookup
+    // wallet/vendor license combination could potentially be more easily verified in
+    // an alternative manner such as a trusted government website lookup
     struct PublicUserInformation {
         string information;
     }
@@ -330,10 +330,12 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
         _transfer(msg.sender, requester, requiredFee);
 
         usedResponseIds[requestId] = true;
-        responses[requestId] = Response({dataLocation: dataLocation});
+        responses[requestId] = Response({
+            dataHash: obfuscatedData[dataLocation].dataHash
+        });
     }
 
-/*
+    /*
 
       /$$$$$$   /$$$$$$  /$$$$$$ /$$$$$$$ 
      /$$__  $$ /$$__  $$|_  $$_/| $$__  $$
@@ -632,7 +634,10 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
             updateRequests[key] = request;
         } else if (dataType == 0x06) {
             (uint256 key, Response memory response) = decodeResponse(data);
-            require(responses[key].dataLocation == 0, "Key already in use");
+            require(
+                bytes(responses[key].dataHash).length == 0,
+                "Key already in use"
+            );
             responses[key] = response;
         } else if (dataType == 0x07) {
             (
