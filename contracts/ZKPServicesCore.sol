@@ -29,8 +29,12 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
     uint256 public requestFee;
     uint256 public responseFee;
 
-    struct RSAKey {
-        string key; // RSA Public Key
+    struct RSAEncryptionKey {
+        string key; // RSA Public Encryption Key
+    }
+
+    struct RSASigningKey {
+        string key; // RSA Signing key for verification
     }
 
     struct Data {
@@ -39,7 +43,7 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
 
     struct DataRequest {
         string encryptedRequest; // AES encrypted request
-        string encryptedKey; // AES key encrypted with RSA public key of recipient
+        string encryptedKey; // AES key encrypted with RSA public encryption key of recipient
         uint256 timeLimit; // Time limit in seconds for response
         address _2FAProvider; // Address of 2FA provider
         address requester;
@@ -48,7 +52,7 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
 
     struct UpdateRequest {
         string encryptedRequest; // AES encrypted request
-        string encryptedKey; // AES key encrypted with RSA public key of recipient
+        string encryptedKey; // AES key encrypted with RSA public encryption key of recipient
         uint256 timeLimit; // Time limit in seconds for response
         address _2FAProvider; // Address of 2FA provider
         address requester;
@@ -64,7 +68,8 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
     
     CCIP | Cross-Chain Compatible Variables:
         
-        rsaKeys
+        rsaEncryptionKeys
+        rsaSigningKeys
         obfuscatedData
         responses
 
@@ -98,7 +103,8 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
     IGroth16VerifierP2 public responseVerifier;
 
     //CCIP compatible variables
-    mapping(address => RSAKey) public rsaKeys;
+    mapping(address => RSAEncryptionKey) public rsaEncryptionKeys;
+    mapping(address => RSASigningKey) public rsaSigningKeys;
     mapping(uint256 => Data) public obfuscatedData;
     mapping(uint256 => Response) public responses;
     //CCIP partially compatible variables
@@ -115,10 +121,10 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
     //99.9999% put into the vault, 0.0001% transferred to deploying wallet
     uint256 private constant VAULT_AMOUNT = (TOTAL_SUPPLY * 999999) / 1000000;
 
-    constructor(address _coreResponseVerifierAddress, address _CCIPReceiverRouterAddress)
-        ERC20("ZKPServices", "ZKP")
-        CCIPReceiver(_CCIPReceiverRouterAddress)
-    {
+    constructor(
+        address _coreResponseVerifierAddress,
+        address _CCIPReceiverRouterAddress
+    ) ERC20("ZKPServices", "ZKP") CCIPReceiver(_CCIPReceiverRouterAddress) {
         responseVerifier = IGroth16VerifierP2(_coreResponseVerifierAddress);
         _mint(msg.sender, TOTAL_SUPPLY - VAULT_AMOUNT);
         _mint(address(this), VAULT_AMOUNT);
@@ -129,8 +135,12 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
         _transfer(address(this), msg.sender, 200 * 10**18);
     }
 
-    function setRSAKey(string memory rsaKey) public {
-        rsaKeys[msg.sender] = RSAKey(rsaKey);
+    function setRSAEncryptionKey(string memory rsaEncryptionKey) public {
+        rsaEncryptionKeys[msg.sender] = RSAEncryptionKey(rsaEncryptionKey);
+    }
+
+    function setRSASigningKey(string memory rsaSigningKey) public {
+        rsaSigningKeys[msg.sender] = RSASigningKey(rsaSigningKey);
     }
 
     function register2FAProvider(address provider) public {
@@ -272,7 +282,7 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
         responses[requestId] = Response({dataLocation: dataLocation});
     }
 
-/*
+    /*
 
       /$$$$$$   /$$$$$$  /$$$$$$ /$$$$$$$ 
      /$$__  $$ /$$__  $$|_  $$_/| $$__  $$
@@ -355,28 +365,42 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
 
         // verification that data being sent from this contract is not spurious
         if (dataType == 0x01) {
-            (address key, RSAKey memory rsaKey) = decodeRSAKey(data);
-            require(msg.sender == key, "Sender must be the RSA key");
+            (
+                address key,
+                RSAEncryptionKey memory rsaEncryptionKey
+            ) = decodeRSAEncryptionKey(data);
+            require(msg.sender == key, "Sender must be the RSA key owner");
             require(
-                keccak256(abi.encode(rsaKeys[key])) ==
-                    keccak256(abi.encode(rsaKey)),
+                keccak256(abi.encode(rsaEncryptionKeys[key])) ==
+                    keccak256(abi.encode(rsaEncryptionKey)),
                 "Mismatch between data key and data"
             );
         } else if (dataType == 0x02) {
+            (
+                address key,
+                RSASigningKey memory rsaSigningKey
+            ) = decodeRSASigningKey(data);
+            require(msg.sender == key, "Sender must be the RSA key owner");
+            require(
+                keccak256(abi.encode(rsaSigningKeys[key])) ==
+                    keccak256(abi.encode(rsaSigningKey)),
+                "Mismatch between data key and data"
+            );
+        } else if (dataType == 0x03) {
             (uint256 key, Data memory dataStruct) = decodeData(data);
             require(
                 keccak256(abi.encode(obfuscatedData[key])) ==
                     keccak256(abi.encode(dataStruct)),
                 "Mismatch between data and mapping"
             );
-        } else if (dataType == 0x03) {
+        } else if (dataType == 0x04) {
             (uint256 key, DataRequest memory request) = decodeDataRequest(data);
             require(
                 keccak256(abi.encode(dataRequests[key])) ==
                     keccak256(abi.encode(request)),
                 "Mismatch between data request and mapping"
             );
-        } else if (dataType == 0x04) {
+        } else if (dataType == 0x05) {
             (uint256 key, UpdateRequest memory request) = decodeUpdateRequest(
                 data
             );
@@ -385,7 +409,7 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
                     keccak256(abi.encode(request)),
                 "Mismatch between update request and mapping"
             );
-        } else if (dataType == 0x05) {
+        } else if (dataType == 0x06) {
             (uint256 key, Response memory response) = decodeResponse(data);
             require(
                 keccak256(abi.encode(responses[key])) ==
@@ -506,23 +530,33 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
 
         if (dataType == 0x01) {
             // RSA key can be overwritten as we check the msg.sender requests the change in sendMessage
-            (address key, RSAKey memory rsaKey) = decodeRSAKey(data);
-            rsaKeys[key] = rsaKey;
+            (
+                address key,
+                RSAEncryptionKey memory rsaEncryptionKey
+            ) = decodeRSAEncryptionKey(data);
+            rsaEncryptionKeys[key] = rsaEncryptionKey;
         } else if (dataType == 0x02) {
+            // RSA key can be overwritten as we check the msg.sender requests the change in sendMessage
+            (
+                address key,
+                RSASigningKey memory rsaSigningKey
+            ) = decodeRSASigningKey(data);
+            rsaSigningKeys[key] = rsaSigningKey;
+        } else if (dataType == 0x03) {
             (uint256 key, Data memory dataStruct) = decodeData(data);
             require(
                 bytes(obfuscatedData[key].dataHash).length == 0,
                 "Key already in use"
             );
             obfuscatedData[key] = dataStruct;
-        } else if (dataType == 0x03) {
+        } else if (dataType == 0x04) {
             (uint256 key, DataRequest memory request) = decodeDataRequest(data);
             require(
                 bytes(dataRequests[key].encryptedRequest).length == 0,
                 "Key already in use"
             );
             dataRequests[key] = request;
-        } else if (dataType == 0x04) {
+        } else if (dataType == 0x05) {
             (uint256 key, UpdateRequest memory request) = decodeUpdateRequest(
                 data
             );
@@ -531,15 +565,27 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
                 "Key already in use"
             );
             updateRequests[key] = request;
-        } else if (dataType == 0x05) {
+        } else if (dataType == 0x06) {
             (uint256 key, Response memory response) = decodeResponse(data);
             require(responses[key].dataLocation == 0, "Key already in use");
             responses[key] = response;
         }
     }
 
-    function encodeRSAKey(address key) public view returns (bytes memory) {
-        return abi.encode(key, rsaKeys[key]);
+    function encodeRSAEncryptionKey(address key)
+        public
+        view
+        returns (bytes memory)
+    {
+        return abi.encode(key, rsaEncryptionKeys[key]);
+    }
+
+    function encodeRSASigningKey(address key)
+        public
+        view
+        returns (bytes memory)
+    {
+        return abi.encode(key, rsaSigningKeys[key]);
     }
 
     function encodeData(uint256 key) public view returns (bytes memory) {
@@ -562,12 +608,20 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
         return abi.encode(key, responses[key]);
     }
 
-    function decodeRSAKey(bytes memory encodedData)
+    function decodeRSAEncryptionKey(bytes memory encodedData)
         public
         pure
-        returns (address, RSAKey memory)
+        returns (address, RSAEncryptionKey memory)
     {
-        return abi.decode(encodedData, (address, RSAKey));
+        return abi.decode(encodedData, (address, RSAEncryptionKey));
+    }
+
+    function decodeRSASigningKey(bytes memory encodedData)
+        public
+        pure
+        returns (address, RSASigningKey memory)
+    {
+        return abi.decode(encodedData, (address, RSASigningKey));
     }
 
     function decodeData(bytes memory encodedData)
