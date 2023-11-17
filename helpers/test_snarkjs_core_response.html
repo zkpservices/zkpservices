@@ -16,15 +16,17 @@
     async function handleButtonClick() {
       const snarkjs = window.snarkjs;
       const input = {
-        "field_0": document.getElementById("field_0").value,
-        "field_1": document.getElementById("field_1").value,
-        "field_salt": document.getElementById("field_salt").value,
-        "one_time_key": document.getElementById("one_time_key").value,
-        "user_secret_0": document.getElementById("user_secret_0").value,
-        "user_secret_1": document.getElementById("user_secret_1").value,
-        "provided_field_and_key_hash": document.getElementById("provided_field_and_key_hash").value,
-        "provided_field_and_user_secret_hash": document.getElementById("provided_field_and_user_secret_hash").value
+          "field_0": document.getElementById("field_0").value,
+          "field_1": document.getElementById("field_1").value,
+          "field_salt": document.getElementById("field_salt").value,
+          "one_time_key": document.getElementById("one_time_key").value,
+          "user_secret_0": document.getElementById("user_secret_0").value,
+          "user_secret_1": document.getElementById("user_secret_1").value,
+          "provided_field_and_key_hash": document.getElementById("provided_field_and_key_hash").value,
+          "provided_field_and_salt_and_user_secret_hash": document.getElementById("provided_field_and_salt_and_user_secret_hash").value,
+          "provided_salt_hash": document.getElementById("provided_salt_hash").value
       };
+
       const circuitWasm = "../circuits/ZKPServicesCoreResponse/build/ZKPServicesCoreResponse_js/ZKPServicesCoreResponse.wasm";
       const circuitZkey = "../circuits/ZKPServicesCoreResponse/circuit.zkey";
 
@@ -56,41 +58,48 @@
       }
     }
   </script>
+
 </head>
+
 <body>
-  <div class="input-container">
-    <label for="field_0">Field 0 (first half of field):</label><br>
-    <input id="field_0" type="text">
-  </div>
-  <div class="input-container">
-    <label for="field_1">Field 1 (second half of field):</label><br>
-    <input id="field_1" type="text">
-  </div>
-  <div class="input-container">
-    <label for="field_salt">Field Salt:</label><br>
-    <input id="field_salt" type="text">
-  </div>
-  <div class="input-container">
-    <label for="one_time_key">One Time Key:</label><br>
-    <input id="one_time_key" type="text">
-  </div>
-  <div class="input-container">
-    <label for="user_secret_0">User Secret 0 (first half of user secret):</label><br>
-    <input id="user_secret_0" type="text">
-  </div>
-  <div class="input-container">
-    <label for="user_secret_1">User Secret 1 (second half of user secret):</label><br>
-    <input id="user_secret_1" type="text">
-  </div>
-  <div class="input-container">
-    <label for="provided_field_and_key_hash">Provided Field and Key Hash:</label><br>
-    <input id="provided_field_and_key_hash" type="text">
-  </div>
-  <div class="input-container">
-    <label for="provided_field_and_user_secret_hash">Provided Field and User Secret Hash:</label><br>
-    <input id="provided_field_and_user_secret_hash" type="text">
-  </div>
-  <button onClick="handleButtonClick()">Run SnarkJS Test</button>
-  <div id="result"></div>
+    <div class="input-container">
+        <label for="field_0">Field 0 (first half of field):</label><br>
+        <input id="field_0" type="text">
+    </div>
+    <div class="input-container">
+        <label for="field_1">Field 1 (second half of field):</label><br>
+        <input id="field_1" type="text">
+    </div>
+    <div class="input-container">
+        <label for="field_salt">Field Salt:</label><br>
+        <input id="field_salt" type="text">
+    </div>
+    <div class="input-container">
+        <label for="one_time_key">One Time Key:</label><br>
+        <input id="one_time_key" type="text">
+    </div>
+    <div class="input-container">
+        <label for="user_secret_0">User Secret 0 (first half of user secret):</label><br>
+        <input id="user_secret_0" type="text">
+    </div>
+    <div class="input-container">
+        <label for="user_secret_1">User Secret 1 (second half of user secret):</label><br>
+        <input id="user_secret_1" type="text">
+    </div>
+    <div class="input-container">
+        <label for="provided_field_and_key_hash">Provided Field and Key Hash:</label><br>
+        <input id="provided_field_and_key_hash" type="text">
+    </div>
+    <div class="input-container">
+        <label for="provided_field_and_salt_and_user_secret_hash">Provided Field, Salt, and User Secret Hash:</label><br>
+        <input id="provided_field_and_salt_and_user_secret_hash" type="text">
+    </div>
+    <div class="input-container">
+        <label for="provided_salt_hash">Provided Salt Hash:</label><br>
+        <input id="provided_salt_hash" type="text">
+    </div>
+    <button onClick="handleButtonClick()">Run SnarkJS Test</button>
+    <div id="result"></div>
 </body>
+
 </html>

@@ -23,14 +23,17 @@ contract ZKPServicesCoreResponseVerifier {
     uint256 constant deltay2 = 8495653923123431417604973247489272438418190587263600148770280649306958101930;
 
     
-    uint256 constant IC0x = 11534744773529601680186390356858190704210240971340302467958228928463839368859;
-    uint256 constant IC0y = 3532177555179504585255016385541449857193446738791122372162062951769597879613;
+    uint256 constant IC0x = 17679673156177307594276512473289430215637185984912241121940606186107376278713;
+    uint256 constant IC0y = 11807591004423480581179137080846248775008969350878280268097560234074614532279;
     
-    uint256 constant IC1x = 11097598186367366984372556558202546425110244800826769108863716935560319347219;
-    uint256 constant IC1y = 16881795027829597254259848230501323257372613194047265561930817946732586369666;
+    uint256 constant IC1x = 6201812190326197969212854719674667490252309938638477406058472641341718437780;
+    uint256 constant IC1y = 18370955393698844662798862281908098278523254222997328247134323518694591829002;
     
-    uint256 constant IC2x = 10947220977378073122314953354439766451803535105442632444544763227609165824405;
-    uint256 constant IC2y = 3930964614350971030352056709645359859529172726508827119052728657478202569425;
+    uint256 constant IC2x = 8327951669662852197004180410967927839365298740769280502939649983212306970646;
+    uint256 constant IC2y = 4187076226647156594073694320246627936564788079231147007494232889949793725814;
+    
+    uint256 constant IC3x = 7581783507373709421960857128396863682552759894567983120483749922574153173715;
+    uint256 constant IC3y = 8361918803468329842512929318625759189205064711607932896327214611680117771078;
     
  
     // Memory data
@@ -39,7 +42,7 @@ contract ZKPServicesCoreResponseVerifier {
 
     uint16 constant pLastMem = 896;
 
-    function verifyProof(uint[2] calldata _pA, uint[2][2] calldata _pB, uint[2] calldata _pC, uint[2] calldata _pubSignals) public view returns (bool) {
+    function verifyProof(uint[2] calldata _pA, uint[2][2] calldata _pB, uint[2] calldata _pC, uint[3] calldata _pubSignals) public view returns (bool) {
         assembly {
             function checkField(v) {
                 if iszero(lt(v, q)) {
@@ -86,6 +89,8 @@ contract ZKPServicesCoreResponseVerifier {
                 g1_mulAccC(_pVk, IC1x, IC1y, calldataload(add(pubSignals, 0)))
                 
                 g1_mulAccC(_pVk, IC2x, IC2y, calldataload(add(pubSignals, 32)))
+                
+                g1_mulAccC(_pVk, IC3x, IC3y, calldataload(add(pubSignals, 64)))
                 
 
                 // -A
@@ -145,6 +150,8 @@ contract ZKPServicesCoreResponseVerifier {
             checkField(calldataload(add(_pubSignals, 32)))
             
             checkField(calldataload(add(_pubSignals, 64)))
+            
+            checkField(calldataload(add(_pubSignals, 96)))
             
 
             // Validate all evaluations
