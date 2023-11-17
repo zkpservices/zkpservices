@@ -19,7 +19,8 @@
           "field_0": document.getElementById("field_0").value,
           "field_1": document.getElementById("field_1").value,
           "field_salt": document.getElementById("field_salt").value,
-          "one_time_key": document.getElementById("one_time_key").value,
+          "one_time_key_0": document.getElementById("one_time_key_0").value,
+          "one_time_key_1": document.getElementById("one_time_key_1").value,
           "user_secret_0": document.getElementById("user_secret_0").value,
           "user_secret_1": document.getElementById("user_secret_1").value,
           "provided_field_and_key_hash": document.getElementById("provided_field_and_key_hash").value,
@@ -74,9 +75,13 @@
         <label for="field_salt">Field Salt:</label><br>
         <input id="field_salt" type="text">
     </div>
+   <div class="input-container">
+        <label for="one_time_key_0">One Time Key 0 (first half of one time key):</label><br>
+        <input id="one_time_key_0" type="text">
+    </div>
     <div class="input-container">
-        <label for="one_time_key">One Time Key:</label><br>
-        <input id="one_time_key" type="text">
+        <label for="one_time_key_1">One Time Key 1 (second half of one time key):</label><br>
+        <input id="one_time_key_1" type="text">
     </div>
     <div class="input-container">
         <label for="user_secret_0">User Secret 0 (first half of user secret):</label><br>

@@ -351,6 +351,7 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
     IRouterClient public senderRouter;
     LinkTokenInterface public senderToken;
     mapping(string => uint64) public receivers;
+    mapping(string => uint256) public receiverCCIPFees;
     mapping(uint64 => bool) public originPolicy;
 
     function setSender(address routerAddress, address linkAddress)
@@ -361,11 +362,21 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
         senderToken = LinkTokenInterface(linkAddress);
     }
 
-    function addReceiver(string calldata receiver, uint64 destinationChain)
+    /**
+    * @dev Allows the contract owner to set a static fee for a specified receiver in terms of the zkp.services ERC20 token.
+    * Currently, using the native ERC20 provides an easy approach for users. However, the underlying architecture 
+    * has the capability to facilitate payments using other tokens, such as LINK or native tokens (e.g. AVAX), in subsequent versions.
+    * Choosing these alternatives at this stage would require two transactions: one to grant spending approvals for LINK/AVAX, 
+    * and another for executing the desired operation. Future models can incorporate Chainlink/Uniswap oracles for dynamic pricing,
+    * and support the LINK/native asset payment options as well. The estimation functions to calculate the fees in terms of LINK
+    * can be leveraged to create a per-user LINK vault, etc.
+    */
+    function addReceiver(string calldata receiver, uint64 destinationChain, uint256 CCIPFee)
         public
         onlyOwner
     {
         receivers[receiver] = destinationChain;
+        receiverCCIPFees[receiver] = CCIPFee; 
     }
 
     function setOriginPolicy(uint64 origin, bool policy) public onlyOwner {
@@ -502,15 +513,16 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
             evm2AnyMessage
         );
         require(
-            fees <= senderToken.balanceOf(msg.sender),
+            fees <= senderToken.balanceOf(address(this)),
             "Insufficient LINK balance"
         );
 
-        // Transfer the fees from the sender to the contract.
-        senderToken.transferFrom(msg.sender, address(this), fees);
-
         // Approve the router to spend the contract's tokens
         senderToken.approve(address(senderRouter), fees);
+
+        if (receiverCCIPFees[receiver] > 0){
+            _transfer(msg.sender, owner(), receiverCCIPFees[receiver]);
+        }
 
         messageId = senderRouter.ccipSend(
             destinationChainSelector,
