@@ -350,8 +350,9 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
 
     IRouterClient public senderRouter;
     LinkTokenInterface public senderToken;
-    mapping(string => uint64) public receivers;
+    mapping(string => uint64) public receiverChainId;
     mapping(string => uint256) public receiverCCIPFees;
+    mapping(string => address) public receiverAddress;
     mapping(uint64 => bool) public originPolicy;
 
     function setSender(address routerAddress, address linkAddress)
@@ -363,20 +364,23 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
     }
 
     /**
-    * @dev Allows the contract owner to set a static fee for a specified receiver in terms of the zkp.services ERC20 token.
-    * Currently, using the native ERC20 provides an easy approach for users. However, the underlying architecture 
-    * has the capability to facilitate payments using other tokens, such as LINK or native tokens (e.g. AVAX), in subsequent versions.
-    * Choosing these alternatives at this stage would require two transactions: one to grant spending approvals for LINK/AVAX, 
-    * and another for executing the desired operation. Future models can incorporate Chainlink/Uniswap oracles for dynamic pricing,
-    * and support the LINK/native asset payment options as well. The estimation functions to calculate the fees in terms of LINK
-    * can be leveraged to create a per-user LINK vault, etc.
-    */
-    function addReceiver(string calldata receiver, uint64 destinationChain, uint256 CCIPFee)
-        public
-        onlyOwner
-    {
-        receivers[receiver] = destinationChain;
-        receiverCCIPFees[receiver] = CCIPFee; 
+     * @dev Allows the contract owner to set a static fee for a specified receiver in terms of the zkp.services ERC20 token.
+     * Currently, using the native ERC20 provides an easy approach for users. However, the underlying architecture
+     * has the capability to facilitate payments using other tokens, such as LINK or native tokens (e.g. AVAX), in subsequent versions.
+     * Choosing these alternatives at this stage would require two transactions: one to grant spending approvals for LINK/AVAX,
+     * and another for executing the desired operation. Future models can incorporate Chainlink/Uniswap oracles for dynamic pricing,
+     * and support the LINK/native asset payment options as well. The estimation functions to calculate the fees in terms of LINK
+     * can be leveraged to create a per-user LINK vault, etc.
+     */
+    function setReceiver(
+        string calldata receiver,
+        uint64 destinationChain,
+        uint256 CCIPFee,
+        address _receiverAddress
+    ) public onlyOwner {
+        receiverChainId[receiver] = destinationChain;
+        receiverCCIPFees[receiver] = CCIPFee;
+        receiverAddress[receiver] = _receiverAddress;
     }
 
     function setOriginPolicy(uint64 origin, bool policy) public onlyOwner {
@@ -387,25 +391,20 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
         string memory receiver,
         bytes[] memory dataTypes,
         bytes[] memory data
-    ) public returns (bytes32 messageId) {
-        require(
-            senderRouter != IRouterClient(address(0)),
-            "Sender not registered"
-        );
-        require(receivers[receiver] != 0, "Receiver not registered");
+    ) public returns (bytes32[] memory messageIds) {
         require(
             dataTypes.length == data.length,
             "Mismatch in dataTypes and data arrays length"
         );
 
-        bytes memory combinedData;
+        messageIds = new bytes32[](data.length);
 
         for (uint256 i = 0; i < data.length; i++) {
             bytes memory currentData = abi.encodePacked(dataTypes[i], data[i]);
-            combinedData = abi.encodePacked(combinedData, currentData);
+            messageIds[i] = sendMessage(receiver, currentData);
         }
 
-        return sendMessage(receiver, combinedData);
+        return messageIds;
     }
 
     function sendMessage(string memory receiver, bytes memory dataBytes)
@@ -416,13 +415,7 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
             senderRouter != IRouterClient(address(0)),
             "Sender not registered"
         );
-        require(receivers[receiver] != 0, "Receiver not registered");
-
-        uint64 destinationChainSelector = receivers[receiver];
-        require(
-            destinationChainSelector != 0,
-            "Destination chain not set for receiver"
-        );
+        require(receiverChainId[receiver] != 0, "Receiver not registered");
 
         uint8 dataType = uint8(dataBytes[0]);
         bytes memory data = sliceBytes(dataBytes, 1);
@@ -499,7 +492,7 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
         }
 
         Client.EVM2AnyMessage memory evm2AnyMessage = Client.EVM2AnyMessage({
-            receiver: abi.encode(address(this)),
+            receiver: abi.encode(receiverAddress[receiver]),
             data: dataBytes,
             tokenAmounts: new Client.EVMTokenAmount[](0),
             extraArgs: Client._argsToBytes(
@@ -508,24 +501,29 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
             feeToken: address(senderToken)
         });
 
-        uint256 fees = senderRouter.getFee(
-            destinationChainSelector,
+        uint256 linkFees = senderRouter.getFee(
+            receiverChainId[receiver],
             evm2AnyMessage
         );
         require(
-            fees <= senderToken.balanceOf(address(this)),
+            linkFees <= senderToken.balanceOf(address(this)),
             "Insufficient LINK balance"
         );
 
         // Approve the router to spend the contract's tokens
-        senderToken.approve(address(senderRouter), fees);
+        senderToken.approve(address(senderRouter), linkFees);
 
-        if (receiverCCIPFees[receiver] > 0){
+        require(
+            balanceOf(msg.sender) >= receiverCCIPFees[receiver],
+            "Insufficient ZKP balance"
+        );
+
+        if (receiverCCIPFees[receiver] > 0 && owner() != msg.sender) {
             _transfer(msg.sender, owner(), receiverCCIPFees[receiver]);
         }
 
         messageId = senderRouter.ccipSend(
-            destinationChainSelector,
+            receiverChainId[receiver],
             evm2AnyMessage
         );
 
@@ -541,7 +539,7 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
             senderRouter != IRouterClient(address(0)),
             "Sender not registered"
         );
-        require(receivers[receiver] != 0, "Receiver not registered");
+        require(receiverChainId[receiver] != 0, "Receiver not registered");
         require(
             dataTypes.length == data.length,
             "Mismatch in dataTypes and data arrays length"
@@ -557,6 +555,7 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
         return totalFees;
     }
 
+    // first byte should be the data type
     function estimateMessageFee(string memory receiver, bytes memory dataBytes)
         public
         view
@@ -566,16 +565,10 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
             senderRouter != IRouterClient(address(0)),
             "Sender not registered"
         );
-        require(receivers[receiver] != 0, "Receiver not registered");
-
-        uint64 destinationChainSelector = receivers[receiver];
-        require(
-            destinationChainSelector != 0,
-            "Destination chain not set for receiver"
-        );
+        require(receiverChainId[receiver] != 0, "Receiver not registered");
 
         Client.EVM2AnyMessage memory evm2AnyMessage = Client.EVM2AnyMessage({
-            receiver: abi.encode(receivers[receiver]),
+            receiver: abi.encode(receiverAddress[receiver]),
             data: dataBytes,
             tokenAmounts: new Client.EVMTokenAmount[](0),
             extraArgs: Client._argsToBytes(
@@ -584,25 +577,25 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
             feeToken: address(senderToken)
         });
 
-        return senderRouter.getFee(destinationChainSelector, evm2AnyMessage);
+        return senderRouter.getFee(receiverChainId[receiver], evm2AnyMessage);
     }
 
     function _ccipReceive(Client.Any2EVMMessage memory any2EvmMessage)
         internal
         override
     {
-        // strictly trust messages received from trusted chains
-        uint64 sourceChain = any2EvmMessage.sourceChainSelector;
-        require(originPolicy[sourceChain], "Source chain not trusted");
-        // strictly trust the the contract with the exact same address as this one (deployed by same wallet with same nonce)
-        address sourceChainAddress = abi.decode(
-            any2EvmMessage.sender,
-            (address)
-        );
-        require(
-            sourceChainAddress == address(this),
-            "Messages must originate from the same contract address on other chains"
-        );
+        // // strictly trust messages received from trusted chains
+        // uint64 sourceChain = any2EvmMessage.sourceChainSelector;
+        // require(originPolicy[sourceChain], "Source chain not trusted");
+        // // strictly trust the the contract with the exact same address as this one (deployed by same wallet with same nonce)
+        // address sourceChainAddress = abi.decode(
+        //     any2EvmMessage.sender,
+        //     (address)
+        // );
+        // require(
+        //     sourceChainAddress == address(this),
+        //     "Messages must originate from the same contract address on other chains"
+        // );
 
         uint8 dataType = uint8(any2EvmMessage.data[0]);
         bytes memory data = sliceBytes(any2EvmMessage.data, 1);
