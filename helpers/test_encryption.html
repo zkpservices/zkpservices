@@ -67,6 +67,52 @@
         </br>
         </br>   
 
+        <h3>RSA Signing/Verification Key Generation</h3>
+        <button onclick="generateRSASigningKeys()">Generate RSA Signing Keys</button>
+        <h4>Signing Public Key:</h4>
+        <textarea id="signingPublicKeyOutput" rows="4" cols="50"></textarea>
+        <h4>Signing Private Key:</h4>
+        <textarea id="signingPrivateKeyOutput" rows="4" cols="50"></textarea>
+        </br>
+        </br>
+
+        <h4>Import RSA Signing Public Key:</h4>
+        <textarea id="importSigningPublicKeyInput" rows="4" cols="50"></textarea>
+        </br>
+        </br>
+        <button onclick="importRSASigningPublicKey()">Import Signing Public Key</button>
+        <h4>Import RSA Signing Private Key:</h4>
+        <textarea id="importSigningPrivateKeyInput" rows="4" cols="50"></textarea>
+        </br>
+        </br>
+        <button onclick="importRSASigningPrivateKey()">Import Signing Private Key</button>
+        </br>
+        </br>
+
+        <h4>Type a message to sign:</h4>
+        <textarea id="messageToSignInput" rows="4" cols="50"></textarea>
+        </br>
+        </br>
+
+        <button onclick="signMessage()">Sign Message</button>
+        <h4>Signature:</h4>
+        <textarea id="signedMessageOutput" rows="4" cols="50"></textarea>
+        </br>
+        </br>
+
+        <h4>Type a message to verify:</h4>
+        <textarea id="messageToVerifyInput" rows="4" cols="50"></textarea>
+        </br>
+        <h4>Provide the Signature:</h4>
+        <textarea id="signatureToVerifyInput" rows="4" cols="50"></textarea>
+        </br>
+        </br>
+        <button onclick="verifySignedMessage()">Verify Message</button>
+        <h4>Verification Result:</h4>
+        <p id="verificationResult"></p>
+        </br>
+        </br>
+
 <script src="encryption.js">
 </script>
 

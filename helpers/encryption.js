@@ -46,7 +46,7 @@ async function generateRSAKeys() {
             hash: "SHA-256"
         },
         true,
-        ["encrypt", "decrypt"]
+        ["encrypt", "decrypt"] 
     );
 
     let publicKey = await window.crypto.subtle.exportKey("spki", rsaKeyPair.publicKey);
@@ -69,7 +69,7 @@ async function importPublicKey(publicKeyString) {
             hash: "SHA-256"
         },
         true,
-        ["encrypt"]
+        ["encrypt", "verify"]
     );
 }
 
@@ -83,7 +83,7 @@ async function importPrivateKey(privateKeyString) {
             hash: "SHA-256"
         },
         true,
-        ["decrypt"]
+        ["decrypt", "sign"]
     );
 }
 
@@ -95,7 +95,6 @@ async function logRSAKeys() {
     console.log("Public Key:", publicKeyString);
     console.log("Private Key:", privateKeyString);
 }
-
 
 async function generateAESKey() {
     aesKey = await window.crypto.subtle.generateKey(
@@ -189,3 +188,102 @@ function base64ToArrayBuffer(base64) {
     return bytes.buffer;
 }
 
+var rsaSigningKeyPair;
+
+async function generateRSASigningKeys() {
+    rsaSigningKeyPair = await window.crypto.subtle.generateKey(
+        {
+            name: "RSASSA-PKCS1-v1_5",
+            modulusLength: 2048,
+            publicExponent: new Uint8Array([0x01, 0x00, 0x01]),
+            hash: "SHA-256"
+        },
+        true,
+        ["sign", "verify"]
+    );
+
+    let publicKey = await window.crypto.subtle.exportKey("spki", rsaSigningKeyPair.publicKey);
+    let privateKey = await window.crypto.subtle.exportKey("pkcs8", rsaSigningKeyPair.privateKey);
+
+    let publicKeyString = arrayBufferToBase64(publicKey);
+    let privateKeyString = arrayBufferToBase64(privateKey);
+
+    document.getElementById("signingPublicKeyOutput").textContent = publicKeyString;
+    document.getElementById("signingPrivateKeyOutput").textContent = privateKeyString;
+}
+
+async function importRSASigningPublicKey() {
+    let publicKeyString = document.getElementById("importSigningPublicKeyInput").value;
+    let publicKeyBuffer = base64ToArrayBuffer(publicKeyString);
+
+    let importedPublicKey = await window.crypto.subtle.importKey(
+        "spki",
+        publicKeyBuffer,
+        {
+            name: "RSASSA-PKCS1-v1_5",
+            hash: "SHA-256"
+        },
+        true,
+        ["verify"]
+    );
+
+    if (!rsaSigningKeyPair) {
+        rsaSigningKeyPair = {};
+    }
+    rsaSigningKeyPair.publicKey = importedPublicKey;
+}
+
+async function importRSASigningPrivateKey() {
+    let privateKeyString = document.getElementById("importSigningPrivateKeyInput").value;
+    let privateKeyBuffer = base64ToArrayBuffer(privateKeyString);
+
+    let importedPrivateKey = await window.crypto.subtle.importKey(
+        "pkcs8",
+        privateKeyBuffer,
+        {
+            name: "RSASSA-PKCS1-v1_5",
+            hash: "SHA-256"
+        },
+        true,
+        ["sign"]
+    );
+
+    if (!rsaSigningKeyPair) {
+        rsaSigningKeyPair = {};
+    }
+    rsaSigningKeyPair.privateKey = importedPrivateKey;
+}
+
+async function signMessage() {
+    let message = document.getElementById("messageToSignInput").value;
+    let encodedMessage = new TextEncoder().encode(message);
+
+    let signature = await window.crypto.subtle.sign(
+        {
+            name: "RSASSA-PKCS1-v1_5"
+        },
+        rsaSigningKeyPair.privateKey,
+        encodedMessage
+    );
+
+    document.getElementById("signedMessageOutput").textContent = arrayBufferToBase64(signature);
+}
+
+async function verifySignedMessage() {
+    let message = document.getElementById("messageToVerifyInput").value;  // changed this line
+    let encodedMessage = new TextEncoder().encode(message);
+    
+    let signatureBase64 = document.getElementById("signatureToVerifyInput").value; // and this line
+    let signature = base64ToArrayBuffer(signatureBase64);
+
+    let isValid = await window.crypto.subtle.verify(
+        {
+            name: "RSASSA-PKCS1-v1_5"
+        },
+        rsaSigningKeyPair.publicKey,
+        signature,
+        encodedMessage
+    );
+
+    document.getElementById("verificationResult").textContent = isValid ? "Valid signature!" : "Invalid signature!";
+}
