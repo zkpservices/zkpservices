@@ -69,7 +69,7 @@ async function importPublicKey(publicKeyString) {
             hash: "SHA-256"
         },
         true,
-        ["encrypt", "verify"]
+        ["encrypt"]
     );
 }
 
@@ -83,7 +83,7 @@ async function importPrivateKey(privateKeyString) {
             hash: "SHA-256"
         },
         true,
-        ["decrypt", "sign"]
+        ["decrypt"]
     );
 }
 
