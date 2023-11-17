@@ -26,11 +26,11 @@
         }
       },
       "zkp.services verification": {
-        "zkp.services obfuscation salt": "JD8fuw3fiHJXCsdv9jwe04ifg",
+        "smart contract obfuscation salt": "JD8fuw3fiHJXCsdv9jwe04ifg",
         "root hash": "9d84eff8540e772f91625fb88fcac7db4de6b7f742e25173da5cd3ced3a85d76",
-        "signed hash": "",
-        "signatory wallet": "0x01",
-        "signatory public key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvXYNok0ryPSoFiPHNkKcfkz7VRmBNkSLsCZjntTV/ozBOUD1Yutnvu7NEDxtC9DqkaaCruGtCfO7Ee4TirXGL/NnndibmH9ffs6usGM8hf17R3p3bxc8niOqW8CZF5NGG8hvLdnppnkjmcu73E2A6+chdaNE21hzRpOMUk0R2Mqh6+b6OOwML2oFv6us/gGqibzOQd3V07fr0/NOyECkOu2bKzs0vtnnKOG703vOXD9Ol70BV1nViNOhgoaGAhg13UzDiKqkiCsX/I7REkmsy32PHBLaX4aETSgMJ24AlqbrE5q8IBFgm2iuuPDtvlII1UyHJjOdgWdAcQAiJn39wwIDAQAB===="
+        "signed hash": "BBNBx/lA8CVuxXmRFY4QS+Lp01AHK7HxruXRh75CBADVJrfW7BlL09x/+bQRkbyagWGm/OXmC4ImGXkhg8IyeleBmZYozVdhJ+NVEraHd9VHF+iU6akBBh+vaci35TLUFsPyAdNd7STCWrHKgA6b5gE9FcijoCm3EpGQbd1q//WMALaSmdJ1HP0dK3zyxzLqdoMeFiXSVYCb18o8HKgLpQkmXcdKjTnGyyfoYmwT68KEshXFe9TRMZk2Zv4MimTLMpcGEhi/WMUimv0fgCn0hyyDUfwo+3qmJLi5NUUxxoRQoQeokKIJTtUmaO9xJUHoEZL8dGQGnplEXbaR96e0qA======",
+        "signatory wallet": "0x84713a3a001E2157d134B97C59D6bdAb351dd69d",
+        "signatory public key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAukayhiOl7d1C23LjRNenQtspmhDmGK2Mk8fzraCYpk77UbHYGrzVPsgEYvi76B7sszK+e8R9ze+gAS8ANGYVIvw/TdBhutsCc6yn0K9foLWKdBdAErNilETHxLCUAIJdsGr84jCj0PaOtv6AaLBH5MweeIl9u237fhNicRKSedJx4E/fG/YH4e8PGBCVG2zYgXLr96rUs/7qO97+wKGbduZVXJamJ6RJY/XBxYYms6+jZphTOTWHVgf+6I8Ibbag4a6hUhIDpfE2Kmkbfe+AkSEf2E9MsfCkzbio5YAibhYgfTHfPL9/vB08gfihBVKkErMaDePvuAhDAqzzuJZmXwIDAQAB===="
       }
     }
   }

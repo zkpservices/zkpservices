@@ -7,7 +7,7 @@ import {CCIPReceiver} from "@chainlink/contracts-ccip/src/v0.8/ccip/applications
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./interfaces/ITwoFactor.sol";
-import "./interfaces/IGroth16VerifierP2.sol";
+import "./interfaces/IGroth16VerifierP3.sol";
 
 /*
 
@@ -39,6 +39,7 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
 
     struct Data {
         string dataHash; // SHA256 of associated data
+        uint256 saltHash; // Poseidon hash of obfuscation salt
     }
 
     struct DataRequest {
@@ -46,6 +47,7 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
         string encryptedKey; // AES key encrypted with RSA public encryption key of recipient
         uint256 timeLimit; // Time limit in seconds for response
         address _2FAProvider; // Address of 2FA provider
+        uint256 _2FAID; // 2FA request ID
         address requester;
         uint256 responseFeeAmount;
     }
@@ -55,23 +57,37 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
         string encryptedKey; // AES key encrypted with RSA public encryption key of recipient
         uint256 timeLimit; // Time limit in seconds for response
         address _2FAProvider; // Address of 2FA provider
+        uint256 _2FAID; // 2FA request ID
         address requester;
         uint256 responseFeeAmount;
-        string newHash;
+        string dataHash;
+        uint256 saltHash;
     }
 
     struct Response {
         uint256 dataLocation;
     }
 
+    // this is an optional field which is used to house information about a
+    // wallet, for example, a verifier pharmacy's location, store name, license
+    // number, etc. all of the information housed here is also verifiable with
+    // a DataRequest if it is onboarded, but it is provided here for convenience and
+    // to house alternative data not on the protocol potentially - for example, a
+    // wallet/vendor license combination could be more easily verified in an
+    // alternative manner such as a trusted government website lookup
+    struct PublicUserInformation {
+        string information;
+    }
+
     /* 
-    
+
     CCIP | Cross-Chain Compatible Variables:
         
         rsaEncryptionKeys
         rsaSigningKeys
         obfuscatedData
         responses
+        publicUserInformation
 
     Partially Compatible Variables:
         
@@ -100,13 +116,14 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
     */
 
     //ZKP Solidity verifier
-    IGroth16VerifierP2 public responseVerifier;
+    IGroth16VerifierP3 public responseVerifier;
 
     //CCIP compatible variables
     mapping(address => RSAEncryptionKey) public rsaEncryptionKeys;
     mapping(address => RSASigningKey) public rsaSigningKeys;
     mapping(uint256 => Data) public obfuscatedData;
     mapping(uint256 => Response) public responses;
+    mapping(address => PublicUserInformation) public publicUserInformation;
     //CCIP partially compatible variables
     mapping(uint256 => DataRequest) public dataRequests;
     mapping(uint256 => UpdateRequest) public updateRequests;
@@ -125,7 +142,7 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
         address _coreResponseVerifierAddress,
         address _CCIPReceiverRouterAddress
     ) ERC20("ZKPServices", "ZKP") CCIPReceiver(_CCIPReceiverRouterAddress) {
-        responseVerifier = IGroth16VerifierP2(_coreResponseVerifierAddress);
+        responseVerifier = IGroth16VerifierP3(_coreResponseVerifierAddress);
         _mint(msg.sender, TOTAL_SUPPLY - VAULT_AMOUNT);
         _mint(address(this), VAULT_AMOUNT);
         requestFee = 1 * 10**18;
@@ -141,6 +158,14 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
 
     function setRSASigningKey(string memory rsaSigningKey) public {
         rsaSigningKeys[msg.sender] = RSASigningKey(rsaSigningKey);
+    }
+
+    function setPublicUserInformation(string memory _publicUserInformation)
+        public
+    {
+        publicUserInformation[msg.sender] = PublicUserInformation(
+            _publicUserInformation
+        );
     }
 
     function register2FAProvider(address provider) public {
@@ -161,12 +186,14 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
         delete _2FAProviderOwners[provider];
     }
 
+    // request ID = poseidon(field + key)
     function requestData(
         uint256 requestId,
         string memory encryptedRequest,
         string memory encryptedKey,
         uint256 timeLimit,
         address _2FAProvider,
+        uint256 _2FAID,
         uint256 responseFeeAmount
     ) public {
         require(
@@ -183,19 +210,29 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
             encryptedKey,
             block.timestamp + timeLimit,
             _2FAProvider,
+            _2FAID,
             msg.sender,
             responseFeeAmount
         );
     }
 
+    // request ID = poseidon(field + key)
+    // storage location = poseidon(field + salt + user secret)
+    // salt hash = poseidon(salt)
+    // *salt hash is required for obfuscation in smart contract storage location
+    // *in case the user secret gets leaked, salt further obfuscates
+    //  which data hashes corresponds to plaintext fields in the smart
+    //  contract
     function requestUpdate(
         uint256 requestId,
         string memory encryptedRequest,
         string memory encryptedKey,
         uint256 timeLimit,
         address _2FAProvider,
+        uint256 _2FAID,
         uint256 responseFeeAmount,
-        string memory newHash
+        string memory dataHash,
+        uint256 saltHash
     ) public {
         require(
             !usedRequestIds[requestId],
@@ -211,20 +248,25 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
             encryptedKey,
             block.timestamp + timeLimit,
             _2FAProvider,
+            _2FAID,
             msg.sender,
             responseFeeAmount,
-            newHash
+            dataHash,
+            saltHash
         );
     }
 
+    // request ID = poseidon(field + key)
+    // storage location = poseidon(field + salt + user secret)
+    // salt hash = poseidon(salt)
     function respond(
         uint256 requestId,
-        uint256 twoFactorId,
         uint256 dataLocation,
+        uint256 saltHash,
         uint256[2] calldata _pA,
         uint256[2][2] calldata _pB,
         uint256[2] calldata _pC,
-        uint256[2] calldata _pubSignals,
+        uint256[3] calldata _pubSignals,
         bool isUpdate
     ) public {
         require(
@@ -249,28 +291,37 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
             ? updateRequests[requestId]._2FAProvider
             : dataRequests[requestId]._2FAProvider;
         if (_2FAProvider != address(0)) {
+            uint256 _2FAID = isUpdate
+                ? updateRequests[requestId]._2FAID
+                : dataRequests[requestId]._2FAID;
             ITwoFactor.TwoFactorData memory twoFactorData = ITwoFactor(
                 _2FAProvider
-            ).twoFactorData(twoFactorId);
+            ).twoFactorData(_2FAID);
             require(twoFactorData.success, "2FA failed.");
         }
 
         require(
             _pubSignals[0] == requestId &&
                 _pubSignals[1] == dataLocation &&
+                _pubSignals[2] == saltHash &&
                 responseVerifier.verifyProof(_pA, _pB, _pC, _pubSignals),
             "ZKP verification failed."
         );
 
-        require(
-            keccak256(bytes(obfuscatedData[dataLocation].dataHash)) ==
-                keccak256(bytes(string(abi.encodePacked(_pubSignals[1])))),
-            "Mismatched data hash."
-        );
-
         if (isUpdate) {
+            require(
+                saltHash == updateRequests[requestId].saltHash,
+                "Salt hash does not match update request salt hash"
+            );
             obfuscatedData[dataLocation].dataHash = updateRequests[requestId]
-                .newHash;
+                .dataHash;
+            obfuscatedData[dataLocation].saltHash = updateRequests[requestId]
+                .saltHash;
+        } else {
+            require(
+                saltHash == obfuscatedData[dataLocation].saltHash,
+                "Salt hash does not match stored salt hash"
+            );
         }
 
         address requester = isUpdate
@@ -282,7 +333,7 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
         responses[requestId] = Response({dataLocation: dataLocation});
     }
 
-    /*
+/*
 
       /$$$$$$   /$$$$$$  /$$$$$$ /$$$$$$$ 
      /$$__  $$ /$$__  $$|_  $$_/| $$__  $$
@@ -373,7 +424,7 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
             require(
                 keccak256(abi.encode(rsaEncryptionKeys[key])) ==
                     keccak256(abi.encode(rsaEncryptionKey)),
-                "Mismatch between data key and data"
+                "Mismatch between data at stored key and data provided"
             );
         } else if (dataType == 0x02) {
             (
@@ -384,21 +435,21 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
             require(
                 keccak256(abi.encode(rsaSigningKeys[key])) ==
                     keccak256(abi.encode(rsaSigningKey)),
-                "Mismatch between data key and data"
+                "Mismatch between data at stored key and data provided"
             );
         } else if (dataType == 0x03) {
             (uint256 key, Data memory dataStruct) = decodeData(data);
             require(
                 keccak256(abi.encode(obfuscatedData[key])) ==
                     keccak256(abi.encode(dataStruct)),
-                "Mismatch between data and mapping"
+                "Mismatch between data at stored key and data provided"
             );
         } else if (dataType == 0x04) {
             (uint256 key, DataRequest memory request) = decodeDataRequest(data);
             require(
                 keccak256(abi.encode(dataRequests[key])) ==
                     keccak256(abi.encode(request)),
-                "Mismatch between data request and mapping"
+                "Mismatch between data at stored key and data provided"
             );
         } else if (dataType == 0x05) {
             (uint256 key, UpdateRequest memory request) = decodeUpdateRequest(
@@ -407,14 +458,28 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
             require(
                 keccak256(abi.encode(updateRequests[key])) ==
                     keccak256(abi.encode(request)),
-                "Mismatch between update request and mapping"
+                "Mismatch between data at stored key and data provided"
             );
         } else if (dataType == 0x06) {
             (uint256 key, Response memory response) = decodeResponse(data);
             require(
                 keccak256(abi.encode(responses[key])) ==
                     keccak256(abi.encode(response)),
-                "Mismatch between response and mapping"
+                "Mismatch between data at stored key and data provided"
+            );
+        } else if (dataType == 0x07) {
+            (
+                address key,
+                PublicUserInformation memory _publicUserInformation
+            ) = decodePublicUserInformation(data);
+            require(
+                msg.sender == key,
+                "Sender must be the public user information owner"
+            );
+            require(
+                keccak256(abi.encode(publicUserInformation[key])) ==
+                    keccak256(abi.encode(_publicUserInformation)),
+                "Mismatch between data at stored key and data provided"
             );
         } else {
             revert("Invalid dataType");
@@ -514,7 +579,7 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
     {
         // strictly trust messages received from trusted chains
         uint64 sourceChain = any2EvmMessage.sourceChainSelector;
-        require(originPolicy[sourceChain], "source chain not trusted");
+        require(originPolicy[sourceChain], "Source chain not trusted");
         // strictly trust the the contract with the exact same address as this one (deployed by same wallet with same nonce)
         address sourceChainAddress = abi.decode(
             any2EvmMessage.sender,
@@ -522,7 +587,7 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
         );
         require(
             sourceChainAddress == address(this),
-            "messages must originate from the same contract address on other chains"
+            "Messages must originate from the same contract address on other chains"
         );
 
         uint8 dataType = uint8(any2EvmMessage.data[0]);
@@ -569,6 +634,12 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
             (uint256 key, Response memory response) = decodeResponse(data);
             require(responses[key].dataLocation == 0, "Key already in use");
             responses[key] = response;
+        } else if (dataType == 0x07) {
+            (
+                address key,
+                PublicUserInformation memory _publicUserInformation
+            ) = decodePublicUserInformation(data);
+            publicUserInformation[key] = _publicUserInformation;
         }
     }
 
@@ -606,6 +677,14 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
 
     function encodeResponse(uint256 key) public view returns (bytes memory) {
         return abi.encode(key, responses[key]);
+    }
+
+    function encodePublicUserInformation(address key)
+        public
+        view
+        returns (bytes memory)
+    {
+        return abi.encode(key, publicUserInformation[key]);
     }
 
     function decodeRSAEncryptionKey(bytes memory encodedData)
@@ -654,6 +733,14 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
         returns (uint256, Response memory)
     {
         return abi.decode(encodedData, (uint256, Response));
+    }
+
+    function decodePublicUserInformation(bytes memory encodedData)
+        public
+        pure
+        returns (address, PublicUserInformation memory)
+    {
+        return abi.decode(encodedData, (address, PublicUserInformation));
     }
 
     function sliceBytes(bytes memory _bytes, uint256 start)
