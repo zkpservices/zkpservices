@@ -43,9 +43,9 @@ export default function Example() {
               <input
                 id="email"
                 name="email"
-                type="email"
-                autoComplete="email"
-                className="block w-full max-w-lg rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm bg-opacity-50 bg-white dark:bg-gray-800 dark:text-white"
+                type="password"
+                autoComplete=""
+                className="relative block w-full appearance-none rounded-md border border-gray-300 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none dark:bg-gray-900 focus:ring-emerald-500 sm:text-sm"
               />
             </div>
           </div>
@@ -58,9 +58,9 @@ export default function Example() {
               <input
                 id="email"
                 name="email"
-                type="email"
-                autoComplete="email"
-                className="block w-full max-w-lg rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm bg-opacity-50 bg-white dark:bg-gray-800 dark:text-white"
+                type="password"
+                autoComplete=""
+                className="relative block w-full appearance-none rounded-md border border-gray-300 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none dark:bg-gray-900 focus:ring-emerald-500 sm:text-sm"
               />
             </div>
           </div>
@@ -73,9 +73,9 @@ export default function Example() {
               <input
                 id="email"
                 name="email"
-                type="email"
-                autoComplete="email"
-                className="block w-full max-w-lg rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm bg-opacity-50 bg-white dark:bg-gray-800 dark:text-white"
+                type="password"
+                autoComplete=""
+                className="relative block w-full appearance-none rounded-md border border-gray-300 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none dark:bg-gray-900 focus:ring-emerald-500 sm:text-sm"
               />
             </div>
           </div>
@@ -97,7 +97,7 @@ export default function Example() {
                 id="about"
                 name="about"
                 rows={3}
-                className="block w-full max-w-lg rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm bg-opacity-50 bg-white dark:bg-gray-800 dark:text-white"
+                className="relative block w-full appearance-none rounded-md border border-gray-300 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none dark:bg-gray-900 focus:ring-emerald-500 sm:text-sm"
                 defaultValue={''}
               />
               <p className="mt-2 text-sm ">Write a few sentences about yourself.</p>
@@ -113,7 +113,7 @@ export default function Example() {
                 id="about"
                 name="about"
                 rows={3}
-                className="block w-full max-w-lg rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm bg-opacity-50 bg-white dark:bg-gray-800 dark:text-white"
+                className="relative block w-full appearance-none rounded-md border border-gray-300 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none dark:bg-gray-900 focus:ring-emerald-500 sm:text-sm"
                 defaultValue={''}
               />
               <p className="mt-2 text-sm ">Write a few sentences about yourself.</p>
@@ -156,7 +156,7 @@ export default function Example() {
                 id="about"
                 name="about"
                 rows={3}
-                className="block w-full max-w-lg rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm bg-opacity-50 bg-white dark:bg-gray-800 dark:text-white"
+                className="relative block w-full appearance-none rounded-md border border-gray-300 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none dark:bg-gray-900 focus:ring-emerald-500 sm:text-sm"
                 defaultValue={''}
               />
               <p className="mt-2 text-sm ">Write a few sentences about yourself.</p>
@@ -172,7 +172,7 @@ export default function Example() {
                 id="about"
                 name="about"
                 rows={3}
-                className="block w-full max-w-lg rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm bg-opacity-50 bg-white dark:bg-gray-800 dark:text-white"
+                className="relative block w-full appearance-none rounded-md border border-gray-300 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none dark:bg-gray-900 focus:ring-emerald-500 sm:text-sm"
                 defaultValue={''}
               />
               <p className="mt-2 text-sm ">Write a few sentences about yourself.</p>
@@ -213,7 +213,7 @@ export default function Example() {
                 id="about"
                 name="about"
                 rows={3}
-                className="block w-full max-w-lg rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm bg-opacity-50 bg-white dark:bg-gray-800 dark:text-white"
+                className="relative block w-full appearance-none rounded-md border border-gray-300 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none dark:bg-gray-900 focus:ring-emerald-500 sm:text-sm"
                 defaultValue={''}
               />
               <p className="mt-2 text-sm ">Write a few sentences about yourself.</p>
