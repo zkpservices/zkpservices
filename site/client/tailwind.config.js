@@ -3,20 +3,6 @@ module.exports = {
   content: ['./{src,mdx}/**/*.{js,mjs,jsx,mdx}'],
   darkMode: 'class',
   theme: {
-    colors: {
-      transparent: 'transparent',
-      current: 'currentColor',
-      white: "#FFFFFF",
-      background: '#BFCED3',
-      light: '#648A75',
-      lightdark: '#014D4E',
-      dark: '#18293D',
-      darklight: '#00637C',
-      darkshade: '#121921',
-      primary: '#314C47',
-      bubblegum: '#ff77e9',
-      bermuda: '#78dcca',
-    },
     fontSize: {
       '2xs': ['0.75rem', { lineHeight: '1.25rem' }],
       xs: ['0.8125rem', { lineHeight: '1.5rem' }],
