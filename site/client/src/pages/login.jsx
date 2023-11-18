@@ -43,8 +43,8 @@ export default function Example() {
           <form className="mt-8 space-y-6" action="#" method="POST">
 
               <div>
-                <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
-                  Data Provider
+                <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200">
+                  Data Provider:
                 </label>
                 <div className="mt-2">
                   <input
@@ -60,10 +60,10 @@ export default function Example() {
               </div>
 
               <div>
-                <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900">
-                  Password
+                <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200">
+                  Password:
                 </label>
-                <div>
+                <div className="mt-2">
                   <input
                     id="password"
                     name="password"

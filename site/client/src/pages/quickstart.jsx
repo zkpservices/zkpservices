@@ -20,8 +20,8 @@ export default function Example() {
     <>
     <Guide />
 
-    <form className="space-y-8 divide-y divide-gray-200">
-      <div className="space-y-8 divide-y divide-gray-200 sm:space-y-5">
+    <form className="space-y-8 divide-y divide-gray-200 dark:divide-gray-700">
+      <div className="space-y-8 divide-y divide-gray-200 dark:divide-gray-700 sm:space-y-5">
         <div className="space-y-6 sm:space-y-5">
           <div>
             <h2 className="text-2xl font-bold leading-6 ">Sign Up</h2>
@@ -35,7 +35,7 @@ export default function Example() {
             <p className="mt-1 max-w-2xl text-sm ">Use a permanent address where you can receive mail.</p>
           </div>
 
-          <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:border-t sm:border-gray-200 sm:pt-5">
+          <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:border-t sm:border-gray-200 dark:border-gray-700 sm:pt-5">
             <label htmlFor="email" className="block text-sm font-medium sm:mt-px sm:pt-2">
               Database Password: 
             </label>
@@ -50,7 +50,7 @@ export default function Example() {
             </div>
           </div>
 
-          <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:border-t sm:border-gray-200 sm:pt-5">
+          <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:border-t sm:border-gray-200 dark:border-gray-700 sm:pt-5">
             <label htmlFor="email" className="block text-sm font-medium sm:mt-px sm:pt-2">
               2FA Password: 
             </label>
@@ -60,12 +60,12 @@ export default function Example() {
                 name="email"
                 type="password"
                 autoComplete=""
-                className="relative block w-full appearance-none rounded-md border border-gray-300 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none dark:bg-gray-900 focus:ring-emerald-500 sm:text-sm"
+                className="relative block w-full appearance-none rounded-md border border-gray-300 dark:border-gray-700 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none dark:bg-gray-900 focus:ring-emerald-500 sm:text-sm"
               />
             </div>
           </div>
           
-          <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:border-t sm:border-gray-200 sm:pt-5">
+          <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:border-t sm:border-gray-200 dark:border-gray-700 sm:pt-5">
             <label htmlFor="email" className="block text-sm font-medium sm:mt-px sm:pt-2">
               Smart Contract Password: 
             </label>
@@ -75,7 +75,7 @@ export default function Example() {
                 name="email"
                 type="password"
                 autoComplete=""
-                className="relative block w-full appearance-none rounded-md border border-gray-300 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none dark:bg-gray-900 focus:ring-emerald-500 sm:text-sm"
+                className="relative block w-full appearance-none rounded-md border border-gray-300 dark:border-gray-700 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none dark:bg-gray-900 focus:ring-emerald-500 sm:text-sm"
               />
             </div>
           </div>
@@ -88,7 +88,7 @@ export default function Example() {
             <p className="mt-1 max-w-2xl text-sm ">Use a permanent address where you can receive mail.</p>
           </div>
 
-          <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:border-t sm:border-gray-200 sm:pt-5">
+          <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:border-t sm:border-gray-200 dark:border-gray-700 sm:pt-5">
             <label htmlFor="about" className="block text-sm font-medium sm:mt-px sm:pt-2">
               RSA Encryption Key - Public Key 
             </label>
@@ -97,14 +97,14 @@ export default function Example() {
                 id="about"
                 name="about"
                 rows={3}
-                className="relative block w-full appearance-none rounded-md border border-gray-300 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none dark:bg-gray-900 focus:ring-emerald-500 sm:text-sm"
+                className="relative block w-full appearance-none rounded-md border border-gray-300 dark:border-gray-700 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none dark:bg-gray-900 focus:ring-emerald-500 sm:text-sm"
                 defaultValue={''}
               />
               <p className="mt-2 text-sm ">Write a few sentences about yourself.</p>
             </div>
           </div>
 
-          <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:border-t sm:border-gray-200 sm:pt-5">
+          <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:border-t sm:border-gray-200 dark:border-gray-700 sm:pt-5">
             <label htmlFor="about" className="block text-sm font-medium sm:mt-px sm:pt-2">
               RSA Encryption Key - Private Key
             </label>
@@ -113,7 +113,7 @@ export default function Example() {
                 id="about"
                 name="about"
                 rows={3}
-                className="relative block w-full appearance-none rounded-md border border-gray-300 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none dark:bg-gray-900 focus:ring-emerald-500 sm:text-sm"
+                className="relative block w-full appearance-none rounded-md border border-gray-300 dark:border-gray-700 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none dark:bg-gray-900 focus:ring-emerald-500 sm:text-sm"
                 defaultValue={''}
               />
               <p className="mt-2 text-sm ">Write a few sentences about yourself.</p>
@@ -125,7 +125,7 @@ export default function Example() {
             <div className="flex justify-end">
               <button
                 type="button"
-                className="rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700"
+                className="rounded-md border border-gray-300 dark:border-gray-700 bg-white py-2 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700"
               >
                 Generate Random Keys
               </button>
@@ -147,7 +147,7 @@ export default function Example() {
             <p className="mt-1 max-w-2xl text-sm ">Use a permanent address where you can receive mail.</p>
           </div>
 
-          <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:border-t sm:border-gray-200 sm:pt-5">
+          <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:border-t sm:border-gray-200 dark:border-gray-700 sm:pt-5">
             <label htmlFor="about" className="block text-sm font-medium sm:mt-px sm:pt-2">
               RSA Signing Key - Public Key 
             </label>
@@ -156,14 +156,14 @@ export default function Example() {
                 id="about"
                 name="about"
                 rows={3}
-                className="relative block w-full appearance-none rounded-md border border-gray-300 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none dark:bg-gray-900 focus:ring-emerald-500 sm:text-sm"
+                className="relative block w-full appearance-none rounded-md border border-gray-300 dark:border-gray-700 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none dark:bg-gray-900 focus:ring-emerald-500 sm:text-sm"
                 defaultValue={''}
               />
               <p className="mt-2 text-sm ">Write a few sentences about yourself.</p>
             </div>
           </div>
 
-          <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:border-t sm:border-gray-200 sm:pt-5">
+          <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:border-t sm:border-gray-200 dark:border-gray-700 sm:pt-5">
             <label htmlFor="about" className="block text-sm font-medium sm:mt-px sm:pt-2">
               RSA Signing Key - Private Key
             </label>
@@ -172,7 +172,7 @@ export default function Example() {
                 id="about"
                 name="about"
                 rows={3}
-                className="relative block w-full appearance-none rounded-md border border-gray-300 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none dark:bg-gray-900 focus:ring-emerald-500 sm:text-sm"
+                className="relative block w-full appearance-none rounded-md border border-gray-300 dark:border-gray-700 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none dark:bg-gray-900 focus:ring-emerald-500 sm:text-sm"
                 defaultValue={''}
               />
               <p className="mt-2 text-sm ">Write a few sentences about yourself.</p>
@@ -183,7 +183,7 @@ export default function Example() {
             <div className="flex justify-end">
               <button
                 type="button"
-                className="rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700"
+                className="rounded-md border border-gray-300 dark:border-gray-700 bg-white py-2 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700"
               >
                 Generate Random Keys
               </button>
@@ -204,7 +204,7 @@ export default function Example() {
             <p className="mt-1 max-w-2xl text-sm ">Use a permanent address where you can receive mail.</p>
           </div>
 
-          <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:border-t sm:border-gray-200 sm:pt-5">
+          <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:border-t sm:border-gray-200 dark:border-gray-700 sm:pt-5">
             <label htmlFor="about" className="block text-sm font-medium sm:mt-px sm:pt-2">
               Public Information
             </label>
@@ -213,7 +213,7 @@ export default function Example() {
                 id="about"
                 name="about"
                 rows={3}
-                className="relative block w-full appearance-none rounded-md border border-gray-300 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none dark:bg-gray-900 focus:ring-emerald-500 sm:text-sm"
+                className="relative block w-full appearance-none rounded-md border border-gray-300 dark:border-gray-700 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none dark:bg-gray-900 focus:ring-emerald-500 sm:text-sm"
                 defaultValue={''}
               />
               <p className="mt-2 text-sm ">Write a few sentences about yourself.</p>
@@ -223,14 +223,14 @@ export default function Example() {
         </div>
 
 
-        <div className="space-y-6 divide-y divide-gray-200 pt-8 sm:space-y-5 sm:pt-10">
+        <div className="space-y-6 divide-y divide-gray-200 dark:divide-gray-700 pt-8 sm:space-y-5 sm:pt-10">
           <div>
             <h3 className="text-lg font-medium leading-6 ">Onboard to Smart Contract</h3>
             <p className="mt-1 max-w-2xl text-sm ">
               Please select which of the parameters you would like to onboard to the smart contract.
             </p>
           </div>
-          <div className="space-y-6 divide-y divide-gray-200 sm:space-y-5">
+          <div className="space-y-6 divide-y divide-gray-200 dark:divide-gray-700 sm:space-y-5">
             <div className="pt-6 sm:pt-5">
               <div role="group" aria-labelledby="label-email">
                 <div className="sm:grid sm:grid-cols-3 sm:items-baseline sm:gap-4">
@@ -247,7 +247,7 @@ export default function Example() {
                             id="comments"
                             name="comments"
                             type="checkbox"
-                            className="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                            className="h-4 w-4 rounded border-gray-300 dark:border-gray-700 text-emerald-600 focus:ring-emerald-500"
                           />
                         </div>
                         <div className="ml-3 text-sm">
@@ -263,7 +263,7 @@ export default function Example() {
                             id="candidates"
                             name="candidates"
                             type="checkbox"
-                            className="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                            className="h-4 w-4 rounded border-gray-300 dark:border-gray-700 text-emerald-600 focus:ring-emerald-500"
                           />
                         </div>
                         <div className="ml-3 text-sm">
@@ -279,7 +279,7 @@ export default function Example() {
                             id="offers"
                             name="offers"
                             type="checkbox"
-                            className="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                            className="h-4 w-4 rounded border-gray-300 dark:border-gray-700 text-emerald-600 focus:ring-emerald-500"
                           />
                         </div>
                         <div className="ml-3 text-sm">

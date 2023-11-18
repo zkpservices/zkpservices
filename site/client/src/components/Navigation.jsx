@@ -188,7 +188,6 @@ export const navigation = [
     title: 'Guides',
     links: [
       { title: 'Introduction', href: '/' },
-      { title: 'Quickstart', href: '/quickstart' },
       { title: 'SDKs', href: '/sdks' },
       { title: 'Authentication', href: '/authentication' },
       { title: 'Pagination', href: '/pagination' },
@@ -197,13 +196,15 @@ export const navigation = [
     ],
   },
   {
-    title: 'API Documentation',
+    title: 'Services',
     links: [
-      { title: 'User Data', href: '/contacts' },
-      { title: 'Conversations', href: '/conversations' },
-      { title: 'Messages', href: '/messages' },
-      { title: 'Groups', href: '/groups' },
-      { title: 'Attachments', href: '/attachments' },
+      { title: 'Quickstart', href: '/quickstart' },
+      { title: 'Login', href: '/login' },
+      { title: 'Dashboard', href: '/dashboard' },
+      { title: 'Request Data', href: '/requestdata' },
+      { title: 'Request Update', href: '/requestupdate' },
+      { title: 'Respond', href: '/respond' },
+      { title: 'Cross-Chain Backups', href: '/crosschain' },
     ],
   },
 ]
@@ -224,7 +225,7 @@ export function Navigation(props) {
         ))}
         <li className="sticky bottom-0 z-10 mt-6 min-[416px]:hidden">
           <Button href="#" variant="filled" className="w-full">
-            Connect Wallet
+            Sign in
           </Button>
         </li>
       </ul>
