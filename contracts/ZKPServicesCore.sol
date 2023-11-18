@@ -353,7 +353,7 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
     mapping(string => uint64) public receiverChainId;
     mapping(string => uint256) public receiverCCIPFees;
     mapping(string => address) public receiverAddress;
-    mapping(uint64 => bool) public originPolicy;
+    mapping(bytes32 => bool) public originPolicy;
 
     function setSender(address routerAddress, address linkAddress)
         public
@@ -383,8 +383,14 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
         receiverAddress[receiver] = _receiverAddress;
     }
 
-    function setOriginPolicy(uint64 origin, bool policy) public onlyOwner {
-        originPolicy[origin] = policy;
+    function setOriginPolicy(
+        uint64 _originChain,
+        address _originAddress,
+        bool policy
+    ) public onlyOwner {
+        originPolicy[
+            keccak256(abi.encodePacked(_originChain, _originAddress))
+        ] = policy;
     }
 
     function sendMultipleMessages(
@@ -584,18 +590,18 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
         internal
         override
     {
-        // // strictly trust messages received from trusted chains
-        // uint64 sourceChain = any2EvmMessage.sourceChainSelector;
-        // require(originPolicy[sourceChain], "Source chain not trusted");
-        // // strictly trust the the contract with the exact same address as this one (deployed by same wallet with same nonce)
-        // address sourceChainAddress = abi.decode(
-        //     any2EvmMessage.sender,
-        //     (address)
-        // );
-        // require(
-        //     sourceChainAddress == address(this),
-        //     "Messages must originate from the same contract address on other chains"
-        // );
+        // strictly trust messages received from trusted chains and addresses
+        uint64 sourceChain = any2EvmMessage.sourceChainSelector;
+        address sourceChainAddress = abi.decode(
+            any2EvmMessage.sender,
+            (address)
+        );
+        require(
+            originPolicy[
+                keccak256(abi.encodePacked(sourceChain, sourceChainAddress))
+            ],
+            "Messages must originate from a trusted chain and contract address"
+        );
 
         uint8 dataType = uint8(any2EvmMessage.data[0]);
         bytes memory data = sliceBytes(any2EvmMessage.data, 1);
