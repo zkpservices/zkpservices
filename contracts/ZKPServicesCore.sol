@@ -11,8 +11,8 @@ import "./interfaces/IGroth16VerifierP3.sol";
 
 /*
 
-           /$$                                                             /$$                              
-          | $$                                                            |__/                              
+           /$$                                                              /$$                              
+          | $$                                                             |__/                              
  /$$$$$$$$| $$   /$$  /$$$$$$      /$$$$$$$  /$$$$$$   /$$$$$$  /$$    /$$ /$$  /$$$$$$$  /$$$$$$   /$$$$$$$
 |____ /$$/| $$  /$$/ /$$__  $$    /$$_____/ /$$__  $$ /$$__  $$|  $$  /$$/| $$ /$$_____/ /$$__  $$ /$$_____/
    /$$$$/ | $$$$$$/ | $$  \ $$   |  $$$$$$ | $$$$$$$$| $$  \__/ \  $$/$$/ | $$| $$      | $$$$$$$$|  $$$$$$ 
@@ -129,7 +129,7 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
     mapping(uint256 => UpdateRequest) public updateRequests;
 
     mapping(uint256 => bool) public usedRequestIds;
-    mapping(uint256 => bool) public usedResponseIds;      
+    mapping(uint256 => bool) public usedResponseIds;
     mapping(address => ITwoFactor) public _2FAProviders;
     mapping(address => address) public _2FAProviderOwners;
 
@@ -152,7 +152,7 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
         _transfer(address(this), msg.sender, 200 * 10**18);
     }
 
-    function setRequestFee(uint256 _requestFee) public onlyOwner { 
+    function setRequestFee(uint256 _requestFee) public onlyOwner {
         requestFee = _requestFee;
     }
 
@@ -208,6 +208,12 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
             balanceOf(msg.sender) >= requestFee,
             "Not enough ZKP tokens for request fee."
         );
+        if (_2FAProvider != address(0)) {
+            require(
+                _2FAProviders[_2FAProvider] != ITwoFactor(address(0)),
+                "2FA Provider is not registered."
+            );
+        }
         _burn(msg.sender, requestFee);
         dataRequests[requestId] = DataRequest(
             encryptedRequest,
@@ -248,6 +254,12 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
             balanceOf(msg.sender) >= requestFee,
             "Not enough ZKP tokens for request fee."
         );
+        if (_2FAProvider != address(0)) {
+            require(
+                _2FAProviders[_2FAProvider] != ITwoFactor(address(0)),
+                "2FA Provider is not registered."
+            );
+        }
         _burn(msg.sender, requestFee);
         updateRequests[requestId] = UpdateRequest(
             encryptedRequest,
