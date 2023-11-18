@@ -42,7 +42,7 @@ export default function Example() {
           </div>
           <form className="mt-8 space-y-6" action="#" method="POST">
 
-          <div>
+              <div>
                 <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
                   Data Provider
                 </label>
@@ -51,7 +51,7 @@ export default function Example() {
                     id="email"
                     name="email"
                     type="text"
-                    value="https://zkp.services"
+                    defaultValue="https://zkp.services"
                     autoComplete=""
                     required
                     className="relative block w-full appearance-none rounded-md border border-gray-300 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none dark:bg-gray-900 focus:ring-emerald-500 sm:text-sm"
