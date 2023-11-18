@@ -196,7 +196,7 @@ export const navigation = [
     ],
   },
   {
-    title: 'Resources',
+    title: 'Services',
     links: [
       { title: 'Quickstart', href: '/quickstart' },
       { title: 'Contacts', href: '/contacts' },
