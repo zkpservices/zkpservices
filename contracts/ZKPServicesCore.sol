@@ -129,7 +129,7 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
     mapping(uint256 => UpdateRequest) public updateRequests;
 
     mapping(uint256 => bool) public usedRequestIds;
-    mapping(uint256 => bool) public usedResponseIds;
+    mapping(uint256 => bool) public usedResponseIds;      
     mapping(address => ITwoFactor) public _2FAProviders;
     mapping(address => address) public _2FAProviderOwners;
 
@@ -150,6 +150,10 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
 
     function requestVaultTokens() public {
         _transfer(address(this), msg.sender, 200 * 10**18);
+    }
+
+    function setRequestFee(uint256 _requestFee) public onlyOwner { 
+        requestFee = _requestFee;
     }
 
     function setRSAEncryptionKey(string memory rsaEncryptionKey) public {
@@ -214,6 +218,8 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
             msg.sender,
             responseFeeAmount
         );
+
+        usedRequestIds[requestId] = true;
     }
 
     // request ID = poseidon(field + key)
@@ -254,6 +260,8 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
             dataHash,
             saltHash
         );
+
+        usedRequestIds[requestId] = true;
     }
 
     // request ID = poseidon(field + key)
@@ -329,10 +337,11 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
             : dataRequests[requestId].requester;
         _transfer(msg.sender, requester, requiredFee);
 
-        usedResponseIds[requestId] = true;
         responses[requestId] = Response({
             dataHash: obfuscatedData[dataLocation].dataHash
         });
+
+        usedResponseIds[requestId] = true;
     }
 
     /*
@@ -502,7 +511,7 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
             data: dataBytes,
             tokenAmounts: new Client.EVMTokenAmount[](0),
             extraArgs: Client._argsToBytes(
-                Client.EVMExtraArgsV1({gasLimit: 200_000, strict: false})
+                Client.EVMExtraArgsV1({gasLimit: 2000000, strict: false})
             ),
             feeToken: address(senderToken)
         });
@@ -630,26 +639,29 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
         } else if (dataType == 0x04) {
             (uint256 key, DataRequest memory request) = decodeDataRequest(data);
             require(
-                bytes(dataRequests[key].encryptedRequest).length == 0,
-                "Key already in use"
+                !usedRequestIds[key],
+                "This requestId has already been used."
             );
             dataRequests[key] = request;
+            usedRequestIds[key] = true;
         } else if (dataType == 0x05) {
             (uint256 key, UpdateRequest memory request) = decodeUpdateRequest(
                 data
             );
             require(
-                bytes(updateRequests[key].encryptedRequest).length == 0,
-                "Key already in use"
+                !usedRequestIds[key],
+                "This requestId has already been used."
             );
             updateRequests[key] = request;
+            usedRequestIds[key] = true;
         } else if (dataType == 0x06) {
             (uint256 key, Response memory response) = decodeResponse(data);
             require(
-                bytes(responses[key].dataHash).length == 0,
-                "Key already in use"
+                !usedResponseIds[key],
+                "This responseId has already been used."
             );
             responses[key] = response;
+            usedResponseIds[key] = true;
         } else if (dataType == 0x07) {
             (
                 address key,
