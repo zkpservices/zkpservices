@@ -26,7 +26,7 @@ export default function Example() {
         <body class="h-full">
         ```
       */}
-      <div className="flex min-h-full items-center justify-center pt-12 sm:px-6 lg:px-8 pb-40">
+      <div className="flex min-h-full items-center justify-center pt-6 pb-32 sm:px-6 lg:px-8">
         <div className="w-full max-w-md space-y-8">
           <div>
             <Logo className="mx-20" />
@@ -41,23 +41,39 @@ export default function Example() {
             </p>
           </div>
           <form className="mt-8 space-y-6" action="#" method="POST">
-            <input type="hidden" name="remember" defaultValue="true" />
-            <div className="-space-y-px rounded-md shadow-sm">
+
+          <div>
+                <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
+                  Data Provider
+                </label>
+                <div className="mt-2">
+                  <input
+                    id="email"
+                    name="email"
+                    type="text"
+                    value="https://zkp.services"
+                    autoComplete=""
+                    required
+                    className="relative block w-full appearance-none rounded-md border border-gray-300 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none dark:bg-gray-900 focus:ring-emerald-500 sm:text-sm"
+                  />
+                </div>
+              </div>
+
               <div>
-                <label htmlFor="password" className="sr-only">
+                <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900">
                   Password
                 </label>
-                <input
+                <div>
+                  <input
                     id="password"
                     name="password"
                     type="password"
                     autoComplete="current-password"
                     required
                     className="relative block w-full appearance-none rounded-md border border-gray-300 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none dark:bg-gray-900 focus:ring-emerald-500 sm:text-sm"
-                    placeholder="Password"
-                />
+                  />
+                </div>
               </div>
-            </div>
 
             <div className="flex items-center justify-between">
               <div className="flex items-center">
