@@ -53,17 +53,6 @@ const mydata = [
       ],
     },
   },
-  {
-    href: '/crosschain',
-    name: 'Cross-Chain Backups',
-    description:
-      'Learn about the group model and how to create, retrieve, update, delete, and list groups.',
-    icon: UsersIcon,
-    pattern: {
-      y: 22,
-      squares: [[0, 1]],
-    },
-  },
   // {
   //   href: '/crosschain',
   //   name: 'Cross-Chain Backups',
@@ -328,7 +317,7 @@ export function Dashboard() {
       </div>
     </div>
 
-    <div className="xl:max-w-none mt-12 pb-8">
+    <div className="xl:max-w-none mt-16 pb-8">
       <Heading level={2} id="services" className="mt-0">
         Start Activity
       </Heading>
@@ -339,7 +328,14 @@ export function Dashboard() {
       </div>
     </div>
 
-    <History />
+    <div className="xl:max-w-none mt-8">
+      <Heading level={2} id="history" className="mt-0">
+        Recent Activity
+      </Heading>
+      <div className="mt-4 border-t border-zinc-900/5 dark:border-white/5" >
+        <History />
+      </div>
+    </div>
 
     </>
   )

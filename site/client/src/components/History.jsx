@@ -1,161 +1,112 @@
-import { Fragment } from 'react'
-import { ArrowDownCircleIcon, ArrowPathIcon, ArrowUpCircleIcon } from '@heroicons/react/20/solid'
-import { Heading } from '@/components/Heading'
+import { Tab } from '@headlessui/react';
+import { useMotionTemplate } from 'framer-motion'; 
 
-const statuses = {
-  Paid: 'text-green-700 dark:text-green-300 bg-green-50 dark:bg-green-900 ring-green-600/20',
-  Withdraw: 'text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-900 ring-gray-500/10',
-  Overdue: 'text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-900 ring-red-600/10',
-};
+const people = [
+  { name: 'Lindsay Walton', title: 'Front-end Developer', email: 'lindsay.walton@example.com', role: 'Member' },
+  { name: 'John Doe', title: 'Back-end Developer', email: 'john.doe@example.com', role: 'Admin' },
+  { name: 'Jane Smith', title: 'Full-stack Developer', email: 'jane.smith@example.com', role: 'Member' },
+  { name: 'Emily Johnson', title: 'Designer', email: 'emily.johnson@example.com', role: 'Member' },
+  { name: 'Michael Scott', title: 'Regional Manager', email: 'michael.scott@example.com', role: 'Admin' },
+  { name: 'Michael Scott', title: 'Regional Manager', email: 'michael.scott@example.com', role: 'Admin' },
+  { name: 'Jim Halpert', title: 'Salesman', email: 'jim.halpert@example.com', role: 'Member' },
+  { name: 'Michael Scott', title: 'Regional Manager', email: 'michael.scott@example.com', role: 'Admin' },
+  { name: 'Jim Halpert', title: 'Salesman', email: 'jim.halpert@example.com', role: 'Member' },
+  { name: 'Michael Scott', title: 'Regional Manager', email: 'michael.scott@example.com', role: 'Admin' },
+  { name: 'Jim Halpert', title: 'Salesman', email: 'jim.halpert@example.com', role: 'Member' },
+  { name: 'Michael Scott', title: 'Regional Manager', email: 'michael.scott@example.com', role: 'Admin' },
+  { name: 'Jim Halpert', title: 'Salesman', email: 'jim.halpert@example.com', role: 'Member' },
+  { name: 'Jim Halpert', title: 'Salesman', email: 'jim.halpert@example.com', role: 'Member' }
+];
 
-const days = [
-  {
-    date: 'Today',
-    dateTime: '2023-03-22',
-    transactions: [
-      {
-        id: 1,
-        invoiceNumber: '00012',
-        href: '#',
-        amount: '$7,600.00 USD',
-        tax: '$500.00',
-        status: 'Paid',
-        client: 'Reform',
-        description: 'Website redesign',
-        icon: ArrowUpCircleIcon,
-      },
-      {
-        id: 2,
-        invoiceNumber: '00011',
-        href: '#',
-        amount: '$10,000.00 USD',
-        status: 'Withdraw',
-        client: 'Tom Cook',
-        description: 'Salary',
-        icon: ArrowDownCircleIcon,
-      },
-      {
-        id: 3,
-        invoiceNumber: '00009',
-        href: '#',
-        amount: '$2,000.00 USD',
-        tax: '$130.00',
-        status: 'Overdue',
-        client: 'Tuple',
-        description: 'Logo design',
-        icon: ArrowPathIcon,
-      },
-    ],
-  },
-  {
-    date: 'Yesterday',
-    dateTime: '2023-03-21',
-    transactions: [
-      {
-        id: 4,
-        invoiceNumber: '00010',
-        href: '#',
-        amount: '$14,000.00 USD',
-        tax: '$900.00',
-        status: 'Paid',
-        client: 'SavvyCal',
-        description: 'Website redesign',
-        icon: ArrowUpCircleIcon,
-      },
-    ],
-  },
-]
+const tabs = [
+  { name: 'First Two People' },
+  { name: 'Next Two People' },
+  { name: 'Last Two People' }
+];
 
 function classNames(...classes) {
-  return classes.filter(Boolean).join(' ')
+  return classes.filter(Boolean).join(' ');
 }
-
 
 export function History() {
   return (
-    <>
-      <div className="xl:max-w-none mt-4">
-        <div className="mx-auto max-w-full">
-          <h2 id="history" className="mt-0 text-gray-900 dark:text-gray-50">
-            Recent Activity
-          </h2>
+    <div className="xl:max-w-none mt-12 pb-8">
+      <Tab.Group>
+        <div className="mb-8 space-x-1">
+          <Tab.List className="flex">
+            {tabs.map((tab) => (
+              <Tab key={tab.name} as="button" className={({ selected }) =>
+                  classNames(
+                    selected ? 'bg-indigo-100 text-indigo-700' : 'bg-gray-200 text-gray-500 hover:bg-gray-300',
+                    'rounded-md px-3 py-2 text-sm font-medium mx-1'
+                  )
+                }>
+                {tab.name}
+              </Tab>
+            ))}
+          </Tab.List>
         </div>
-        <div className="mt-6 overflow-hidden border-t dark:border-gray-700 w-full">
-          <div className="mx-auto max-w-full w-full">
-            <div className="mx-auto max-w-full lg:mx-0 lg:max-w-none w-full">
-              <table className="w-full min-w-full text-left text-gray-900 dark:text-gray-50">
-                <thead className="sr-only">
-                  <tr>
-                    <th className="pl-1">Amount</th>
-                    <th className="hidden sm:table-cell">Client</th>
-                    <th className="pr-1">More details</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {days.map((day) => (
-                    <Fragment key={day.dateTime}>
-                      <tr className="text-sm leading-6 text-gray-900 dark:text-gray-50">
-                        <th scope="colgroup" colSpan={3} className="relative isolate py-2 font-semibold bg-gray-50 dark:bg-gray-800 pl-1 pr-1">
-                          <time dateTime={day.dateTime}>{day.date}</time>
-                          <div className="absolute inset-y-0 right-full -z-10 w-screen border-b dark:border-gray-700 bg-gray-50 dark:bg-gray-800" />
-                          <div className="absolute inset-y-0 left-0 -z-10 w-screen border-b dark:border-gray-700 bg-gray-50 dark:bg-gray-800" />
-                        </th>
-                      </tr>
-                      {day.transactions.map((transaction) => (
-                        <tr key={transaction.id}>
-                          <td className="relative py-5 pr-6 pl-1">
-                            <div className="flex gap-x-6">
-                              {/* Your icon code */}
-                              <div className="flex-auto">
-                                <div className="flex items-start gap-x-3">
-                                  <div className="text-sm font-medium leading-6 text-gray-900 dark:text-gray-50">{transaction.amount}</div>
-                                  <div
-                                    className={classNames(
-                                      statuses[transaction.status],
-                                      'rounded-md py-1 px-2 text-xs font-medium ring-1 ring-inset'
-                                    )}
-                                  >
-                                    {transaction.status}
-                                  </div>
-                                </div>
-                                {transaction.tax ? (
-                                  <div className="mt-1 text-xs leading-5 text-gray-500 dark:text-gray-300">{transaction.tax} tax</div>
-                                ) : null}
-                              </div>
-                            </div>
-                            <div className="absolute bottom-0 right-full h-px w-screen bg-gray-100 dark:bg-gray-700" />
-                            <div className="absolute bottom-0 left-0 h-px w-screen bg-gray-100 dark:bg-gray-700" />
-                          </td>
-                          <td className="hidden py-5 pr-1 sm:table-cell">
-                            <div className="text-sm leading-6 text-gray-900 dark:text-gray-50">{transaction.client}</div>
-                            <div className="mt-1 text-xs leading-5 text-gray-500 dark:text-gray-300">{transaction.description}</div>
-                          </td>
-                          <td className="py-5 text-right pr-1">
-                            <div className="flex justify-end">
-                              <a
-                                href={transaction.href}
-                                className="text-sm font-medium leading-6 text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300"
-                              >
-                                View<span className="hidden sm:inline"> transaction</span>
-                                <span className="sr-only">
-                                  , invoice #{transaction.invoiceNumber}, {transaction.client}
-                                </span>
-                              </a>
-                            </div>
-                            <div className="mt-1 text-xs leading-5 text-gray-500 dark:text-gray-300">
-                              Invoice <span className="text-gray-900 dark:text-gray-50">#{transaction.invoiceNumber}</span>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </Fragment>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
+        <div className="mt-4">
+          <Tab.Panels className="w-full">
+            <Tab.Panel>
+              <Table people={people.slice(0, 2)} />
+            </Tab.Panel>
+            <Tab.Panel>
+              <Table people={people.slice(2, 4)} />
+            </Tab.Panel>
+            <Tab.Panel>
+              <Table people={people.slice(4)} />
+            </Tab.Panel>
+          </Tab.Panels>
         </div>
+      </Tab.Group>
+    </div>
+  );
+}
+
+const Table = ({ people }) => (
+  <div className="-m-1.5 overflow-x-auto">
+    <div className="p-1.5 min-w-full inline-block align-middle">
+      <div className={people.length > 5 ? "group border dark:border-gray-700 rounded-xl overflow-hidden max-h-[calc(2.5rem*6)] overflow-y-auto hover:border-emerald-500 dark:hover:border-emerald-500" : "group border dark:border-gray-700 rounded-xl overflow-hidden hover:border-emerald-500 dark:hover:border-emerald-500"}>
+        <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-600 w-full">
+          <thead className="text-gray-900 dark:text-white">
+            <tr>
+              <th scope="col" className="min-w-[25%] px-3 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-200 uppercase font-bold">
+                Name
+              </th>
+              <th scope="col" className="min-w-[30%] px-3 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-200 uppercase font-bold">
+                Title
+              </th>
+              <th scope="col" className="min-w-[30%] px-3 py-4 text-left text-sm font-medium text-gray-500 dark:text-gray-200 uppercase font-bold">
+                Email
+              </th>
+              <th scope="col" className="min-w-[15%] px-3 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-200 uppercase font-bold">
+                Edit
+              </th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200 dark:divide-gray-600 text-gray-900 dark:text-gray-300">
+            {people.map((person, index) => (
+              <tr key={person.email}>
+                <td className="px-3 py-4 text-sm font-medium">
+                  {person.name}
+                </td>
+                <td className="px-3 py-4 text-sm">
+                  {person.title}
+                </td>
+                <td className="px-3 py-4 text-sm">
+                  {person.email}
+                </td>
+                <td className="px-3 py-4 text-left text-sm font-medium">
+                  <a href="#" className="text-indigo-600 hover:text-indigo-900 dark:hover:text-indigo-400">
+                    Edit
+                  </a>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
-    </>
-  )
-};
+    </div>
+  </div>
+);
