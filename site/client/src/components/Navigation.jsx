@@ -199,11 +199,12 @@ export const navigation = [
     title: 'Services',
     links: [
       { title: 'Quickstart', href: '/quickstart' },
-      { title: 'Contacts', href: '/contacts' },
-      { title: 'Conversations', href: '/conversations' },
-      { title: 'Messages', href: '/messages' },
-      { title: 'Groups', href: '/groups' },
-      { title: 'Attachments', href: '/attachments' },
+      { title: 'Login', href: '/login' },
+      { title: 'Dashboard', href: '/dashboard' },
+      { title: 'Request Data', href: '/requestdata' },
+      { title: 'Request Update', href: '/requestupdate' },
+      { title: 'Respond', href: '/respond' },
+      { title: 'Cross-Chain Backup', href: '/crosschain' },
     ],
   },
 ]
