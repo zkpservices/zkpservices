@@ -1,58 +1,71 @@
 export const description =
-  'On this page, we’ll dive into the different contact endpoints you can use to manage contacts programmatically.'
+  'On this page, we’ll dive into the different user endpoints you can use to manage user data programmatically.'
 
-# Contacts
+# User Data
 
-As the name suggests, contacts are a core part of Protocol — the very reason Protocol exists is so you can have secure conversations with your contacts. On this page, we'll dive into the different contact endpoints you can use to manage contacts programmatically. We'll look at how to query, create, update, and delete contacts. {{ className: 'lead' }}
+User data is the foundation of the zkp.services solution. On this page, we'll dive into the API requests that our dApp makes with our backend API in order to control your data securely. {{ className: 'lead' }}
 
-## The contact model
+## The structure of user data
 
-The contact model contains all the information about your contacts, such as their username, avatar, and phone number. It also contains a reference to the conversation between you and the contact and information about when they were last active on Protocol.
+Our data model is an extremely versatile JSON object that gives way to an endless number of data points a user is able to store, for countless different services. As such, below we will provide an example of a potential data structure for user data, but note that none of the fields in the data object are specifically required.
 
 ### Properties
 
 <Properties>
   <Property name="id" type="string">
-    Unique identifier for the contact.
+    Unique wallet address identifier for the user.
   </Property>
-  <Property name="username" type="string">
-    The username for the contact.
+  <Property name="password" type="string">
+    The password associated with the user.
   </Property>
-  <Property name="phone_number" type="string">
-    The phone number for the contact.
+  <Property name="requests_sent" type="JSON Object[]">
+    A list of requests sent by the user.
   </Property>
-  <Property name="avatar_url" type="string">
-    The avatar image URL for the contact.
+  <Property name="requests_received" type="JSON Object[]">
+    A list of requests received for the user's data, by other users.
   </Property>
-  <Property name="display_name" type="string">
-    The contact display name in the contact list. By default, this is just the
-    username.
+  <Property name="responses_sent" type="JSON Object[]">
+    A list of responses sent by the user.
   </Property>
-  <Property name="conversation_id" type="string">
-    Unique identifier for the conversation associated with the contact.
-  </Property>
-  <Property name="last_active_at" type="timestamp">
-    Timestamp of when the contact was last active on the platform.
-  </Property>
-  <Property name="created_at" type="timestamp">
-    Timestamp of when the contact was created.
+  <Property name="responses_received" type="JSON Object[]">
+    A list of responses received by the user, of other users data.
   </Property>
 </Properties>
 
 ---
 
-## List all contacts {{ tag: 'GET', label: '/v1/contacts' }}
+## Retrieve user data {{ tag: 'POST', label: '/test/userdata-api, action: "get_item"' }}
 
 <Row>
   <Col>
 
-    This endpoint allows you to retrieve a paginated list of all your contacts. By default, a maximum of ten contacts are shown per page.
+    This endpoint allows you to retrieve either the entire, or a subset, of the "data" object for the self user.
+
+    Authorization is required.
+
+    ### Required attributes
+
+    <Properties>
+      <Property name="id" type="string">
+        The wallet address of the user.
+      </Property>
+      <Property name="password" type="string">
+        The hash of the password of the user.
+      </Property>
+      <Property name="action" type="string">
+        The action of this request, which is "get_item".
+      </Property>
+      <Property name="key" type="string">
+        The flattened JSON key for the property trying to be retrieved, for example, "medical records - pharmacy central melbourne.data.active prescriptions".
+      </Property>
+    </Properties>
 
     ### Optional attributes
 
     <Properties>
-      <Property name="limit" type="integer">
-        Limit the number of contacts returned.
+      <Property name="key" type="string">
+        The flattened JSON key for the property trying to be retrieved, for example, "medical records - pharmacy central melbourne.data.active prescriptions".
+        If not provided, will return the entire data set for user.
       </Property>
     </Properties>
 
@@ -62,55 +75,83 @@ The contact model contains all the information about your contacts, such as thei
     <CodeGroup title="Request" tag="GET" label="/v1/contacts">
 
     ```bash {{ title: 'cURL' }}
-    curl -G https://api.protocol.chat/v1/contacts \
-      -H "Authorization: Bearer {token}" \
-      -d active=true \
-      -d limit=10
+    curl --location --request POST https://yrd4sydg5g.execute-api.us-east-1.amazonaws.com/test/userdata-api' \
+    --header 'Content-Type: application/json' \
+    --data-raw '{
+        "id": "Ox4",
+        "action": "get_item",
+        "password": "abc123",
+        "key": "medical records - pharmacy central melbourne.data.active prescriptions.Amoxicillin"
+    }'
     ```
 
     ```js
-    import ApiClient from '@example/protocol-api'
+    var settings = {
+      "url": "https://yrd4sydg5g.execute-api.us-east-1.amazonaws.com/test/userdata-api",
+      "method": "POST",
+      "timeout": 0,
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "data": JSON.stringify({
+        "id": "Ox4",
+        "action": "get_item",
+        "password": "abc123",
+        "key": "medical records - pharmacy central melbourne.data.active prescriptions.Amoxicillin"
+      }),
+    };
 
-    const client = new ApiClient(token)
-
-    await client.contacts.list()
+    $.ajax(settings).done(function (response) {
+      console.log(response);
+    });
     ```
 
     ```python
-    from protocol_api import ApiClient
+    import requests
+    import json
 
-    client = ApiClient(token)
+    url = "https://yrd4sydg5g.execute-api.us-east-1.amazonaws.com/test/userdata-api"
 
-    client.contacts.list()
+    payload = json.dumps({
+      "id": "Ox4",
+      "action": "get_item",
+      "password": "abc123",
+      "key": "medical records - pharmacy central melbourne.data.active prescriptions.Amoxicillin"
+    })
+    headers = {
+      'Content-Type': 'application/json'
+    }
+
+    response = requests.request("POST", url, headers=headers, data=payload)
+
+    print(response.text)
+
     ```
 
-    ```php
-    $client = new \Protocol\ApiClient($token);
+    ```powershell {{ title: 'Powershell' }}
+    $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
+    $headers.Add("Content-Type", "application/json")
 
-    $client->contacts->list();
+    $body = "{
+    `n    `"id`": `"Ox4`",
+    `n    `"action`": `"get_item`",
+    `n    `"password`": `"abc123`",
+    `n    `"key`": `"medical records - pharmacy central melbourne.data.active prescriptions.Amoxicillin`"
+    `n}"
+
+    $response = Invoke-RestMethod 'https://yrd4sydg5g.execute-api.us-east-1.amazonaws.com/test/userdata-api' -Method 'POST' -Headers $headers -Body $body
+    $response | ConvertTo-Json
     ```
 
     </CodeGroup>
 
     ```json {{ title: 'Response' }}
     {
-      "has_more": false,
-      "data": [
-        {
-          "id": "WAz8eIbvDR60rouK",
-          "username": "FrankMcCallister",
-          "phone_number": "1-800-759-3000",
-          "avatar_url": "https://assets.protocol.chat/avatars/frank.jpg",
-          "display_name": null,
-          "conversation_id": "xgQQXg3hrtjh7AvZ",
-          "last_active_at": 705103200,
-          "created_at": 692233200
-        },
-        {
-          "id": "hSIhXBhNe8X1d8Et"
-          // ...
+        "medical records - pharmacy central melbourne.data.active prescriptions.Amoxicillin": {
+            "usage": "Antibiotic",
+            "dosage": "250mg to 500mg every 8 hours or 875mg every 12 hours",
+            "refills remaining": "3 for 50 x 1g or equivalent"
         }
-      ]
     }
     ```
 
@@ -119,34 +160,43 @@ The contact model contains all the information about your contacts, such as thei
 
 ---
 
-## Create a contact {{ tag: 'POST', label: '/v1/contacts' }}
+## Create a user and dataset {{ tag: 'POST', label: '/test/userdata-api, action: "create_item"' }}
 
 <Row>
   <Col>
 
-    This endpoint allows you to add a new contact to your contact list in Protocol. To add a contact, you must provide their Protocol username and phone number.
+    This endpoint allows you to create a new user and associated dataset. You can only add a user from a wallet that you own.
 
     ### Required attributes
 
     <Properties>
-      <Property name="username" type="string">
-        The username for the contact.
+      <Property name="id" type="string">
+        The wallet address of the user.
       </Property>
-      <Property name="phone_number" type="string">
-        The phone number for the contact.
+      <Property name="password" type="string">
+        The hash of the password of the user.
       </Property>
-    </Properties>
+      <Property name="action" type="string">
+        The action of this request, which is "create_item".
+      </Property>
+      <Property name="data" type="string">
+        Contains the initial JSON dataset for a user. Can be empty {}.
+      </Property>
+      <Property name="requests_sent" type="JSON Object">
+        The object containing the set of requests sent. This will usually be empty "\{\}" unless a user is being copied over from another database.
+      </Property>
+      <Property name="requests_received" type="JSON Object">
+        The object containing the set of requests received. This will usually be empty "\{\}" unless a user is being copied over from another database.
+      </Property>
+      <Property name="responses_sent" type="JSON Object">
+        The object containing the set of responses sent. This will usually be empty "\{\}" unless a user is being copied over from another database.
+      </Property>
+      <Property name="responses_received" type="JSON Object">
+        The object containing the set of requests received. This will usually be empty "\{\}" unless a user is being copied over from another database.
+      </Property>
 
-    ### Optional attributes
-
-    <Properties>
-      <Property name="avatar_url" type="string">
-        The avatar image URL for the contact.
-      </Property>
-      <Property name="display_name" type="string">
-        The contact display name in the contact list. By default, this is just the username.
-      </Property>
     </Properties>
+    
 
   </Col>
   <Col sticky>
@@ -154,60 +204,116 @@ The contact model contains all the information about your contacts, such as thei
     <CodeGroup title="Request" tag="POST" label="/v1/contacts">
 
     ```bash {{ title: 'cURL' }}
-    curl https://api.protocol.chat/v1/contacts \
-      -H "Authorization: Bearer {token}" \
-      -d username="FrankMcCallister" \
-      -d phone_number="1-800-759-3000" \
-      -d avatar_url="https://assets.protocol.chat/avatars/frank.jpg"
+      curl --location --request POST 'https://yrd4sydg5g.execute-api.us-east-1.amazonaws.com/test/userdata-api' \
+      --header 'Content-Type: application/json' \
+      --data-raw '{
+          "id": "Ox234",
+          "action": "create_item",
+          "password": "abc123",
+          "data": {
+              "id": {
+                  "name": "Johnathan Doe",
+                  "DOB": "25/03/2002"
+              }
+          },
+          "requests_sent": {},
+          "requests_received": {},
+          "responses_sent": {},
+          "responses_received": {}
+          
+      }'
     ```
 
     ```js
-    import ApiClient from '@example/protocol-api'
+    var settings = {
+      "url": "https://yrd4sydg5g.execute-api.us-east-1.amazonaws.com/test/userdata-api",
+      "method": "POST",
+      "timeout": 0,
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "data": JSON.stringify({
+        "id": "Ox234",
+        "action": "create_item",
+        "password": "abc123",
+        "data": {
+          "id": {
+            "name": "Johnathan Doe",
+            "DOB": "25/03/2002"
+          }
+        },
+        "requests_sent": {},
+        "requests_received": {},
+        "responses_sent": {},
+        "responses_received": {}
+      }),
+    };
 
-    const client = new ApiClient(token)
-
-    await client.contacts.create({
-      username: 'FrankMcCallister',
-      phone_number: '1-800-759-3000',
-      avatar_url: 'https://assets.protocol.chat/avatars/frank.jpg',
-    })
+$.ajax(settings).done(function (response) {
+  console.log(response);
+});
     ```
 
     ```python
-    from protocol_api import ApiClient
+      import requests
+      import json
 
-    client = ApiClient(token)
+      url = "https://yrd4sydg5g.execute-api.us-east-1.amazonaws.com/test/userdata-api"
 
-    client.contacts.create(
-      username="FrankMcCallister",
-      phone_number="1-800-759-3000",
-      avatar_url="https://assets.protocol.chat/avatars/frank.jpg",
-    )
+      payload = json.dumps({
+        "id": "Ox234",
+        "action": "create_item",
+        "password": "abc123",
+        "data": {
+          "id": {
+            "name": "Johnathan Doe",
+            "DOB": "25/03/2002"
+          }
+        },
+        "requests_sent": {},
+        "requests_received": {},
+        "responses_sent": {},
+        "responses_received": {}
+      })
+      headers = {
+        'Content-Type': 'application/json'
+      }
+
+      response = requests.request("POST", url, headers=headers, data=payload)
+
+      print(response.text)
+
     ```
 
-    ```php
-    $client = new \Protocol\ApiClient($token);
+    ```powershell {{ title: 'Powershell' }}
+    $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
+    $headers.Add("Content-Type", "application/json")
 
-    $client->contacts->create([
-      'username' => 'FrankMcCallister',
-      'phone_number' => '1-800-759-3000',
-      'avatar_url' => 'https://assets.protocol.chat/avatars/frank.jpg',
-    ]);
+    $body = "{
+    `n    `"id`": `"Ox234`",
+    `n    `"action`": `"create_item`",
+    `n    `"password`": `"abc123`",
+    `n    `"data`": {
+    `n        `"id`": {
+    `n            `"name`": `"Johnathan Doe`",
+    `n            `"DOB`": `"25/03/2002`"
+    `n        }
+    `n    },
+    `n    `"requests_sent`": {},
+    `n    `"requests_received`": {},
+    `n    `"responses_sent`": {},
+    `n    `"responses_received`": {}
+    `n    
+    `n}"
+
+    $response = Invoke-RestMethod 'https://yrd4sydg5g.execute-api.us-east-1.amazonaws.com/test/userdata-api' -Method 'POST' -Headers $headers -Body $body
+    $response | ConvertTo-Json
     ```
 
     </CodeGroup>
 
-    ```json {{ title: 'Response' }}
-    {
-      "id": "WAz8eIbvDR60rouK",
-      "username": "FrankMcCallister",
-      "phone_number": "1-800-759-3000",
-      "avatar_url": "https://assets.protocol.chat/avatars/frank.jpg",
-      "display_name": null,
-      "conversation_id": "xgQQXg3hrtjh7AvZ",
-      "last_active_at": null,
-      "created_at": 692233200
-    }
+    ```text {{ title: 'Response' }}
+    User 0x234 created successfully!
     ```
 
   </Col>
@@ -215,17 +321,18 @@ The contact model contains all the information about your contacts, such as thei
 
 ---
 
-## Retrieve a contact {{ tag: 'GET', label: '/v1/contacts/:id' }}
+## Update a users data {{ tag: 'PUT', label: '/test/userdata-api, action: "update_item"' }}
 
 <Row>
   <Col>
 
-    This endpoint allows you to retrieve a contact by providing their Protocol id. Refer to [the list](#the-contact-model) at the top of this page to see which properties are included with contact objects.
+    This endpoint allows you update the data object for a specific user. <br/><br/>
+    This is an <b>incremental</b> function, meaning that you supply the data \{\} json object containing only the fields you wish to update. The fields you do not specify will not be modified. If you specify a field that does not exist, it will be created.
 
   </Col>
   <Col sticky>
 
-    <CodeGroup title="Request" tag="GET" label="/v1/contacts/WAz8eIbvDR60rouK">
+    <CodeGroup title="Request" tag="PUT" label="/test/userdata-api">
 
     ```bash {{ title: 'cURL' }}
     curl https://api.protocol.chat/v1/contacts/WAz8eIbvDR60rouK \
