@@ -1,0 +1,28 @@
+# Quickstart
+
+This form will allow you to set up the necessary parameters required to use various zkp.services. 
+These consist of a DB password, 2FA password, smart contract password, RSA encryption keys, and RSA signing keys. 
+The role of each is subsequently explained.
+
+### Database Password
+
+The database password will allow you to securely authenticate access to data stored with your chosen data provider, which will house
+your data stored at rest.
+
+### 2FA Password
+
+The 2FA password is used to validate that you are you through knowledge of an additional secret password with our trustless, decentralized 2FA provider.
+
+### Smart Contract Password
+
+This is a password string that is used to obfuscate at which fields in the smart contract mappings proofs of plaintext data are stored.
+For example, `"Pharmacy Records for Good Pharmacy Co." => { obfuscated proof of data }` becomes 
+`"fdq928888f0q9u3333fuh0q98324fh9qqqqqqqq" => { obfuscated proof of data }`
+
+### RSA Encryption Keys
+
+Used to encrypt communications between two entities - that is, used to encrypt requests and responses for information.
+
+### RSA Signing Keys
+
+Used to sign and validate stored data.

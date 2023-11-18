@@ -10,8 +10,8 @@ import { UsersIcon } from '@/components/icons/UsersIcon'
 
 const services = [
   {
-    href: '/login',
-    name: 'Login',
+    href: '/requestdata',
+    name: 'Request Data',
     description:
       'Learn about the contact model and how to create, retrieve, update, delete, and list contacts.',
     icon: UserIcon,
@@ -24,8 +24,8 @@ const services = [
     },
   },
   {
-    href: '/dashboard',
-    name: 'Dashboard',
+    href: '/requestupdate',
+    name: 'Request Update',
     description:
       'Learn about the conversation model and how to create, retrieve, update, delete, and list conversations.',
     icon: ChatBubbleIcon,
@@ -38,8 +38,8 @@ const services = [
     },
   },
   {
-    href: '/requestdata',
-    name: 'Request Data',
+    href: '/respond',
+    name: 'Respond',
     description:
       'Learn about the message model and how to create, retrieve, update, delete, and list messages.',
     icon: EnvelopeIcon,
@@ -52,8 +52,8 @@ const services = [
     },
   },
   {
-    href: '/groups',
-    name: 'Groups',
+    href: '/crosschain',
+    name: 'Cross-Chain Backups',
     description:
       'Learn about the group model and how to create, retrieve, update, delete, and list groups.',
     icon: UsersIcon,
