@@ -1,5 +1,9 @@
 notes
 scenarios
 **/node_modules
+lambda/
+**/.terraform.lock.hcl
+**/terraform.tfstate
+**/terraform-provider-aws_v5.9.0_x5.exe
 **/artifacts
 **/.deps
