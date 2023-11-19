@@ -18,6 +18,9 @@ Our data model is an extremely versatile JSON object that gives way to an endles
   <Property name="password" type="string">
     The password associated with the user.
   </Property>
+  <Property name="data" type="JSON Object[]">
+    JSON object containing the entire dataset for a specific user. Usually only accessed at child levels.
+  </Property>
   <Property name="requests_sent" type="JSON Object[]">
     A list of requests sent by the user.
   </Property>
@@ -54,9 +57,6 @@ Our data model is an extremely versatile JSON object that gives way to an endles
       </Property>
       <Property name="action" type="string">
         The action of this request, which is "get_item".
-      </Property>
-      <Property name="key" type="string">
-        The flattened JSON key for the property trying to be retrieved, for example, "medical records - pharmacy central melbourne.data.active prescriptions".
       </Property>
     </Properties>
 
@@ -355,19 +355,17 @@ $.ajax(settings).done(function (response) {
     curl --location --request PUT 'https://yrd4sydg5g.execute-api.us-east-1.amazonaws.com/test/userdata-api' \
     --header 'Content-Type: application/json' \
     --data-raw '{
-        "httpMethod": "PUT",
-        "body": {
-            "id": "Ox3",
-            "data": {
-                "medical records": {
-                    "prescriptions": [
-                        "vitamin C"
-                    ]
-                }
+        "id": "Ox8ab74ba8cbed8374bd",
+        "data": {
+            "myki": {
+                "balance": "A$200"
             },
-            "password": "abc123",
-            "action": "update_item"
-        }
+            "commbank": {
+                "savings": "A$20000.00"
+            }
+        },
+        "password": "abc123",
+        "action": "update_item"
     }'
     ```
 
@@ -380,19 +378,17 @@ $.ajax(settings).done(function (response) {
         "Content-Type": "application/json"
       },
       "data": JSON.stringify({
-        "httpMethod": "PUT",
-        "body": {
-          "id": "Ox3",
-          "data": {
-            "medical records": {
-              "prescriptions": [
-                "vitamin C"
-              ]
-            }
+        "id": "Ox8ab74ba8cbed8374bd",
+        "data": {
+          "myki": {
+            "balance": "A$200"
           },
-          "password": "abc123",
-          "action": "update_item"
-        }
+          "commbank": {
+            "savings": "A$20000.00"
+          }
+        },
+        "password": "abc123",
+        "action": "update_item"
       }),
     };
 
@@ -408,19 +404,17 @@ $.ajax(settings).done(function (response) {
     url = "https://yrd4sydg5g.execute-api.us-east-1.amazonaws.com/test/userdata-api"
 
     payload = json.dumps({
-      "httpMethod": "PUT",
-      "body": {
-        "id": "Ox3",
-        "data": {
-          "medical records": {
-            "prescriptions": [
-              "vitamin C"
-            ]
-          }
+      "id": "Ox8ab74ba8cbed8374bd",
+      "data": {
+        "myki": {
+          "balance": "A$200"
         },
-        "password": "abc123",
-        "action": "update_item"
-      }
+        "commbank": {
+          "savings": "A$20000.00"
+        }
+      },
+      "password": "abc123",
+      "action": "update_item"
     })
     headers = {
       'Content-Type': 'application/json'
@@ -429,7 +423,6 @@ $.ajax(settings).done(function (response) {
     response = requests.request("PUT", url, headers=headers, data=payload)
 
     print(response.text)
-
     ```
 
     ```powershell {{ title: 'Powershell' }}
@@ -437,19 +430,17 @@ $.ajax(settings).done(function (response) {
     $headers.Add("Content-Type", "application/json")
 
     $body = "{
-    `n    `"httpMethod`": `"PUT`",
-    `n    `"body`": {
-    `n        `"id`": `"Ox3`",
-    `n        `"data`": {
-    `n            `"medical records`": {
-    `n                `"prescriptions`": [
-    `n                    `"vitamin C`"
-    `n                ]
-    `n            }
+    `n    `"id`": `"Ox8ab74ba8cbed8374bd`",
+    `n    `"data`": {
+    `n        `"myki`": {
+    `n            `"balance`": `"A`$200`"
     `n        },
-    `n        `"password`": `"abc123`",
-    `n        `"action`": `"update_item`"
-    `n    }
+    `n        `"commbank`": {
+    `n            `"savings`": `"A`$20000.00`"
+    `n        }
+    `n    },
+    `n    `"password`": `"abc123`",
+    `n    `"action`": `"update_item`"
     `n}"
 
     $response = Invoke-RestMethod 'https://yrd4sydg5g.execute-api.us-east-1.amazonaws.com/test/userdata-api' -Method 'PUT' -Headers $headers -Body $body
@@ -457,9 +448,26 @@ $.ajax(settings).done(function (response) {
     ```
   </CodeGroup>
       ```json {{ title: 'Response' }}
-      "medical records": {
-          "prescriptions": [
-              "vitamin C"
+      {
+          "data": {
+              "myki": {
+                  "balance": "A$200"
+              },
+              "id": {
+                  "name": "Johnathan Doe",
+                  "DOB": "25/03/2002"
+              },
+              "commbank": {
+                  "savings": "mbbbnngg"
+              },
+              "NAB": {
+                  "savings": "A$2400.00"
+              }
+          },
+          "dashboard": [
+              "myki",
+              "commbank",
+              "NAB"
           ]
       }
     ```
@@ -503,13 +511,10 @@ $.ajax(settings).done(function (response) {
     curl --location --request PUT 'https://yrd4sydg5g.execute-api.us-east-1.amazonaws.com/test/userdata-api' \
     --header 'Content-Type: application/json' \
     --data-raw '{
-        "httpMethod": "PUT",
-        "body": {
-            "id": "Ox3",
-            "new_password": "def456",
+            "id": "Ox4",
+            "new_password": "abc123",
             "password": "abc123",
             "action": "update_password"
-        }
     }'
     ```
 
@@ -522,13 +527,10 @@ $.ajax(settings).done(function (response) {
         "Content-Type": "application/json"
       },
       "data": JSON.stringify({
-        "httpMethod": "PUT",
-        "body": {
-          "id": "Ox3",
-          "new_password": "def456",
-          "password": "abc123",
-          "action": "update_password"
-        }
+        "id": "Ox4",
+        "new_password": "abc123",
+        "password": "abc123",
+        "action": "update_password"
       }),
     };
 
@@ -544,13 +546,10 @@ $.ajax(settings).done(function (response) {
     url = "https://yrd4sydg5g.execute-api.us-east-1.amazonaws.com/test/userdata-api"
 
     payload = json.dumps({
-      "httpMethod": "PUT",
-      "body": {
-        "id": "Ox3",
-        "new_password": "def456",
-        "password": "abc123",
-        "action": "update_password"
-      }
+      "id": "Ox4",
+      "new_password": "abc123",
+      "password": "abc123",
+      "action": "update_password"
     })
     headers = {
       'Content-Type': 'application/json'
@@ -566,13 +565,10 @@ $.ajax(settings).done(function (response) {
     $headers.Add("Content-Type", "application/json")
 
     $body = "{
-    `n    `"httpMethod`": `"PUT`",
-    `n    `"body`": {
-    `n        `"id`": `"Ox3`",
-    `n        `"new_password`": `"def456`",
+    `n        `"id`": `"Ox4`",
+    `n        `"new_password`": `"abc123`",
     `n        `"password`": `"abc123`",
     `n        `"action`": `"update_password`"
-    `n    }
     `n}"
 
     $response = Invoke-RestMethod 'https://yrd4sydg5g.execute-api.us-east-1.amazonaws.com/test/userdata-api' -Method 'PUT' -Headers $headers -Body $body
@@ -851,6 +847,109 @@ $.ajax(settings).done(function (response) {
 
     ```text {{ title: 'Response' }}
     "Response added successfully"
+    ```
+
+  </Col>
+</Row>
+
+---
+
+## Retrieve user dashboard items {{ tag: 'POST', label: '/test/userdata-api, action: "get_dashboard"' }}
+
+<Row>
+  <Col>
+
+    This endpoint allows you to the list of services available for a particular users dashboard.
+
+    Authorization is required.
+
+    ### Required attributes
+
+    <Properties>
+      <Property name="id" type="string">
+        The wallet address of the user.
+      </Property>
+      <Property name="password" type="string">
+        The hash of the password of the user.
+      </Property>
+      <Property name="action" type="string">
+        The action of this request, which is "get_dashboard".
+      </Property>
+    </Properties>
+
+  </Col>
+  <Col sticky>
+
+    <CodeGroup title="Request" tag="POST" label="/v1/contacts">
+
+    ```bash {{ title: 'cURL' }}
+    curl --location --request POST 'https://yrd4sydg5g.execute-api.us-east-1.amazonaws.com/test/userdata-api' \
+    --header 'Content-Type: application/json' \
+    --data-raw '{
+        "id": "Ox8ab74ba8cbed8374bd",
+        "action": "get_dashboard",
+        "password": "abc123"
+    }'
+    ```
+
+    ```js
+    var settings = {
+      "url": "https://yrd4sydg5g.execute-api.us-east-1.amazonaws.com/test/userdata-api",
+      "method": "POST",
+      "timeout": 0,
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "data": JSON.stringify({
+        "id": "Ox8ab74ba8cbed8374bd",
+        "action": "get_dashboard",
+        "password": "abc123"
+      }),
+    };
+
+    $.ajax(settings).done(function (response) {
+      console.log(response);
+    });
+    ```
+
+    ```python
+    import requests
+    import json
+
+    url = "https://yrd4sydg5g.execute-api.us-east-1.amazonaws.com/test/userdata-api"
+
+    payload = json.dumps({
+      "id": "Ox8ab74ba8cbed8374bd",
+      "action": "get_dashboard",
+      "password": "abc123"
+    })
+    headers = {
+      'Content-Type': 'application/json'
+    }
+
+    response = requests.request("POST", url, headers=headers, data=payload)
+
+    print(response.text)
+    ```
+
+    ```powershell {{ title: 'Powershell' }}
+    $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
+    $headers.Add("Content-Type", "application/json")
+
+    $body = "{
+    `n    `"id`": `"Ox8ab74ba8cbed8374bd`",
+    `n    `"action`": `"get_dashboard`",
+    `n    `"password`": `"abc123`"
+    `n}"
+
+    $response = Invoke-RestMethod 'https://yrd4sydg5g.execute-api.us-east-1.amazonaws.com/test/userdata-api' -Method 'POST' -Headers $headers -Body $body
+    $response | ConvertTo-Json
+    ```
+
+    </CodeGroup>
+
+    ```json {{ title: 'Response' }}
+    ["myki", "commbank", "NAB"]
     ```
 
   </Col>
