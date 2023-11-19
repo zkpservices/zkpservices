@@ -1,4 +1,6 @@
 import { Logo } from "../components/Logo.jsx"
+import { useState } from 'react'
+import { useWallet } from "@/components/Wallet.jsx";
 
 /*
   This example requires some changes to your config:
@@ -16,6 +18,7 @@ import { Logo } from "../components/Logo.jsx"
 */
 
 export default function Example() {
+  const { walletConnected } = useWallet();
   return (
     <>
       {/*
@@ -30,6 +33,8 @@ export default function Example() {
         <div className="w-full max-w-md space-y-8">
           <div>
             <Logo className="mx-20" />
+            {walletConnected ? (
+            <>
             <h2 className="mt-10 text-center text-3xl font-bold tracking-tight ">
               Sign in to your account
             </h2>
@@ -39,7 +44,15 @@ export default function Example() {
                 set up your account 
               </a>
             </p>
+            </>
+            ) : (
+              <h2 className="mt-10 text-center text-3xl font-bold tracking-tight">
+                Please connect your wallet to get started.
+              </h2>
+            )}
           </div>
+          {walletConnected ? (
+          <>
           <form className="mt-8 space-y-6" action="#" method="POST">
 
               <div>
@@ -106,6 +119,10 @@ export default function Example() {
               </button>
             </div>
           </form>
+          </>
+          ) : (
+            <></>
+          )}
         </div>
       </div>
     </>

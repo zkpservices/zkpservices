@@ -3,6 +3,7 @@ import Link from 'next/link'
 import clsx from 'clsx'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { MetaMaskSDK } from '@metamask/sdk';
+import { useWallet } from './Wallet';
 
 import { Button } from '@/components/Button'
 import { Logo } from '@/components/Logo'
@@ -47,7 +48,7 @@ export const Header = forwardRef(function Header({ className }, ref) {
   let bgOpacityDark = useTransform(scrollY, [0, 72], [0.2, 0.8])
   const [account, setAccount] = useState(null);
   const [accountText, setAccountText] = useState('');
-  const [walletConnected, setWalletConnected] = useState(false);
+  const { walletConnected, setWalletConnected } = useWallet();
   const [isHovered, setIsHovered] = useState(false);
   const [textOpacity, setTextOpacity] = useState(1); // Initialize opacity to 1
 
@@ -147,7 +148,7 @@ export const Header = forwardRef(function Header({ className }, ref) {
         {/* <MobileSearch /> */}
         <ModeToggle />
       </div>
-      <div className="hidden min-[416px]:contents">
+      <div className="hidden min-[416px]:contents flex gap-4">
         <Button href="#" id="connectWalletButtonNav"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
@@ -158,6 +159,14 @@ export const Header = forwardRef(function Header({ className }, ref) {
             {walletConnected && isHovered ? 'Disconnect' : walletConnected ? accountText : 'Connect Wallet'}
           </span>
         </Button>
+        <Button
+        href="/login"
+        id="loginButtonNav"
+        className={`${walletConnected ? 'opacity-100 cursor-pointer' : 'opacity-60 cursor-not-allowed'}`}
+        disabled={!walletConnected}
+      >
+        Login
+      </Button>
         </div>
       </div>
     </motion.div>

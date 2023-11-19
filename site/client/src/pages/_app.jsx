@@ -1,6 +1,7 @@
 import Head from 'next/head'
 import { Router, useRouter } from 'next/router'
 import { MDXProvider } from '@mdx-js/react'
+import { WalletProvider } from '@/components/Wallet'
 
 import { Layout } from '@/components/Layout'
 import * as mdxComponents from '@/components/mdx'
@@ -26,11 +27,13 @@ export default function App({ Component, pageProps }) {
         <title>zkp.services</title>
         <meta name="description" content={pageProps.description} />
       </Head>
+      <WalletProvider>
       <MDXProvider components={mdxComponents}>
         <Layout {...pageProps}>
           <Component {...pageProps} />
         </Layout>
       </MDXProvider>
+      </WalletProvider>
     </>
   )
 }
