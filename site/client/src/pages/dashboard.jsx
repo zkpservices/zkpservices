@@ -316,7 +316,11 @@ function HollowCard() {
 }
 
 
+
 const IlluminatedTable = ({ people }) => {
+  const [isOverflowing, setIsOverflowing] = useState(false);
+  const tableContainerRef = useRef(null);
+
   let mouseX = useMotionValue(0);
   let mouseY = useMotionValue(0);
 
@@ -334,12 +338,25 @@ const IlluminatedTable = ({ people }) => {
     mouseY.set(clientY - top);
   }
 
+  useEffect(() => {
+    if (tableContainerRef.current) {
+      const contentHeight = tableContainerRef.current.scrollHeight;
+      const containerHeight = tableContainerRef.current.clientHeight;
+
+      if (contentHeight > containerHeight) {
+        setIsOverflowing(true);
+      } else {
+        setIsOverflowing(false);
+      }
+    }
+  }, [people]);
+
   let maskImage = useMotionTemplate`radial-gradient(180px at ${mouseX}px ${mouseY}px, white, transparent)`;
   let style = { maskImage, WebkitMaskImage: maskImage };
 
   return (
-    <div className="overflow-x-auto relative" onMouseMove={onMouseMove}>
-      <MyDataPattern {...pattern} mouseX={mouseX} mouseY={mouseY} /> 
+    <div className="relative" onMouseMove={onMouseMove}>
+      <MyDataPattern {...pattern} mouseX={mouseX} mouseY={mouseY} />
       <div className="min-w-full inline-block align-middle overflow-hidden rounded-xl">
         <div className="group relative flex rounded-xl transition-shadow hover:shadow-md hover:shadow-zinc-900/5 dark:hover:shadow-black/5">
           <motion.div
@@ -347,7 +364,11 @@ const IlluminatedTable = ({ people }) => {
             style={{ ...style, zIndex: -1 }}
           />
           <div className="absolute inset-0 rounded-xl ring-1 ring-inset ring-zinc-900/7.5 group-hover:ring-zinc-900/10 dark:ring-white/10 dark:group-hover:ring-white/20" />
-          <div className="relative z-10 overflow-y-auto max-h-[calc(2.5rem*10)] w-full">
+          <div
+            ref={tableContainerRef}
+            className={`relative z-10 w-full ${isOverflowing ? 'overflow-y-auto' : ''}`}
+            style={{ maxHeight: 'calc(2.5rem * 10)' }}
+          >
             <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-600 w-full table-fixed">
               <thead className="text-gray-900 dark:text-white">
                 <tr>
@@ -392,8 +413,6 @@ const IlluminatedTable = ({ people }) => {
     </div>
   );
 };
-
-
 
 const rows = [
   ["Row1 Cell1", "Row1 Cell2"],
