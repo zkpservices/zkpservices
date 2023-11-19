@@ -11,7 +11,6 @@ import { UserIcon } from '@/components/icons/UserIcon'
 import { UsersIcon } from '@/components/icons/UsersIcon'
 import { PlusIcon } from '@/components/icons/PlusIcon'
 import { History } from '@/components/History'
-import { Notification } from '@/components/Notification'
 
 const mydata = [
   {
@@ -365,65 +364,6 @@ function HollowCard() {
 
 
 export function Dashboard() {
-
-  let tableData = {
-    'Incoming': [
-      {
-        operation: ['Data Requested', 'From You'],
-        field: ['Central Melbourne Pharmacy Records', 'Address 0x2344242...3424242'],
-        status: ['Response Sent', 'grey'], 
-        details: ['View Details', 'Request ID 0x240992222222222229']
-      },
-      {
-        operation: ['Update Requested', 'From You'],
-        field: ['Central Melbourne Pharmacy Records', 'Address 0x2344242...3424242'],
-        status: ['Complete Update', 'button'], 
-        details: ['View Details', 'Request ID 0x240992222222222229']
-      }
-    ],
-    'Outgoing': [
-      {
-        operation: ['Data Requested', 'By You'],
-        field: ['Pharmacist Identity', 'Address 0x2344242...3424242'],
-        status: ['View Response', 'button'], 
-        details: ['View Details', 'Request ID 0x342222222222222444']
-      },
-      {
-        operation: ['Data Requested', 'By You'],
-        field: ['Pharmacist License', 'Address 0x2344242...3424242'],
-        status: ['Awaiting Response', 'grey'], 
-        details: ['View Details', 'Request ID 0x342222222222222444']
-      },
-      {
-        operation: ['Data Requested', 'By You'],
-        field: ['Pharmacist License', 'Address 0x2344242...3424242'],
-        status: ['Awaiting Response', 'grey'], 
-        details: ['View Details', 'Request ID 0x342222222222222444']
-      }
-    ],
-    // 'Cross-Chain Sync': [
-    //   {
-    //     operation: ['Sync Data'],
-    //     field: ['Central Melbourne Pharmacy Records', 'From Avalanche to Polygon'],
-    //     status: ['Sync Completed', 'button'], 
-    //     details: ['View Details']
-    //   },
-    //   {
-    //     operation: ['Sync Data'],
-    //     field: ['Central Melbourne Pharmacy Records', 'From Avalanche to Optimism'],
-    //     status: ['Sync Completed', 'button'], 
-    //     details: ['View Details']
-    //   },
-    //   {
-    //     operation: ['Sync Public Information'],
-    //     field: ['Public Information', 'From Polygon to Avalanche'],
-    //     status: ['Awaiting Completion', 'grey'], 
-    //     details: ['View Details']
-    //   }
-    // ]
-  };
-
-
   return (
     <>
 
@@ -455,15 +395,8 @@ export function Dashboard() {
         Recent Activity
       </Heading>
       <div className="mt-4 border-t border-zinc-900/5 dark:border-white/5" >
-        <History tableData={tableData} />
+        <History />
       </div>
-    </div>
-
-    <div>
-      <Notification
-        showTopText="Test Title"
-        showBottomText="Test Description"
-      />
     </div>
 
     </>

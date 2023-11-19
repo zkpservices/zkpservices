@@ -86,6 +86,7 @@ import boto3
 from botocore.exceptions import ClientError
 
 def delete_item(item_id, password, key):
+    check_password(item_id, password)
     try:
         # Authenticate the user
         password_auth_result = check_password(item_id, password)
@@ -171,6 +172,7 @@ def get_item_public(item_id, password):
                 
 
 def update_password(item_id, new_password, old_password, context):
+    check_password(id, old_password)
 
     try:
         response = table.update_item(
@@ -196,6 +198,7 @@ def create_item(item_data):
         responses_received_data_json = json.dumps(item_data.get('responses_received', {}))
         requests_sent_data_json = json.dumps(item_data.get('requests_sent', {}))
         responses_sent_data_json = json.dumps(item_data.get('responses_sent', {}))
+        crosschain_transactions = json.dumps(item_data.get('crosschain_transactions', {}))
 
         # Initialize the available_dashboard list with objects from the data field
         available_dashboard = list(item_data['data'].keys())
@@ -217,7 +220,7 @@ def create_item(item_data):
             "requests_sent": requests_sent_data_json,
             "responses_sent": responses_sent_data_json,
             "available_dashboard": available_dashboard,  # Add the available_dashboard list
-            "last_updated": item_data['last_updated']  # Add the "last_updated" timestamp
+            "crosschain_transactions": crosschain_transactions
         })
 
         return "Item created successfully!"
@@ -225,6 +228,7 @@ def create_item(item_data):
         return str(e)
 
 def update_item(id, password, body):
+    check_password(id, password)
     # Check if the item with the given ID exists
     existing_item = get_item(id)
     if not existing_item:
@@ -305,7 +309,8 @@ def update_timestamps(data):
 
 
 
-def add_request(sender_id, requests):
+def add_request(sender_id, requests, password):
+    check_password(sender_id, password)
     try:
         # Get sender's data from the database
         sender_response = table.get_item(Key={"id": sender_id})
@@ -365,7 +370,8 @@ def add_request(sender_id, requests):
             "body": json.dumps(str(e))
         }
 
-def add_response(sender_id, responses):
+def add_response(sender_id, responses, password):
+    check_password(sender_id, password)
     try:
         # Get sender's data from the database
         sender_response = table.get_item(Key={"id": sender_id})
@@ -425,7 +431,8 @@ def add_response(sender_id, responses):
             "body": json.dumps(str(e))
         }
 
-def get_available_dashboard(item_id):
+def get_available_dashboard(item_id, password):
+    check_password(item_id, password)
     try:
         # Query the DynamoDB table to fetch the available_dashboard attribute
         response = table.get_item(Key={"id": item_id}, ProjectionExpression="available_dashboard")
@@ -450,7 +457,8 @@ def get_available_dashboard(item_id):
             "body": json.dumps(str(e))
         }
 
-def get_dashboard(item_id):
+def get_dashboard(item_id, password):
+    check_password(item_id, password)
     try:
 
         # Query the DynamoDB table to fetch the "dashboard" attribute
@@ -475,7 +483,8 @@ def get_dashboard(item_id):
             "body": json.dumps(str(e))
         }
 
-def add_to_dashboard(item_id, service):
+def add_to_dashboard(item_id, service, password):
+    check_password(item_id, password)
     try:
 
         # Query the DynamoDB table to fetch the "available_dashboard" attribute
@@ -533,7 +542,8 @@ def add_to_dashboard(item_id, service):
             "body": json.dumps(str(e))
         }
 
-def remove_from_dashboard(item_id, service):
+def remove_from_dashboard(item_id, service, password):
+    check_password(item_id, password)
     try:
 
         # Query the DynamoDB table to fetch the "dashboard" attribute
@@ -574,7 +584,95 @@ def remove_from_dashboard(item_id, service):
             "body": json.dumps(str(e))
         }
 
+def add_crosschain_transaction(id, crosschain_transaction, password):
+    check_password(id, password)
+    try:
+        
+        # Get users CCTXs from the database
+        user = table.get_item(Key={"id": id})
+        user_data = user.get("Item", None)
 
+        if not user_data:
+            return {
+                "statusCode": 404,
+                "body": json.dumps("User not found")
+            }
+
+        # Update users cctx's
+        cctx = json.loads(user_data.get('crosschain_transactions', '{}'))
+        cctx.update(crosschain_transaction)
+        crosschain_transactions = json.dumps(cctx)
+
+        # Update cctx's in the database
+        response = table.update_item(
+            Key={"id": id},
+            UpdateExpression="set #crosschain_transactions = :crosschain_transactions",
+            ExpressionAttributeNames={"#crosschain_transactions": "crosschain_transactions"},
+            ExpressionAttributeValues={":crosschain_transactions": crosschain_transactions}
+        )
+
+        return {
+            "statusCode": 200,
+            "body": json.dumps("Crosschain transaction added successfully!")
+        }
+
+    except Exception as e:
+        return {
+            "statusCode": 500,
+            "body": json.dumps(str(e))
+        }
+
+def get_crosschain_transcation(id, password):
+    check_password(id, password)
+    try:
+
+        # Query the DynamoDB table to fetch the "crosschain_transactions" attribute
+        response = table.get_item(Key={"id": id}, ProjectionExpression="crosschain_transactions")
+        item = response.get("Item", None)
+        if not item or "crosschain_transactions" not in item:
+            return {
+                "statusCode": 404,
+                "body": json.dumps("Crosschain transactions list not found")
+            }
+
+        # Retrieve the "crosschain_transactions" list from the item
+        cctx = item.get('crosschain_transactions', [])
+
+        return {
+            "statusCode": 200,
+            "body": json.dumps(cctx)
+        }
+    except Exception as e:
+        return {
+            "statusCode": 500,
+            "body": json.dumps(str(e))
+        }
+
+def get_crosschain_transaction(id, password):
+    check_password(id, password)
+    try:
+
+        # Query the DynamoDB table to fetch the "crosschain_transactions" attribute
+        response = table.get_item(Key={"id": id}, ProjectionExpression="crosschain_transactions")
+        item = response.get("Item", None)
+        if not item or "crosschain_transactions" not in item:
+            return {
+                "statusCode": 404,
+                "body": json.dumps("Crosschain transactions list not found")
+            }
+
+        # Retrieve the "crosschain_transactions" list from the item
+        cctx = item.get('crosschain_transactions', [])
+
+        return {
+            "statusCode": 200,
+            "body": cctx
+        }
+    except Exception as e:
+        return {
+            "statusCode": 500,
+            "body": json.dumps(str(e))
+        }
 
 
 def handler(event, context):
@@ -600,8 +698,7 @@ def handler(event, context):
         #         }
         if http_method == 'POST':
             if body and 'action' in body and body['action'] == 'get_item':
-                password_auth_result = check_password(body['id'], body['password'])
-                if(password_auth_result == True):
+
                     if 'id' in body:
                         key = None
                         if 'key' in body:
@@ -614,8 +711,7 @@ def handler(event, context):
                             "statusCode": 400,
                             "body": json.dumps("Missing 'id' in the request body")
                         }
-                else:
-                    return password_auth_result
+
             elif body and 'action' in body and body['action'] == 'create_item':
                 if 'id' in body and 'data' in body:
                     return create_item(body)
@@ -625,66 +721,66 @@ def handler(event, context):
                         "body": json.dumps("Missing 'id' or 'data' in the request body")
                     }
             elif body and 'action' in body and body['action'] == 'add_request':
-                password_auth_result = check_password(body['id'], body['password'])
-                if(password_auth_result == True):
-                    if 'requests' in body and 'id' in body:
-                        return add_request(body['id'], body['requests'])
-                    else:
-                        return {
-                            "statusCode": 400,
-                            "body": json.dumps("Missing 'requests' or 'id' in the request body")
-                        }
+                if 'requests' in body and 'id' in body:
+                    return add_request(body['id'], body['requests'])
                 else:
-                    return password_auth_result
+                    return {
+                        "statusCode": 400,
+                        "body": json.dumps("Missing 'requests' or 'id' in the request body")
+                    }
+
             elif body and 'action' in body and body['action'] == 'add_response':
-                password_auth_result = check_password(body['id'], body['password'])
-                if(password_auth_result == True):
-                    if 'responses' in body and 'id' in body:
-                        return add_response(body['id'], body['responses'])
-                    else:
-                        return {
-                            "statusCode": 400,
-                            "body": json.dumps("Missing 'responses' or 'id' in the request body")
-                        }
+                if 'responses' in body and 'id' in body:
+                    return add_response(body['id'], body['responses'], body['password'])
                 else:
-                    return password_auth_result
+                    return {
+                        "statusCode": 400,
+                        "body": json.dumps("Missing 'responses' or 'id' in the request body")
+                    }
+
             elif body['action'] == 'get_available_dashboard':
-                password_auth_result = check_password(body['id'], body['password'])
-                if(password_auth_result == True):
-                    if 'id' in body:
-                        return get_available_dashboard(body['id'])
-                    else:
-                        return {
-                            "statusCode": 400,
-                            "body": json.dumps("Missing 'id' or 'password' in the request body")
-                        }
+                if 'id' in body:
+                    return get_available_dashboard(body['id'], body['password'])
                 else:
-                    return password_auth_result
+                    return {
+                        "statusCode": 400,
+                        "body": json.dumps("Missing 'id' or 'password' in the request body")
+                    }
+
             elif body['action'] == 'get_dashboard':
-                password_auth_result = check_password(body['id'], body['password'])
-                if(password_auth_result == True):
-                    if 'id' in body:
-                        return get_dashboard(body['id'])
-                    else:
-                        return {
-                            "statusCode": 400,
-                            "body": json.dumps("Missing 'id' or 'password' in the request body")
+                if 'id' in body:
+                    return get_dashboard(body['id'], body['password'])
+                else:
+                    return {
+                        "statusCode": 400,
+                        "body": json.dumps("Missing 'id' or 'password' in the request body")
+                    }
+
+            elif body['action'] == 'add_to_dashboard':
+                if 'id' in body and 'password' in body and 'service' in body:
+                    return add_to_dashboard(body['id'], body['service'], body['password'])
+                else:
+                    return {
+                        "statusCode": 400,
+                        "body": json.dumps("Missing 'id', 'password', or 'service' in the request body")
                         }
+            elif body['action'] == 'add_crosschain_transaction':
+                if 'id' in body:
+                    return add_crosschain_transaction(body['id'], body['transaction'], body['password'])
                 else:
-                    return password_auth_result
-            elif body and 'action' in body:
-                password_auth_result = check_password(body['id'], body['password'])
-                if(password_auth_result == True):
-                    if body['action'] == 'add_to_dashboard':
-                        if 'id' in body and 'password' in body and 'service' in body:
-                            return add_to_dashboard(body['id'], body['service'])
-                        else:
-                            return {
-                                "statusCode": 400,
-                                "body": json.dumps("Missing 'id', 'password', or 'service' in the request body")
-                            }
+                    return {
+                        "statusCode": 400,
+                        "body": json.dumps("Missing 'id', 'transaction' or 'password' in the request body")
+                        }
+            elif body['action'] == 'get_crosschain_transaction':
+                if 'id' in body:
+                    return get_crosschain_transaction(body['id'], body['password'])
                 else:
-                    return password_auth_result
+                    return {
+                        "statusCode": 400,
+                        "body": json.dumps("Missing 'id', 'transaction' or 'password' in the request body")
+                        }
+
             # Add handling for other POST actions here
             else:
                 return {
@@ -693,60 +789,52 @@ def handler(event, context):
                 }
 
         elif http_method == 'PUT':
-            password_auth_result = check_password(body['id'], body['password'])
-            if(password_auth_result == True):
-                if body and 'action' in body and body['action'] == 'update_item':
-                    if 'id' in body and 'data' in body and 'password' in body:
-                        return update_item(body['id'], body['password'], body['data'])
-                    else:
-                        return {
-                            "statusCode": 400,
-                            "body": json.dumps("Missing 'id', 'data', or 'password' in the update item request body")
-                        }
-                if body and 'action' in body and body['action'] == 'update_password':
-                    if 'id' in body and 'password' in body:
-                        return update_password(body['id'], body['new_password'], body['password'], context)
-                    else:
-                        return {
-                            "statusCode": 400,
-                            "body": json.dumps("Missing 'id', 'data', or 'password' in the request body")
-                        }
-                # Add handling for other PUT actions here
+            if body and 'action' in body and body['action'] == 'update_item':
+                if 'id' in body and 'data' in body and 'password' in body:
+                    return update_item(body['id'], body['password'], body['data'])
                 else:
                     return {
                         "statusCode": 400,
-                        "body": json.dumps("Invalid action for PUT request")
+                        "body": json.dumps("Missing 'id', 'data', or 'password' in the update item request body")
                     }
+            if body and 'action' in body and body['action'] == 'update_password':
+                if 'id' in body and 'password' in body:
+                    return update_password(body['id'], body['new_password'], body['password'], context)
+                else:
+                    return {
+                        "statusCode": 400,
+                        "body": json.dumps("Missing 'id', 'data', or 'password' in the request body")
+                    }
+            # Add handling for other PUT actions here
             else:
-                return password_auth_result
+                return {
+                    "statusCode": 400,
+                    "body": json.dumps("Invalid action for PUT request")
+                }
         elif http_method == 'DELETE':
-            password_auth_result = check_password(body['id'], body['password'])
-            if(password_auth_result == True):
-                if body and 'action' in body:
-                    if body['action'] == 'remove_from_dashboard':
-                        if 'id' in body and 'password' in body and 'service' in body:
-                            return remove_from_dashboard(body['id'], body['service'])
-                        else:
-                            return {
-                                "statusCode": 400,
-                                "body": json.dumps("Missing 'id', 'password', or 'service' in the request body")
-                            }
-                    elif body['action'] == 'delete_item':
-                        if 'id' in body and 'password' in body and 'key' in body:
-                            return delete_item(body['id'], body['password'], body['key'])
-                        else:
-                            return {
-                                "statusCode": 400,
-                                "body": json.dumps("Missing 'id', 'password', or 'key' in the delete item request body")
-                            }
-                    # Add handling for other DELETE actions here
+            if body and 'action' in body:
+                if body['action'] == 'remove_from_dashboard':
+                    if 'id' in body and 'password' in body and 'service' in body:
+                        return remove_from_dashboard(body['id'], body['service'], body['password'])
                     else:
                         return {
                             "statusCode": 400,
-                            "body": json.dumps("Invalid action for DELETE request")
+                            "body": json.dumps("Missing 'id', 'password', or 'service' in the request body")
                         }
-            else:
-                return password_auth_result
+                elif body['action'] == 'delete_item':
+                    if 'id' in body and 'password' in body and 'key' in body:
+                        return delete_item(body['id'], body['password'], body['key'], body['password'])
+                    else:
+                        return {
+                            "statusCode": 400,
+                            "body": json.dumps("Missing 'id', 'password', or 'key' in the delete item request body")
+                        }
+                # Add handling for other DELETE actions here
+                else:
+                    return {
+                        "statusCode": 400,
+                        "body": json.dumps("Invalid action for DELETE request")
+                    }
 
         # Add handling for other HTTP methods here
         else:
