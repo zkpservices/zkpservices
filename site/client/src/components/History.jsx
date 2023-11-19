@@ -116,7 +116,10 @@ export function History() {
                       </thead>
                       <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                         {(tableData[tab.name] || []).map((rowData, rowIndex) => (
-                          <tr key={rowIndex}>
+                          <tr 
+                            key={rowIndex}
+                            className="hover:bg-emerald-50 dark:hover:bg-emerald-800"  // Added this line for hover effect
+                          >
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200">
                               {rowData.operation.map((op, i) => (
                                 <div key={i} className={i === 1 ? 'text-gray-400' : ''}>{op}</div>
