@@ -201,10 +201,6 @@ export const navigation = [
       { title: 'Quickstart', href: '/quickstart' },
       { title: 'Login', href: '/login' },
       { title: 'Dashboard', href: '/dashboard' },
-      { title: 'Request Data', href: '/requestdata' },
-      { title: 'Request Update', href: '/requestupdate' },
-      { title: 'Respond', href: '/respond' },
-      { title: 'Cross-Chain Backups', href: '/crosschain' },
     ],
   },
 ]
