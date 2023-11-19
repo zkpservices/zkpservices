@@ -315,9 +315,18 @@ function HollowCard() {
   )
 }
 
+
 const IlluminatedTable = ({ people }) => {
   let mouseX = useMotionValue(0);
   let mouseY = useMotionValue(0);
+
+  let pattern = {
+    y: 16,
+    squares: [
+      [0, 1],
+      [1, 3],
+    ],
+  };
 
   function onMouseMove({ currentTarget, clientX, clientY }) {
     let { left, top } = currentTarget.getBoundingClientRect();
@@ -330,6 +339,7 @@ const IlluminatedTable = ({ people }) => {
 
   return (
     <div className="overflow-x-auto relative" onMouseMove={onMouseMove}>
+      <MyDataPattern {...pattern} mouseX={mouseX} mouseY={mouseY} /> 
       <div className="min-w-full inline-block align-middle overflow-hidden rounded-xl">
         <div className="group relative flex rounded-xl transition-shadow hover:shadow-md hover:shadow-zinc-900/5 dark:hover:shadow-black/5">
           <motion.div
@@ -342,16 +352,16 @@ const IlluminatedTable = ({ people }) => {
               <thead className="text-gray-900 dark:text-white">
                 <tr>
                   <th scope="col" className="min-w-[25%] px-3 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-200 uppercase tracking-wider">
-                    Name
+                    Activity
                   </th>
                   <th scope="col" className="min-w-[30%] px-3 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-200 uppercase tracking-wider">
-                    Title
+                    Data
                   </th>
                   <th scope="col" className="min-w-[30%] px-3 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-200 uppercase tracking-wider">
-                    Email
+                    Status
                   </th>
                   <th scope="col" className="min-w-[15%] px-3 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-200 uppercase tracking-wider">
-                    Edit
+                    Details
                   </th>
                 </tr>
               </thead>
@@ -382,6 +392,7 @@ const IlluminatedTable = ({ people }) => {
     </div>
   );
 };
+
 
 
 const rows = [
