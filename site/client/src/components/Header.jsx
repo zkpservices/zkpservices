@@ -1,7 +1,8 @@
-import { forwardRef } from 'react'
+import { forwardRef, useState, useEffect } from 'react'
 import Link from 'next/link'
 import clsx from 'clsx'
 import { motion, useScroll, useTransform } from 'framer-motion'
+import { MetaMaskSDK } from '@metamask/sdk';
 
 import { Button } from '@/components/Button'
 import { Logo } from '@/components/Logo'
@@ -26,6 +27,17 @@ function TopLevelNavItem({ href, children }) {
   )
 }
 
+// const options = {
+//   injectProvider: false,
+//   dAppMetadata: {name: "zkp.services", url: "https://zkp.services"},
+//   communicationLayerPreference: 'webrtc',
+// };
+
+// const MMSDK = new MetaMaskSDK(options);
+
+// const ethereum = MMSDK.getProvider();
+
+
 export const Header = forwardRef(function Header({ className }, ref) {
   let { isOpen: mobileNavIsOpen } = useMobileNavigationStore()
   let isInsideMobileNavigation = useIsInsideMobileNavigation()
@@ -33,6 +45,63 @@ export const Header = forwardRef(function Header({ className }, ref) {
   let { scrollY } = useScroll()
   let bgOpacityLight = useTransform(scrollY, [0, 72], [0.5, 0.9])
   let bgOpacityDark = useTransform(scrollY, [0, 72], [0.2, 0.8])
+  const [account, setAccount] = useState(null);
+  const [accountText, setAccountText] = useState('');
+  const [walletConnected, setWalletConnected] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const [textOpacity, setTextOpacity] = useState(1); // Initialize opacity to 1
+
+
+  useEffect(() => {
+    if (account) {
+      // Update accountText when account changes
+      setAccountText(truncateAddress(account));
+    } else {
+      setAccountText('');
+    }
+  }, [account]);
+
+  async function connectToMetaMask() {
+    try {
+      await window.ethereum.request({ method: 'eth_requestAccounts' });
+      // User has granted access
+      setWalletConnected(true);
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      setAccount(accounts[0]);
+    } catch (error) {
+      // User denied access or there was an error
+      console.error(error);
+    }
+  }
+
+  const truncateAddress = (address) => {
+    if (!address) return '';
+    const start = address.substring(0, 6);
+    const end = address.substring(address.length - 3);
+    return `${start}...${end}`;
+  }
+  
+  async function disconnectWallet() {
+    try {
+      // Reset your application state related to the wallet
+      // For example, set userAddress to null
+      // setConnected(false);
+      setAccount(null);
+      setWalletConnected(false);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+  
+  function updateWalletConnect() {
+    console.log("updating wallet connect")
+  
+    if(walletConnected) {
+      disconnectWallet()
+    } else {
+      connectToMetaMask()
+    }
+  }
 
   return (
     <motion.div
@@ -79,7 +148,16 @@ export const Header = forwardRef(function Header({ className }, ref) {
         <ModeToggle />
       </div>
       <div className="hidden min-[416px]:contents">
-        <Button href="#">Connect Wallet</Button>
+        <Button href="#" id="connectWalletButtonNav"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        onClick={() => { 
+          updateWalletConnect()
+        }}>
+          <span className={`transition-opacity ${textOpacity !== 1 ? 'duration-300 ease-in-out' : ''}`} style={{ opacity: textOpacity }}>
+            {walletConnected && isHovered ? 'Disconnect' : walletConnected ? accountText : 'Connect Wallet'}
+          </span>
+        </Button>
         </div>
       </div>
     </motion.div>

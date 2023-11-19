@@ -36,6 +36,13 @@ module.exports = {
         7.5: '0.075',
         15: '0.15',
       },
+      transitionProperty: {
+        'opacity': 'opacity', // Ensure this line is present
+      },
+      animation: {
+        'fade-in': 'fadeIn 1s ease-in-out',
+        'fade-out': 'fadeOut 1s ease-in-out',
+      },
     },
   },
   plugins: [require('@tailwindcss/typography'), require('@tailwindcss/forms')],
