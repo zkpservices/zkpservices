@@ -1,54 +1,71 @@
 import { Tab } from '@headlessui/react';
 
 const tabs = [
-  { name: 'New York' },
-  { name: 'London' },
-  { name: 'Sydney' },
+  { name: 'Incoming' },
+  { name: 'Outgoing' },
+  { name: 'Cross-Chain Sync' },
 ];
 
-const tableData = [
-  {
-    name: 'John Brown',
-    age: 45,
-    address: 'New York No. 1 Lake Park',
-    tab: 'New York'
-  },
-  {
-    name: 'Jim Green',
-    age: 27,
-    address: 'London No. 1 Lake Park',
-    tab: 'London'
-  },
-  {
-    name: 'Joe Black',
-    age: 31,
-    address: 'Sydney No. 1 Lake Park',
-    tab: 'Sydney'
-  },
-  {
-    name: 'Joe Black',
-    age: 31,
-    address: 'Sydney No. 1 Lake Park',
-    tab: 'Sydney'
-  },
-  {
-    name: 'Joe Black',
-    age: 31,
-    address: 'Sydney No. 1 Lake Park',
-    tab: 'Sydney'
-  },
-  {
-    name: 'Joe Black',
-    age: 31,
-    address: 'Sydney No. 1 Lake Park',
-    tab: 'Sydney'
-  },
-];
+const tableData = {
+  'Incoming': [
+    {
+      operation: ['Data Requested', 'From You'],
+      field: ['Central Melbourne Pharmacy Records', 'Address 0x2344242...3424242'],
+      status: ['Response Sent', '', 'grey'],
+      details: ['View Details', 'Request ID 0x240992222222222229']
+    },
+    {
+      operation: ['Update Requested', 'From You'],
+      field: ['Central Melbourne Pharmacy Records', 'Address 0x2344242...3424242'],
+      status: ['Complete Update', '', 'button'],
+      details: ['View Details', 'Request ID 0x240992222222222229']
+    }
+  ],
+  'Outgoing': [
+    {
+      operation: ['Data Requested', 'By You'],
+      field: ['Pharmacist Identity', 'Address 0x2344242...3424242'],
+      status: ['View Response', '', 'button'],
+      details: ['View Details', 'Request ID 0x342222222222222444']
+    },
+    {
+      operation: ['Data Requested', 'By You'],
+      field: ['Pharmacist License', 'Address 0x2344242...3424242'],
+      status: ['Awaiting Response', '', 'text'],
+      details: ['View Details', 'Request ID 0x342222222222222444']
+    },
+    {
+      operation: ['Data Requested', 'By You'],
+      field: ['Pharmacist License', 'Address 0x2344242...3424242'],
+      status: ['Awaiting Response', '', 'text'],
+      details: ['View Details', 'Request ID 0x342222222222222444']
+    }
+  ],
+  'Cross-Chain Sync': [
+    {
+      operation: ['Sync Data'],
+      field: ['Central Melbourne Pharmacy Records', 'From Avalanche to Polygon'],
+      status: ['Sync Completed', '', 'grey'],
+      details: ['View Details']
+    },
+    {
+      operation: ['Sync Data'],
+      field: ['Central Melbourne Pharmacy Records', 'From Avalanche to Optimism'],
+      status: ['Sync Completed', '', 'grey'],
+      details: ['View Details']
+    },
+    {
+      operation: ['Sync Public Information'],
+      field: ['Public Information', 'From Polygon to Avalanche'],
+      status: ['Awaiting Completion', '', 'text'],
+      details: ['View Details']
+    }
+  ]
+};
 
 const classNames = (...classes) => {
   return classes.filter(Boolean).join(' ');
 };
-
 
 export function History() {
   return (
@@ -78,41 +95,60 @@ export function History() {
           <Tab.Panels className="w-full overflow-x-auto">
             {tabs.map((tab, index) => (
               <Tab.Panel key={index}>
-                <div className="p-1.5 min-w-full inline-block align-middle overflow-y-auto h-[200px]"> {/* Added vertical overflow styles here */}
+                <div className="p-1.5 min-w-full inline-block align-middle overflow-y-auto h-[400px]">  
                   <div className="border rounded-lg overflow-hidden dark:border-gray-700">
                     <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                       <thead>
                         <tr>
-                          <th scope="col" className="px-6 py-3 text-left text-xs text-gray-500 uppercase">
-                            Name
+                          <th className="px-6 py-3 text-left text-xs text-gray-500 uppercase">
+                            Operation
                           </th>
-                          <th scope="col" className="px-6 py-3 text-left text-xs text-gray-500 uppercase">
-                            Age
+                          <th className="px-6 py-3 text-left text-xs text-gray-500 uppercase">
+                            Field
                           </th>
-                          <th scope="col" className="px-6 py-3 text-left text-xs text-gray-500 uppercase">
-                            Address
+                          <th className="px-6 py-3 text-left text-xs text-gray-500 uppercase">
+                            Status
                           </th>
-                          <th scope="col" className="px-6 py-3 text-right text-xs text-gray-500 uppercase">
-                            Action
+                          <th className="px-6 py-3 text-left text-xs text-gray-500 uppercase">
+                            Details
                           </th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                        {tableData.filter(data => data.tab === tab.name).map((filteredData, rowIndex) => (
+                        {(tableData[tab.name] || []).map((rowData, rowIndex) => (
                           <tr key={rowIndex}>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200">
-                              {filteredData.name}
+                              {rowData.operation.map((op, i) => (
+                                <div key={i} className={i === 1 ? 'text-gray-400' : ''}>{op}</div>
+                              ))}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200">
-                              {filteredData.age}
+                              {rowData.field.map((fld, i) => (
+                                <div key={i} className={i === 1 ? 'text-gray-400' : ''}>{fld}</div>
+                              ))}
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200">
-                              {filteredData.address}
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200 flex items-center">  {/* Centered buttons */}
+                              {rowData.status[2] === 'grey' ? (
+                                <button className="px-2 py-1 text-gray-400 bg-gray-200 rounded-md text-sm font-medium">  {/* Greyed-out button */}
+                                  {rowData.status[0]}
+                                </button>
+                              ) : rowData.status[2] === 'button' ? (
+                                <button className="px-2 py-1 rounded-md text-sm font-medium bg-emerald-100 text-emerald-500 hover:bg-emerald-200">  {/* Button color akin to tabs */}
+                                  {rowData.status[0]}
+                                </button>
+                              ) : (
+                                <span>{rowData.status[0]}</span>
+                              )}
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
-                              <a className="text-blue-500 hover:text-blue-700" href="#">
-                                Delete
-                              </a>
+                            <td className="px-6 py-4 whitespace-nowrap text-left text-sm">
+                              <div>
+                                <a className="text-blue-500 hover:text-blue-700" href="#">
+                                  {rowData.details[0]}
+                                </a>
+                              </div>
+                              <div className="text-gray-500">
+                                {rowData.details[1]}
+                              </div>
                             </td>
                           </tr>
                         ))}

@@ -393,10 +393,10 @@ export function Dashboard() {
     <div className="xl:max-w-none mt-8">
       <Heading level={2} id="history" className="mt-0">
         Recent Activity
-        <div className="mt-4 border-t border-zinc-900/5 dark:border-white/5" >
-          <History />
-        </div>
       </Heading>
+      <div className="mt-4 border-t border-zinc-900/5 dark:border-white/5" >
+        <History />
+      </div>
     </div>
 
     </>
