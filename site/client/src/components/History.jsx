@@ -95,8 +95,8 @@ export function History() {
           <Tab.Panels className="w-full overflow-x-auto">
             {tabs.map((tab, index) => (
               <Tab.Panel key={index}>
-                <div className="p-1.5 min-w-full inline-block align-middle overflow-y-auto h-[600px]">
-                  <div className="border rounded-lg overflow-hidden dark:border-gray-700">
+                <div className="p-1.5 min-w-full inline-block align-middle overflow-y-auto h-[400px]">
+                  <div className={`border-2 transition ease-in-out duration-500 hover:border-emerald-400 hover:shadow-lg hover:ring-1 hover:ring-emerald-300 dark:hover:border-emerald-700 dark:hover:shadow-lg dark:hover:ring-1 dark:hover:ring-emerald-600 rounded-lg overflow-hidden dark:border-gray-700`}>
                     <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                       <thead>
                         <tr>
