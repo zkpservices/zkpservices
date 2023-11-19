@@ -95,21 +95,21 @@ export function History() {
           <Tab.Panels className="w-full overflow-x-auto">
             {tabs.map((tab, index) => (
               <Tab.Panel key={index}>
-                <div className="p-1.5 min-w-full inline-block align-middle overflow-y-auto h-[400px]">  
+                <div className="p-1.5 min-w-full inline-block align-middle overflow-y-auto h-[600px]">
                   <div className="border rounded-lg overflow-hidden dark:border-gray-700">
                     <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                       <thead>
                         <tr>
-                          <th className="px-6 py-3 text-left text-xs text-gray-500 uppercase">
+                          <th className="px-6 py-3 text-left text-xs text-gray-500 uppercase dark:text-gray-300">
                             Operation
                           </th>
-                          <th className="px-6 py-3 text-left text-xs text-gray-500 uppercase">
+                          <th className="px-6 py-3 text-left text-xs text-gray-500 uppercase dark:text-gray-300">
                             Field
                           </th>
-                          <th className="px-6 py-3 text-left text-xs text-gray-500 uppercase">
+                          <th className="px-6 py-3 text-left text-xs text-gray-500 uppercase dark:text-gray-300">
                             Status
                           </th>
-                          <th className="px-6 py-3 text-left text-xs text-gray-500 uppercase">
+                          <th className="px-6 py-3 text-left text-xs text-gray-500 uppercase dark:text-gray-300">
                             Details
                           </th>
                         </tr>
@@ -127,13 +127,13 @@ export function History() {
                                 <div key={i} className={i === 1 ? 'text-gray-400' : ''}>{fld}</div>
                               ))}
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200 flex items-center">  {/* Centered buttons */}
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200 flex items-center">
                               {rowData.status[2] === 'grey' ? (
-                                <button className="px-2 py-1 text-gray-400 bg-gray-200 rounded-md text-sm font-medium">  {/* Greyed-out button */}
+                                <button className="px-2 py-1 text-gray-400 bg-gray-200 rounded-md text-sm font-medium dark:bg-gray-700 dark:text-gray-400">
                                   {rowData.status[0]}
                                 </button>
                               ) : rowData.status[2] === 'button' ? (
-                                <button className="px-2 py-1 rounded-md text-sm font-medium bg-emerald-100 text-emerald-500 hover:bg-emerald-200">  {/* Button color akin to tabs */}
+                                <button className="px-2 py-1 rounded-md text-sm font-medium bg-emerald-100 text-emerald-500 hover:bg-emerald-200 dark:bg-emerald-900 dark:text-emerald-400 dark:hover:bg-emerald-800">
                                   {rowData.status[0]}
                                 </button>
                               ) : (
@@ -142,11 +142,11 @@ export function History() {
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-left text-sm">
                               <div>
-                                <a className="text-blue-500 hover:text-blue-700" href="#">
+                                <a className="text-blue-500 hover:text-blue-700 dark:text-blue-300 dark:hover:text-blue-500" href="#">
                                   {rowData.details[0]}
                                 </a>
                               </div>
-                              <div className="text-gray-500">
+                              <div className="text-gray-500 dark:text-gray-300">
                                 {rowData.details[1]}
                               </div>
                             </td>
