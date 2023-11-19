@@ -2,7 +2,7 @@ from heapq import merge
 import os
 import json
 import boto3
-import random
+import time
 from decimal import Decimal
 from botocore.exceptions import ClientError
 
@@ -52,7 +52,7 @@ def update_json(obj1, obj2):
 def get_item(item_id, key=None):
     response = table.get_item(Key={"id": item_id})
     item = response.get("Item", None)
-    
+
     if item and 'data' in item:
         data = item['data']
         if key is None:
@@ -65,7 +65,7 @@ def get_item(item_id, key=None):
 
 def get_nested_value(data, key):
     keys = key.split('.')
-    value = data
+    value = json.loads(data)
     for k in keys:
         if '[' in k and ']' in k:
             # Handle list index
@@ -80,6 +80,74 @@ def get_nested_value(data, key):
         else:
             return None
     return value
+
+import json
+import boto3
+from botocore.exceptions import ClientError
+
+def delete_item(item_id, password, key):
+    try:
+        # Authenticate the user
+        password_auth_result = check_password(item_id, password)
+        if not password_auth_result == True:
+            return password_auth_result
+
+        # Fetch the existing item from the database
+        existing_item = get_item(item_id)
+
+        if not existing_item:
+            return {
+                "statusCode": 404,
+                "body": json.dumps("Item not found")
+            }
+
+        # Split the key path by dot notation
+        keys = key.split('.')
+
+        # Traverse the data object to find the target key to delete
+        data = existing_item['data']
+        parent = None
+        last_key = keys[-1]
+
+        for k in keys[:-1]:
+            if k in data:
+                parent = data
+                data = data[k]
+            else:
+                return {
+                    "statusCode": 400,
+                    "body": json.dumps("Key path not found in data object")
+                }
+
+        # Check if the last key exists in the parent object and is a dictionary
+        if parent is not None and isinstance(parent, dict) and last_key in parent:
+            # Delete the key from the parent dictionary
+            del parent[last_key]
+
+            # Update the item in the database with the modified data
+            response = table.update_item(
+                Key={"id": item_id},
+                UpdateExpression="set #data = :data",
+                ExpressionAttributeNames={"#data": "data"},
+                ExpressionAttributeValues={":data": json.dumps(existing_item['data'])},
+                ReturnValues="UPDATED_NEW"
+            )
+
+            return {
+                "statusCode": 200,
+                "body": json.dumps("Key deleted successfully!")
+            }
+        else:
+            return {
+                "statusCode": 400,
+                "body": json.dumps("Key not found in data object")
+            }
+    except Exception as e:
+        return {
+            "statusCode": 500,
+            "body": json.dumps(str(e))
+        }
+
 
 
 def check_password(item_id, password):
@@ -124,30 +192,37 @@ def create_item(item_data):
             "body": "Item with the specified ID already exists"
         }
     try:
-        item_data_json = json.dumps(item_data['data'], cls=DecimalEncoder)
-        requests_received_data_json = json.dumps(item_data['requests_received'])
-        responses_received_data_json = json.dumps(item_data['responses_received'])
-        requests_sent_data_json = json.dumps(item_data['requests_sent'])
-        responses_sent_data_json = json.dumps(item_data['responses_sent'])
+        requests_received_data_json = json.dumps(item_data.get('requests_received', {}))
+        responses_received_data_json = json.dumps(item_data.get('responses_received', {}))
+        requests_sent_data_json = json.dumps(item_data.get('requests_sent', {}))
+        responses_sent_data_json = json.dumps(item_data.get('responses_sent', {}))
 
-        # Initialize the dashboard list with objects from the data field
-        dashboard = list(item_data['data'].keys())
+        # Initialize the available_dashboard list with objects from the data field
+        available_dashboard = list(item_data['data'].keys())
+
+        # Add a "last_updated" timestamp for each parent level in the "data" field
+        data_with_timestamps = item_data['data']
+        for key in data_with_timestamps:
+            data_with_timestamps[key]['last_updated'] = str(int(time.time()))
+        item_data_json = json.dumps(data_with_timestamps, cls=DecimalEncoder)
+        # Add a "last_updated" timestamp for columns outside the "data" field
+        item_data['last_updated'] = str(int(time.time()))
 
         response = table.put_item(Item={
             "id": item_data['id'],
-            "data": item_data_json,
+            "data": item_data_json,  # Use the updated "data" field
             "password": item_data.get("password", ""),
             "requests_received": requests_received_data_json,
             "responses_received": responses_received_data_json,
             "requests_sent": requests_sent_data_json,
             "responses_sent": responses_sent_data_json,
-            "dashboard": dashboard  # Add the dashboard list
+            "available_dashboard": available_dashboard,  # Add the available_dashboard list
+            "last_updated": item_data['last_updated']  # Add the "last_updated" timestamp
         })
 
         return "Item created successfully!"
     except Exception as e:
         return str(e)
-
 
 def update_item(id, password, body):
     # Check if the item with the given ID exists
@@ -173,22 +248,28 @@ def update_item(id, password, body):
                 "statusCode": 404,
                 "body": json.dumps("Item not found")
             }
-                # Fetch the existing "dashboard" set from the database
-        response = table.get_item(Key={"id": item_id}, ProjectionExpression="dashboard")
-        existing_dashboard_set = response.get("Item", {}).get("dashboard", [])
+        
+        # Fetch the existing "available_dashboard" set from the database
+        response = table.get_item(Key={"id": item_id}, ProjectionExpression="available_dashboard")
+        existing_available_dashboard_set = response.get("Item", {}).get("available_dashboard", [])
 
         # Convert the DynamoDB set to a Python list
-        existing_dashboard = list(existing_dashboard_set)
+        existing_available_dashboard = list(existing_available_dashboard_set)
 
-        # Update the "dashboard" list with keys from the "body" object
+        # Update the "available_dashboard" list with keys from the "body" object
         for key in body.keys():
-            if key not in existing_dashboard:
-                existing_dashboard.append(key)
+            if key not in existing_available_dashboard:
+                existing_available_dashboard.append(key)
+        
+        existing_item = json.loads(existing_item)
 
+        for key in body:
+            body[key]['last_updated'] = str(int(time.time()))
+        
+        # Merge the new data into the existing data, preserving the "last_updated" timestamps
         merged_item = update_json(existing_item, body)
-
-        # # Remove 'id' from the merged item, as it's used as the key
-        # merged_item.pop('id', None)
+        
+        # Update the "last_updated" timestamps for each parent key in the "data" column
 
         # Convert Decimal fields to float for serialization
         item_data_json = json.dumps(merged_item, cls=DecimalEncoder)
@@ -196,9 +277,9 @@ def update_item(id, password, body):
         # Update the item in the database
         response = table.update_item(
             Key={"id": item_id},
-            UpdateExpression="set #data = :data, #dashboard = :dashboard",
-            ExpressionAttributeNames={"#data": "data", "#dashboard": "dashboard"},
-            ExpressionAttributeValues={":data": existing_item, ":dashboard": existing_dashboard},
+            UpdateExpression="set #data = :data, #available_dashboard = :available_dashboard",
+            ExpressionAttributeNames={"#data": "data", "#available_dashboard": "available_dashboard"},
+            ExpressionAttributeValues={":data": item_data_json, ":available_dashboard": existing_available_dashboard},
             ReturnValues="UPDATED_NEW"
         )
 
@@ -209,6 +290,18 @@ def update_item(id, password, body):
             "statusCode": 500,
             "body": json.dumps(str(e))
         }
+
+def update_timestamps(data):
+    # Recursive function to update "last_updated" timestamps for parent keys in the "data" object
+    if isinstance(data, dict):
+        current_timestamp = str(int(time.time()))
+        data['last_updated'] = current_timestamp
+        for key, value in data.items():
+            if key != 'last_updated':
+                update_timestamps(value)
+    elif isinstance(data, list):
+        for item in data:
+            update_timestamps(item)
 
 
 
@@ -332,11 +425,36 @@ def add_response(sender_id, responses):
             "body": json.dumps(str(e))
         }
 
+def get_available_dashboard(item_id):
+    try:
+        # Query the DynamoDB table to fetch the available_dashboard attribute
+        response = table.get_item(Key={"id": item_id}, ProjectionExpression="available_dashboard")
+
+        item = response.get("Item", None)
+        if not item or "available_dashboard" not in item:
+            return {
+                "statusCode": 404,
+                "body": json.dumps("available_dashboard not found")
+            }
+
+        # Retrieve the available_dashboard list from the item
+        available_dashboard = item.get('available_dashboard', [])
+
+        return {
+            "statusCode": 200,
+            "body": json.dumps(available_dashboard)
+        }
+    except Exception as e:
+        return {
+            "statusCode": 500,
+            "body": json.dumps(str(e))
+        }
+
 def get_dashboard(item_id):
     try:
-        # Query the DynamoDB table to fetch the dashboard attribute
-        response = table.get_item(Key={"id": item_id}, ProjectionExpression="dashboard")
 
+        # Query the DynamoDB table to fetch the "dashboard" attribute
+        response = table.get_item(Key={"id": item_id}, ProjectionExpression="dashboard")
         item = response.get("Item", None)
         if not item or "dashboard" not in item:
             return {
@@ -344,7 +462,7 @@ def get_dashboard(item_id):
                 "body": json.dumps("Dashboard not found")
             }
 
-        # Retrieve the dashboard list from the item
+        # Retrieve the "dashboard" list from the item
         dashboard = item.get('dashboard', [])
 
         return {
@@ -356,6 +474,107 @@ def get_dashboard(item_id):
             "statusCode": 500,
             "body": json.dumps(str(e))
         }
+
+def add_to_dashboard(item_id, service):
+    try:
+
+        # Query the DynamoDB table to fetch the "available_dashboard" attribute
+        response = table.get_item(Key={"id": item_id}, ProjectionExpression="available_dashboard")
+
+        item = response.get("Item", None)
+        if not item or "available_dashboard" not in item:
+            return {
+                "statusCode": 404,
+                "body": json.dumps("Available dashboard not found")
+            }
+
+        # Retrieve the "available_dashboard" list from the item
+        available_dashboard = item.get('available_dashboard', [])
+
+        # Query the DynamoDB table to fetch the "dashboard" attribute
+        response = table.get_item(Key={"id": item_id}, ProjectionExpression="dashboard")
+
+        item = response.get("Item", None)
+        if not service or "dashboard" not in item:
+            return {
+                "statusCode": 404,
+                "body": json.dumps("Dashboard not found")
+            }
+        dashboard = item.get('dashboard', [])
+
+        # Check if the "item" already exists in the "dashboard" list
+        if service in dashboard:
+            return {
+                "statusCode": 400,
+                "body": json.dumps("Item already in dashboard")
+            }
+        if service not in available_dashboard:
+            return {
+                "statusCode": 400,
+                "body": json.dumps("Service not available for user")
+            }
+        # Add the new item to the "dashboard" list
+        dashboard.append(service)
+
+        # Update the "dashboard" list in DynamoDB
+        response = table.update_item(
+            Key={"id": item_id},
+            UpdateExpression="SET dashboard = :dashboard",
+            ExpressionAttributeValues={":dashboard": dashboard}
+        )
+
+        return {
+            "statusCode": 200,
+            "body": json.dumps("Item added to dashboard successfully!")
+        }
+    except Exception as e:
+        return {
+            "statusCode": 500,
+            "body": json.dumps(str(e))
+        }
+
+def remove_from_dashboard(item_id, service):
+    try:
+
+        # Query the DynamoDB table to fetch the "dashboard" attribute
+        response = table.get_item(Key={"id": item_id}, ProjectionExpression="dashboard")
+
+        item = response.get("Item", None)
+        if not service or "dashboard" not in item:
+            return {
+                "statusCode": 404,
+                "body": json.dumps("Dashboard not found")
+            }
+
+        dashboard = item.get('dashboard', [])
+
+        # Check if the "item" already exists in the "dashboard" list
+        if service not in dashboard:
+            return {
+                "statusCode": 400,
+                "body": json.dumps("Service not currently assigned to user dashboard")
+            }
+        # Add the new item to the "dashboard" list
+        dashboard.remove(service)
+
+        # Update the "dashboard" list in DynamoDB
+        response = table.update_item(
+            Key={"id": item_id},
+            UpdateExpression="SET dashboard = :dashboard",
+            ExpressionAttributeValues={":dashboard": dashboard}
+        )
+
+        return {
+            "statusCode": 200,
+            "body": json.dumps("Item removed from dashboard successfully!")
+        }
+    except Exception as e:
+        return {
+            "statusCode": 500,
+            "body": json.dumps(str(e))
+        }
+
+
 
 
 def handler(event, context):
@@ -429,6 +648,18 @@ def handler(event, context):
                         }
                 else:
                     return password_auth_result
+            elif body['action'] == 'get_available_dashboard':
+                password_auth_result = check_password(body['id'], body['password'])
+                if(password_auth_result == True):
+                    if 'id' in body:
+                        return get_available_dashboard(body['id'])
+                    else:
+                        return {
+                            "statusCode": 400,
+                            "body": json.dumps("Missing 'id' or 'password' in the request body")
+                        }
+                else:
+                    return password_auth_result
             elif body['action'] == 'get_dashboard':
                 password_auth_result = check_password(body['id'], body['password'])
                 if(password_auth_result == True):
@@ -439,6 +670,19 @@ def handler(event, context):
                             "statusCode": 400,
                             "body": json.dumps("Missing 'id' or 'password' in the request body")
                         }
+                else:
+                    return password_auth_result
+            elif body and 'action' in body:
+                password_auth_result = check_password(body['id'], body['password'])
+                if(password_auth_result == True):
+                    if body['action'] == 'add_to_dashboard':
+                        if 'id' in body and 'password' in body and 'service' in body:
+                            return add_to_dashboard(body['id'], body['service'])
+                        else:
+                            return {
+                                "statusCode": 400,
+                                "body": json.dumps("Missing 'id', 'password', or 'service' in the request body")
+                            }
                 else:
                     return password_auth_result
             # Add handling for other POST actions here
@@ -473,6 +717,34 @@ def handler(event, context):
                         "statusCode": 400,
                         "body": json.dumps("Invalid action for PUT request")
                     }
+            else:
+                return password_auth_result
+        elif http_method == 'DELETE':
+            password_auth_result = check_password(body['id'], body['password'])
+            if(password_auth_result == True):
+                if body and 'action' in body:
+                    if body['action'] == 'remove_from_dashboard':
+                        if 'id' in body and 'password' in body and 'service' in body:
+                            return remove_from_dashboard(body['id'], body['service'])
+                        else:
+                            return {
+                                "statusCode": 400,
+                                "body": json.dumps("Missing 'id', 'password', or 'service' in the request body")
+                            }
+                    elif body['action'] == 'delete_item':
+                        if 'id' in body and 'password' in body and 'key' in body:
+                            return delete_item(body['id'], body['password'], body['key'])
+                        else:
+                            return {
+                                "statusCode": 400,
+                                "body": json.dumps("Missing 'id', 'password', or 'key' in the delete item request body")
+                            }
+                    # Add handling for other DELETE actions here
+                    else:
+                        return {
+                            "statusCode": 400,
+                            "body": json.dumps("Invalid action for DELETE request")
+                        }
             else:
                 return password_auth_result
 

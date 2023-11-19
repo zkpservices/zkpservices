@@ -1,33 +1,71 @@
 import { Tab } from '@headlessui/react';
-import { useMotionValue, useMotionTemplate, motion } from 'framer-motion';
-
-
-const people = [
-  { name: 'Lindsay Walton', title: 'Front-end Developer', email: 'lindsay.walton@example.com', role: 'Member' },
-  { name: 'John Doe', title: 'Back-end Developer', email: 'john.doe@example.com', role: 'Admin' },
-  { name: 'Jane Smith', title: 'Full-stack Developer', email: 'jane.smith@example.com', role: 'Member' },
-  { name: 'Emily Johnson', title: 'Designer', email: 'emily.johnson@example.com', role: 'Member' },
-  { name: 'Michael Scott', title: 'Regional Manager', email: 'michael.scott@example.com', role: 'Admin' },
-  { name: 'Michael Scott', title: 'Regional Manager', email: 'michael.scott@example.com', role: 'Admin' },
-  { name: 'Jim Halpert', title: 'Salesman', email: 'jim.halpert@example.com', role: 'Member' },
-  { name: 'Michael Scott', title: 'Regional Manager', email: 'michael.scott@example.com', role: 'Admin' },
-  { name: 'Jim Halpert', title: 'Salesman', email: 'jim.halpert@example.com', role: 'Member' },
-  { name: 'Michael Scott', title: 'Regional Manager', email: 'michael.scott@example.com', role: 'Admin' },
-  { name: 'Jim Halpert', title: 'Salesman', email: 'jim.halpert@example.com', role: 'Member' },
-  { name: 'Michael Scott', title: 'Regional Manager', email: 'michael.scott@example.com', role: 'Admin' },
-  { name: 'Jim Halpert', title: 'Salesman', email: 'jim.halpert@example.com', role: 'Member' },
-  { name: 'Jim Halpert', title: 'Salesman', email: 'jim.halpert@example.com', role: 'Member' }
-];
 
 const tabs = [
-  { name: 'First Two People' },
-  { name: 'Next Two People' },
-  { name: 'Last Two People' }
+  { name: 'Incoming' },
+  { name: 'Outgoing' },
+  { name: 'Cross-Chain Sync' },
 ];
 
-function classNames(...classes) {
+const tableData = {
+  'Incoming': [
+    {
+      operation: ['Data Requested', 'From You'],
+      field: ['Central Melbourne Pharmacy Records', 'Address 0x2344242...3424242'],
+      status: ['Response Sent', '', 'grey'],
+      details: ['View Details', 'Request ID 0x240992222222222229']
+    },
+    {
+      operation: ['Update Requested', 'From You'],
+      field: ['Central Melbourne Pharmacy Records', 'Address 0x2344242...3424242'],
+      status: ['Complete Update', '', 'button'],
+      details: ['View Details', 'Request ID 0x240992222222222229']
+    }
+  ],
+  'Outgoing': [
+    {
+      operation: ['Data Requested', 'By You'],
+      field: ['Pharmacist Identity', 'Address 0x2344242...3424242'],
+      status: ['View Response', '', 'button'],
+      details: ['View Details', 'Request ID 0x342222222222222444']
+    },
+    {
+      operation: ['Data Requested', 'By You'],
+      field: ['Pharmacist License', 'Address 0x2344242...3424242'],
+      status: ['Awaiting Response', '', 'text'],
+      details: ['View Details', 'Request ID 0x342222222222222444']
+    },
+    {
+      operation: ['Data Requested', 'By You'],
+      field: ['Pharmacist License', 'Address 0x2344242...3424242'],
+      status: ['Awaiting Response', '', 'text'],
+      details: ['View Details', 'Request ID 0x342222222222222444']
+    }
+  ],
+  'Cross-Chain Sync': [
+    {
+      operation: ['Sync Data'],
+      field: ['Central Melbourne Pharmacy Records', 'From Avalanche to Polygon'],
+      status: ['Sync Completed', '', 'grey'],
+      details: ['View Details']
+    },
+    {
+      operation: ['Sync Data'],
+      field: ['Central Melbourne Pharmacy Records', 'From Avalanche to Optimism'],
+      status: ['Sync Completed', '', 'grey'],
+      details: ['View Details']
+    },
+    {
+      operation: ['Sync Public Information'],
+      field: ['Public Information', 'From Polygon to Avalanche'],
+      status: ['Awaiting Completion', '', 'text'],
+      details: ['View Details']
+    }
+  ]
+};
+
+const classNames = (...classes) => {
   return classes.filter(Boolean).join(' ');
-}
+};
 
 export function History() {
   return (
@@ -36,146 +74,96 @@ export function History() {
         <div className="mb-8 space-x-1">
           <Tab.List className="flex">
             {tabs.map((tab) => (
-              <Tab key={tab.name} as="button" className={({ selected }) =>
+              <Tab
+                key={tab.name}
+                as="button"
+                className={({ selected }) =>
                   classNames(
-                    selected ? 'bg-indigo-100 text-indigo-700' : 'bg-gray-200 text-gray-500 hover:bg-gray-300',
+                    selected
+                      ? 'bg-emerald-100 text-emerald-500 dark:bg-emerald-900 dark:text-emerald-400'
+                      : 'bg-gray-200 text-gray-500 hover:bg-gray-300 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700',
                     'rounded-md px-3 py-2 text-sm font-medium mx-1'
                   )
-                }>
+                }
+              >
                 {tab.name}
               </Tab>
             ))}
           </Tab.List>
         </div>
         <div className="mt-4">
-          <Tab.Panels className="w-full">
-            <Tab.Panel>
-              <Table people={people.slice(0, 2)} />
-            </Tab.Panel>
-            <Tab.Panel>
-              <Table people={people.slice(2, 4)} />
-            </Tab.Panel>
-            <Tab.Panel>
-              <Table people={people.slice(4)} />
-            </Tab.Panel>
+          <Tab.Panels className="w-full overflow-x-auto">
+            {tabs.map((tab, index) => (
+              <Tab.Panel key={index}>
+                <div className="p-1.5 min-w-full inline-block align-middle overflow-y-auto h-[400px]">
+                  <div className={`border-2 transition ease-in-out duration-500 hover:border-emerald-400 hover:shadow-lg hover:ring-1 hover:ring-emerald-300 dark:hover:border-emerald-700 dark:hover:shadow-lg dark:hover:ring-1 dark:hover:ring-emerald-600 rounded-lg overflow-hidden dark:border-gray-700`}>
+                    <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                      <thead>
+                        <tr>
+                          <th className="px-6 py-3 text-left text-xs text-gray-500 uppercase dark:text-gray-300">
+                            Operation
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs text-gray-500 uppercase dark:text-gray-300">
+                            Field
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs text-gray-500 uppercase dark:text-gray-300">
+                            Status
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs text-gray-500 uppercase dark:text-gray-300">
+                            Details
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                        {(tableData[tab.name] || []).map((rowData, rowIndex) => (
+                          <tr 
+                            key={rowIndex}
+                            className="hover:bg-emerald-50 dark:hover:bg-emerald-800"  // Added this line for hover effect
+                          >
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200">
+                              {rowData.operation.map((op, i) => (
+                                <div key={i} className={i === 1 ? 'text-gray-400' : ''}>{op}</div>
+                              ))}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200">
+                              {rowData.field.map((fld, i) => (
+                                <div key={i} className={i === 1 ? 'text-gray-400' : ''}>{fld}</div>
+                              ))}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200 flex items-center">
+                              {rowData.status[2] === 'grey' ? (
+                                <button className="px-2 py-1 text-gray-400 bg-gray-200 rounded-md text-sm font-medium dark:bg-gray-700 dark:text-gray-400">
+                                  {rowData.status[0]}
+                                </button>
+                              ) : rowData.status[2] === 'button' ? (
+                                <button className="px-2 py-1 rounded-md text-sm font-medium bg-emerald-100 text-emerald-500 hover:bg-emerald-200 dark:bg-emerald-900 dark:text-emerald-400 dark:hover:bg-emerald-800">
+                                  {rowData.status[0]}
+                                </button>
+                              ) : (
+                                <span>{rowData.status[0]}</span>
+                              )}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-left text-sm">
+                              <div>
+                                <a className="text-blue-500 hover:text-blue-700 dark:text-blue-300 dark:hover:text-blue-500" href="#">
+                                  {rowData.details[0]}
+                                </a>
+                              </div>
+                              <div className="text-gray-500 dark:text-gray-300">
+                                {rowData.details[1]}
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </Tab.Panel>
+            ))}
           </Tab.Panels>
         </div>
       </Tab.Group>
     </div>
   );
 }
-
-const Table = ({ people }) => (
-  <div className="-m-1.5 overflow-x-auto">
-    <div className="p-1.5 min-w-full inline-block align-middle">
-      <div className={people.length > 5 ? "group border dark:border-gray-700 rounded-xl overflow-hidden max-h-[calc(2.5rem*6)] overflow-y-auto hover:border-emerald-500 dark:hover:border-emerald-500" : "group border dark:border-gray-700 rounded-xl overflow-hidden hover:border-emerald-500 dark:hover:border-emerald-500"}>
-        <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-600 w-full">
-          <thead className="text-gray-900 dark:text-white">
-            <tr>
-              <th scope="col" className="min-w-[25%] px-3 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-200 uppercase font-bold">
-                Name
-              </th>
-              <th scope="col" className="min-w-[30%] px-3 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-200 uppercase font-bold">
-                Title
-              </th>
-              <th scope="col" className="min-w-[30%] px-3 py-4 text-left text-sm font-medium text-gray-500 dark:text-gray-200 uppercase font-bold">
-                Email
-              </th>
-              <th scope="col" className="min-w-[15%] px-3 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-200 uppercase font-bold">
-                Edit
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200 dark:divide-gray-600 text-gray-900 dark:text-gray-300">
-            {people.map((person, index) => (
-              <tr key={person.email}>
-                <td className="px-3 py-4 text-sm font-medium">
-                  {person.name}
-                </td>
-                <td className="px-3 py-4 text-sm">
-                  {person.title}
-                </td>
-                <td className="px-3 py-4 text-sm">
-                  {person.email}
-                </td>
-                <td className="px-3 py-4 text-left text-sm font-medium">
-                  <a href="#" className="text-indigo-600 hover:text-indigo-900 dark:hover:text-indigo-400">
-                    Edit
-                  </a>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-);
-
-const IlluminatedTable = ({ people }) => {
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-
-  function onMouseMove({ currentTarget, clientX, clientY }) {
-    const { left, top } = currentTarget.getBoundingClientRect();
-    mouseX.set(clientX - left);
-    mouseY.set(clientY - top);
-  }
-
-  const maskImage = useMotionTemplate`radial-gradient(180px at ${mouseX}px ${mouseY}px, white, transparent)`;
-  const style = { maskImage, WebkitMaskImage: maskImage };
-
-  return (
-    <div className="-m-1.5 overflow-x-auto" onMouseMove={onMouseMove}>
-      <div className="p-1.5 min-w-full inline-block align-middle">
-        <div className={people.length > 5 ? "group border dark:border-gray-700 rounded-xl overflow-hidden max-h-[calc(2.5rem*6)] overflow-y-auto hover:border-emerald-500 dark:hover:border-emerald-500" : "group border dark:border-gray-700 rounded-xl overflow-hidden hover:border-emerald-500 dark:hover:border-emerald-500"}>
-
-          <motion.div
-            className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#D7EDEA] to-[#F4FBDF] opacity-0 transition duration-300 group-hover:opacity-100 dark:from-[#202D2E] dark:to-[#303428]"
-            style={style}
-          />
-
-            <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-600 w-full">
-              <thead className="text-gray-900 dark:text-white">
-                <tr>
-                  <th scope="col" className="min-w-[25%] px-3 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-200 uppercase font-bold">
-                    Name
-                  </th>
-                  <th scope="col" className="min-w-[30%] px-3 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-200 uppercase font-bold">
-                    Title
-                  </th>
-                  <th scope="col" className="min-w-[30%] px-3 py-4 text-left text-sm font-medium text-gray-500 dark:text-gray-200 uppercase font-bold">
-                    Email
-                  </th>
-                  <th scope="col" className="min-w-[15%] px-3 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-200 uppercase font-bold">
-                    Edit
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200 dark:divide-gray-600 text-gray-900 dark:text-gray-300">
-                {people.map((person, index) => (
-                  <tr key={person.email}>
-                    <td className="px-3 py-4 text-sm font-medium">
-                      {person.name}
-                    </td>
-                    <td className="px-3 py-4 text-sm">
-                      {person.title}
-                    </td>
-                    <td className="px-3 py-4 text-sm">
-                      {person.email}
-                    </td>
-                    <td className="px-3 py-4 text-left text-sm font-medium">
-                      <a href="#" className="text-indigo-600 hover:text-indigo-900 dark:hover:text-indigo-400">
-                        Edit
-                      </a>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          
-        </div>
-      </div>
-    </div>
-  );
-};
