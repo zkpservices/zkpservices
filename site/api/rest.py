@@ -83,13 +83,8 @@ def get_nested_value(data, key):
 
 
 def check_password(item_id, password):
-    print("PASSWORD CHECK TIME!")
-    print("Supplied password: ")
-    print(password)
     response = table.get_item(Key={"id": item_id})
     item = response.get("Item", None)
-    print("found password:")
-    print(item['password'])
     if not item:
         return {
             "statusCode": 404,
@@ -101,9 +96,7 @@ def check_password(item_id, password):
             "body": "Incorrect password."
         }
     else:
-        print("password matches:")
-        print(item['password'] == password)
-    return True
+        return True
 
 def get_item_public(item_id, password):    
     return get_item(item_id)
@@ -132,14 +125,19 @@ def create_item(item_data):
         }
     try:
         item_data_json = json.dumps(item_data['data'], cls=DecimalEncoder)
-        requests_data_json = json.dumps(item_data['requests'])
-        responses_data_json = json.dumps(item_data['responses'])
+        requests_received_data_json = json.dumps(item_data['requests_received'])
+        responses_received_data_json = json.dumps(item_data['responses_received'])
+        requests_sent_data_json = json.dumps(item_data['requests_sent'])
+        responses_sent_data_json = json.dumps(item_data['responses_sent'])
         response = table.put_item(Item={
             "id": item_data['id'],
             "data": item_data_json,
             "password": item_data.get("password", ""),
-            "requests": requests_data_json,
-            "responses": responses_data_json
+            "requests_received": requests_received_data_json,
+            "responses_received": responses_received_data_json,
+            "requests_sent": requests_sent_data_json,
+            "responses_sent": responses_sent_data_json
+
         })
         return "Item created successfully!"
     except Exception as e:
@@ -169,11 +167,6 @@ def update_item(id, password, body):
                 "statusCode": 404,
                 "body": json.dumps("Item not found")
             }
-
-        print("here is the body:")
-        print(body)
-        print("followed by the existing item:")
-        print(existing_item)
 
         merged_item = update_json(existing_item, body)
 
@@ -215,14 +208,6 @@ def add_request(sender_id, requests):
 
         # Extract receiver's id from the requests object
         receiver_id = requests[list(requests.keys())[0]]['id']
-        print("requests:")
-        print(requests)
-        print("requests.keys():")
-        print(requests.keys())
-        print("list(requests.keys()):")
-        print(list(requests.keys()))
-        print("list(requests.keys())[0]:")
-        print(receiver_id)
 
         # Get receiver's data from the database
         receiver_response = table.get_item(Key={"id": receiver_id})
@@ -256,84 +241,6 @@ def add_request(sender_id, requests):
             UpdateExpression="set #requests_received = :requests_received",
             ExpressionAttributeNames={"#requests_received": "requests_received"},
             ExpressionAttributeValues={":requests_received": receiver_requests_received_json}
-        )
-
-        return {
-            "statusCode": 200,
-            "body": json.dumps("Request added successfully!")
-        }
-
-    except Exception as e:
-        return {
-            "statusCode": 500,
-            "body": json.dumps(str(e))
-        }
-
-
-def add_response(user_id, requester_id, requests):
-    try:
-        # Get the user's data from the database
-        response = table.get_item(Key={"id": user_id})
-        user_data = response.get("Item", None)
-
-        # Check if the user exists
-        if not user_data:
-            return {
-                "statusCode": 404,
-                "body": json.dumps("User not found")
-            }
-
-        user_responses = json.loads(user_data['responses'])
-
-        # Check for duplicate titles in the new requests
-        existing_titles = set(user_responses.keys())
-        new_titles = set(requests.keys())
-        if existing_titles.intersection(new_titles):
-            return {
-                "statusCode": 400,
-                "body": json.dumps("Response with duplicate title already exists for this user")
-            }
-
-        # Add the new request object to the user's requests
-        user_responses.update(requests)
-
-        # Convert the updated requests back to JSON string
-        user_requests_json = json.dumps(user_responses)
-        print(user_requests_json)
-        
-        response = table.update_item(
-            Key={"id": user_id},
-            UpdateExpression="set #requests = :requests",
-            ExpressionAttributeNames={
-                "#requests": "requests"
-            },
-            ExpressionAttributeValues={
-                ":requests": user_requests_json
-            },
-            ReturnValues="ALL_NEW"
-        )
-        print("User responses pre processing:")
-        print(user_data['responses'])
-        # Now, add the corresponding entry to the user's responses
-        user_responses = json.loads(user_data.get('responses', '{}'))
-        print("user responses post processing:")
-        print(user_responses)
-        for request_id, request_data in requests.items():
-            response_entry = {
-                "requester_id": requester_id,
-                "encrypted_request": request_data["encrypted_request"],
-                "encrypted_secret_key": request_data["encrypted_secret_key"]
-            }
-            user_responses[request_id] = response_entry
-
-        # Update the user's responses in the database
-        user_responses_json = json.dumps(user_responses)
-        response = table.update_item(
-            Key={"id": user_id},
-            UpdateExpression="set #responses = :responses",
-            ExpressionAttributeNames={"#responses": "responses"},
-            ExpressionAttributeValues={":responses": user_responses_json},
-            ReturnValues="ALL_NEW"
         )
 
         return {
@@ -411,36 +318,17 @@ def add_response(sender_id, responses):
 
 
 def handler(event, context):
-    print("Made it to the handler function!!")
-    print("Event: ")
-    print(event)
-    print("Context: ")
-    print(context)
     event = json.dumps(event)
     event = json.loads(event)
-    print("Event type:")
-    print(type(event))
-    print("Event after JSON dumps/loads:")
-    print(event)
     try:
         inner_body = json.loads(event['body'])
         request_context = event['requestContext']
-        print("request context:")
-        print(request_context)
-        print("http:")
-        print(request_context["http"])
         http_method = request_context["http"]["method"]
-        print("inner body:")
-        print(inner_body)
-        print("inner body type:")
-        print(type(inner_body))
         # http_method = inner_body['httpMethod']
-        print(http_method)
 
         # Parse the JSON body if it exists
         body = inner_body
         
-        print(body)
 
         # Perform actions based on the HTTP method and action
         # if http_method == 'GET':
@@ -457,8 +345,6 @@ def handler(event, context):
                     if 'id' in body:
                         key = None
                         if 'key' in body:
-                            print("key found in body")
-                            print(body['key'])
                             key = body['key']
                         
                         key = body['key'] if 'key' in body else None
@@ -493,12 +379,12 @@ def handler(event, context):
             elif body and 'action' in body and body['action'] == 'add_response':
                 password_auth_result = check_password(body['id'], body['password'])
                 if(password_auth_result == True):
-                    if 'requests' in body and 'id' in body:
-                        return add_response(body['id'], body['requests'])
+                    if 'responses' in body and 'id' in body:
+                        return add_response(body['id'], body['responses'])
                     else:
                         return {
                             "statusCode": 400,
-                            "body": json.dumps("Missing 'requests' or 'id' in the request body")
+                            "body": json.dumps("Missing 'responses' or 'id' in the request body")
                         }
                 else:
                     return password_auth_result
