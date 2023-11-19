@@ -129,6 +129,10 @@ def create_item(item_data):
         responses_received_data_json = json.dumps(item_data['responses_received'])
         requests_sent_data_json = json.dumps(item_data['requests_sent'])
         responses_sent_data_json = json.dumps(item_data['responses_sent'])
+
+        # Initialize the dashboard list with objects from the data field
+        dashboard = list(item_data['data'].keys())
+
         response = table.put_item(Item={
             "id": item_data['id'],
             "data": item_data_json,
@@ -136,12 +140,14 @@ def create_item(item_data):
             "requests_received": requests_received_data_json,
             "responses_received": responses_received_data_json,
             "requests_sent": requests_sent_data_json,
-            "responses_sent": responses_sent_data_json
-
+            "responses_sent": responses_sent_data_json,
+            "dashboard": dashboard  # Add the dashboard list
         })
+
         return "Item created successfully!"
     except Exception as e:
         return str(e)
+
 
 def update_item(id, password, body):
     # Check if the item with the given ID exists
@@ -170,9 +176,6 @@ def update_item(id, password, body):
 
         merged_item = update_json(existing_item, body)
 
-        # # Remove 'id' from the merged item, as it's used as the key
-        # merged_item.pop('id', None)
-
         # Convert Decimal fields to float for serialization
         item_data_json = json.dumps(merged_item, cls=DecimalEncoder)
 
@@ -185,6 +188,20 @@ def update_item(id, password, body):
             ReturnValues="UPDATED_NEW"
         )
 
+        # Check if objects in the updated data are present in the dashboard list
+        dashboard = response['Attributes'].get('dashboard', [])
+        updated_data_objects = list(body.get('data', {}).keys())
+        for obj in updated_data_objects:
+            if obj not in dashboard:
+                dashboard.append(obj)
+
+        # Update the dashboard list in the database
+        response = table.update_item(
+            Key={"id": item_id},
+            UpdateExpression="set dashboard = :dashboard",
+            ExpressionAttributeValues={":dashboard": dashboard}
+        )
+
         return response['Attributes']
     except Exception as e:
         print(e)
@@ -192,6 +209,7 @@ def update_item(id, password, body):
             "statusCode": 500,
             "body": json.dumps(str(e))
         }
+
 
 
 def add_request(sender_id, requests):
@@ -314,7 +332,30 @@ def add_response(sender_id, responses):
             "body": json.dumps(str(e))
         }
 
+def get_dashboard(item_id):
+    try:
+        # Query the DynamoDB table to fetch the dashboard attribute
+        response = table.get_item(Key={"id": item_id}, ProjectionExpression="dashboard")
 
+        item = response.get("Item", None)
+        if not item or "dashboard" not in item:
+            return {
+                "statusCode": 404,
+                "body": json.dumps("Dashboard not found")
+            }
+
+        # Retrieve the dashboard list from the item
+        dashboard = item.get('dashboard', [])
+
+        return {
+            "statusCode": 200,
+            "body": json.dumps(dashboard)
+        }
+    except Exception as e:
+        return {
+            "statusCode": 500,
+            "body": json.dumps(str(e))
+        }
 
 
 def handler(event, context):
@@ -388,6 +429,14 @@ def handler(event, context):
                         }
                 else:
                     return password_auth_result
+            elif body['action'] == 'get_dashboard':
+                if 'id' in body and 'password' in body:
+                    return get_dashboard(body['id'])
+                else:
+                    return {
+                        "statusCode": 400,
+                        "body": json.dumps("Missing 'id' or 'password' in the request body")
+                    }
             # Add handling for other POST actions here
             else:
                 return {
