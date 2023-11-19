@@ -19,10 +19,10 @@ const guides = [
       'Read about the different types of errors returned by the API.',
   },
   {
-    href: '/api_docs',
-    name: 'API Guide',
+    href: '/webhooks',
+    name: 'Webhooks',
     description:
-      'Learn how to to use our API for user data.',
+      'Learn how to programmatically configure webhooks for your app.',
   },
 ]
 

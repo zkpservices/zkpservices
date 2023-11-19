@@ -8,5 +8,3 @@ lambda/
 **/artifacts
 **/.deps
 **/package-lock.json
-site/client/package-lock.json
-site/client/package-lock.json

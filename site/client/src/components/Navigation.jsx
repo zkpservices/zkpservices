@@ -192,7 +192,7 @@ export const navigation = [
       { title: 'Authentication', href: '/authentication' },
       { title: 'Pagination', href: '/pagination' },
       { title: 'Errors', href: '/errors' },
-      { title: 'API Guide', href: '/api_docs' },
+      { title: 'Webhooks', href: '/webhooks' },
     ],
   },
   {
@@ -225,7 +225,7 @@ export function Navigation(props) {
         ))}
         <li className="sticky bottom-0 z-10 mt-6 min-[416px]:hidden">
           <Button href="#" variant="filled" className="w-full">
-            Connect Wallet
+            Sign in
           </Button>
         </li>
       </ul>
