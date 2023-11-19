@@ -464,7 +464,7 @@ $.ajax(settings).done(function (response) {
                   "savings": "A$2400.00"
               }
           },
-          "dashboard": [
+          "available_dashboard": [
               "myki",
               "commbank",
               "NAB"
@@ -854,12 +854,115 @@ $.ajax(settings).done(function (response) {
 
 ---
 
-## Retrieve user dashboard items {{ tag: 'POST', label: '/test/userdata-api, action: "get_dashboard"' }}
+## Retrieve user available dashboard items {{ tag: 'POST', label: '/test/userdata-api, action: "get_available_dashboard"' }}
 
 <Row>
   <Col>
 
     This endpoint allows you to the list of services available for a particular users dashboard.
+
+    Authorization is required.
+
+    ### Required attributes
+
+    <Properties>
+      <Property name="id" type="string">
+        The wallet address of the user.
+      </Property>
+      <Property name="password" type="string">
+        The hash of the password of the user.
+      </Property>
+      <Property name="action" type="string">
+        The action of this request, which is "get_available_dashboard".
+      </Property>
+    </Properties>
+
+  </Col>
+  <Col sticky>
+
+    <CodeGroup title="Request" tag="POST" label="/v1/contacts">
+
+    ```bash {{ title: 'cURL' }}
+    curl --location --request POST 'https://yrd4sydg5g.execute-api.us-east-1.amazonaws.com/test/userdata-api' \
+    --header 'Content-Type: application/json' \
+    --data-raw '{
+        "id": "Ox8ab74ba8cbed8374bd",
+        "action": "get_available_dashboard",
+        "password": "abc123"
+    }'
+    ```
+
+    ```js
+    var settings = {
+      "url": "https://yrd4sydg5g.execute-api.us-east-1.amazonaws.com/test/userdata-api",
+      "method": "POST",
+      "timeout": 0,
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "data": JSON.stringify({
+        "id": "Ox8ab74ba8cbed8374bd",
+        "action": "get_available_dashboard",
+        "password": "abc123"
+      }),
+    };
+
+    $.ajax(settings).done(function (response) {
+      console.log(response);
+    });
+    ```
+
+    ```python
+    import requests
+    import json
+
+    url = "https://yrd4sydg5g.execute-api.us-east-1.amazonaws.com/test/userdata-api"
+
+    payload = json.dumps({
+      "id": "Ox8ab74ba8cbed8374bd",
+      "action": "get_available_dashboard",
+      "password": "abc123"
+    })
+    headers = {
+      'Content-Type': 'application/json'
+    }
+
+    response = requests.request("POST", url, headers=headers, data=payload)
+
+    print(response.text)
+    ```
+
+    ```powershell {{ title: 'Powershell' }}
+    $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
+    $headers.Add("Content-Type", "application/json")
+
+    $body = "{
+    `n    `"id`": `"Ox8ab74ba8cbed8374bd`",
+    `n    `"action`": `"get_available_dashboard`",
+    `n    `"password`": `"abc123`"
+    `n}"
+
+    $response = Invoke-RestMethod 'https://yrd4sydg5g.execute-api.us-east-1.amazonaws.com/test/userdata-api' -Method 'POST' -Headers $headers -Body $body
+    $response | ConvertTo-Json
+    ```
+
+    </CodeGroup>
+
+    ```json {{ title: 'Response' }}
+    ["myki", "commbank", "NAB"]
+    ```
+
+  </Col>
+</Row>
+
+---
+
+## Retrieve user current dashboard items {{ tag: 'POST', label: '/test/userdata-api, action: "get_dashboard"' }}
+
+<Row>
+  <Col>
+
+    This endpoint allows you to the list of current selected services for a particular users dashboard.
 
     Authorization is required.
 
@@ -949,7 +1052,117 @@ $.ajax(settings).done(function (response) {
     </CodeGroup>
 
     ```json {{ title: 'Response' }}
-    ["myki", "commbank", "NAB"]
+    ["myki", "commbank"]
+    ```
+
+  </Col>
+</Row>
+
+---
+
+## Remove a service from a users dashboard {{ tag: 'DELETE', label: '/test/userdata-api, action: "remove_from_dashbaord"' }}
+
+<Row>
+  <Col>
+
+    This endpoint allows you to the remove a particular service from a users dashbaord.
+
+    Authorization is required.
+
+    ### Required attributes
+
+    <Properties>
+      <Property name="id" type="string">
+        The wallet address of the user.
+      </Property>
+      <Property name="password" type="string">
+        The hash of the password of the user.
+      </Property>
+      <Property name="action" type="string">
+        The action of this request, which is "get_dashboard".
+      </Property>
+      <Property name="service" type="string">
+        The name of the service you want to remove from the users dashboard.
+      </Property>
+    </Properties>
+
+  </Col>
+  <Col sticky>
+
+    <CodeGroup title="Request" tag="POST" label="/v1/contacts">
+
+    ```bash {{ title: 'cURL' }}
+    curl --location --request DELETE 'https://yrd4sydg5g.execute-api.us-east-1.amazonaws.com/test/userdata-api' \
+    --header 'Content-Type: application/json' \
+    --data-raw '{
+        "id": "Ox8ab74ba8cbed8374bd",
+        "action": "remove_from_dashboard",
+        "password": "abc123",
+        "service": "myki"
+    }'
+    ```
+
+    ```js
+    var settings = {
+      "url": "https://yrd4sydg5g.execute-api.us-east-1.amazonaws.com/test/userdata-api",
+      "method": "DELETE",
+      "timeout": 0,
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "data": JSON.stringify({
+        "id": "Ox8ab74ba8cbed8374bd",
+        "action": "remove_from_dashboard",
+        "password": "abc123",
+        "service": "myki"
+      }),
+    };
+
+    $.ajax(settings).done(function (response) {
+      console.log(response);
+    });
+    ```
+
+    ```python
+    import requests
+    import json
+
+    url = "https://yrd4sydg5g.execute-api.us-east-1.amazonaws.com/test/userdata-api"
+
+    payload = json.dumps({
+      "id": "Ox8ab74ba8cbed8374bd",
+      "action": "remove_from_dashboard",
+      "password": "abc123",
+      "service": "myki"
+    })
+    headers = {
+      'Content-Type': 'application/json'
+    }
+
+    response = requests.request("DELETE", url, headers=headers, data=payload)
+
+    print(response.text)
+    ```
+
+    ```powershell {{ title: 'Powershell' }}
+    $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
+    $headers.Add("Content-Type", "application/json")
+
+    $body = "{
+    `n    `"id`": `"Ox8ab74ba8cbed8374bd`",
+    `n    `"action`": `"remove_from_dashboard`",
+    `n    `"password`": `"abc123`",
+    `n    `"service`": `"myki`"
+    `n}"
+
+    $response = Invoke-RestMethod 'https://yrd4sydg5g.execute-api.us-east-1.amazonaws.com/test/userdata-api' -Method 'DELETE' -Headers $headers -Body $body
+    $response | ConvertTo-Json
+    ```
+
+    </CodeGroup>
+
+    ```text {{ title: 'Response' }}
+    "Item removed from dashboard successfully!"
     ```
 
   </Col>
