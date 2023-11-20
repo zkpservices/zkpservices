@@ -1,16 +1,25 @@
 import Link from 'next/link'
-import { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
+import { useEffect, useRef, useState } from 'react';
 import { motion, transform, useMotionTemplate, useMotionValue } from 'framer-motion'
 import { Tab } from '@headlessui/react';
 import { useWallet } from "@/components/Wallet.jsx";
 
-// import { Modal } from '@/components/Modal'
-// import { NewDataModal } from '@/components/NewDataModal'
-// import { ZKPFaucetModal } from '@/components/ZKPFaucetModal'
-// import { ViewFieldModal } from '@/components/ViewFieldModal'
-// import { NewUpdateRequestModal } from '@/components/NewUpdateRequestModal'
+import { Modal } from '@/components/Modal'
+import { ZKPFaucetModal } from '@/components/ZKPFaucetModal'
+import { ViewFieldModal } from '@/components/ViewFieldModal'
+import { NewUpdateRequestModal } from '@/components/NewUpdateRequestModal'
 import { NewDataRequestModal } from '@/components/NewDataRequestModal'
+import { NewCrossChainSyncModal } from '@/components/NewCrossChainSyncModal'
+import { NewCrossChainSyncStatusModal } from '@/components/NewCrossChainSyncStatusModal'
+import { CompleteUpdateModal } from '@/components/CompleteUpdateModal'
+import { CompletedDataUpdateModal } from '@/components/CompletedDataUpdateModal'
+import { RequestedDataSentModal } from '@/components/RequestedDataSentModal'
+import { ReceivedUpdateResponseModal } from '@/components/ReceivedUpdateResponseModal'
+import { ReceivedDataResponseModal } from '@/components/ReceivedDataResponseModal'
+import { AwaitingUpdateCompletionModal} from '@/components/AwaitingUpdateCompletionModal'
+import { AwaitingDataModal } from '@/components/AwaitingDataModal'
+import { SendDataModal } from '@/components/SendDataModal'
 import { ThreeJSComponent } from '@/components/ThreeJSComponent'
 import { GridPattern } from '@/components/GridPattern'
 import { Heading } from '@/components/Heading'
@@ -381,8 +390,13 @@ export function Dashboard() {
     'Cross-Chain Sync': []
   })
 
-  const { walletConnected, userAddress, showLoginNotification, 
+  let { walletConnected, userAddress, showLoginNotification, 
     setShowLoginNotification, loggedIn, userPassword, username, setUsername } = useWallet();
+
+  // temporary overwrite for testing dashboard
+  loggedIn = true;
+  walletConnected = true;
+
   const get_item_payload = {
     "id": userAddress,
     "action": "get_item",
@@ -550,7 +564,17 @@ export function Dashboard() {
     {/* <ZKPFaucetModal /> */}
     {/* <ViewFieldModal title="Medical Records" /> */}
     {/* <NewUpdateRequestModal /> */}
-    <NewDataRequestModal />
+    {/* <NewDataRequestModal /> */}
+    {/* <NewCrossChainSyncModal /> */}
+    {/* <NewCrossChainSyncStatusModal /> */}
+    {/* <CompleteUpdateModal /> */}
+    {/* <SendDataModal /> */}
+    {/* <CompletedDataUpdateModal /> */}
+    {/* <RequestedDataSentModal /> */}
+    {/* <ReceivedUpdateResponseModal /> */}
+    {/* <ReceivedDataResponseModal /> */}
+    {/* <AwaitingUpdateCompletionModal /> */}
+    <AwaitingDataModal />
 
     </>
    ) : (

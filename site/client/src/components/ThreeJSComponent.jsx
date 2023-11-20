@@ -31,7 +31,7 @@ export function ThreeJSComponent() {
       let points;
       let centroid = new window.THREE.Vector3();
 
-      fetch('zkp_geometry_clean.obj.csv')
+      fetch('zkp_geometry_clean_adjusted.obj.csv')
         .then(response => response.text())
         .then(text => {
           const rows = text.split('\n').map(row => row.split(',').map(Number));
@@ -48,8 +48,9 @@ export function ThreeJSComponent() {
           const boundingBox = new window.THREE.Box3().setFromBufferAttribute(geometry.attributes.position);
           boundingBox.getCenter(centroid);
 
+
           // Shift the camera slightly closer to the points
-          camera.position.set(centroid.x - 0.1, centroid.y, centroid.z + 4);
+          camera.position.set(centroid.x - 2, centroid.y+0.5, centroid.z + 4);
 
           camera.aspect = containerRef.current.clientWidth / containerRef.current.clientHeight;
           camera.updateProjectionMatrix();
@@ -62,7 +63,7 @@ export function ThreeJSComponent() {
           let rotationX = 0;
           let rotationY = 0;
           let rotationZ = 0;
-          let explosionFactor = 0.02;
+          let explosionFactor = 0.015;
 
           document.addEventListener('mousemove', (event) => {
             isMouseMoving = true;
@@ -90,12 +91,14 @@ export function ThreeJSComponent() {
               }
               geometry.attributes.position.needsUpdate = true;
             } else {
-              rotationX *= 0.95;
-              rotationY *= 0.95;
+              let factor = .2
+              rotationX *= factor;
+              rotationY *= factor;
+              rotationZ *= factor;
 
               points.rotation.x = rotationX;
               points.rotation.y = rotationY;
-              points.rotation.z = rotationZ;
+              // points.rotation.z = rotationZ;
 
               for (let i = 0; i < vertices.length; i++) {
                 vertices[i] += (originalPositions[i] - vertices[i]) * 0.1;
