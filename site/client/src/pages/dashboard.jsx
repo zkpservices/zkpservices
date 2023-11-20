@@ -8,6 +8,7 @@ import { useWallet } from "@/components/Wallet.jsx";
 import { Modal } from '@/components/Modal'
 import { ZKPFaucetModal } from '@/components/ZKPFaucetModal'
 import { ViewFieldModal } from '@/components/ViewFieldModal'
+import { NewDashboardDataModal } from '@/components/NewDashboardDataModal'
 import { NewUpdateRequestModal } from '@/components/NewUpdateRequestModal'
 import { NewDataRequestModal } from '@/components/NewDataRequestModal'
 import { NewCrossChainSyncModal } from '@/components/NewCrossChainSyncModal'
@@ -560,7 +561,7 @@ export function Dashboard() {
     </div> */}
 
     {/* <Modal /> */}
-    {/* <NewDataModal /> */}
+    {/* <NewDashboardDataModal /> */}
     {/* <ZKPFaucetModal /> */}
     {/* <ViewFieldModal title="Medical Records" /> */}
     {/* <NewUpdateRequestModal /> */}

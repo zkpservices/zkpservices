@@ -1,5 +1,6 @@
 import { Fragment, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
+import { XMarkIcon } from '@heroicons/react/24/outline';
 
 export function NewCrossChainSyncModal() {
   const [open, setOpen] = useState(true);
@@ -31,6 +32,19 @@ export function NewCrossChainSyncModal() {
           >
             <div>
               <div className="relative bg-white rounded-lg max-w-screen-2xl mx-auto mt-6 px-4 pt-5 pb-4 text-left shadow-xl dark:bg-gray-800 sm:my-20 sm:w-full sm:max-w-3xl sm:p-6">
+                <div className="absolute right-0 top-0 hidden pr-4 pt-4 sm:block">
+                  <button
+                    type="button"
+                    className="rounded-md bg-white dark:bg-gray-800 text-gray-400 dark:text-gray-600 hover:text-gray-500 dark:hover:text-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                    onClick={() => setOpen(false)}
+                  >
+                    <span className="sr-only">Close</span>
+                    <XMarkIcon
+                      className="h-6 w-6 text-emerald-500 dark:text-emerald-300 hover:text-emerald-600 dark:hover:text-emerald-400"
+                      aria-hidden="true"
+                    />
+                  </button>
+                </div>
                 <Dialog.Title
                   as="h3"
                   className="text-lg font-semibold text-gray-900 dark:text-white"
@@ -45,7 +59,7 @@ export function NewCrossChainSyncModal() {
                     </label>
                     <textarea
                       id="destinationChain"
-                      className="block w-full rounded-md border-0 py-2 pl-3 pr-3 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500"
+                      className="block w-full rounded-md border-0 py-2 pl-3 pr-3 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500 mt-1"
                       rows={1}
                     />
                   </div>
@@ -56,7 +70,7 @@ export function NewCrossChainSyncModal() {
                     </label>
                     <textarea
                       id="parameterToSync"
-                      className="block w-full rounded-md border-0 py-2 pl-3 pr-3 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500"
+                      className="block w-full rounded-md border-0 py-2 pl-3 pr-3 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500 mt-1"
                       rows={1}
                     />
                   </div>
@@ -67,35 +81,21 @@ export function NewCrossChainSyncModal() {
                     </label>
                     <textarea
                       id="parameterKey"
-                      className="block w-full rounded-md border-0 py-2 pl-3 pr-3 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500"
+                      className="block w-full rounded-md border-0 py-2 pl-3 pr-3 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500 mt-1"
                       rows={1}
-                    />
-                  </div>
-
-                  <div className="mt-4">
-                    <label htmlFor="parameterValue" className="block text-sm font-medium leading-5 text-gray-900 dark:text-white">
-                      Parameter Value:
-                    </label>
-                    <textarea
-                      id="parameterValue"
-                      className="block w-full rounded-md border-0 py-2 pl-3 pr-3 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500"
-                      rows={8}
-                      readOnly
                     />
                   </div>
 
                   <hr className="my-4 border-gray-300 dark:border-gray-700" />
 
                   <div className="mt-4">
-                    <label htmlFor="ccipFee" className="block text-sm font-medium leading-5 text-gray-900 dark:text-white">
-                      CCIP Fee:
+                    <label htmlFor="additionalInfo" className="block text-sm font-medium leading-5 text-gray-900 dark:text-white">
+                      Additional Information (Optional):
                     </label>
                     <textarea
-                      id="ccipFee"
-                      className="block w-full rounded-md border-0 py-2 pl-3 pr-3 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500"
-                      rows={1}
-                      defaultValue="10 ZKP"
-                      readOnly
+                      id="additionalInfo"
+                      className="block w-full rounded-md border-0 py-2 pl-3 pr-3 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500 mt-1"
+                      rows={3}
                     />
                   </div>
 
@@ -103,7 +103,7 @@ export function NewCrossChainSyncModal() {
                     <label htmlFor="disclaimer" className="block text-sm font-medium leading-5 text-gray-900 dark:text-white">
                       Disclaimer:
                     </label>
-                    <p className="text-gray-700 dark:text-gray-300 mt-2">
+                    <p className="text-gray-700 dark:text-gray-300 mt-2 whitespace-normal">
                       Data requests and update requests are only partially supported due to the fact that the (optional) selected 2FA providers would need to be able to support equivalent logic and have the same addresses on the destination chain (this is available with the default 2FA provider of zkp.services, ZKPServicesVRF2FA, but may not be for other 2FA providers).
                     </p>
                   </div>
@@ -124,7 +124,7 @@ export function NewCrossChainSyncModal() {
                       setOpen(false);
                     }}
                   >
-                    Call Smart Contract
+                    Start Sync
                   </button>
                 </div>
               </div>
