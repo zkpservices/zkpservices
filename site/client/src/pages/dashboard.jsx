@@ -1,9 +1,10 @@
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react';
-import { motion, useMotionTemplate, useMotionValue } from 'framer-motion'
+import axios from 'axios';
+import { motion, transform, useMotionTemplate, useMotionValue } from 'framer-motion'
 import { Tab } from '@headlessui/react';
+import { useWallet } from "@/components/Wallet.jsx";
 
-import { ThreeJSComponent } from '@/components/ThreeJSComponent'
 import { GridPattern } from '@/components/GridPattern'
 import { Heading } from '@/components/Heading'
 import { ChatBubbleIcon } from '@/components/icons/ChatBubbleIcon'
@@ -367,68 +368,132 @@ function HollowCard() {
 
 export function Dashboard() {
 
-  let tableData = {
-    'Incoming': [
-      {
-        operation: ['Data Requested', 'From You'],
-        field: ['Central Melbourne Pharmacy Records', 'Address 0x2344242...3424242'],
-        status: ['Response Sent', 'grey'], 
-        details: ['View Details', 'Request ID 0x240992222222222229']
-      },
-      {
-        operation: ['Update Requested', 'From You'],
-        field: ['Central Melbourne Pharmacy Records', 'Address 0x2344242...3424242'],
-        status: ['Complete Update', 'button'], 
-        details: ['View Details', 'Request ID 0x240992222222222229']
-      }
-    ],
-    'Outgoing': [
-      {
-        operation: ['Data Requested', 'By You'],
-        field: ['Pharmacist Identity', 'Address 0x2344242...3424242'],
-        status: ['View Response', 'button'], 
-        details: ['View Details', 'Request ID 0x342222222222222444']
-      },
-      {
-        operation: ['Data Requested', 'By You'],
-        field: ['Pharmacist License', 'Address 0x2344242...3424242'],
-        status: ['Awaiting Response', 'grey'], 
-        details: ['View Details', 'Request ID 0x342222222222222444']
-      },
-      {
-        operation: ['Data Requested', 'By You'],
-        field: ['Pharmacist License', 'Address 0x2344242...3424242'],
-        status: ['Awaiting Response', 'grey'], 
-        details: ['View Details', 'Request ID 0x342222222222222444']
-      }
-    ],
-    // 'Cross-Chain Sync': [
-    //   {
-    //     operation: ['Sync Data'],
-    //     field: ['Central Melbourne Pharmacy Records', 'From Avalanche to Polygon'],
-    //     status: ['Sync Completed', 'button'], 
-    //     details: ['View Details']
-    //   },
-    //   {
-    //     operation: ['Sync Data'],
-    //     field: ['Central Melbourne Pharmacy Records', 'From Avalanche to Optimism'],
-    //     status: ['Sync Completed', 'button'], 
-    //     details: ['View Details']
-    //   },
-    //   {
-    //     operation: ['Sync Public Information'],
-    //     field: ['Public Information', 'From Polygon to Avalanche'],
-    //     status: ['Awaiting Completion', 'grey'], 
-    //     details: ['View Details']
-    //   }
-    // ]
-  };
+  const [tableData, setTableData] = useState({
+    'Incoming': [],
+    'Outgoing': [],
+    'Cross-Chain Sync': []
+  })
 
+  const { walletConnected, userAddress, showLoginNotification, 
+    setShowLoginNotification, loggedIn, userPassword, username, setUsername } = useWallet();
+  const get_item_payload = {
+    "id": userAddress,
+    "action": "get_item",
+    "key": "id.name",
+    "password": userPassword       
+  }
+  const get_ccip_payload = {
+    "id": userAddress,
+    "action": "get_crosschain_transaction",
+    "password": userPassword       
+  }
+  useEffect(() => {
+    // Make a POST request when the Dashboard page is shown
+    axios
+      .post('https://yrd4sydg5g.execute-api.us-east-1.amazonaws.com/test/userdata-api', get_item_payload)
+      .then((response) => {
+        console.log(response['data']['id.name'])
+        setUsername(response['data']['id.name'])
+        console.log('username')
+        console.log(username)
+      })
+      .catch((error) => {
+        // Handle errors
+        console.error('Error making POST request:', error);
+      });
 
+      axios
+      .post('https://yrd4sydg5g.execute-api.us-east-1.amazonaws.com/test/userdata-api', get_ccip_payload)
+      .then((response) => {
+        const responseData = response['data']
+        
+        const transformedData = Object.entries(responseData).map(([ccip_id, data]) => {
+          const { source_chain, destination_chain, field } = data;
+          return {
+            operation: ['Sync Data'],
+            field: [field, `From ${source_chain} to ${destination_chain}`],
+            status: ['Sync Completed', 'button'],
+            details: ['View Details'],
+          };
+        });
+        setTableData((prevTableData) => ({
+          ...prevTableData,
+          'Cross-Chain Sync': transformedData, // Update with your transformed data
+        }));
+        console.log(tableData)
+      })
+      
+      .catch((error) => {
+        // Handle errors
+        console.error('Error making POST request:', error);
+      });
+
+    // After 5000 milliseconds (5 seconds), hide the notification
+    const notificationTimeout = setTimeout(() => {
+      setShowLoginNotification(false);
+    }, 5000);
+
+    // Clear the notification timeout when the component unmounts
+    return () => {
+      clearTimeout(notificationTimeout);
+    };
+  }, []);
+  const [dashboardData, setDashboardData] = useState(null);
+
+  function handleRefreshButtonClick() {
+    const get_ccip_payload = {
+      "id": userAddress,
+      "action": "get_crosschain_transaction",
+      "password": userPassword       
+    }
+    axios
+    .post('https://yrd4sydg5g.execute-api.us-east-1.amazonaws.com/test/userdata-api', get_item_payload)
+    .then((response) => {
+      console.log(response['data']['id.name'])
+      setUsername(response['data']['id.name'])
+      console.log('username')
+      console.log(username)
+    })
+    .catch((error) => {
+      // Handle errors
+      console.error('Error making POST request:', error);
+    });
+
+    axios
+    .post('https://yrd4sydg5g.execute-api.us-east-1.amazonaws.com/test/userdata-api', get_ccip_payload)
+    .then((response) => {
+      const responseData = response['data']
+      
+      const transformedData = Object.entries(responseData).map(([ccip_id, data]) => {
+        const { source_chain, destination_chain, field } = data;
+        return {
+          operation: ['Sync Data'],
+          field: [field, `From ${source_chain} to ${destination_chain}`],
+          status: ['Sync Completed', 'button'],
+          details: ['View Details'],
+        };
+      });
+      console.log(transformedData)
+      setTableData((prevTableData) => ({
+        ...prevTableData,
+        'Cross-Chain Sync': transformedData, // Update with your transformed data
+      }));
+      console.log(tableData)
+    })
+    
+    .catch((error) => {
+      // Handle errors
+      console.error('Error making POST request:', error);
+    });
+  }
   return (
     <>
-
+    {walletConnected && loggedIn ? (
+    <>
     <div className="xl:max-w-none">
+      <h2 className="mt-10 text-center text-3xl font-bold tracking-tight ">
+              {(username != '') ? `Welcome back, ${username}.` : ''}
+      </h2>
       <Heading level={2} id="mydata" className="mt-0">
         Access My Data 
       </Heading>
@@ -461,18 +526,21 @@ export function Dashboard() {
     </div>
 
     <div>
+    {showLoginNotification && (
       <Notification
-        showTopText="Test Title"
-        showBottomText="Test Description"
+        showTopText="Logged in successfully"
+        showBottomText={`Logged in as ${userAddress}`}
       />
+    )}
     </div>
 
-    {/* <div>
-      <ThreeJSComponent />
-    </div> */}
-
     </>
-  )
-}
+   ) : (
+      <h2 className="mt-10 text-center text-3xl font-bold tracking-tight">
+        Please connect your wallet and login to get started
+      </h2>
+   )}
+  </>
+  )}
 
 export default Dashboard;

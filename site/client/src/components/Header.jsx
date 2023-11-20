@@ -46,21 +46,26 @@ export const Header = forwardRef(function Header({ className }, ref) {
   let { scrollY } = useScroll()
   let bgOpacityLight = useTransform(scrollY, [0, 72], [0.5, 0.9])
   let bgOpacityDark = useTransform(scrollY, [0, 72], [0.2, 0.8])
-  const [account, setAccount] = useState(null);
   const [accountText, setAccountText] = useState('');
-  const { walletConnected, setWalletConnected } = useWallet();
+  const {walletConnected, setWalletConnected, userAddress, setUserAddress, loggedIn, setLoggedIn} = useWallet();
   const [isHovered, setIsHovered] = useState(false);
   const [textOpacity, setTextOpacity] = useState(1); // Initialize opacity to 1
 
 
   useEffect(() => {
-    if (account) {
+    console.log('made it to useeffect, userAddress:')
+    console.log(userAddress)
+    if (userAddress) {
       // Update accountText when account changes
-      setAccountText(truncateAddress(account));
+      console.log('using effect, setting account text')
+      console.log('userAddress')
+      console.log(userAddress)
+      setAccountText(truncateAddress(userAddress));
+      console.log('set account text')
     } else {
       setAccountText('');
     }
-  }, [account]);
+  }, [userAddress]);
 
   async function connectToMetaMask() {
     try {
@@ -68,7 +73,10 @@ export const Header = forwardRef(function Header({ className }, ref) {
       // User has granted access
       setWalletConnected(true);
       const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-      setAccount(accounts[0]);
+      console.log('setting account')
+      setUserAddress(accounts[0]);
+      console.log('set account to:')
+      console.log(accounts[0])
     } catch (error) {
       // User denied access or there was an error
       console.error(error);
@@ -87,7 +95,8 @@ export const Header = forwardRef(function Header({ className }, ref) {
       // Reset your application state related to the wallet
       // For example, set userAddress to null
       // setConnected(false);
-      setAccount(null);
+      setUserAddress(null);
+      setLoggedIn(false)
       setWalletConnected(false);
     } catch (error) {
       console.error(error);
@@ -96,7 +105,7 @@ export const Header = forwardRef(function Header({ className }, ref) {
   
   function updateWalletConnect() {
     console.log("updating wallet connect")
-  
+    console.log(loggedIn)
     if(walletConnected) {
       disconnectWallet()
     } else {
@@ -165,7 +174,7 @@ export const Header = forwardRef(function Header({ className }, ref) {
         className={`${walletConnected ? 'opacity-100 cursor-pointer' : 'opacity-60 cursor-not-allowed'}`}
         disabled={!walletConnected}
       >
-        Login
+        {walletConnected && loggedIn ? 'Logout' : walletConnected ? 'Login' : 'Login'}
       </Button>
         </div>
       </div>

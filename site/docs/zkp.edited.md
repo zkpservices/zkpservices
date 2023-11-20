@@ -20,18 +20,18 @@ To understand what we do here, you need to start with understanding zero-knowled
 
 At its core, a ZKP is a cryptographic method that allows one party to prove to another party that a statement is true without revealing any specific information about the statement itself.
 
-Imagine you have a secret password and want to prove to someone that you know it without revealing it.
+Imagine you have a secret password and want to prove to someone that you know the password without actually revealing it.
 
 ZKP makes this possible.
 
 Combining this cryptographic technique with smart contracts, zkp.services manages and verifies obfuscated (hidden or scrambled) data.
 
-We use advanced encryption techniques like RSA and AES to ensure data is securely stored and transferred. We also add layers of security with features like 2-factor authentication ("2FA") and token systems while still maintaining data privacy.
+We use advanced encryption techniques like RSA and AES to ensure data is securely stored and transferred. We also add layers of security with features like 2-factor authentication (2FA) and token systems while still maintaining data privacy.
 
 Our protocol offers a secure solution where data can be stored, requested, updated, and validated without sensitive data becoming exposed. Instead, mathematical proofs verify the authenticity and integrity of the data, ensuring both privacy and trustworthiness.
 
 
-#### **Simplifying ZKP**
+#### **Simplified variation**
 
 To help you understand what ZKP is, think of “Where’s Waldo?”.
 
@@ -43,7 +43,7 @@ ZKP serves as that magical book.
 
 In the digital world, much information, like Waldo, is hidden in the crowd.
 
-With ZKP, you can prove specific things about your information, like where Waldo is in the picture, without showing the entire picture.
+With ZKP, you can prove specific things about your information (like where Waldo is in the picture) without showing the entire picture.
 
 So, just as you wouldn’t need to point out Waldo’s exact location, with ZKP, you can keep your digital secrets safe and still convince others of certain truths about them.
 
@@ -78,7 +78,7 @@ With that, there are a plethora of industries in which zkp.services may become s
 <!---->
 
 5. **Token Access and Management**
-   Users can spend ZKP tokens within our system when they request data. Discounted rates will apply with our ZKP tokens, incentivising various actions.
+   Users can spend ZKP tokens within our system when they request data. Discounted rates will apply with our ZKP tokens, providing an incentive for various actions.
 
 
 
@@ -92,7 +92,7 @@ There is no shortage of use cases that zkp.services can fit into. Here are some 
 
 1. **Identity**
 
-Identity is the primary use case that most relevant ZKP protocols are currently pursuing in some way, shape, or form.
+The primary use case that most relevant ZKP protocols are currently pursuing in some way, shape, or form.
 
 There are many things about our identity that we are forced to share with authorities. In most cases, these are justified requests. But in all instances, we reveal more than we have to.
 
@@ -104,15 +104,14 @@ Take, for instance, the following scenarios:&#x20;
   Confirm membership in a club or organization without revealing member details (such as your address).
 * **Credential verification**
   Prove academic or professional credentials without revealing specifics (such as where you attended).
-* **KYC verification**
-  Prove to an organisation or company that you are who you say you are without revealing your passport, license, or other documents.
+
 
 
 2. **Healthcare**
 
 Sharing medical data is often necessary, but traditional systems can overshare and compromise patient privacy.
 
-In the medical field, unauthorized or accidental access to patient data, such as with system oversights of third-party data breaches, compromises patient confidentiality and trust. ZKP allows medical professionals to verify necessary patient information without exposing the entirety of their medical history.
+In the medical field, unauthorized or accidental access to patient data (such as with system oversights of third-party data breaches) compromises patient confidentiality and trust. ZKP allows medical professionals to verify necessary patient information without exposing the entirety of their medical history.
 
 Only relevant data is accessed whilst patient privacy is preserved.
 
@@ -129,9 +128,9 @@ Take, for instance, the following scenarios:
 
 3. **Supply chain**
 
-The supply chain industry has a universal trust issue. Many bad actors in this world consistently succeed in taking advantage of consumers. In contrast, many good actors want to better the world with ethical and sustainable practices.
+The supply chain industry has a universal trust issue. Many bad actors in this world consistently succeed in taking advantage of consumers. In contrast, many great actors want to better the world with ethical and sustainable practices.
 
-Both need checks and balances in place to provide complete transparency across a product's history. ZKP can accomplish just that without revealing unnecessary company or manufacturer trade secrets.
+Both need checks and balances in place to provide complete transparency across a product's history - ZKP can accomplish just that without revealing unnecessary company or manufacturer trade secrets.
 
 Take, for instance, the following scenarios:
 
@@ -140,13 +139,13 @@ Take, for instance, the following scenarios:
 * **Product authenticity**
   Prove the authenticity of a product without revealing trade secrets or proprietary methods.
 * **Source verification**
-  Verify the origin of a product without revealing particulars about the entire supply chain.
+  Verify the origin of a product without revealing the entire supply chain.
 
 
 
 4. **Financial services**
 
-This is a pivotal sector for any state where trust, discretion, and verification intersect. Traditional financial systems often expose more personal data than required, leading to potentially expensive vulnerabilities.
+It is a pivotal sector for any state where trust, discretion, and verification intersect. Traditional financial systems often expose more personal data than required, leading to potentially expensive vulnerabilities.
 
 Take, for instance, the following scenarios:
 
@@ -161,9 +160,9 @@ Take, for instance, the following scenarios:
 
 5. **Legal & Compliance**
 
-The legal sector needs to improve its operational inefficiencies and dated working methods.
+The legal sector needs to improve its operational inefficiencies and dated ways of working.
 
-It is not uncommon for both parties in a legal dispute to be compelled to reveal irrelevant data. Although the standard discovery process allows for confidential information to be redacted, other parties such as the judge may still have access to it, regardless of whether it is shared with the opposing party.h the opposing party or not.
+In many instances, both parties to a case are forced to reveal data unnecessarily. Even despite standard Discovery practices providing opportunities for the court to step in and redact what providing parties request their opposition not to see, others still become able to see this data regardless of whether it makes it to the other party in a case.
 
 Take, for instance, the following scenarios:
 
@@ -171,6 +170,5 @@ Take, for instance, the following scenarios:
   Lawyers can prove the existence of past verdicts without revealing client details or case specifics.
 * **Regulatory compliance**
   Companies can provide compliance with regulations without revealing sensitive internal processes.
-* **Reasonable accommodation verification**
-  Individuals with disabilities can prove they've requested specific accommodations (e.g., wheelchair access) from employers without revealing the nature or extent of their disability.
+* **Reasonable accommodation verification**Individuals with disabilities can prove they've requested specific accommodations (e.g., wheelchair access) from employers without revealing the nature or extent of their disability.
 

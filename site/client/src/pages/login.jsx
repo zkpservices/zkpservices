@@ -1,7 +1,8 @@
 import { Logo } from "../components/Logo.jsx"
 import { useState } from 'react'
 import { useWallet } from "@/components/Wallet.jsx";
-
+import axios, { formToJSON } from 'axios';
+import Router from 'next/router';
 /*
   This example requires some changes to your config:
   
@@ -18,7 +19,44 @@ import { useWallet } from "@/components/Wallet.jsx";
 */
 
 export default function Example() {
-  const { walletConnected } = useWallet();
+  const { walletConnected, loggedIn, userAddress, setLoggedIn, userPassword, setUserPassword, showLoginNotification, setShowLoginNotification } = useWallet();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    // Extract form data here
+    const formData = new FormData(event.target);
+
+    if (walletConnected) {
+      try {
+        const addressJSON = {
+          "id": userAddress,
+          "action": "login",          
+        }
+        const headers = {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Credentials':true
+        }
+        const formDataJSON = formToJSON(formData)
+        const mergedForm = {
+          ...addressJSON,
+          ...formDataJSON
+        }
+        console.log(mergedForm)
+        const response = await axios.post('https://yrd4sydg5g.execute-api.us-east-1.amazonaws.com/test/userdata-api', mergedForm, headers);
+        setLoggedIn(true);
+        setUserPassword(mergedForm['password'])
+        console.log('user password:')
+        console.log(userPassword)
+        Router.push('/dashboard')
+        setShowLoginNotification(true)
+        
+      } catch (error) {
+        // Handle errors, e.g., show an error message
+        console.error('Authentication failed', error);
+      }
+    }
+  };
   return (
     <>
       {/*
@@ -53,16 +91,16 @@ export default function Example() {
           </div>
           {walletConnected ? (
           <>
-          <form className="mt-8 space-y-6" action="#" method="POST">
+          <form className="mt-8 space-y-6" action="#" method="POST" onSubmit={handleSubmit}>
 
               <div>
-                <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200">
+                <label htmlFor="provider" className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200">
                   Data Provider:
                 </label>
                 <div className="mt-2">
                   <input
-                    id="email"
-                    name="email"
+                    id="provider"
+                    name="provider"
                     type="text"
                     defaultValue="https://zkp.services"
                     autoComplete=""

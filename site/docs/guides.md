@@ -5,15 +5,10 @@ Using zkp.services is simple.
 All main features are easily accessible on our dashboard, these include:
 
 1. **Make - a data request;**
-
    Get data from someone.
-   
-3. **Reply - to a data request**
-
+2. **Reply - to a data request; and**
    Answer a data request from someone.
-   
-5. **Secure - your data**
-
+3. **Secure - your data**
    Back up your data on different blockchains.
 
 Please find guides for each below.
@@ -30,11 +25,11 @@ Please find guides for each below.
 
 Before you start, here's an overview of what you'll need to make a data request:
 
-* **Encrypted Request:** This is the data you want to request.
-* **Encrypted Key:** A secure key to help decrypt the data once you receive it.
-* **Time Limit:** How long before the recipient must respond to your data request.
-* **2FA Information (*optional*):** If you want added security, you can make it so that the responder has to undergo a 2FA requirement before responding.
-* **Response fee:** A data request will cost 10 ZKP tokens by default. If you require more ZKP tokens from whom you request data, increase the number.
+**a. Encrypted Request:** This is the data you want to request.
+**b. Encrypted Key:** A secure key to help decrypt the data once you receive it.
+**c. Time Limit:** How long before the recipient must respond to your data request.
+**d. 2FA Information (*optional*):** If you want added security, you can make it so that the responder has to undergo a 2FA requirement before responding.
+**e. Response fee:** A data request will cost 10 ZKP tokens by default. If you require more ZKP tokens from whom you are requesting data, increase the number.
 
 ## 2 - Check your balance
 
@@ -62,13 +57,13 @@ Click "Call Smart Contract", and your data request will be sent to the person yo
 
 ## **4 - Wait**
 
-Once your request has successfully been sent to the recipient, you must wait for them to respond and approve your access to the requested data.
+Once your request has successfully been sent to the recipient, you must wait for them to respond and approve your access to the data you are requesting.
 
 ## **5 - Receive and Decrypt Data**
 
 If the recipient approves your data request, you may now retrieve the data.
 
-Approved data requests will be encrypted, so to access this data, you must use the encrypted key you prepared in step \[1] to reveal the requested data.
+Approved data requests will be encrypted, so to access this data, you must use the encrypted key that you prepared in step \[1] to reveal the requested data.
 
 *// END VIEW*
 
@@ -80,14 +75,14 @@ Approved data requests will be encrypted, so to access this data, you must use t
 
 Before you start, here's an overview of what you'll need to make a data request:
 
-* **Encrypted Request:** This is the data you want to update.
-* **Encrypted Key:** A secure key to help decrypt the data once you receive it.
-* **Time Limit:** How long before the recipient must respond to your data request.
-* **2FA Information (*optional*):** If you want added security, you can make it so that the responder has to undergo a 2FA requirement before responding.
+**a. Encrypted Request:** This is the data you want to update.
+**b. Encrypted Key:** A secure key to help decrypt the data once you receive it.
+**c. Time Limit:** How long before the recipient must respond to your data request.
+**d. 2FA Information (*optional*):** If you want added security, you can make it so that the responder has to undergo a 2FA requirement before responding.
 // CONSIDER ADDING "2FA PROVIDER / 2FA REQUEST ID / 2FA ONE TIME TOKEN" UNDER "d." HERE.
-* **Data Hash:** A unique identifier for the data you want to update.
-* **Salt Hash:** A cryptographic salt to enhance data security.
-* **Response fee:** A data request will cost 10 ZKP tokens by default. If you require more ZKP tokens from whom you request data, increase the number.
+**e. Data Hash:** A unique identifier for the data you want to update.
+**f. Salt Hash:** A cryptographic salt to enhance data security.
+**e. Response fee:** A data request will cost 10 ZKP tokens by default. If you require more ZKP tokens from whom you are requesting data, increase the number.
 
 ## 2 - Check your balance
 
@@ -111,17 +106,17 @@ Click the "Make an Update Request" option at the beginning of the page. A modal 
 
 Use the data you've prepared earlier in step \[1] to fill out the data request form in the modal.
 
-Click "Call Smart Contract", and your data update request will be sent to the person you request an update from.
+Click "Call Smart Contract", and your data update request will be sent to the person you are requesting an update from.
 
 ## **4 - Wait**
 
-Once your request has successfully been sent to the recipient, you must wait for them to respond and approve your access to the requested data.
+Once your request has successfully been sent to the recipient, you must wait for them to respond and approve your access to the data you are requesting.
 
 ## 5 - Receive and Decrypt Data
 
 After the recipient responds, you can now check that the data has been updated as desired.
 
-The data will be encrypted, so to access this data, you must use the encrypted key you prepared in step \[1] to reveal the requested data.
+The data will be encrypted, so to access this data, you must use the encrypted key that you prepared in step \[1] to reveal the requested data.
 
 *// END VIEW*
 
@@ -133,9 +128,9 @@ The data will be encrypted, so to access this data, you must use the encrypted k
 
 Before you start, here's an overview of what you'll need to make a data request:
 
-**a.** **Destination chain:** The blockchain to which you want to back up your data.
-**b.** **Parameter to sync:** \[amir].
-**c.** **Data location:** The data you want to be stored.
+**a. Destination chain:** The blockchain to which you want to back up your data.
+**b. Parameter to sync:** \[amir].
+**c. Data location:** The data you want to be stored.
 
 ## 2 - Check your balance
 
@@ -167,6 +162,6 @@ Navigate to your dashboard located in **\[x]**.
 
 Go to your recent activity table and navigate to the "Cross-chain sync" tab.
 
-Find the data sync that you're interested in checking. You can view the status in the **\[x]** column.
+Find the data sync that you're interested in checking. You'll be able to view the status in the **\[x]** column.
 
 Alternatively, you can click "View Details" to see what data was synced and when.
