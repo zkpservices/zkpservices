@@ -3,27 +3,35 @@ import { Heading } from '@/components/Heading'
 
 const guides = [
   {
-    href: '/authentication',
-    name: 'Authentication',
-    description: 'Learn how to authenticate your API requests.',
-  },
-  {
-    href: '/pagination',
-    name: 'Pagination',
-    description: 'Understand how to work with paginated responses.',
-  },
-  {
-    href: '/errors',
-    name: 'Errors',
+    href: '/zkp.edited',
+    name: 'Overview',
     description:
-      'Read about the different types of errors returned by the API.',
+      'An overview of zkp.services.',
+  },
+  {
+    href: '/guides',
+    name: 'dApp Guide',
+    description:
+      'A guide on how to use our dApp.',
+  },
+  {
+    href: '/youdata',
+    name: 'Your Data',
+    description:
+      'Learn how we handle your data.',
+  },
+  {
+    href: '/2FA',
+    name: '2FA',
+    description:
+      'Learn how we implement our own native 2FA solution.',
   },
   {
     href: '/api_docs',
     name: 'API Guide',
     description:
       'Learn how to to use our API for user data.',
-  },
+  }
 ]
 
 export function Guides() {

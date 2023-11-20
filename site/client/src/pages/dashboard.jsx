@@ -5,6 +5,13 @@ import { motion, transform, useMotionTemplate, useMotionValue } from 'framer-mot
 import { Tab } from '@headlessui/react';
 import { useWallet } from "@/components/Wallet.jsx";
 
+// import { Modal } from '@/components/Modal'
+// import { NewDataModal } from '@/components/NewDataModal'
+// import { ZKPFaucetModal } from '@/components/ZKPFaucetModal'
+// import { ViewFieldModal } from '@/components/ViewFieldModal'
+// import { NewUpdateRequestModal } from '@/components/NewUpdateRequestModal'
+import { NewDataRequestModal } from '@/components/NewDataRequestModal'
+import { ThreeJSComponent } from '@/components/ThreeJSComponent'
 import { GridPattern } from '@/components/GridPattern'
 import { Heading } from '@/components/Heading'
 import { ChatBubbleIcon } from '@/components/icons/ChatBubbleIcon'
@@ -533,6 +540,17 @@ export function Dashboard() {
       />
     )}
     </div>
+
+    {/* <div>
+      <ThreeJSComponent />
+    </div> */}
+
+    {/* <Modal /> */}
+    {/* <NewDataModal /> */}
+    {/* <ZKPFaucetModal /> */}
+    {/* <ViewFieldModal title="Medical Records" /> */}
+    {/* <NewUpdateRequestModal /> */}
+    <NewDataRequestModal />
 
     </>
    ) : (
