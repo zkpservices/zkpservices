@@ -1,11 +1,10 @@
 import { Fragment, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
-import { XMarkIcon } from '@heroicons/react/24/outline';
 
 export function NewDataRequestModal() {
   const [is2FAEnabled, setIs2FAEnabled] = useState(false);
   const [open, setOpen] = useState(true);
-  const [twoFAProvider, setTwoFAProvider] = useState("zkp.services VRF 2FA");
+  const [twoFAProvider, setTwoFAProvider] = useState("zkp.services VRF 2FA (default)");
   const [twoFARequestID, setTwoFARequestID] = useState("");
 
   const generateRandomID = () => {
@@ -41,19 +40,6 @@ export function NewDataRequestModal() {
           >
             <div>
               <div className="relative bg-white rounded-lg max-w-screen-2xl mx-auto mt-6 px-4 pt-5 pb-4 text-left shadow-xl dark:bg-gray-800 sm:my-20 sm:w-full sm:max-w-3xl sm:p-6">
-                <div className="absolute right-0 top-0 hidden pr-4 pt-4 sm:block">
-                  <button
-                    type="button"
-                    className="rounded-md bg-white dark:bg-gray-800 text-gray-400 dark:text-gray-600 hover:text-gray-500 dark:hover:text-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
-                    onClick={() => setOpen(false)}
-                  >
-                    <span className="sr-only">Close</span>
-                    <XMarkIcon
-                      className="h-6 w-6 text-emerald-500 dark:text-emerald-300 hover:text-emerald-600 dark:hover:text-emerald-400"
-                      aria-hidden="true"
-                    />
-                  </button>
-                </div>
                 <Dialog.Title
                   as="h3"
                   className="text-lg font-semibold text-gray-900 dark:text-white"
@@ -68,7 +54,7 @@ export function NewDataRequestModal() {
                     </label>
                     <textarea
                       id="receiverAddress"
-                      className="block w-full rounded-md border-0 py-2 pl-3 pr-3 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500 mt-1"
+                      className="block w-full rounded-md border-0 py-2 pl-3 pr-3 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500"
                       rows={1}
                     />
                   </div>
@@ -78,8 +64,8 @@ export function NewDataRequestModal() {
                       Field Requested:
                     </label>
                     <textarea
-                      id="fieldRequested"
-                      className="block w-full rounded-md border-0 py-2 pl-3 pr-3 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500 mt-1"
+                      id="fieldToUpdate"
+                      className="block w-full rounded-md border-0 py-2 pl-3 pr-3 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500"
                       rows={1}
                     />
                   </div>
@@ -92,7 +78,7 @@ export function NewDataRequestModal() {
                     </label>
                     <textarea
                       id="oneTimeKey"
-                      className="block w-full rounded-md border-0 py-2 pl-3 pr-3 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500 mt-1"
+                      className="block w-full rounded-md border-0 py-2 pl-3 pr-3 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500"
                       rows={1}
                     />
                     <button
@@ -111,7 +97,7 @@ export function NewDataRequestModal() {
                     </label>
                     <textarea
                       id="oneTimeSalt"
-                      className="block w-full rounded-md border-0 py-2 pl-3 pr-3 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500 mt-1"
+                      className="block w-full rounded-md border-0 py-2 pl-3 pr-3 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500"
                       rows={1}
                     />
                     <button
@@ -126,13 +112,13 @@ export function NewDataRequestModal() {
 
                   <div className="mt-4">
                     <label htmlFor="timeLimit" className="block text-sm font-medium leading-5 text-gray-900 dark:text-white">
-                      Time Limit of Request (in seconds, default is 600):
+                      Time Limit of Request (in seconds):
                     </label>
                     <textarea
                       id="timeLimit"
-                      className="block w-full rounded-md border-0 py-2 pl-3 pr-3 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500 mt-1"
+                      className="block w-full rounded-md border-0 py-2 pl-3 pr-3 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500"
                       rows={1}
-                      defaultValue="600"
+                      defaultValue="600 (default)"
                     />
                   </div>
 
@@ -156,7 +142,7 @@ export function NewDataRequestModal() {
                         </label>
                         <textarea
                           id="twoFAProvider"
-                          className="block w-full rounded-md border-0 py-2 pl-3 pr-3 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500 mt-1"
+                          className="block w-full rounded-md border-0 py-2 pl-3 pr-3 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500"
                           rows={1}
                           defaultValue={twoFAProvider}
                         />
@@ -168,7 +154,7 @@ export function NewDataRequestModal() {
                         </label>
                         <textarea
                           id="twoFARequestID"
-                          className="block w-full rounded-md border-0 py-2 pl-3 pr-3 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500 mt-1"
+                          className="block w-full rounded-md border-0 py-2 pl-3 pr-3 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500"
                           rows={1}
                           value={twoFARequestID}
                           onChange={(e) => setTwoFARequestID(e.target.value)}
@@ -192,13 +178,13 @@ export function NewDataRequestModal() {
 
                   <div className="mt-4">
                     <label htmlFor="responseFee" className="block text-sm font-medium leading-5 text-gray-900 dark:text-white">
-                      Set Response Fee (in ZKP, default is 10):
+                      Set Response Fee:
                     </label>
                     <textarea
                       id="responseFee"
-                      className="block w-full rounded-md border-0 py-2 pl-3 pr-3 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500 mt-1"
+                      className="block w-full rounded-md border-0 py-2 pl-3 pr-3 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500"
                       rows={1}
-                      defaultValue="10"
+                      defaultValue="10 ZKP (default)"
                     />
                   </div>
 

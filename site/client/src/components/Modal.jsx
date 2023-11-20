@@ -55,6 +55,9 @@ export function Modal() {
                       <p className="text-sm text-gray-500 dark:text-gray-300">
                         {/* Your content here */}
                         Your content goes here and can have as much text as needed. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                        Your content goes here and can have as much text as needed. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                        Your content goes here and can have as much text as needed. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                        Your content goes here and can have as much text as needed. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
                       </p>
                     </div>
                   </div>
