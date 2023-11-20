@@ -34,7 +34,7 @@ Our data model is an extremely versatile JSON object that gives way to an endles
 
 ---
 
-## Retrieve user data {{ tag: 'POST', label: '/test/userdata-api, action: "get_item"' }}
+## Retrieve user data {{ tag: 'POST', label: '/userdata, action: "get_item"' }}
 
 <Row>
   <Col>
@@ -75,7 +75,7 @@ Our data model is an extremely versatile JSON object that gives way to an endles
     <CodeGroup title="Request" tag="GET" label="/v1/contacts">
 
     ```bash {{ title: 'cURL' }}
-    curl --location --request POST https://yrd4sydg5g.execute-api.us-east-1.amazonaws.com/test/userdata-api' \
+    curl --location --request POST https://y1oeimdo63.execute-api.us-east-1.amazonaws.com/userdata' \
     --header 'Content-Type: application/json' \
     --data-raw '{
         "id": "Ox4",
@@ -87,7 +87,7 @@ Our data model is an extremely versatile JSON object that gives way to an endles
 
     ```js
     var settings = {
-      "url": "https://yrd4sydg5g.execute-api.us-east-1.amazonaws.com/test/userdata-api",
+      "url": "https://y1oeimdo63.execute-api.us-east-1.amazonaws.com/userdata",
       "method": "POST",
       "timeout": 0,
       "headers": {
@@ -110,7 +110,7 @@ Our data model is an extremely versatile JSON object that gives way to an endles
     import requests
     import json
 
-    url = "https://yrd4sydg5g.execute-api.us-east-1.amazonaws.com/test/userdata-api"
+    url = "https://y1oeimdo63.execute-api.us-east-1.amazonaws.com/userdata"
 
     payload = json.dumps({
       "id": "Ox4",
@@ -139,7 +139,7 @@ Our data model is an extremely versatile JSON object that gives way to an endles
     `n    `"key`": `"medical records - pharmacy central melbourne.data.active prescriptions.Amoxicillin`"
     `n}"
 
-    $response = Invoke-RestMethod 'https://yrd4sydg5g.execute-api.us-east-1.amazonaws.com/test/userdata-api' -Method 'POST' -Headers $headers -Body $body
+    $response = Invoke-RestMethod 'https://y1oeimdo63.execute-api.us-east-1.amazonaws.com/userdata' -Method 'POST' -Headers $headers -Body $body
     $response | ConvertTo-Json
     ```
 
@@ -160,7 +160,7 @@ Our data model is an extremely versatile JSON object that gives way to an endles
 
 ---
 
-## Create a user and dataset {{ tag: 'POST', label: '/test/userdata-api, action: "create_item"' }}
+## Create a user and dataset {{ tag: 'POST', label: '/userdata, action: "create_item"' }}
 
 <Row>
   <Col>
@@ -204,7 +204,7 @@ Our data model is an extremely versatile JSON object that gives way to an endles
     <CodeGroup title="Request" tag="POST" label="/v1/contacts">
 
     ```bash {{ title: 'cURL' }}
-      curl --location --request POST 'https://yrd4sydg5g.execute-api.us-east-1.amazonaws.com/test/userdata-api' \
+      curl --location --request POST 'https://y1oeimdo63.execute-api.us-east-1.amazonaws.com/userdata' \
       --header 'Content-Type: application/json' \
       --data-raw '{
           "id": "Ox234",
@@ -226,7 +226,7 @@ Our data model is an extremely versatile JSON object that gives way to an endles
 
     ```js
     var settings = {
-      "url": "https://yrd4sydg5g.execute-api.us-east-1.amazonaws.com/test/userdata-api",
+      "url": "https://y1oeimdo63.execute-api.us-east-1.amazonaws.com/userdata",
       "method": "POST",
       "timeout": 0,
       "headers": {
@@ -258,7 +258,7 @@ $.ajax(settings).done(function (response) {
       import requests
       import json
 
-      url = "https://yrd4sydg5g.execute-api.us-east-1.amazonaws.com/test/userdata-api"
+      url = "https://y1oeimdo63.execute-api.us-east-1.amazonaws.com/userdata"
 
       payload = json.dumps({
         "id": "Ox234",
@@ -306,7 +306,7 @@ $.ajax(settings).done(function (response) {
     `n    
     `n}"
 
-    $response = Invoke-RestMethod 'https://yrd4sydg5g.execute-api.us-east-1.amazonaws.com/test/userdata-api' -Method 'POST' -Headers $headers -Body $body
+    $response = Invoke-RestMethod 'https://y1oeimdo63.execute-api.us-east-1.amazonaws.com/userdata' -Method 'POST' -Headers $headers -Body $body
     $response | ConvertTo-Json
     ```
 
@@ -321,7 +321,7 @@ $.ajax(settings).done(function (response) {
 
 ---
 
-## Update a users data {{ tag: 'PUT', label: '/test/userdata-api, action: "update_item"' }}
+## Update a users data {{ tag: 'PUT', label: '/userdata, action: "update_item"' }}
 
 <Row>
   <Col>
@@ -349,10 +349,10 @@ $.ajax(settings).done(function (response) {
   </Col>
   <Col sticky>
 
-    <CodeGroup title="Request" tag="PUT" label="/test/userdata-api">
+    <CodeGroup title="Request" tag="PUT" label="/userdata">
 
     ```bash {{ title: 'cURL' }}
-    curl --location --request PUT 'https://yrd4sydg5g.execute-api.us-east-1.amazonaws.com/test/userdata-api' \
+    curl --location --request PUT 'https://y1oeimdo63.execute-api.us-east-1.amazonaws.com/userdata' \
     --header 'Content-Type: application/json' \
     --data-raw '{
         "httpMethod": "PUT",
@@ -373,7 +373,7 @@ $.ajax(settings).done(function (response) {
 
     ```js
     var settings = {
-      "url": "https://yrd4sydg5g.execute-api.us-east-1.amazonaws.com/test/userdata-api",
+      "url": "https://y1oeimdo63.execute-api.us-east-1.amazonaws.com/userdata",
       "method": "PUT",
       "timeout": 0,
       "headers": {
@@ -405,7 +405,7 @@ $.ajax(settings).done(function (response) {
     import requests
     import json
 
-    url = "https://yrd4sydg5g.execute-api.us-east-1.amazonaws.com/test/userdata-api"
+    url = "https://y1oeimdo63.execute-api.us-east-1.amazonaws.com/userdata"
 
     payload = json.dumps({
       "httpMethod": "PUT",
@@ -452,7 +452,7 @@ $.ajax(settings).done(function (response) {
     `n    }
     `n}"
 
-    $response = Invoke-RestMethod 'https://yrd4sydg5g.execute-api.us-east-1.amazonaws.com/test/userdata-api' -Method 'PUT' -Headers $headers -Body $body
+    $response = Invoke-RestMethod 'https://y1oeimdo63.execute-api.us-east-1.amazonaws.com/userdata' -Method 'PUT' -Headers $headers -Body $body
     $response | ConvertTo-Json
     ```
   </CodeGroup>
@@ -468,7 +468,7 @@ $.ajax(settings).done(function (response) {
 
 ---
 
-## Update password {{ tag: 'PUT', label: '/test/userdata-api, action: "update_item"' }}
+## Update password {{ tag: 'PUT', label: '/userdata, action: "update_item"' }}
 
 <Row>
   <Col>
@@ -497,10 +497,10 @@ $.ajax(settings).done(function (response) {
   </Col>
   <Col sticky>
 
-    <CodeGroup title="Request" tag="PUT" label="/test/userdata-api">
+    <CodeGroup title="Request" tag="PUT" label="/userdata">
 
     ```bash {{ title: 'cURL' }}
-    curl --location --request PUT 'https://yrd4sydg5g.execute-api.us-east-1.amazonaws.com/test/userdata-api' \
+    curl --location --request PUT 'https://y1oeimdo63.execute-api.us-east-1.amazonaws.com/userdata' \
     --header 'Content-Type: application/json' \
     --data-raw '{
         "httpMethod": "PUT",
@@ -515,7 +515,7 @@ $.ajax(settings).done(function (response) {
 
     ```js
     var settings = {
-      "url": "https://yrd4sydg5g.execute-api.us-east-1.amazonaws.com/test/userdata-api",
+      "url": "https://y1oeimdo63.execute-api.us-east-1.amazonaws.com/userdata",
       "method": "PUT",
       "timeout": 0,
       "headers": {
@@ -541,7 +541,7 @@ $.ajax(settings).done(function (response) {
     import requests
     import json
 
-    url = "https://yrd4sydg5g.execute-api.us-east-1.amazonaws.com/test/userdata-api"
+    url = "https://y1oeimdo63.execute-api.us-east-1.amazonaws.com/userdata"
 
     payload = json.dumps({
       "httpMethod": "PUT",
@@ -575,7 +575,7 @@ $.ajax(settings).done(function (response) {
     `n    }
     `n}"
 
-    $response = Invoke-RestMethod 'https://yrd4sydg5g.execute-api.us-east-1.amazonaws.com/test/userdata-api' -Method 'PUT' -Headers $headers -Body $body
+    $response = Invoke-RestMethod 'https://y1oeimdo63.execute-api.us-east-1.amazonaws.com/userdata' -Method 'PUT' -Headers $headers -Body $body
     $response | ConvertTo-Json
     ```
 
@@ -590,7 +590,7 @@ $.ajax(settings).done(function (response) {
 
 ---
 
-## Add request {{ tag: 'POST', label: '/test/userdata-api, action: "add_request"' }}
+## Add request {{ tag: 'POST', label: '/userdata, action: "add_request"' }}
 
 <Row>
   <Col>
@@ -619,10 +619,10 @@ $.ajax(settings).done(function (response) {
   </Col>
   <Col sticky>
 
-    <CodeGroup title="Request" tag="PUT" label="/test/userdata-api">
+    <CodeGroup title="Request" tag="PUT" label="/userdata">
 
     ```bash {{ title: 'cURL' }}
-    curl --location --request POST 'https://yrd4sydg5g.execute-api.us-east-1.amazonaws.com/test/userdata-api' \
+    curl --location --request POST 'https://y1oeimdo63.execute-api.us-east-1.amazonaws.com/userdata' \
     --header 'Content-Type: application/json' \
     --data-raw '{
         "id": "Ox3",
@@ -640,7 +640,7 @@ $.ajax(settings).done(function (response) {
 
     ```js
     var settings = {
-      "url": "https://yrd4sydg5g.execute-api.us-east-1.amazonaws.com/test/userdata-api",
+      "url": "https://y1oeimdo63.execute-api.us-east-1.amazonaws.com/userdata",
       "method": "POST",
       "timeout": 0,
       "headers": {
@@ -669,7 +669,7 @@ $.ajax(settings).done(function (response) {
     import requests
     import json
 
-    url = "https://yrd4sydg5g.execute-api.us-east-1.amazonaws.com/test/userdata-api"
+    url = "https://y1oeimdo63.execute-api.us-east-1.amazonaws.com/userdata"
 
     payload = json.dumps({
       "id": "Ox3",
@@ -709,7 +709,7 @@ $.ajax(settings).done(function (response) {
     `n    }
     `n}"
 
-    $response = Invoke-RestMethod 'https://yrd4sydg5g.execute-api.us-east-1.amazonaws.com/test/userdata-api' -Method 'POST' -Headers $headers -Body $body
+    $response = Invoke-RestMethod 'https://y1oeimdo63.execute-api.us-east-1.amazonaws.com/userdata' -Method 'POST' -Headers $headers -Body $body
     $response | ConvertTo-Json
     ```
 
@@ -724,7 +724,7 @@ $.ajax(settings).done(function (response) {
 
 ---
 
-## Add response {{ tag: 'POST', label: '/test/userdata-api, action: "add_response"' }}
+## Add response {{ tag: 'POST', label: '/userdata, action: "add_response"' }}
 
 <Row>
   <Col>
@@ -753,10 +753,10 @@ $.ajax(settings).done(function (response) {
   </Col>
   <Col sticky>
 
-    <CodeGroup title="Request" tag="PUT" label="/test/userdata-api">
+    <CodeGroup title="Request" tag="PUT" label="/userdata">
 
     ```bash {{ title: 'cURL' }}
-    curl --location --request POST 'https://yrd4sydg5g.execute-api.us-east-1.amazonaws.com/test/userdata-api' \
+    curl --location --request POST 'https://y1oeimdo63.execute-api.us-east-1.amazonaws.com/userdata' \
     --header 'Content-Type: application/json' \
     --data-raw '{
         "id": "Ox3",
@@ -774,7 +774,7 @@ $.ajax(settings).done(function (response) {
 
     ```js
     var settings = {
-      "url": "https://yrd4sydg5g.execute-api.us-east-1.amazonaws.com/test/userdata-api",
+      "url": "https://y1oeimdo63.execute-api.us-east-1.amazonaws.com/userdata",
       "method": "POST",
       "timeout": 0,
       "headers": {
@@ -803,7 +803,7 @@ $.ajax(settings).done(function (response) {
     import requests
     import json
 
-    url = "https://yrd4sydg5g.execute-api.us-east-1.amazonaws.com/test/userdata-api"
+    url = "https://y1oeimdo63.execute-api.us-east-1.amazonaws.com/userdata"
 
     payload = json.dumps({
       "id": "Ox3",
@@ -843,7 +843,7 @@ $.ajax(settings).done(function (response) {
     `n    }
     `n}"
 
-    $response = Invoke-RestMethod 'https://yrd4sydg5g.execute-api.us-east-1.amazonaws.com/test/userdata-api' -Method 'POST' -Headers $headers -Body $body
+    $response = Invoke-RestMethod 'https://y1oeimdo63.execute-api.us-east-1.amazonaws.com/userdata' -Method 'POST' -Headers $headers -Body $body
     $response | ConvertTo-Json
     ```
 

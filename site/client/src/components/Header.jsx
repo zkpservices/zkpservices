@@ -65,7 +65,7 @@ export const Header = forwardRef(function Header({ className }, ref) {
     } else {
       setAccountText('');
     }
-  }, [userAddress]);
+  }, [userAddress, loggedIn]);
 
   async function connectToMetaMask() {
     try {
@@ -110,6 +110,12 @@ export const Header = forwardRef(function Header({ className }, ref) {
       disconnectWallet()
     } else {
       connectToMetaMask()
+    }
+  }
+
+  function loginButtonClicked() {
+    if(loggedIn) {
+      setLoggedIn(false)
     }
   }
 
@@ -171,6 +177,7 @@ export const Header = forwardRef(function Header({ className }, ref) {
         <Button
         href="/login"
         id="loginButtonNav"
+        onClick={loginButtonClicked}
         className={`${walletConnected ? 'opacity-100 cursor-pointer' : 'opacity-60 cursor-not-allowed'}`}
         disabled={!walletConnected}
       >

@@ -13,10 +13,13 @@ export function WalletProvider({ children }) {
   const [userPassword, setUserPassword] = useState('')
   const [showLoginNotification, setShowLoginNotification] = useState(false);
   const [username, setUsername] = useState('');
+  const [twoFactorAuthPassword, setTwoFactorAuthPassword] = useState('');
+  const [contractPassword, setContractPassword] = useState('');
 
   return (
     <WalletContext.Provider value={{ walletConnected, setWalletConnected, loggedIn, setLoggedIn, userAddress, setUserAddress, 
-      showLoginNotification, setShowLoginNotification, userPassword, setUserPassword, username, setUsername}}>
+      showLoginNotification, setShowLoginNotification, userPassword, setUserPassword, username, setUsername, twoFactorAuthPassword, setTwoFactorAuthPassword,
+      contractPassword, setContractPassword}}>
       {children}
     </WalletContext.Provider>
   );

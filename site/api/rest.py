@@ -50,6 +50,10 @@ def update_json(obj1, obj2):
     return obj1
 
 def get_item(item_id, key=None):
+    # Authenticate the user
+    # password_auth_result = check_password(item_id, password)
+    # if not password_auth_result == True:
+    #     return None
     response = table.get_item(Key={"id": item_id})
     item = response.get("Item", None)
 
@@ -63,6 +67,18 @@ def get_item(item_id, key=None):
     
     return None
 
+def login(item_id, password):
+    # Authenticate the user
+    password_auth_result = check_password(item_id, password)
+    if not password_auth_result == True:
+        return password_auth_result
+    else:
+        return {
+                "statusCode": 200,
+                "body": json.dumps("User authenticated successfully.")
+            } 
+
+    
 def get_nested_value(data, key):
     keys = key.split('.')
     value = json.loads(data)
@@ -86,7 +102,6 @@ import boto3
 from botocore.exceptions import ClientError
 
 def delete_item(item_id, password, key):
-    check_password(item_id, password)
     try:
         # Authenticate the user
         password_auth_result = check_password(item_id, password)
@@ -152,6 +167,7 @@ def delete_item(item_id, password, key):
 
 
 def check_password(item_id, password):
+
     response = table.get_item(Key={"id": item_id})
     item = response.get("Item", None)
     if not item:
@@ -172,7 +188,10 @@ def get_item_public(item_id, password):
                 
 
 def update_password(item_id, new_password, old_password, context):
-    check_password(id, old_password)
+    # Authenticate the user
+    password_auth_result = check_password(item_id, old_password)
+    if not password_auth_result == True:
+        return password_auth_result
 
     try:
         response = table.update_item(
@@ -188,6 +207,7 @@ def update_password(item_id, new_password, old_password, context):
 def create_item(item_data):
     # Check if the item with the given ID already exists
     existing_item = get_item(item_data['id'])
+
     if existing_item:
         return {
             "statusCode": 409,
@@ -215,12 +235,18 @@ def create_item(item_data):
             "id": item_data['id'],
             "data": item_data_json,  # Use the updated "data" field
             "password": item_data.get("password", ""),
+            "2fa_password": item_data['2fa_password'],
+            "contract_password": item_data['contract_password'],
             "requests_received": requests_received_data_json,
             "responses_received": responses_received_data_json,
             "requests_sent": requests_sent_data_json,
             "responses_sent": responses_sent_data_json,
             "available_dashboard": available_dashboard,  # Add the available_dashboard list
-            "crosschain_transactions": crosschain_transactions
+            "crosschain_transactions": crosschain_transactions,
+            "rsa_enc_pub_key": item_data['rsa_enc_pub_key'],
+            "rsa_enc_priv_key": item_data['rsa_enc_priv_key'],
+            "rsa_sign_pub_key": item_data['rsa_sign_pub_key'],
+            "rsa_sign_pub_key": item_data['rsa_sign_pub_key'],
         })
 
         return "Item created successfully!"
@@ -228,7 +254,10 @@ def create_item(item_data):
         return str(e)
 
 def update_item(id, password, body):
-    check_password(id, password)
+    # Authenticate the user
+    password_auth_result = check_password(id, password)
+    if not password_auth_result == True:
+        return password_auth_result
     # Check if the item with the given ID exists
     existing_item = get_item(id)
     if not existing_item:
@@ -310,7 +339,10 @@ def update_timestamps(data):
 
 
 def add_request(sender_id, requests, password):
-    check_password(sender_id, password)
+    # Authenticate the user
+    password_auth_result = check_password(sender_id, password)
+    if not password_auth_result == True:
+        return password_auth_result
     try:
         # Get sender's data from the database
         sender_response = table.get_item(Key={"id": sender_id})
@@ -371,7 +403,10 @@ def add_request(sender_id, requests, password):
         }
 
 def add_response(sender_id, responses, password):
-    check_password(sender_id, password)
+    # Authenticate the user
+    password_auth_result = check_password(sender_id, password)
+    if not password_auth_result == True:
+        return password_auth_result
     try:
         # Get sender's data from the database
         sender_response = table.get_item(Key={"id": sender_id})
@@ -432,7 +467,10 @@ def add_response(sender_id, responses, password):
         }
 
 def get_available_dashboard(item_id, password):
-    check_password(item_id, password)
+    # Authenticate the user
+    password_auth_result = check_password(item_id, password)
+    if not password_auth_result == True:
+        return password_auth_result
     try:
         # Query the DynamoDB table to fetch the available_dashboard attribute
         response = table.get_item(Key={"id": item_id}, ProjectionExpression="available_dashboard")
@@ -458,7 +496,10 @@ def get_available_dashboard(item_id, password):
         }
 
 def get_dashboard(item_id, password):
-    check_password(item_id, password)
+    # Authenticate the user
+    password_auth_result = check_password(item_id, password)
+    if not password_auth_result == True:
+        return password_auth_result
     try:
 
         # Query the DynamoDB table to fetch the "dashboard" attribute
@@ -484,7 +525,10 @@ def get_dashboard(item_id, password):
         }
 
 def add_to_dashboard(item_id, service, password):
-    check_password(item_id, password)
+    # Authenticate the user
+    password_auth_result = check_password(item_id, password)
+    if not password_auth_result == True:
+        return password_auth_result
     try:
 
         # Query the DynamoDB table to fetch the "available_dashboard" attribute
@@ -543,9 +587,11 @@ def add_to_dashboard(item_id, service, password):
         }
 
 def remove_from_dashboard(item_id, service, password):
-    check_password(item_id, password)
+    # Authenticate the user
+    password_auth_result = check_password(item_id, password)
+    if not password_auth_result == True:
+        return password_auth_result
     try:
-
         # Query the DynamoDB table to fetch the "dashboard" attribute
         response = table.get_item(Key={"id": item_id}, ProjectionExpression="dashboard")
 
@@ -585,7 +631,10 @@ def remove_from_dashboard(item_id, service, password):
         }
 
 def add_crosschain_transaction(id, crosschain_transaction, password):
-    check_password(id, password)
+    # Authenticate the user
+    password_auth_result = check_password(id, password)
+    if not password_auth_result == True:
+        return password_auth_result
     try:
         
         # Get users CCTXs from the database
@@ -623,7 +672,10 @@ def add_crosschain_transaction(id, crosschain_transaction, password):
         }
 
 def get_crosschain_transcation(id, password):
-    check_password(id, password)
+    # Authenticate the user
+    password_auth_result = check_password(id, password)
+    if not password_auth_result == True:
+        return password_auth_result
     try:
 
         # Query the DynamoDB table to fetch the "crosschain_transactions" attribute
@@ -649,7 +701,10 @@ def get_crosschain_transcation(id, password):
         }
 
 def get_crosschain_transaction(id, password):
-    check_password(id, password)
+    # Authenticate the user
+    password_auth_result = check_password(id, password)
+    if not password_auth_result == True:
+        return password_auth_result
     try:
 
         # Query the DynamoDB table to fetch the "crosschain_transactions" attribute
@@ -678,10 +733,14 @@ def get_crosschain_transaction(id, password):
 def handler(event, context):
     event = json.dumps(event)
     event = json.loads(event)
+    request_context = event['requestContext']
+    http_method = request_context["http"]["method"]
+    if http_method == 'OPTIONS':
+        return {
+            "statusCode": 200,
+        }
     try:
         inner_body = json.loads(event['body'])
-        request_context = event['requestContext']
-        http_method = request_context["http"]["method"]
         # http_method = inner_body['httpMethod']
 
         # Parse the JSON body if it exists
@@ -719,6 +778,14 @@ def handler(event, context):
                     return {
                         "statusCode": 400,
                         "body": json.dumps("Missing 'id' or 'data' in the request body")
+                    }
+            elif body and 'action' in body and body['action'] == 'login':
+                if 'id' in body and 'password' in body:
+                    return login(body['id'], body['password'])
+                else:
+                    return {
+                        "statusCode": 400,
+                        "body": json.dumps("Missing 'id' or 'password' in the request body")
                     }
             elif body and 'action' in body and body['action'] == 'add_request':
                 if 'requests' in body and 'id' in body:
@@ -789,6 +856,7 @@ def handler(event, context):
                 }
 
         elif http_method == 'PUT':
+            
             if body and 'action' in body and body['action'] == 'update_item':
                 if 'id' in body and 'data' in body and 'password' in body:
                     return update_item(body['id'], body['password'], body['data'])
@@ -823,7 +891,7 @@ def handler(event, context):
                         }
                 elif body['action'] == 'delete_item':
                     if 'id' in body and 'password' in body and 'key' in body:
-                        return delete_item(body['id'], body['password'], body['key'], body['password'])
+                        return delete_item(body['id'], body['password'], body['key'])
                     else:
                         return {
                             "statusCode": 400,

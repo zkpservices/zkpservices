@@ -1,4 +1,8 @@
 import Guide from './quickstart_guide.mdx';
+import { useWallet } from '@/components/Wallet';
+import { useState } from 'react';
+import axios, { formToJSON } from 'axios';
+import Router from 'next/router';
 
 /*
   This example requires some changes to your config:
@@ -15,11 +19,60 @@ import Guide from './quickstart_guide.mdx';
   ```
 */
 export default function Example() {
+  let { walletConnected, userAddress, showLoginNotification, 
+    setShowLoginNotification, loggedIn, setLoggedIn, userPassword, setUserPassword, username, setUsername, twoFactorAuthPassword, setTwoFactorAuthPassword,
+    contractPassword, setContractPassword } = useWallet();
+  const [rsaEncPubKey, setRsaEncPubKey] = useState('');
+  const [rsaEncPrivKey, setRsaEncPrivKey] = useState('');
+  const [rsaSignPubKey, setRsaSignPubKey] = useState('');
+  const [rsaSignPrivKey, setRsaSignPrivKey] = useState('');
+  const [userData, setUserData] = useState('');
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+
+      try {
+        const quickstart_JSON = {
+          "id": userAddress,
+          "action": "create_item", 
+          "password": userPassword,
+          "contract_password": contractPassword,
+          "2fa_password": twoFactorAuthPassword,
+          "rsa_enc_pub_key": rsaEncPubKey,
+          "rsa_enc_priv_key": rsaEncPubKey,
+          "rsa_sign_pub_key": rsaEncPubKey,
+          "rsa_sign_priv_key": rsaEncPubKey,
+          "data": JSON.parse(userData),
+          "requests_sent": {},
+          "requests_received": {},
+          "responses_sent": {},
+          "responses_received": {}
+        }
+        console.log(quickstart_JSON)
+
+        const response = await axios.post('https://y1oeimdo63.execute-api.us-east-1.amazonaws.com/userdata', quickstart_JSON);
+        Router.push('/dashboard')
+        setLoggedIn(true)
+        setShowLoginNotification(true)
+        
+        
+      } catch (error) {
+        // Handle errors, e.g., show an error message
+        console.error('Authentication failed', error);
+      }
+  };
+
   return (
 
     <>
+    {!walletConnected ? (
+      <h2 className="mt-10 text-center text-3xl font-bold tracking-tight">
+        Please connect your wallet to get started.
+      </h2>
+    ) : (
+    <>
     <Guide />
-
     <form className="space-y-8 divide-y divide-gray-200 dark:divide-gray-700">
       <div className="space-y-8 divide-y divide-gray-200 dark:divide-gray-700 sm:space-y-5">
         <div className="space-y-6 sm:space-y-5">
@@ -41,10 +94,11 @@ export default function Example() {
             </label>
             <div className="mt-1 sm:col-span-2 sm:mt-0">
               <input
-                id="email"
-                name="email"
+                id="password"
+                name="password"
                 type="password"
                 autoComplete=""
+                onChange={(e) => setUserPassword(e.target.value)}
                 className="relative block w-full appearance-none rounded-md border border-gray-300 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none dark:bg-gray-900 focus:ring-emerald-500 sm:text-sm"
               />
             </div>
@@ -56,10 +110,11 @@ export default function Example() {
             </label>
             <div className="mt-1 sm:col-span-2 sm:mt-0">
               <input
-                id="email"
-                name="email"
+                id="2fa_password"
+                name="2fa_password"
                 type="password"
                 autoComplete=""
+                onChange={(e) => setTwoFactorAuthPassword(e.target.value)}
                 className="relative block w-full appearance-none rounded-md border border-gray-300 dark:border-gray-700 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none dark:bg-gray-900 focus:ring-emerald-500 sm:text-sm"
               />
             </div>
@@ -71,10 +126,11 @@ export default function Example() {
             </label>
             <div className="mt-1 sm:col-span-2 sm:mt-0">
               <input
-                id="email"
-                name="email"
+                id="contract_password"
+                name="contract_password"
                 type="password"
                 autoComplete=""
+                onChange={(e) => setContractPassword(e.target.value)}
                 className="relative block w-full appearance-none rounded-md border border-gray-300 dark:border-gray-700 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none dark:bg-gray-900 focus:ring-emerald-500 sm:text-sm"
               />
             </div>
@@ -94,9 +150,10 @@ export default function Example() {
             </label>
             <div className="mt-1 sm:col-span-2 sm:mt-0">
               <textarea
-                id="about"
-                name="about"
+                id="rsa_enc_pub_key"
+                name="rsa_enc_pub_key"
                 rows={3}
+                onChange={(e) => setRsaEncPubKey(e.target.value)}
                 className="relative block w-full appearance-none rounded-md border border-gray-300 dark:border-gray-700 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none dark:bg-gray-900 focus:ring-emerald-500 sm:text-sm"
                 defaultValue={''}
               />
@@ -110,9 +167,10 @@ export default function Example() {
             </label>
             <div className="mt-1 sm:col-span-2 sm:mt-0">
               <textarea
-                id="about"
-                name="about"
+                id="rsa_enc_priv_key"
+                name="rsa_enc_priv_key"
                 rows={3}
+                onChange={(e) => setRsaEncPrivKey(e.target.value)}
                 className="relative block w-full appearance-none rounded-md border border-gray-300 dark:border-gray-700 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none dark:bg-gray-900 focus:ring-emerald-500 sm:text-sm"
                 defaultValue={''}
               />
@@ -153,9 +211,10 @@ export default function Example() {
             </label>
             <div className="mt-1 sm:col-span-2 sm:mt-0">
               <textarea
-                id="about"
-                name="about"
+                id="rsa_sign_pub_key"
+                name="rsa_sign_pub_key"
                 rows={3}
+                onChange={(e) => setRsaSignPubKey(e.target.value)}
                 className="relative block w-full appearance-none rounded-md border border-gray-300 dark:border-gray-700 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none dark:bg-gray-900 focus:ring-emerald-500 sm:text-sm"
                 defaultValue={''}
               />
@@ -169,9 +228,10 @@ export default function Example() {
             </label>
             <div className="mt-1 sm:col-span-2 sm:mt-0">
               <textarea
-                id="about"
-                name="about"
+                id="rsa_sign_priv_key"
+                name="rsa_sign_priv_key"
                 rows={3}
+                onChange={(e) => setRsaSignPrivKey(e.target.value)}
                 className="relative block w-full appearance-none rounded-md border border-gray-300 dark:border-gray-700 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none dark:bg-gray-900 focus:ring-emerald-500 sm:text-sm"
                 defaultValue={''}
               />
@@ -210,9 +270,10 @@ export default function Example() {
             </label>
             <div className="mt-1 sm:col-span-2 sm:mt-0">
               <textarea
-                id="about"
-                name="about"
+                id="data"
+                name="data"
                 rows={3}
+                onChange={(e) => setUserData(e.target.value)}
                 className="relative block w-full appearance-none rounded-md border border-gray-300 dark:border-gray-700 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none dark:bg-gray-900 focus:ring-emerald-500 sm:text-sm"
                 defaultValue={''}
               />
@@ -302,6 +363,7 @@ export default function Example() {
         <div className="flex justify-end">
           <button
             type="submit"
+            onClick={handleSubmit}
             className="ml-3 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
           >
             Submit Form
@@ -309,6 +371,8 @@ export default function Example() {
         </div>
       </div>
     </form>
+    </>
+    )}
     </>
   )
 }
