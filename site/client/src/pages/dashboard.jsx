@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { motion, useMotionTemplate, useMotionValue } from 'framer-motion'
 import { Tab } from '@headlessui/react';
 
+import { ThreeJSComponent } from '@/components/ThreeJSComponent'
 import { GridPattern } from '@/components/GridPattern'
 import { Heading } from '@/components/Heading'
 import { ChatBubbleIcon } from '@/components/icons/ChatBubbleIcon'
@@ -465,6 +466,10 @@ export function Dashboard() {
         showBottomText="Test Description"
       />
     </div>
+
+    {/* <div>
+      <ThreeJSComponent />
+    </div> */}
 
     </>
   )
