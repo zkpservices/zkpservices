@@ -141,13 +141,15 @@ const services = [
   },
 ]
 
-export function Dashboard() {
 
+
+export function Dashboard() {
   const [tableData, setTableData] = useState({
     'Incoming': [],
     'Outgoing': [],
     'Cross-Chain Sync': []
-  })
+  });
+
 
   let { walletConnected, userAddress, showLoginNotification, 
     setShowLoginNotification, loggedIn, userPassword, username, setUsername } = useWallet();
@@ -155,39 +157,38 @@ export function Dashboard() {
   // temporary overwrite for testing dashboard
   // loggedIn = true;
   // walletConnected = true;
-  
-  // placeholders for payloads, this is not hardcoding
+
+  // Placeholders for payloads, this is not hardcoding
   const get_item_payload = {
     "id": userAddress,
     "action": "get_item",
     "key": "id.name",
     "password": userPassword       
-  }
+  };
+
   const get_ccip_payload = {
     "id": userAddress,
     "action": "get_crosschain_transaction",
     "password": userPassword       
-  }
+  };
+
   useEffect(() => {
     // Make a POST request when the Dashboard page is shown
     axios
       .post('https://y1oeimdo63.execute-api.us-east-1.amazonaws.com/userdata', get_item_payload)
       .then((response) => {
-        console.log(response['data']['id.name'])
-        setUsername(response['data']['id.name'])
-        console.log('username')
-        console.log(username)
+        setUsername(response['data']['id.name']);
       })
       .catch((error) => {
         // Handle errors
         console.error('Error making POST request:', error);
       });
 
-      axios
+    axios
       .post('https://y1oeimdo63.execute-api.us-east-1.amazonaws.com/userdata', get_ccip_payload)
       .then((response) => {
-        const responseData = response['data']
-        
+        const responseData = response['data'];
+
         const transformedData = Object.entries(responseData).map(([ccip_id, data]) => {
           const { source_chain, destination_chain, field } = data;
           return {
@@ -197,13 +198,12 @@ export function Dashboard() {
             details: ['View Details'],
           };
         });
+
         setTableData((prevTableData) => ({
           ...prevTableData,
-          'Cross-Chain Sync': transformedData, // Update with your transformed data
+          'Cross-Chain Sync': transformedData,
         }));
-        console.log(tableData)
       })
-      
       .catch((error) => {
         // Handle errors
         console.error('Error making POST request:', error);
@@ -219,6 +219,7 @@ export function Dashboard() {
       clearTimeout(notificationTimeout);
     };
   }, []);
+
   const [dashboardData, setDashboardData] = useState(null);
 
   function handleRefreshButtonClick() {
@@ -244,7 +245,7 @@ export function Dashboard() {
     .post('https://y1oeimdo63.execute-api.us-east-1.amazonaws.com/userdata', get_ccip_payload)
     .then((response) => {
       const responseData = response['data']
-      
+
       const transformedData = Object.entries(responseData).map(([ccip_id, data]) => {
         const { source_chain, destination_chain, field } = data;
         return {
@@ -261,88 +262,78 @@ export function Dashboard() {
       }));
       console.log(tableData)
     })
-    
+
     .catch((error) => {
       // Handle errors
       console.error('Error making POST request:', error);
     });
   }
+
   return (
     <>
-    {walletConnected && loggedIn ? (
-    <>
-    <div className="xl:max-w-none">
-      <h2 className="mt-10 text-center text-3xl font-bold tracking-tight ">
-              {(username != '') ? `Welcome back, ${username}.` : ''}
-      </h2>
-      <Heading level={2} id="mydata" className="mt-0">
-        Access My Data 
-      </Heading>
-      <div className="not-prose mt-4 grid grid-cols-1 gap-8 border-t border-zinc-900/5 pt-10 dark:border-white/5 sm:grid-cols-2 xl:grid-cols-4">
-        {mydata.map((service) => (
-          <MyData key={service.href} service={service} />
-        ))}
-        <HollowCard />
+      <div className="xl:max-w-none">
+        {walletConnected && loggedIn ? (
+          <>
+            <h2 className="mt-10 text-center text-3xl font-bold tracking-tight">
+              {username ? `Welcome back, ${username}.` : ''}
+            </h2>
+            <Heading level={2} id="mydata" className="mt-0">
+              Access My Data 
+            </Heading>
+            <div className="not-prose mt-4 grid grid-cols-1 gap-8 border-t border-zinc-900/5 pt-10 dark:border-white/5 sm:grid-cols-2 xl:grid-cols-4">
+              {mydata.map((service) => (
+                <MyData key={service.href} service={service} />
+              ))}
+              <HollowCard />
+            </div>
+          </>
+        ) : (
+          <div className="flex justify-center">
+            <h2 className="text-3xl font-bold tracking-tight text-center">
+              Please connect your wallet and login to get started
+            </h2>
+          </div>
+        )}
       </div>
-    </div>
 
-    <div className="xl:max-w-none mt-16 pb-8">
-      <Heading level={2} id="services" className="mt-0">
-        Start Activity
-      </Heading>
-      <div className="not-prose mt-4 grid grid-cols-1 gap-8 border-t border-zinc-900/5 pt-10 dark:border-white/5 sm:grid-cols-2 xl:grid-cols-4">
-        {services.map((service) => (
-          <Service key={service.href} service={service} />
-        ))}
+      <div className="xl:max-w-none mt-16 pb-8">
+        {loggedIn && (
+          <>
+            <Heading level={2} id="services" className="mt-0">
+              Start Activity
+            </Heading>
+            <div className="not-prose mt-4 grid grid-cols-1 gap-8 border-t border-zinc-900/5 pt-10 dark:border-white/5 sm:grid-cols-2 xl:grid-cols-4">
+              {services.map((service) => (
+                <Service key={service.href} service={service} />
+              ))}
+            </div>
+          </>
+        )}
       </div>
-    </div>
 
-    <div className="xl:max-w-none mt-8">
-      <Heading level={2} id="history" className="mt-0">
-        Recent Activity
-      </Heading>
-      <div className="mt-4 border-t border-zinc-900/5 dark:border-white/5" >
-        <History tableData={tableData} showRefresh={true} />
+      <div className="xl:max-w-none mt-8">
+        {loggedIn && (
+          <>
+            <Heading level={2} id="history" className="mt-0">
+              Recent Activity
+            </Heading>
+            <div className="mt-4 border-t border-zinc-900/5 dark:border-white/5">
+              <History tableData={tableData} showRefresh={true} />
+            </div>
+          </>
+        )}
       </div>
-    </div>
 
-    <div>
-    {showLoginNotification && (
-      <Notification
-        showTopText="Logged in successfully"
-        showBottomText={`Logged in as ${userAddress}`}
-      />
-    )}
-    </div>
-
-    {/* <div>
-      <ThreeJSComponent />
-    </div> */}
-
-    {/* <Modal /> */}
-    {/* <NewDashboardDataModal /> */}
-    {/* <ZKPFaucetModal /> */}
-    {/* <ViewFieldModal title="Medical Records" /> */}
-    {/* <NewUpdateRequestModal /> */}
-    {/* <NewDataRequestModal /> */}
-    {/* <NewCrossChainSyncModal /> */}
-    {/*</NewCrossChainSyncStatusModal >*/}
-    {/* <CompleteUpdateModal /> */}
-    {/* <SendDataModal /> */}
-    {/* <CompletedDataUpdateModal /> */}
-    {/* <RequestedDataSentModal /> */}
-    {/* <ReceivedUpdateResponseModal /> */}
-    {/* <ReceivedDataResponseModal /> */}
-    {/* <AwaitingUpdateCompletionModal /> */}
-    {/* <AwaitingDataModal /> */}
-
+      <div>
+        {showLoginNotification && (
+          <Notification
+            showTopText="Logged in successfully"
+            showBottomText={`Logged in as ${userAddress}`}
+          />
+        )}
+      </div>
     </>
-   ) : (
-      <h2 className="mt-10 text-center text-3xl font-bold tracking-tight">
-        Please connect your wallet and login to get started
-      </h2>
-   )}
-  </>
-  )}
+  );
+}
 
 export default Dashboard;
