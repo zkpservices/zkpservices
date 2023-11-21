@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useEffect, useRef, useState } from 'react';
 import { useWallet } from "@/components/Wallet.jsx";
 import { MyData }  from '@/components/MyData';
-import { Service }  from '@/components/Service';
+import { Services }  from '@/components/Services';
 import { HollowCard }  from '@/components/HollowCard';
 import { ZKPFaucetModal } from '@/components/ZKPFaucetModal'
 import { ViewFieldModal } from '@/components/ViewFieldModal'
@@ -87,62 +87,7 @@ const mydata = [
   //   },
   // },
 ]
-
-const services = [
-  {
-    href: '/requestdata',
-    name: 'Request Data',
-    description:
-      'Learn about the contact model and how to create, retrieve, update, delete, and list contacts.',
-    icon: QuestionMarkIcon,
-    pattern: {
-      y: 16,
-      squares: [
-        [0, 1],
-        [1, 3],
-      ],
-    },
-  },
-  {
-    href: '/requestupdate',
-    name: 'Request Update',
-    description:
-      'Learn about the conversation model and how to create, retrieve, update, delete, and list conversations.',
-    icon: ChatBubbleIcon,
-    pattern: {
-      y: -6,
-      squares: [
-        [-1, 2],
-        [1, 3],
-      ],
-    },
-  },
-  {
-    href: '/crosschain',
-    name: 'Cross-Chain Backups',
-    description:
-      'Learn about the group model and how to create, retrieve, update, delete, and list groups.',
-    icon: UsersIcon,
-    pattern: {
-      y: 22,
-      squares: [[0, 1]],
-    },
-  },
-  {
-    href: '/2fa',
-    name: 'Manage 2FA Verifier',
-    description:
-      'Learn about the group model and how to create, retrieve, update, delete, and list groups.',
-    icon: UsersIcon,
-    pattern: {
-      y: 22,
-      squares: [[0, 1]],
-    },
-  },
-]
-
-
-
+    
 export function Dashboard() {
   const [tableData, setTableData] = useState({
     'Incoming': [],
@@ -155,8 +100,8 @@ export function Dashboard() {
     setShowLoginNotification, loggedIn, userPassword, username, setUsername } = useWallet();
 
   // temporary overwrite for testing dashboard
-  // loggedIn = true;
-  // walletConnected = true;
+  loggedIn = true;
+  walletConnected = true;
 
   // Placeholders for payloads, this is not hardcoding
   const get_item_payload = {
@@ -296,22 +241,15 @@ export function Dashboard() {
         )}
       </div>
 
-      <div className="xl:max-w-none mt-16 pb-8">
+      <div className="xl:max-w-none mt-16">
         {loggedIn && (
           <>
-            <Heading level={2} id="services" className="mt-0">
-              Start Activity
-            </Heading>
-            <div className="not-prose mt-4 grid grid-cols-1 gap-8 border-t border-zinc-900/5 pt-10 dark:border-white/5 sm:grid-cols-2 xl:grid-cols-4">
-              {services.map((service) => (
-                <Service key={service.href} service={service} />
-              ))}
-            </div>
+            <Services />
           </>
         )}
       </div>
 
-      <div className="xl:max-w-none mt-8">
+      <div className="xl:max-w-none">
         {loggedIn && (
           <>
             <Heading level={2} id="history" className="mt-0">
