@@ -3,6 +3,7 @@ import { motion, useMotionTemplate, useMotionValue } from 'framer-motion'
 import { GridPattern } from '@/components/GridPattern'
 import { Heading } from '@/components/Heading'
 import { QuestionMarkIcon } from '@/components/icons/QuestionMarkIcon'
+import { UpdateIcon } from '@/components/icons/UpdateIcon'
 import { ChatBubbleIcon } from '@/components/icons/ChatBubbleIcon'
 import { EnvelopeIcon } from '@/components/icons/EnvelopeIcon'
 import { UserIcon } from '@/components/icons/UserIcon'
@@ -28,7 +29,7 @@ const services = [
     name: 'Request Update',
     description:
       'Learn about the conversation model and how to create, retrieve, update, delete, and list conversations.',
-    icon: ChatBubbleIcon,
+    icon: UpdateIcon,
     pattern: {
       y: -6,
       squares: [
