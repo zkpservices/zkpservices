@@ -4,6 +4,7 @@ import { GridPattern } from '@/components/GridPattern'
 import { Heading } from '@/components/Heading'
 import { QuestionMarkIcon } from '@/components/icons/QuestionMarkIcon'
 import { UpdateIcon } from '@/components/icons/UpdateIcon'
+import { CrosschainIcon } from '@/components/icons/CrosschainIcon'
 import { ChatBubbleIcon } from '@/components/icons/ChatBubbleIcon'
 import { EnvelopeIcon } from '@/components/icons/EnvelopeIcon'
 import { UserIcon } from '@/components/icons/UserIcon'
@@ -57,7 +58,7 @@ const services = [
     name: 'Cross-Chain Backups',
     description:
       'Learn about the group model and how to create, retrieve, update, delete, and list groups.',
-    icon: UsersIcon,
+    icon: CrosschainIcon,
     pattern: {
       y: 22,
       squares: [[0, 1]],
