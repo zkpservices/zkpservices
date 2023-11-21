@@ -1,20 +1,22 @@
 import Link from 'next/link'
-import { motion, useMotionTemplate, useMotionValue } from 'framer-motion'
 import { GridPattern } from '@/components/GridPattern'
+import { motion, transform, useMotionTemplate, useMotionValue } from 'framer-motion'
 import { Heading } from '@/components/Heading'
 import { QuestionMarkIcon } from '@/components/icons/QuestionMarkIcon'
 import { ChatBubbleIcon } from '@/components/icons/ChatBubbleIcon'
 import { EnvelopeIcon } from '@/components/icons/EnvelopeIcon'
 import { UserIcon } from '@/components/icons/UserIcon'
 import { UsersIcon } from '@/components/icons/UsersIcon'
+import { HollowCard } from './HollowCard'
 
-const services = [
+// to be converted to a prop
+const userdata = [
   {
     href: '/requestdata',
     name: 'Request Data',
     description:
       'Learn about the contact model and how to create, retrieve, update, delete, and list contacts.',
-    icon: QuestionMarkIcon,
+    icon: UserIcon,
     pattern: {
       y: 16,
       squares: [
@@ -51,28 +53,29 @@ const services = [
       ],
     },
   },
-  {
-    href: '/crosschain',
-    name: 'Cross-Chain Backups',
-    description:
-      'Learn about the group model and how to create, retrieve, update, delete, and list groups.',
-    icon: UsersIcon,
-    pattern: {
-      y: 22,
-      squares: [[0, 1]],
-    },
-  },
+  // {
+  //   href: '/crosschain',
+  //   name: 'Cross-Chain Backups',
+  //   description:
+  //     'Learn about the group model and how to create, retrieve, update, delete, and list groups.',
+  //   icon: UsersIcon,
+  //   pattern: {
+  //     y: 22,
+  //     squares: [[0, 1]],
+  //   },
+  // },
 ]
 
-function ServiceIcon({ icon: Icon }) {
+
+function MyDataIcon({ icon: Icon }) {
   return (
-    <div className="flex h-7 w-7 items-center justify-center rounded-full bg-zinc-900/5 ring-1 ring-zinc-900/25 backdrop-blur-[2px] transition duration-300 group-hover:bg-white/50 group-hover:ring-zinc-900/25 dark:bg-white/7.5 dark:ring-white/15 dark:group-hover:bg-sky-300/10 dark:group-hover:ring-sky-400">
-      <Icon className="h-5 w-5 fill-zinc-700/10 stroke-zinc-700 transition-colors duration-300 group-hover:stroke-zinc-900 dark:fill-white/10 dark:stroke-zinc-400 dark:group-hover:fill-sky-300/10 dark:group-hover:stroke-sky-400" />
+    <div className="flex h-7 w-7 items-center justify-center rounded-full bg-zinc-900/5 ring-1 ring-zinc-900/25 backdrop-blur-[2px] transition duration-300 group-hover:bg-white/50 group-hover:ring-zinc-900/25 dark:bg-white/7.5 dark:ring-white/15 dark:group-hover:bg-emerald-300/10 dark:group-hover:ring-emerald-400">
+      <Icon className="h-5 w-5 fill-zinc-700/10 stroke-zinc-700 transition-colors duration-300 group-hover:stroke-zinc-900 dark:fill-white/10 dark:stroke-zinc-400 dark:group-hover:fill-emerald-300/10 dark:group-hover:stroke-emerald-400" />
     </div>
   )
 }
 
-function ServicePattern({ mouseX, mouseY, ...gridProps }) {
+function MyDataPattern({ mouseX, mouseY, ...gridProps }) {
   let maskImage = useMotionTemplate`radial-gradient(180px at ${mouseX}px ${mouseY}px, white, transparent)`
   let style = { maskImage, WebkitMaskImage: maskImage }
 
@@ -88,7 +91,7 @@ function ServicePattern({ mouseX, mouseY, ...gridProps }) {
         />
       </div>
       <motion.div
-        className="absolute inset-0 rounded-2xl bg-gradient-to-r from-[#D7EDEA] to-[#dff5fb] opacity-0 transition duration-300 group-hover:opacity-100 dark:from-[#202D2E] dark:to-[#282d34]"
+        className="absolute inset-0 rounded-2xl bg-gradient-to-r from-[#D7EDEA] to-[#F4FBDF] opacity-0 transition duration-300 group-hover:opacity-100 dark:from-[#202D2E] dark:to-[#303428]"
         style={style}
       />
       <motion.div
@@ -107,7 +110,7 @@ function ServicePattern({ mouseX, mouseY, ...gridProps }) {
   )
 }
 
-function Service({ service }) {
+export function MyData({ mydata }) {
   let mouseX = useMotionValue(0)
   let mouseY = useMotionValue(0)
 
@@ -119,40 +122,39 @@ function Service({ service }) {
 
   return (
     <div
-      key={service.href}
+      key={mydata.href}
       onMouseMove={onMouseMove}
       className="group relative flex rounded-2xl bg-zinc-50 transition-shadow hover:shadow-md hover:shadow-zinc-900/5 dark:bg-white/2.5 dark:hover:shadow-black/5"
     >
-      <ServicePattern {...service.pattern} mouseX={mouseX} mouseY={mouseY} />
+      <MyDataPattern {...mydata.pattern} mouseX={mouseX} mouseY={mouseY} />
       <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-zinc-900/7.5 group-hover:ring-zinc-900/10 dark:ring-white/10 dark:group-hover:ring-white/20" />
       <div className="relative rounded-2xl px-4 pt-16 pb-4">
-        <ServiceIcon icon={service.icon} />
+        <MyDataIcon icon={mydata.icon} />
         <h3 className="mt-4 text-sm font-semibold leading-7 text-zinc-900 dark:text-white">
-          <Link href={service.href}>
+          <Link href={mydata.href}>
             <span className="absolute inset-0 rounded-2xl" />
-            {service.name}
+            {mydata.name}
           </Link>
         </h3>
         <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-          {service.description}
+          {mydata.description}
         </p>
       </div>
     </div>
   )
 }
 
-export function Services() {
+export function UserData() {
   return (
-    <div className="xl:max-w-none mt-16">
-      <div className="my-16 xl:max-w-none">
-        <Heading level={2} id="services">
-          Services
-        </Heading>
-        <div className="not-prose mt-4 grid grid-cols-1 gap-8 border-t border-zinc-900/5 pt-10 dark:border-white/5 sm:grid-cols-2 xl:grid-cols-4">
-          {services.map((service) => (
-            <Service key={service.href} service={service} />
-          ))}
-        </div>
+    <div className="my-16 xl:max-w-none">
+      <Heading level={2} id="mydata">
+        Access My Data
+      </Heading>
+      <div className="not-prose mt-4 grid grid-cols-1 gap-8 border-t border-zinc-900/5 pt-10 dark:border-white/5 sm:grid-cols-2 xl:grid-cols-4">
+        {userdata.map((mydata) => (
+          <MyData key={mydata.href} mydata={mydata} />
+        ))}
+        <HollowCard />
       </div>
     </div>
   )

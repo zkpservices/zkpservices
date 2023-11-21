@@ -2,7 +2,7 @@ import Link from 'next/link'
 import axios from 'axios';
 import { useEffect, useRef, useState } from 'react';
 import { useWallet } from "@/components/Wallet.jsx";
-import { MyData }  from '@/components/MyData';
+import { UserData }  from '@/components/UserData';
 import { Services }  from '@/components/Services';
 import { HollowCard }  from '@/components/HollowCard';
 import { ZKPFaucetModal } from '@/components/ZKPFaucetModal'
@@ -32,62 +32,7 @@ import { UsersIcon } from '@/components/icons/UsersIcon'
 import { History } from '@/components/History'
 import { Notification } from '@/components/Notification'
 
-const mydata = [
-  {
-    href: '/requestdata',
-    name: 'Request Data',
-    description:
-      'Learn about the contact model and how to create, retrieve, update, delete, and list contacts.',
-    icon: UserIcon,
-    pattern: {
-      y: 16,
-      squares: [
-        [0, 1],
-        [1, 3],
-      ],
-    },
-  },
-  {
-    href: '/requestupdate',
-    name: 'Request Update',
-    description:
-      'Learn about the conversation model and how to create, retrieve, update, delete, and list conversations.',
-    icon: ChatBubbleIcon,
-    pattern: {
-      y: -6,
-      squares: [
-        [-1, 2],
-        [1, 3],
-      ],
-    },
-  },
-  {
-    href: '/respond',
-    name: 'Respond',
-    description:
-      'Learn about the message model and how to create, retrieve, update, delete, and list messages.',
-    icon: EnvelopeIcon,
-    pattern: {
-      y: 32,
-      squares: [
-        [0, 2],
-        [1, 4],
-      ],
-    },
-  },
-  // {
-  //   href: '/crosschain',
-  //   name: 'Cross-Chain Backups',
-  //   description:
-  //     'Learn about the group model and how to create, retrieve, update, delete, and list groups.',
-  //   icon: UsersIcon,
-  //   pattern: {
-  //     y: 22,
-  //     squares: [[0, 1]],
-  //   },
-  // },
-]
-    
+   
 export function Dashboard() {
   const [tableData, setTableData] = useState({
     'Incoming': [],
@@ -219,49 +164,25 @@ export function Dashboard() {
       <div className="xl:max-w-none">
         {walletConnected && loggedIn ? (
           <>
+
             <h2 className="mt-10 text-center text-3xl font-bold tracking-tight">
               {username ? `Welcome back, ${username}.` : ''}
             </h2>
-            <Heading level={2} id="mydata" className="mt-0">
-              Access My Data 
-            </Heading>
-            <div className="not-prose mt-4 grid grid-cols-1 gap-8 border-t border-zinc-900/5 pt-10 dark:border-white/5 sm:grid-cols-2 xl:grid-cols-4">
-              {mydata.map((service) => (
-                <MyData key={service.href} service={service} />
-              ))}
-              <HollowCard />
-            </div>
+            
+            <UserData /> {/* to be fed a prop such as userdata eventually */}
+            <Services />
+            <History tableData={tableData} showRefresh={true} />
+
           </>
         ) : (
           <div className="flex justify-center">
             <h2 className="text-3xl font-bold tracking-tight text-center">
-              Please connect your wallet and login to get started
+              Please connect your wallet and log in to get started
             </h2>
           </div>
         )}
       </div>
-
-      <div className="xl:max-w-none mt-16">
-        {loggedIn && (
-          <>
-            <Services />
-          </>
-        )}
-      </div>
-
-      <div className="xl:max-w-none">
-        {loggedIn && (
-          <>
-            <Heading level={2} id="history" className="mt-0">
-              Recent Activity
-            </Heading>
-            <div className="mt-4 border-t border-zinc-900/5 dark:border-white/5">
-              <History tableData={tableData} showRefresh={true} />
-            </div>
-          </>
-        )}
-      </div>
-
+  
       <div>
         {showLoginNotification && (
           <Notification
