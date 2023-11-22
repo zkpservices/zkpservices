@@ -1,10 +1,9 @@
 import { Fragment, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
-import { XMarkIcon } from '@heroicons/react/24/outline';
+import { XMarkIcon } from '@heroicons/react/24/outline'; // Import the XMarkIcon
 
-export function NewCrossChainSyncModal() {
+export function CrossChainSyncStatusModal() {
   const [open, setOpen] = useState(true);
-  const destinationChainOptions = ["Polygon Testnet", "Avalanche Testnet", "Fantom Testnet"];
 
   return (
     <Transition.Root show={open} as={Fragment}>
@@ -41,7 +40,7 @@ export function NewCrossChainSyncModal() {
                   >
                     <span className="sr-only">Close</span>
                     <XMarkIcon
-                      className="h-6 w-6 text-emerald-500 dark:text-emerald-300 hover-text-emerald-600 dark:hover-text-emerald-400"
+                      className="h-6 w-6 text-emerald-500 dark:text-emerald-300 hover:text-emerald-600 dark:hover:text-emerald-400"
                       aria-hidden="true"
                     />
                   </button>
@@ -50,39 +49,47 @@ export function NewCrossChainSyncModal() {
                   as="h3"
                   className="text-lg font-semibold text-gray-900 dark:text-white"
                 >
-                  New Cross Chain-Sync
+                  Cross-Chain Sync Status
                 </Dialog.Title>
-                <div className="mt-2 px-1 lg:max-h-[65vh] max-h-[40vh] overflow-y-auto min-w-[16rem] md:min-w-[40rem] lg:min-w-[40rem]">
+                <div className="mt-2 lg:max-h-[65vh] max-h-[40vh] overflow-y-auto min-w-[16rem] md:min-w-[40rem] lg:min-w-[40rem]">
+
+                  <div className="mt-4">
+                    <label htmlFor="sourceChain" className="block text-sm font-medium leading-5 text-gray-900 dark:text-white">
+                      Source Chain:
+                    </label>
+                    <textarea
+                      id="sourceChain"
+                      className="block w-full rounded-md border-0 py-2 pl-3 pr-3 mt-1 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500"
+                      rows={1}
+                      readOnly
+                      spellcheck="false"
+                    />
+                  </div>
 
                   <div className="mt-4">
                     <label htmlFor="destinationChain" className="block text-sm font-medium leading-5 text-gray-900 dark:text-white">
                       Destination Chain:
                     </label>
-                    <select
+                    <textarea
                       id="destinationChain"
-                      name="destinationChain"
-                      className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-gray-300 dark:ring-emerald-400 focus:ring-2 focus:ring-emerald-500 sm:text-sm sm:leading-6"
-                    >
-                      {destinationChainOptions.map((option) => (
-                        <option key={option}>{option}</option>
-                      ))}
-                    </select>
+                      className="block w-full rounded-md border-0 py-2 pl-3 pr-3 mt-1 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500"
+                      rows={1}
+                      readOnly
+                      spellcheck="false"
+                    />
                   </div>
 
                   <div className="mt-4">
-                    <label htmlFor="parameterToSync" className="block text-sm font-medium leading-5 text-gray-900 dark:text-white">
-                      Parameter to Sync:
+                    <label htmlFor="parameterSynced" className="block text-sm font-medium leading-5 text-gray-900 dark:text-white">
+                      Parameter Synced:
                     </label>
-                    <select
-                      id="location"
-                      name="location"
-                      className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-gray-300 dark:ring-emerald-400 focus:ring-2 focus:ring-emerald-500 sm:text-sm sm:leading-6"
-                      defaultValue="Medical Records"
-                    >
-                      <option>Medical Records</option>
-                      <option>Passport</option>
-                      <option>Driving License</option>
-                    </select>
+                    <textarea
+                      id="parameterSynced"
+                      className="block w-full rounded-md border-0 py-2 pl-3 pr-3 mt-1 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500"
+                      rows={1}
+                      readOnly
+                      spellcheck="false"
+                    />
                   </div>
 
                   <div className="mt-4">
@@ -91,9 +98,10 @@ export function NewCrossChainSyncModal() {
                     </label>
                     <textarea
                       id="parameterKey"
-                      className="block w-full rounded-md border-0 py-2 pl-3 pr-3 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500 mt-1"
+                      className="block w-full rounded-md border-0 py-2 pl-3 pr-3 mt-1 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500"
                       rows={1}
-                      spellCheck="false"
+                      readOnly
+                      spellcheck="false"
                     />
                   </div>
 
@@ -103,9 +111,10 @@ export function NewCrossChainSyncModal() {
                     </label>
                     <textarea
                       id="parameterValue"
-                      className="block w-full rounded-md border-0 py-2 pl-3 pr-3 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500 mt-1"
+                      className="block w-full rounded-md border-0 py-2 pl-3 pr-3 mt-1 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500"
                       rows={8}
                       readOnly
+                      spellcheck="false"
                     />
                   </div>
 
@@ -117,21 +126,39 @@ export function NewCrossChainSyncModal() {
                     </label>
                     <textarea
                       id="ccipFee"
-                      className="block w-full rounded-md border-0 py-2 pl-3 pr-3 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500 mt-1"
+                      className="block w-full rounded-md border-0 py-2 pl-3 pr-3 mt-1 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500"
                       rows={1}
+                      defaultValue="10 ZKP"
                       readOnly
-                    >
-                      10 ZKP
-                    </textarea>
+                      spellcheck="false"
+                    />
                   </div>
 
                   <div className="mt-4">
-                    <label htmlFor="disclaimer" className="block text-sm font-medium leading-5 text-gray-900 dark:text-white">
-                      Disclaimer:
+                    <label htmlFor="ccipRequestID" className="block text-sm font-medium leading-5 text-gray-900 dark:text-white">
+                      CCIP Request ID:
                     </label>
-                    <p className="text-gray-700 dark:text-gray-300 mt-2 whitespace-normal">
-                      Data requests and update requests are only partially supported due to the fact that the (optional) selected 2FA providers would need to be able to support equivalent logic and have the same addresses on the destination chain (this is available with the default 2FA provider of zkp.services, ZKPServicesVRF2FA, but may not be for other 2FA providers).
-                    </p>
+                    <textarea
+                      id="ccipRequestID"
+                      className="block w-full rounded-md border-0 py-2 pl-3 pr-3 mt-1 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500"
+                      rows={1}
+                      readOnly
+                      spellcheck="false"
+                    />
+                  </div>
+
+                  <div className="mt-4">
+                    <label htmlFor="ccipExplorerURL" className="block text-sm font-medium leading-5 text-gray-900 dark:text-white">
+                      CCIP Explorer URL:
+                    </label>
+                    <a
+                      href="https://ccip.chain.link/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-emerald-600 underline mt-2"
+                    >
+                      https://ccip.chain.link/
+                    </a>
                   </div>
 
                 </div>
@@ -141,16 +168,15 @@ export function NewCrossChainSyncModal() {
                     className="mr-3 bg-gray-200 dark:bg-gray-700 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-emerald-400 dark:ring-emerald-400 hover:bg-gray-300 dark:hover:bg-gray-600 rounded-md"
                     onClick={() => setOpen(false)}
                   >
-                    Cancel
+                    Close
                   </button>
                   <button
                     className="bg-emerald-600 dark:bg-emerald-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-500 dark:hover:bg-emerald-400 rounded-md"
                     onClick={() => {
-                      // Call Smart Contract logic here
-                      setOpen(false);
+                      // Refresh Status logic here
                     }}
                   >
-                    Call Smart Contract
+                    Refresh Status
                   </button>
                 </div>
               </div>

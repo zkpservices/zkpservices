@@ -8,7 +8,7 @@ import { NewDashboardDataModal } from '@/components/NewDashboardDataModal'
 import { NewUpdateRequestModal } from '@/components/NewUpdateRequestModal'
 import { NewDataRequestModal } from '@/components/NewDataRequestModal'
 import { NewCrossChainSyncModal } from '@/components/NewCrossChainSyncModal'
-import { NewCrossChainSyncStatusModal } from '@/components/NewCrossChainSyncStatusModal'
+import { CrossChainSyncStatusModal } from '@/components/CrossChainSyncStatusModal'
 import { CompleteUpdateModal } from '@/components/CompleteUpdateModal'
 import { CompletedDataUpdateModal } from '@/components/CompletedDataUpdateModal'
 import { RequestedDataSentModal } from '@/components/RequestedDataSentModal'
@@ -27,6 +27,8 @@ const tableData = {
 export function DashboardContext() {
   return (
     <div>
+      <NewCrossChainSyncModal />
+      {/* <CrossChainSyncStatusModal /> */}
       <UserData /> {/* to be fed a prop such as userdata eventually */}
       <Services useLink={false} />
       <History tableData={tableData} showRefresh={true} />
