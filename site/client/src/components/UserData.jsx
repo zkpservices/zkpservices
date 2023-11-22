@@ -2,12 +2,8 @@ import Link from 'next/link'
 import { GridPattern } from '@/components/GridPattern'
 import { motion, transform, useMotionTemplate, useMotionValue } from 'framer-motion'
 import { Heading } from '@/components/Heading'
-import { QuestionMarkIcon } from '@/components/icons/QuestionMarkIcon'
-import { ChatBubbleIcon } from '@/components/icons/ChatBubbleIcon'
-import { EnvelopeIcon } from '@/components/icons/EnvelopeIcon'
-import { UserIcon } from '@/components/icons/UserIcon'
-import { UsersIcon } from '@/components/icons/UsersIcon'
-import { HollowCard } from './HollowCard'
+import { HollowCard } from '@/components/HollowCard'
+import { DataIcon } from '@/components/icons/DataIcon'
 
 // to be converted to a prop
 const userdata = [
@@ -16,7 +12,7 @@ const userdata = [
     name: 'Request Data',
     description:
       'Learn about the contact model and how to create, retrieve, update, delete, and list contacts.',
-    icon: UserIcon,
+    icon: DataIcon,
     pattern: {
       y: 16,
       squares: [
@@ -30,7 +26,7 @@ const userdata = [
     name: 'Request Update',
     description:
       'Learn about the conversation model and how to create, retrieve, update, delete, and list conversations.',
-    icon: ChatBubbleIcon,
+    icon: DataIcon,
     pattern: {
       y: -6,
       squares: [
@@ -44,7 +40,7 @@ const userdata = [
     name: 'Respond',
     description:
       'Learn about the message model and how to create, retrieve, update, delete, and list messages.',
-    icon: EnvelopeIcon,
+    icon: DataIcon,
     pattern: {
       y: 32,
       squares: [
