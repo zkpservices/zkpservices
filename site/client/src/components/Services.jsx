@@ -5,10 +5,7 @@ import { Heading } from '@/components/Heading'
 import { QuestionMarkIcon } from '@/components/icons/QuestionMarkIcon'
 import { UpdateIcon } from '@/components/icons/UpdateIcon'
 import { CrosschainIcon } from '@/components/icons/CrosschainIcon'
-import { ChatBubbleIcon } from '@/components/icons/ChatBubbleIcon'
 import { EnvelopeIcon } from '@/components/icons/EnvelopeIcon'
-import { UserIcon } from '@/components/icons/UserIcon'
-import { UsersIcon } from '@/components/icons/UsersIcon'
 
 const services = [
   {

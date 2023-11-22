@@ -2,36 +2,9 @@ import Link from 'next/link'
 import axios from 'axios';
 import { useEffect, useRef, useState } from 'react';
 import { useWallet } from "@/components/Wallet.jsx";
-import { UserData }  from '@/components/UserData';
-import { Services }  from '@/components/Services';
-import { HollowCard }  from '@/components/HollowCard';
-import { ZKPFaucetModal } from '@/components/ZKPFaucetModal'
-import { ViewFieldModal } from '@/components/ViewFieldModal'
-import { NewDashboardDataModal } from '@/components/NewDashboardDataModal'
-import { NewUpdateRequestModal } from '@/components/NewUpdateRequestModal'
-import { NewDataRequestModal } from '@/components/NewDataRequestModal'
-import { NewCrossChainSyncModal } from '@/components/NewCrossChainSyncModal'
-import { NewCrossChainSyncStatusModal } from '@/components/NewCrossChainSyncStatusModal'
-import { CompleteUpdateModal } from '@/components/CompleteUpdateModal'
-import { CompletedDataUpdateModal } from '@/components/CompletedDataUpdateModal'
-import { RequestedDataSentModal } from '@/components/RequestedDataSentModal'
-import { ReceivedUpdateResponseModal } from '@/components/ReceivedUpdateResponseModal'
-import { ReceivedDataResponseModal } from '@/components/ReceivedDataResponseModal'
-import { AwaitingUpdateCompletionModal} from '@/components/AwaitingUpdateCompletionModal'
-import { AwaitingDataModal } from '@/components/AwaitingDataModal'
-import { SendDataModal } from '@/components/SendDataModal'
 import { ThreeJSComponent } from '@/components/ThreeJSComponent'
-import { GridPattern } from '@/components/GridPattern'
-import { Heading } from '@/components/Heading'
-// import { UpdateIcon } from '@/components/icons/UpdateIcon'
-import { QuestionMarkIcon } from '@/components/icons/QuestionMarkIcon'
-import { ChatBubbleIcon } from '@/components/icons/ChatBubbleIcon'
-import { EnvelopeIcon } from '@/components/icons/EnvelopeIcon'
-import { UserIcon } from '@/components/icons/UserIcon'
-import { UsersIcon } from '@/components/icons/UsersIcon'
-import { History } from '@/components/History'
 import { Notification } from '@/components/Notification'
-
+import { DashboardContext } from '@/components/DashboardContext';
    
 export function Dashboard() {
   const [tableData, setTableData] = useState({
@@ -169,9 +142,7 @@ export function Dashboard() {
               {username ? `Welcome back, ${username}.` : ''}
             </h2>
             
-            <UserData /> {/* to be fed a prop such as userdata eventually */}
-            <Services />
-            <History tableData={tableData} showRefresh={true} />
+            <DashboardContext />
 
           </>
         ) : (
