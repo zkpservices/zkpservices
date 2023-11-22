@@ -8,7 +8,6 @@ import { DataIcon } from '@/components/icons/DataIcon'
 // to be converted to a prop
 const userdata = [
   {
-    href: '/requestdata',
     name: 'Request Data',
     description:
       'Learn about the contact model and how to create, retrieve, update, delete, and list contacts.',
@@ -22,7 +21,6 @@ const userdata = [
     },
   },
   {
-    href: '/requestupdate',
     name: 'Request Update',
     description:
       'Learn about the conversation model and how to create, retrieve, update, delete, and list conversations.',
@@ -36,7 +34,6 @@ const userdata = [
     },
   },
   {
-    href: '/respond',
     name: 'Respond',
     description:
       'Learn about the message model and how to create, retrieve, update, delete, and list messages.',
@@ -118,7 +115,7 @@ export function MyData({ mydata }) {
 
   return (
     <div
-      key={mydata.href}
+      key={mydata.name}
       onMouseMove={onMouseMove}
       className="group relative flex rounded-2xl bg-zinc-50 transition-shadow hover:shadow-md hover:shadow-zinc-900/5 dark:bg-white/2.5 dark:hover:shadow-black/5"
     >
@@ -127,10 +124,8 @@ export function MyData({ mydata }) {
       <div className="relative rounded-2xl px-4 pt-16 pb-4">
         <MyDataIcon icon={mydata.icon} />
         <h3 className="mt-4 text-sm font-semibold leading-7 text-zinc-900 dark:text-white">
-          <Link href={mydata.href}>
             <span className="absolute inset-0 rounded-2xl" />
             {mydata.name}
-          </Link>
         </h3>
         <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
           {mydata.description}
@@ -148,7 +143,7 @@ export function UserData() {
       </Heading>
       <div className="not-prose mt-4 grid grid-cols-1 gap-8 border-t border-zinc-900/5 pt-10 dark:border-white/5 sm:grid-cols-2 xl:grid-cols-4">
         {userdata.map((mydata) => (
-          <MyData key={mydata.href} mydata={mydata} />
+          <MyData key={mydata.name} mydata={mydata} />
         ))}
         <HollowCard />
       </div>
