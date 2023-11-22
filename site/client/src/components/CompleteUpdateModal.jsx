@@ -72,6 +72,7 @@ export function CompleteUpdateModal() {
                       className="block w-full rounded-md border-0 py-2 pl-3 pr-3 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500 mt-1" // Added mt-1
                       rows={1}
                       readOnly
+                      spellcheck="false"
                     />
                   </div>
 
@@ -84,6 +85,7 @@ export function CompleteUpdateModal() {
                       className="block w-full rounded-md border-0 py-2 pl-3 pr-3 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500 mt-1" // Added mt-1
                       rows={1}
                       readOnly
+                      spellcheck="false"
                     />
                   </div>
 
@@ -96,6 +98,7 @@ export function CompleteUpdateModal() {
                       className="block w-full rounded-md border-0 py-2 pl-3 pr-3 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500 mt-1" // Added mt-1
                       rows={8}
                       readOnly
+                      spellcheck="false"
                     />
                   </div>
 
@@ -110,6 +113,7 @@ export function CompleteUpdateModal() {
                       className="block w-full rounded-md border-0 py-2 pl-3 pr-3 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500 mt-1" // Added mt-1
                       rows={1}
                       readOnly
+                      spellcheck="false"
                     />
                   </div>
 
@@ -122,6 +126,7 @@ export function CompleteUpdateModal() {
                       className="block w-full rounded-md border-0 py-2 pl-3 pr-3 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500 mt-1" // Added mt-1
                       rows={1}
                       readOnly
+                      spellcheck="false"
                     />
                   </div>
 
@@ -134,6 +139,7 @@ export function CompleteUpdateModal() {
                       className="block w-full rounded-md border-0 py-2 pl-3 pr-3 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500 mt-1" // Added mt-1
                       rows={1}
                       readOnly
+                      spellcheck="false"
                     />
                   </div>
 
@@ -163,6 +169,7 @@ export function CompleteUpdateModal() {
                           className="block w-full rounded-md border-0 py-2 pl-3 pr-3 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500 mt-1" // Added mt-1
                           rows={1}
                           readOnly
+                          spellcheck="false"
                         />
                       </div>
 
@@ -175,6 +182,7 @@ export function CompleteUpdateModal() {
                           className="block w-full rounded-md border-0 py-2 pl-3 pr-3 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500 mt-1" // Added mt-1
                           rows={1}
                           readOnly
+                          spellcheck="false"
                         />
                       </div>
 
@@ -187,6 +195,7 @@ export function CompleteUpdateModal() {
                           className="block w-full rounded-md border-0 py-2 pl-3 pr-3 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500 mt-1" // Added mt-1
                           rows={1}
                           readOnly
+                          spellcheck="false"
                         />
                       </div>
 
@@ -229,6 +238,7 @@ export function CompleteUpdateModal() {
                       className="block w-full rounded-md border-0 py-2 pl-3 pr-3 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500 mt-1" // Added mt-1
                       rows={1}
                       readOnly
+                      spellcheck="false"
                     />
                   </div>
 

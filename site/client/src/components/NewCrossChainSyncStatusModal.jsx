@@ -62,6 +62,7 @@ export function NewCrossChainSyncStatusModal() {
                       className="block w-full rounded-md border-0 py-2 pl-3 pr-3 mt-1 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500"
                       rows={1}
                       readOnly
+                      spellcheck="false"
                     />
                   </div>
 
@@ -74,6 +75,7 @@ export function NewCrossChainSyncStatusModal() {
                       className="block w-full rounded-md border-0 py-2 pl-3 pr-3 mt-1 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500"
                       rows={1}
                       readOnly
+                      spellcheck="false"
                     />
                   </div>
 
@@ -86,6 +88,7 @@ export function NewCrossChainSyncStatusModal() {
                       className="block w-full rounded-md border-0 py-2 pl-3 pr-3 mt-1 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500"
                       rows={1}
                       readOnly
+                      spellcheck="false"
                     />
                   </div>
 
@@ -98,6 +101,7 @@ export function NewCrossChainSyncStatusModal() {
                       className="block w-full rounded-md border-0 py-2 pl-3 pr-3 mt-1 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500"
                       rows={1}
                       readOnly
+                      spellcheck="false"
                     />
                   </div>
 
@@ -110,6 +114,7 @@ export function NewCrossChainSyncStatusModal() {
                       className="block w-full rounded-md border-0 py-2 pl-3 pr-3 mt-1 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500"
                       rows={8}
                       readOnly
+                      spellcheck="false"
                     />
                   </div>
 
@@ -125,6 +130,7 @@ export function NewCrossChainSyncStatusModal() {
                       rows={1}
                       defaultValue="10 ZKP"
                       readOnly
+                      spellcheck="false"
                     />
                   </div>
 
@@ -137,6 +143,7 @@ export function NewCrossChainSyncStatusModal() {
                       className="block w-full rounded-md border-0 py-2 pl-3 pr-3 mt-1 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500"
                       rows={1}
                       readOnly
+                      spellcheck="false"
                     />
                   </div>
 

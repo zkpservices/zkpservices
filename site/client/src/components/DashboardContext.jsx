@@ -28,7 +28,7 @@ export function DashboardContext() {
   return (
     <div>
       <UserData /> {/* to be fed a prop such as userdata eventually */}
-      <Services />
+      <Services useLink={false} />
       <History tableData={tableData} showRefresh={true} />
     </div>
   )

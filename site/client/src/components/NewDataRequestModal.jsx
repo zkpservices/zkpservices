@@ -70,6 +70,7 @@ export function NewDataRequestModal() {
                       id="receiverAddress"
                       className="block w-full rounded-md border-0 py-2 pl-3 pr-3 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500 mt-1"
                       rows={1}
+                      spellcheck="false"
                     />
                   </div>
 
@@ -81,6 +82,7 @@ export function NewDataRequestModal() {
                       id="fieldRequested"
                       className="block w-full rounded-md border-0 py-2 pl-3 pr-3 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500 mt-1"
                       rows={1}
+                      spellcheck="false"
                     />
                   </div>
 
@@ -94,6 +96,7 @@ export function NewDataRequestModal() {
                       id="oneTimeKey"
                       className="block w-full rounded-md border-0 py-2 pl-3 pr-3 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500 mt-1"
                       rows={1}
+                      spellcheck="false"
                     />
                     <button
                       className="mt-2 bg-emerald-600 dark:bg-emerald-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-500 dark:hover:bg-emerald-400 rounded-md"
@@ -113,6 +116,7 @@ export function NewDataRequestModal() {
                       id="oneTimeSalt"
                       className="block w-full rounded-md border-0 py-2 pl-3 pr-3 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500 mt-1"
                       rows={1}
+                      spellcheck="false"
                     />
                     <button
                       className="mt-2 bg-emerald-600 dark:bg-emerald-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-500 dark:hover:bg-emerald-400 rounded-md"
@@ -133,6 +137,7 @@ export function NewDataRequestModal() {
                       className="block w-full rounded-md border-0 py-2 pl-3 pr-3 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500 mt-1"
                       rows={1}
                       defaultValue="600"
+                      spellcheck="false"
                     />
                   </div>
 
@@ -159,6 +164,7 @@ export function NewDataRequestModal() {
                           className="block w-full rounded-md border-0 py-2 pl-3 pr-3 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500 mt-1"
                           rows={1}
                           defaultValue={twoFAProvider}
+                          spellcheck="false"
                         />
                       </div>
 
@@ -172,6 +178,7 @@ export function NewDataRequestModal() {
                           rows={1}
                           value={twoFARequestID}
                           onChange={(e) => setTwoFARequestID(e.target.value)}
+                          spellcheck="false"
                         />
                         <button
                           className="mt-2 bg-emerald-600 dark:bg-emerald-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-500 dark:hover:bg-emerald-400 rounded-md"
@@ -199,6 +206,7 @@ export function NewDataRequestModal() {
                       className="block w-full rounded-md border-0 py-2 pl-3 pr-3 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500 mt-1"
                       rows={1}
                       defaultValue="10"
+                      spellcheck="false"
                     />
                   </div>
 

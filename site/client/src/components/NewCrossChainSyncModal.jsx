@@ -61,6 +61,7 @@ export function NewCrossChainSyncModal() {
                       id="destinationChain"
                       className="block w-full rounded-md border-0 py-2 pl-3 pr-3 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500 mt-1"
                       rows={1}
+                      spellcheck="false"
                     />
                   </div>
 
@@ -72,6 +73,7 @@ export function NewCrossChainSyncModal() {
                       id="parameterToSync"
                       className="block w-full rounded-md border-0 py-2 pl-3 pr-3 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500 mt-1"
                       rows={1}
+                      spellcheck="false"
                     />
                   </div>
 
@@ -83,6 +85,7 @@ export function NewCrossChainSyncModal() {
                       id="parameterKey"
                       className="block w-full rounded-md border-0 py-2 pl-3 pr-3 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500 mt-1"
                       rows={1}
+                      spellcheck="false"
                     />
                   </div>
 
@@ -96,6 +99,7 @@ export function NewCrossChainSyncModal() {
                       id="additionalInfo"
                       className="block w-full rounded-md border-0 py-2 pl-3 pr-3 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500 mt-1"
                       rows={3}
+                      spellcheck="false"
                     />
                   </div>
 

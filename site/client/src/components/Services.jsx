@@ -1,15 +1,15 @@
-import Link from 'next/link'
-import { motion, useMotionTemplate, useMotionValue } from 'framer-motion'
-import { GridPattern } from '@/components/GridPattern'
-import { Heading } from '@/components/Heading'
-import { QuestionMarkIcon } from '@/components/icons/QuestionMarkIcon'
-import { UpdateIcon } from '@/components/icons/UpdateIcon'
-import { CrosschainIcon } from '@/components/icons/CrosschainIcon'
-import { EnvelopeIcon } from '@/components/icons/EnvelopeIcon'
+import Link from 'next/link';
+import { motion, useMotionTemplate, useMotionValue } from 'framer-motion';
+import { GridPattern } from '@/components/GridPattern';
+import { Heading } from '@/components/Heading';
+import { QuestionMarkIcon } from '@/components/icons/QuestionMarkIcon';
+import { UpdateIcon } from '@/components/icons/UpdateIcon';
+import { CrosschainIcon } from '@/components/icons/CrosschainIcon';
+import { EnvelopeIcon } from '@/components/icons/EnvelopeIcon';
 
 const services = [
   {
-    href: '/requestdata',
+    href: '/dashboard',
     name: 'Request Data',
     description:
       'Learn about the contact model and how to create, retrieve, update, delete, and list contacts.',
@@ -23,7 +23,7 @@ const services = [
     },
   },
   {
-    href: '/requestupdate',
+    href: '/dashboard',
     name: 'Request Update',
     description:
       'Learn about the conversation model and how to create, retrieve, update, delete, and list conversations.',
@@ -37,7 +37,7 @@ const services = [
     },
   },
   {
-    href: '/respond',
+    href: '/dashboard',
     name: 'Respond',
     description:
       'Learn about the message model and how to create, retrieve, update, delete, and list messages.',
@@ -51,7 +51,7 @@ const services = [
     },
   },
   {
-    href: '/crosschain',
+    href: '/dashboard',
     name: 'Cross-Chain Backups',
     description:
       'Learn about the group model and how to create, retrieve, update, delete, and list groups.',
@@ -61,19 +61,19 @@ const services = [
       squares: [[0, 1]],
     },
   },
-]
+];
 
 function ServiceIcon({ icon: Icon }) {
   return (
     <div className="flex h-7 w-7 items-center justify-center rounded-full bg-zinc-900/5 ring-1 ring-zinc-900/25 backdrop-blur-[2px] transition duration-300 group-hover:bg-white/50 group-hover:ring-zinc-900/25 dark:bg-white/7.5 dark:ring-white/15 dark:group-hover:bg-sky-300/10 dark:group-hover:ring-sky-400">
       <Icon className="h-5 w-5 fill-zinc-700/10 stroke-zinc-700 transition-colors duration-300 group-hover:stroke-zinc-900 dark:fill-white/10 dark:stroke-zinc-400 dark:group-hover:fill-sky-300/10 dark:group-hover:stroke-sky-400" />
     </div>
-  )
+  );
 }
 
 function ServicePattern({ mouseX, mouseY, ...gridProps }) {
-  let maskImage = useMotionTemplate`radial-gradient(180px at ${mouseX}px ${mouseY}px, white, transparent)`
-  let style = { maskImage, WebkitMaskImage: maskImage }
+  let maskImage = useMotionTemplate`radial-gradient(180px at ${mouseX}px ${mouseY}px, white, transparent)`;
+  let style = { maskImage, WebkitMaskImage: maskImage };
 
   return (
     <div className="pointer-events-none">
@@ -103,17 +103,17 @@ function ServicePattern({ mouseX, mouseY, ...gridProps }) {
         />
       </motion.div>
     </div>
-  )
+  );
 }
 
-function Service({ service }) {
-  let mouseX = useMotionValue(0)
-  let mouseY = useMotionValue(0)
+function Service({ service, useLink = true }) {
+  let mouseX = useMotionValue(0);
+  let mouseY = useMotionValue(0);
 
   function onMouseMove({ currentTarget, clientX, clientY }) {
-    let { left, top } = currentTarget.getBoundingClientRect()
-    mouseX.set(clientX - left)
-    mouseY.set(clientY - top)
+    let { left, top } = currentTarget.getBoundingClientRect();
+    mouseX.set(clientX - left);
+    mouseY.set(clientY - top);
   }
 
   return (
@@ -127,20 +127,24 @@ function Service({ service }) {
       <div className="relative rounded-2xl px-4 pt-16 pb-4">
         <ServiceIcon icon={service.icon} />
         <h3 className="mt-4 text-sm font-semibold leading-7 text-zinc-900 dark:text-white">
-          <Link href={service.href}>
-            <span className="absolute inset-0 rounded-2xl" />
-            {service.name}
-          </Link>
+          {useLink ? (
+            <Link href={service.href}>
+              <span className="absolute inset-0 rounded-2xl" />
+              {service.name}
+            </Link>
+          ) : (
+            <span>{service.name}</span>
+          )}
         </h3>
         <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
           {service.description}
         </p>
       </div>
     </div>
-  )
+  );
 }
 
-export function Services() {
+export function Services({ useLink = true }) {
   return (
     <div className="xl:max-w-none mt-16">
       <div className="my-16 xl:max-w-none">
@@ -149,10 +153,10 @@ export function Services() {
         </Heading>
         <div className="not-prose mt-4 grid grid-cols-1 gap-8 border-t border-zinc-900/5 pt-10 dark:border-white/5 sm:grid-cols-2 xl:grid-cols-4">
           {services.map((service) => (
-            <Service key={service.href} service={service} />
+            <Service key={service.href} service={service} useLink={useLink} />
           ))}
         </div>
       </div>
     </div>
-  )
+  );
 }

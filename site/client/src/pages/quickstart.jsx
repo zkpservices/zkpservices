@@ -156,6 +156,7 @@ export default function Example() {
                 onChange={(e) => setRsaEncPubKey(e.target.value)}
                 className="relative block w-full appearance-none rounded-md border border-gray-300 dark:border-gray-700 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none dark:bg-gray-900 focus:ring-emerald-500 sm:text-sm"
                 defaultValue={''}
+                spellcheck="false"
               />
               <p className="mt-2 text-sm ">Write a few sentences about yourself.</p>
             </div>
@@ -173,6 +174,7 @@ export default function Example() {
                 onChange={(e) => setRsaEncPrivKey(e.target.value)}
                 className="relative block w-full appearance-none rounded-md border border-gray-300 dark:border-gray-700 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none dark:bg-gray-900 focus:ring-emerald-500 sm:text-sm"
                 defaultValue={''}
+                spellcheck="false"
               />
               <p className="mt-2 text-sm ">Write a few sentences about yourself.</p>
             </div>
@@ -217,6 +219,7 @@ export default function Example() {
                 onChange={(e) => setRsaSignPubKey(e.target.value)}
                 className="relative block w-full appearance-none rounded-md border border-gray-300 dark:border-gray-700 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none dark:bg-gray-900 focus:ring-emerald-500 sm:text-sm"
                 defaultValue={''}
+                spellcheck="false"
               />
               <p className="mt-2 text-sm ">Write a few sentences about yourself.</p>
             </div>
@@ -234,6 +237,7 @@ export default function Example() {
                 onChange={(e) => setRsaSignPrivKey(e.target.value)}
                 className="relative block w-full appearance-none rounded-md border border-gray-300 dark:border-gray-700 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none dark:bg-gray-900 focus:ring-emerald-500 sm:text-sm"
                 defaultValue={''}
+                spellcheck="false"
               />
               <p className="mt-2 text-sm ">Write a few sentences about yourself.</p>
             </div>
@@ -276,6 +280,7 @@ export default function Example() {
                 onChange={(e) => setUserData(e.target.value)}
                 className="relative block w-full appearance-none rounded-md border border-gray-300 dark:border-gray-700 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none dark:bg-gray-900 focus:ring-emerald-500 sm:text-sm"
                 defaultValue={''}
+                spellcheck="false"
               />
               <p className="mt-2 text-sm ">Write a few sentences about yourself.</p>
             </div>
