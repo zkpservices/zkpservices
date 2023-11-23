@@ -1,6 +1,6 @@
 {
-  "name": "tailwindui-protocol",
-  "version": "0.1.0",
+  "name": "zkp.services",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
