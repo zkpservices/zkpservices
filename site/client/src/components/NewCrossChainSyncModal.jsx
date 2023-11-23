@@ -125,11 +125,11 @@ export function NewCrossChainSyncModal() {
                     </textarea>
                   </div>
 
-                  <div className="mt-4">
-                    <label htmlFor="disclaimer" className="block text-sm font-medium leading-5 text-gray-900 dark:text-white">
+                  <div className="mt-6">
+                    <label htmlFor="disclaimer" className="block text-sm font-bold leading-5 text-gray-900 dark:text-white">
                       Disclaimer:
                     </label>
-                    <p className="text-gray-700 dark:text-gray-300 mt-2 whitespace-normal">
+                    <p className="text-gray-500 dark:text-gray-300 mt-2 whitespace-normal">
                       Data requests and update requests are only partially supported due to the fact that the (optional) selected 2FA providers would need to be able to support equivalent logic and have the same addresses on the destination chain (this is available with the default 2FA provider of zkp.services, ZKPServicesVRF2FA, but may not be for other 2FA providers).
                     </p>
                   </div>

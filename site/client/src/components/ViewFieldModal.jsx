@@ -138,19 +138,19 @@ export function ViewFieldModal({ title }) {
                 </div>
                 <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
                   <button
-                      type="button"
-                      className="ml-3 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
-                      onClick={() => setOpen(false)}
-                    >
-                      Remove from Dashboard
-                    </button>    
-                    <button
-                      type="button"
-                      className="mt-3 ml-3 inline-flex w-full justify-center rounded-md bg-slate-100 dark:bg-slate-800 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-slate-200 dark:hover:bg-slate-900 sm:mt-0 sm:w-auto"
-                      onClick={() => setOpen(false)}
-                    >
-                      Close
-                    </button>
+                    type="button"
+                    className="mt-3 ml-3 inline-flex w-full justify-center rounded-md bg-slate-100 dark:bg-slate-800 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-slate-200 dark:hover:bg-slate-900 sm:mt-0 sm:w-auto"
+                    onClick={() => setOpen(false)}
+                  >
+                    Close
+                  </button>
+                  <button
+                    type="button"
+                    className="ml-3 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                    onClick={() => setOpen(false)}
+                  >
+                    Remove from Dashboard
+                  </button>    
                 </div>
               </div>
             </div>
