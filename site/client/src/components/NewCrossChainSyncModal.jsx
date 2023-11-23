@@ -41,7 +41,7 @@ export function NewCrossChainSyncModal() {
                   >
                     <span className="sr-only">Close</span>
                     <XMarkIcon
-                      className="h-6 w-6 text-emerald-500 dark:text-emerald-300 hover-text-emerald-600 dark:hover-text-emerald-400"
+                      className="h-6 w-6 text-emerald-500 dark:text-emerald-300 hover:text-emerald-600 dark:hover:text-emerald-400"
                       aria-hidden="true"
                     />
                   </button>
@@ -61,8 +61,9 @@ export function NewCrossChainSyncModal() {
                     <select
                       id="destinationChain"
                       name="destinationChain"
-                      className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-emerald-500 focus-ring-emerald-400 sm:text-sm sm:leading-6"
+                      className="mt-2 block w-full rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus-border-emerald-500 dark:focus-border-emerald-500 focus:outline-none focus:border-transparent focus:ring-emerald-500 focus:box-shadow-none bg-slate-100 dark:bg-slate-700 sm:text-sm sm:leading-6"
                     >
+
                       {destinationChainOptions.map((option) => (
                         <option key={option}>{option}</option>
                       ))}
@@ -74,10 +75,9 @@ export function NewCrossChainSyncModal() {
                       Parameter to Sync:
                     </label>
                     <select
-                      id="location"
-                      name="location"
-                      className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-emerald-500 focus-ring-emerald-400 sm:text-sm sm:leading-6"
-                      defaultValue="Medical Records"
+                      id="parameterToSync"
+                      name="parameterToSync"
+                      className="mt-2 block w-full rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus-border-emerald-500 dark:focus-border-emerald-500 focus:outline-none focus:border-transparent focus:ring-emerald-500 focus:box-shadow-none bg-slate-100 dark:bg-slate-700 sm:text-sm sm:leading-6"
                     >
                       <option>Medical Records</option>
                       <option>Passport</option>
@@ -103,7 +103,7 @@ export function NewCrossChainSyncModal() {
                     </label>
                     <textarea
                       id="parameterValue"
-                      className="block w-full rounded-md border-0 py-2 pl-3 pr-3 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-emerald-500 focus-ring-emerald-400 mt-1"
+                      className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
                       rows={8}
                       readOnly
                     />
@@ -117,7 +117,7 @@ export function NewCrossChainSyncModal() {
                     </label>
                     <textarea
                       id="ccipFee"
-                      className="block w-full rounded-md border-0 py-2 pl-3 pr-3 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-emerald-500 focus-ring-emerald-400 mt-1"
+                      className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
                       rows={1}
                       readOnly
                     >
@@ -138,20 +138,19 @@ export function NewCrossChainSyncModal() {
 
                 <div className="mt-6 flex justify-end">
                   <button
-                    className="mr-3 bg-gray-200 dark:bg-gray-700 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-emerald-400 focus-ring-emerald-400 dark:ring-emerald-400 hover-bg-gray-300 dark:hover-bg-gray-600 rounded-md"
+                    type="button"
+                    className="mt-3 ml-3 inline-flex w-full justify-center rounded-md bg-slate-100 dark:bg-slate-800 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-slate-200 dark:hover:bg-slate-900 sm:mt-0 sm:w-auto"
                     onClick={() => setOpen(false)}
                   >
                     Cancel
                   </button>
                   <button
-                    className="bg-emerald-600 dark:bg-emerald-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover-bg-emerald-500 dark:hover-bg-emerald-400 rounded-md"
-                    onClick={() => {
-                      // Call Smart Contract logic here
-                      setOpen(false);
-                    }}
+                    type="button"
+                    className="ml-3 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                    onClick={() => setOpen(false)}
                   >
                     Call Smart Contract
-                  </button>
+                  </button> 
                 </div>
               </div>
             </div>
