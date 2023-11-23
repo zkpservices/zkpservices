@@ -59,10 +59,10 @@ export function ViewFieldModal({ title }) {
                     >
                       {title}
                     </Dialog.Title>
-                    <div className="mt-2 lg:max-h-[65vh] max-h-[40vh] overflow-y-auto min-w-[16rem] md:min-w-[40rem] lg:min-w-[40rem]">
+                    <div className="mt-2 px-1 lg:max-h-[65vh] max-h-[40vh] overflow-y-auto min-w-[16rem] md:min-w-[40rem] lg:min-w-[40rem]">
                       <textarea
                         rows={8}
-                        className="block w-full rounded-md border-0 py-2 pl-3 pr-3 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500 sm:text-sm sm:leading-6"
+                        className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
                         defaultValue={''}
                         readOnly
                         spellcheck="false"
@@ -82,7 +82,7 @@ export function ViewFieldModal({ title }) {
                           <input
                             type="text"
                             id="dataLocation"
-                            className="block w-full rounded-md border-0 py-2 pl-3 pr-3 mt-1 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500 sm:text-sm sm:leading-6"
+                            className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
                             defaultValue="Default data location"
                             readOnly
                           />
@@ -97,7 +97,7 @@ export function ViewFieldModal({ title }) {
                           <input
                             type="text"
                             id="dataHash"
-                            className="block w-full rounded-md border-0 py-2 pl-3 pr-3 mt-1 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500 sm:text-sm sm:leading-6"
+                            className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
                             defaultValue="Default data hash"
                             readOnly
                           />
@@ -112,7 +112,7 @@ export function ViewFieldModal({ title }) {
                           <input
                             type="text"
                             id="obfuscationSalt"
-                            className="block w-full rounded-md border-0 py-2 pl-3 pr-3 mt-1 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500 sm:text-sm sm:leading-6"
+                            className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
                             defaultValue="Default Obfuscation Salt"
                             readOnly
                           />
@@ -127,7 +127,7 @@ export function ViewFieldModal({ title }) {
                           <input
                             type="text"
                             id="saltHash"
-                            className="block w-full rounded-md border-0 py-2 pl-3 pr-3 mt-1 text-gray-900 dark:text-gray-100 dark:bg-gray-800 ring-1 ring-inset ring-emerald-400 focus:ring-2 focus:ring-inset focus:ring-emerald-500 sm:text-sm sm:leading-6"
+                            className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
                             defaultValue="Salt Hash"
                             readOnly
                           />
@@ -138,25 +138,19 @@ export function ViewFieldModal({ title }) {
                 </div>
                 <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
                   <button
-                    type="button"
-                    className="inline-flex w-full justify-center rounded-md bg-emerald-600 dark:bg-emerald-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-500 dark:hover:bg-emerald-400 sm:ml-3 sm:w-auto"
-                    onClick={() => setOpen(false)}
-                  >
-                    Close
-                  </button>
-                  <button
-                    type="button"
-                    className={`mt-3 inline-flex w-full justify-center rounded-md ${
-                      // Conditional class for cancel button in dark mode
-                      'bg-white dark:bg-gray-700'
-                    } px-3 py-2 text-sm font-semibold ${
-                      // Conditional text color for cancel button in dark mode
-                      'text-gray-900 dark:text-white'
-                    } shadow-sm ring-1 ring-inset ring-emerald-400 dark:ring-emerald-400 hover:bg-gray-50 dark:hover:bg-gray-600 sm:mt-0 sm:w-auto`}
-                    onClick={() => setOpen(false)}
-                  >
-                    Remove From Dashboard
-                  </button>
+                      type="button"
+                      className="ml-3 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                      onClick={() => setOpen(false)}
+                    >
+                      Remove from Dashboard
+                    </button>    
+                    <button
+                      type="button"
+                      className="mt-3 ml-3 inline-flex w-full justify-center rounded-md bg-slate-100 dark:bg-slate-800 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-slate-200 dark:hover:bg-slate-900 sm:mt-0 sm:w-auto"
+                      onClick={() => setOpen(false)}
+                    >
+                      Close
+                    </button>
                 </div>
               </div>
             </div>

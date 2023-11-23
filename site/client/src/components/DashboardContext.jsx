@@ -27,8 +27,11 @@ const tableData = {
 export function DashboardContext() {
   return (
     <div>
-      <NewCrossChainSyncModal />
-      {/* <CrossChainSyncStatusModal /> */}
+      {/* <ZKPFaucetModal /> */}
+      {/* <ViewFieldModal title="medical records"/>  */}
+      {/* <NewDashboardDataModal /> */}
+      {/* <NewUpdateRequestModal /> */}
+      <NewDataRequestModal />
       <UserData /> {/* to be fed a prop such as userdata eventually */}
       <Services useLink={false} />
       <History tableData={tableData} showRefresh={true} />
