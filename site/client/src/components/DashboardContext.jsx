@@ -27,10 +27,10 @@ export function DashboardContext() {
     'Outgoing': [],
     'Cross-Chain Sync': []
   });
+  const [userDataFields, setUserDataFields] = useState([])
 
   let { walletConnected, userAddress, showLoginNotification, 
-    setShowLoginNotification, loggedIn, userPassword, username, setUsername,
-    userDataFields, setUserDataFields } = useGlobal();
+    setShowLoginNotification, loggedIn, userPassword, username, setUsername} = useGlobal();
 
   useEffect(() => {
     async function fetchCCTXData() {

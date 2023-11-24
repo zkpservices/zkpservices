@@ -1,9 +1,10 @@
-import Link from 'next/link'
-import { GridPattern } from '@/components/GridPattern'
-import { motion, transform, useMotionTemplate, useMotionValue } from 'framer-motion'
-import { Heading } from '@/components/Heading'
-import { HollowCard } from '@/components/HollowCard'
-import { DataIcon } from '@/components/icons/DataIcon'
+import { useState } from 'react';
+import { GridPattern } from '@/components/GridPattern';
+import { motion, useMotionTemplate, useMotionValue } from 'framer-motion';
+import { Heading } from '@/components/Heading';
+import { HollowCard } from '@/components/HollowCard';
+import { DataIcon } from '@/components/icons/DataIcon';
+import { ViewFieldModal } from './ViewFieldModal';
 
 const fieldDescriptions = 'Click to display data for this field';
 const fieldIcon = DataIcon; // Assuming DataIcon is the desired icon
@@ -40,16 +41,16 @@ function MyDataIcon({ icon: Icon }) {
     <div className="flex h-7 w-7 items-center justify-center rounded-full bg-zinc-900/5 ring-1 ring-zinc-900/25 backdrop-blur-[2px] transition duration-300 group-hover:bg-white/50 group-hover:ring-zinc-900/25 dark:bg-white/7.5 dark:ring-white/15 dark:group-hover:bg-sky-300/10 dark:group-hover:ring-sky-400">
       <Icon className="h-5 w-5 fill-zinc-700/10 stroke-zinc-700 transition-colors duration-300 group-hover:stroke-zinc-900 dark:fill-white/10 dark:stroke-zinc-400 dark:group-hover:fill-sky-300/10 dark:group-hover:stroke-sky-400" />
     </div>
-  )
+  );
 }
 
 function MyDataPattern({ mouseX, mouseY, ...gridProps }) {
-  let maskImage = useMotionTemplate`radial-gradient(180px at ${mouseX}px ${mouseY}px, white, transparent)`
-  let style = { maskImage, WebkitMaskImage: maskImage }
+  let maskImage = useMotionTemplate`radial-gradient(180px at ${mouseX}px ${mouseY}px, white, transparent)`;
+  let style = { maskImage, WebkitMaskImage: maskImage };
 
   return (
     <div className="pointer-events-none">
-      <div className="absolute inset-0 rounded-2xl transition duration-300 [mask-image:linear-gradient(white,transparent)] group-hover:opacity-50">
+      <div className="absolute inset-0 rounded-2xl transition duration-300 mask-image:linear-gradient(white,transparent) group-hover:opacity-50">
         <GridPattern
           width={72}
           height={56}
@@ -68,30 +69,31 @@ function MyDataPattern({ mouseX, mouseY, ...gridProps }) {
       >
         <GridPattern
           width={72}
-          height={56}
+          height= {56}
           x="50%"
           className="absolute inset-x-0 inset-y-[-30%] h-[160%] w-full skew-y-[-18deg] fill-black/50 stroke-black/70 dark:fill-white/2.5 dark:stroke-white/10"
           {...gridProps}
         />
       </motion.div>
     </div>
-  )
+  );
 }
 
-export function MyData({ mydata }) {
-  let mouseX = useMotionValue(0)
-  let mouseY = useMotionValue(0)
+export function MyData({ mydata, onCardClick }) {
+  let mouseX = useMotionValue(0);
+  let mouseY = useMotionValue(0);
 
   function onMouseMove({ currentTarget, clientX, clientY }) {
-    let { left, top } = currentTarget.getBoundingClientRect()
-    mouseX.set(clientX - left)
-    mouseY.set(clientY - top)
+    let { left, top } = currentTarget.getBoundingClientRect();
+    mouseX.set(clientX - left);
+    mouseY.set(clientY - top);
   }
 
   return (
     <div
       key={mydata.name}
       onMouseMove={onMouseMove}
+      onClick={() => onCardClick(mydata.name)}
       className="group relative flex rounded-2xl bg-zinc-50 transition-shadow hover:shadow-md hover:shadow-zinc-900/5 dark:bg-white/2.5 dark:hover:shadow-black/5"
     >
       <MyDataPattern {...mydata.pattern} mouseX={mouseX} mouseY={mouseY} />
@@ -99,18 +101,28 @@ export function MyData({ mydata }) {
       <div className="relative rounded-2xl px-4 pt-16 pb-4">
         <MyDataIcon icon={mydata.icon} />
         <h3 className="mt-4 text-sm font-semibold leading-7 text-zinc-900 dark:text-white">
-            <span className="absolute inset-0 rounded-2xl" />
-            {mydata.name}
+          <span className="absolute inset-0 rounded-2xl" />
+          {mydata.name}
         </h3>
         <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
           {mydata.description}
         </p>
       </div>
     </div>
-  )
+  );
 }
 
-export function UserData({ fieldNames = []}) {
+export function UserData({ fieldNames = [] }) {
+  const [selectedFieldName, setSelectedFieldName] = useState(null);
+
+  const openModal = (fieldName) => {
+    setSelectedFieldName(fieldName);
+  };
+
+  const closeModal = () => {
+    setSelectedFieldName(null);
+  };
+
   return (
     <div className="my-16 xl:max-w-none">
       <Heading level={2} id="mydata">
@@ -124,14 +136,20 @@ export function UserData({ fieldNames = []}) {
               name: fieldName,
               description: fieldDescriptions,
               icon: fieldIcon,
-              pattern: fieldPatterns[index % fieldPatterns.length], // Alternate patterns
+              pattern: fieldPatterns[index % fieldPatterns.length],
             }}
+            onCardClick={openModal}
           />
         ))}
         <HollowCard />
       </div>
+      {selectedFieldName && (
+        <ViewFieldModal
+          title={selectedFieldName} // Pass the selected field name as the title
+          open={selectedFieldName !== null}
+          onClose={closeModal}
+        />
+      )}
     </div>
   );
 }
-
-export default UserData;
