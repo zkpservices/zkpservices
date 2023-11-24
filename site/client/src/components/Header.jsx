@@ -3,7 +3,7 @@ import Link from 'next/link'
 import clsx from 'clsx'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { MetaMaskSDK } from '@metamask/sdk';
-import { useWallet } from './Wallet';
+import { useGlobal } from './GlobalStorage';
 
 import { Button } from '@/components/Button'
 import { Logo } from '@/components/Logo'
@@ -47,7 +47,7 @@ export const Header = forwardRef(function Header({ className }, ref) {
   let bgOpacityLight = useTransform(scrollY, [0, 72], [0.5, 0.9])
   let bgOpacityDark = useTransform(scrollY, [0, 72], [0.2, 0.8])
   const [accountText, setAccountText] = useState('');
-  const {walletConnected, setWalletConnected, userAddress, setUserAddress, loggedIn, setLoggedIn} = useWallet();
+  const {walletConnected, setWalletConnected, userAddress, setUserAddress, loggedIn, setLoggedIn} = useGlobal();
   const [isHovered, setIsHovered] = useState(false);
   const [textOpacity, setTextOpacity] = useState(1); // Initialize opacity to 1
 

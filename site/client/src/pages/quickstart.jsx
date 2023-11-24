@@ -1,13 +1,14 @@
 import Guide from './quickstart_guide.mdx';
-import { useWallet } from '@/components/Wallet';
+import { useGlobal } from '@/components/GlobalStorage';
 import { useState } from 'react';
 import axios, { formToJSON } from 'axios';
 import Router from 'next/router';
+import { createUser } from '@/components/APICalls'
 
 export default function Example() {
   let { walletConnected, userAddress, showLoginNotification, 
     setShowLoginNotification, loggedIn, setLoggedIn, userPassword, setUserPassword, username, setUsername, twoFactorAuthPassword, setTwoFactorAuthPassword,
-    contractPassword, setContractPassword } = useWallet();
+    contractPassword, setContractPassword } = useGlobal();
   const [rsaEncPubKey, setRsaEncPubKey] = useState('');
   const [rsaEncPrivKey, setRsaEncPrivKey] = useState('');
   const [rsaSignPubKey, setRsaSignPubKey] = useState('');
@@ -20,9 +21,6 @@ export default function Example() {
 
       try {
         const quickstart_JSON = {
-          "id": userAddress,
-          "action": "create_item", 
-          "password": userPassword,
           "contract_password": contractPassword,
           "2fa_password": twoFactorAuthPassword,
           "rsa_enc_pub_key": rsaEncPubKey,
@@ -37,10 +35,18 @@ export default function Example() {
         }
         console.log(quickstart_JSON)
 
-        const response = await axios.post('https://y1oeimdo63.execute-api.us-east-1.amazonaws.com/userdata', quickstart_JSON);
-        Router.push('/dashboard')
-        setLoggedIn(true)
-        setShowLoginNotification(true)
+        async function callCreateUser() {
+          try {
+            const createUserResponse = await createUser(userAddress, userPassword, quickstart_JSON);
+            Router.push('/dashboard')
+            setLoggedIn(true)
+            setShowLoginNotification(true)
+          } catch (error) {
+            console.error('Error fetching user data:', error);
+          }
+        }
+    
+        callCreateUser()
         
         
       } catch (error) {

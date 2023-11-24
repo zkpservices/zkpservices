@@ -1,6 +1,7 @@
 import { Logo } from "../components/Logo.jsx"
 import { useState } from 'react'
-import { useWallet } from "@/components/Wallet.jsx";
+import { useGlobal } from "@/components/GlobalStorage.jsx";
+import { login } from '@/components/APICalls.jsx';
 import axios, { formToJSON } from 'axios';
 import Router from 'next/router';
 /*
@@ -19,7 +20,7 @@ import Router from 'next/router';
 */
 
 export default function Example() {
-  const { walletConnected, loggedIn, userAddress, setLoggedIn, userPassword, setUserPassword, showLoginNotification, setShowLoginNotification } = useWallet();
+  const { walletConnected, loggedIn, userAddress, setLoggedIn, userPassword, setUserPassword, showLoginNotification, setShowLoginNotification } = useGlobal();
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -43,7 +44,7 @@ export default function Example() {
           ...formDataJSON
         }
         console.log(mergedForm)
-        const response = await axios.post(formDataJSON['provider'], mergedForm, headers);
+        const response = login(userAddress, mergedForm['password'])
         setLoggedIn(true);
         setUserPassword(mergedForm['password'])
         console.log('user password:')

@@ -1,10 +1,12 @@
 import Link from 'next/link'
 import axios from 'axios';
 import { useEffect, useRef, useState } from 'react';
-import { useWallet } from "@/components/Wallet.jsx";
+import { useG } from "@/components/GlobalStorage.jsx";
 import { ThreeJSComponent } from '@/components/ThreeJSComponent'
 import { Notification } from '@/components/Notification'
 import { DashboardContext } from '@/components/DashboardContext';
+import { getUser } from '@/components/APICalls'
+import { useGlobal } from '@/components/GlobalStorage'
    
 export function Dashboard() {
   const [tableData, setTableData] = useState({
@@ -15,19 +17,11 @@ export function Dashboard() {
 
 
   let { walletConnected, userAddress, showLoginNotification, 
-    setShowLoginNotification, loggedIn, userPassword, username, setUsername } = useWallet();
+    setShowLoginNotification, loggedIn, userPassword, username, setUsername } = useGlobal();
 
   // temporary overwrite for testing dashboard
-  loggedIn = true;
-  walletConnected = true;
-
-  // Placeholders for payloads, this is not hardcoding
-  const get_item_payload = {
-    "id": userAddress,
-    "action": "get_item",
-    "key": "id.name",
-    "password": userPassword       
-  };
+  // loggedIn = true;
+  // walletConnected = true;
 
   const get_ccip_payload = {
     "id": userAddress,
@@ -36,41 +30,43 @@ export function Dashboard() {
   };
 
   useEffect(() => {
-    // Make a POST request when the Dashboard page is shown
-    axios
-      .post('https://y1oeimdo63.execute-api.us-east-1.amazonaws.com/userdata', get_item_payload)
-      .then((response) => {
-        setUsername(response['data']['id.name']);
-      })
-      .catch((error) => {
-        // Handle errors
-        console.error('Error making POST request:', error);
-      });
+    if(loggedIn && walletConnected) {
+    async function fetchUsername() {
+      try {
+        const userData = await getUser(userAddress, userPassword);
+        setUsername(userData['data']['id.name'])
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    }
 
-    axios
-      .post('https://y1oeimdo63.execute-api.us-east-1.amazonaws.com/userdata', get_ccip_payload)
-      .then((response) => {
-        const responseData = response['data'];
+    fetchUsername()
+  }
 
-        const transformedData = Object.entries(responseData).map(([ccip_id, data]) => {
-          const { source_chain, destination_chain, field } = data;
-          return {
-            operation: ['Sync Data'],
-            field: [field, `From ${source_chain} to ${destination_chain}`],
-            status: ['Sync Completed', 'button'],
-            details: ['View Details'],
-          };
-        });
+    // axios
+    //   .post('https://y1oeimdo63.execute-api.us-east-1.amazonaws.com/userdata', get_ccip_payload)
+    //   .then((response) => {
+    //     const responseData = response['data'];
 
-        setTableData((prevTableData) => ({
-          ...prevTableData,
-          'Cross-Chain Sync': transformedData,
-        }));
-      })
-      .catch((error) => {
-        // Handle errors
-        console.error('Error making POST request:', error);
-      });
+    //     const transformedData = Object.entries(responseData).map(([ccip_id, data]) => {
+    //       const { source_chain, destination_chain, field } = data;
+    //       return {
+    //         operation: ['Sync Data'],
+    //         field: [field, `From ${source_chain} to ${destination_chain}`],
+    //         status: ['Sync Completed', 'button'],
+    //         details: ['View Details'],
+    //       };
+    //     });
+
+    //     setTableData((prevTableData) => ({
+    //       ...prevTableData,
+    //       'Cross-Chain Sync': transformedData,
+    //     }));
+    //   })
+    //   .catch((error) => {
+    //     // Handle errors
+    //     console.error('Error making POST request:', error);
+    //   });
 
     // After 5000 milliseconds (5 seconds), hide the notification
     const notificationTimeout = setTimeout(() => {
