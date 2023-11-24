@@ -29,7 +29,8 @@ export function DashboardContext() {
   });
 
   let { walletConnected, userAddress, showLoginNotification, 
-    setShowLoginNotification, loggedIn, userPassword, username, setUsername } = useGlobal();
+    setShowLoginNotification, loggedIn, userPassword, username, setUsername,
+    userDataFields, setUserDataFields } = useGlobal();
 
   useEffect(() => {
     async function fetchCCTXData() {
@@ -49,7 +50,19 @@ export function DashboardContext() {
         console.error('Error fetching user data:', error);
       }
     }
-    fetchCCTXData()
+    async function fetchUserDataFields() {
+      try {
+        // Replace this with the actual fetch method when available
+        // For now, use a placeholder value
+        const placeholderData = ["Medical Records", "Public Transport Information"];
+        setUserDataFields(placeholderData);
+      } catch (error) {
+        console.error('Error fetching user data fields:', error);
+      }
+    }
+
+    fetchCCTXData();
+    fetchUserDataFields();
   }, [])
   return (
     <div>
@@ -58,7 +71,7 @@ export function DashboardContext() {
       {/* <NewDashboardDataModal /> */}
       {/* <NewUpdateRequestModal /> */}
       {/* <NewDataRequestModal /> */}
-      <UserData /> {/* to be fed a prop such as userdata eventually */}
+      <UserData fieldNames={userDataFields}/> 
       <Services useLink={false} />
       <History tableData={tableData} showRefresh={true} />
     </div>

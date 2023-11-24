@@ -5,60 +5,35 @@ import { Heading } from '@/components/Heading'
 import { HollowCard } from '@/components/HollowCard'
 import { DataIcon } from '@/components/icons/DataIcon'
 
-// to be converted to a prop
-const userdata = [
+const fieldDescriptions = 'Click to display data for this field';
+const fieldIcon = DataIcon; // Assuming DataIcon is the desired icon
+const fieldPatterns = [
   {
-    name: 'Request Data',
-    description:
-      'Learn about the contact model and how to create, retrieve, update, delete, and list contacts.',
-    icon: DataIcon,
-    pattern: {
-      y: 16,
-      squares: [
-        [0, 1],
-        [1, 3],
-      ],
-    },
+    y: 16,
+    squares: [
+      [0, 1],
+      [1, 3],
+    ],
   },
   {
-    name: 'Request Update',
-    description:
-      'Learn about the conversation model and how to create, retrieve, update, delete, and list conversations.',
-    icon: DataIcon,
-    pattern: {
-      y: -6,
-      squares: [
-        [-1, 2],
-        [1, 3],
-      ],
-    },
+    y: -6,
+    squares: [
+      [-1, 2],
+      [1, 3],
+    ],
   },
   {
-    name: 'Respond',
-    description:
-      'Learn about the message model and how to create, retrieve, update, delete, and list messages.',
-    icon: DataIcon,
-    pattern: {
-      y: 32,
-      squares: [
-        [0, 2],
-        [1, 4],
-      ],
-    },
+    y: 32,
+    squares: [
+      [0, 2],
+      [1, 4],
+    ],
   },
-  // {
-  //   href: '/crosschain',
-  //   name: 'Cross-Chain Backups',
-  //   description:
-  //     'Learn about the group model and how to create, retrieve, update, delete, and list groups.',
-  //   icon: UsersIcon,
-  //   pattern: {
-  //     y: 22,
-  //     squares: [[0, 1]],
-  //   },
-  // },
-]
-
+  {
+    y: 22,
+    squares: [[0, 1]],
+  },
+];
 
 function MyDataIcon({ icon: Icon }) {
   return (
@@ -135,18 +110,28 @@ export function MyData({ mydata }) {
   )
 }
 
-export function UserData() {
+export function UserData({ fieldNames = []}) {
   return (
     <div className="my-16 xl:max-w-none">
       <Heading level={2} id="mydata">
         Access My Data
       </Heading>
       <div className="not-prose mt-4 grid grid-cols-1 gap-8 border-t border-zinc-900/5 pt-10 dark:border-white/5 sm:grid-cols-2 xl:grid-cols-4">
-        {userdata.map((mydata) => (
-          <MyData key={mydata.name} mydata={mydata} />
+        {fieldNames.map((fieldName, index) => (
+          <MyData
+            key={fieldName}
+            mydata={{
+              name: fieldName,
+              description: fieldDescriptions,
+              icon: fieldIcon,
+              pattern: fieldPatterns[index % fieldPatterns.length], // Alternate patterns
+            }}
+          />
         ))}
         <HollowCard />
       </div>
     </div>
-  )
+  );
 }
+
+export default UserData;
