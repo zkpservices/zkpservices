@@ -1,11 +1,14 @@
-import Link from 'next/link';
-import { motion, useMotionTemplate, useMotionValue } from 'framer-motion';
+import { useState } from 'react';
 import { GridPattern } from '@/components/GridPattern';
+import { motion, useMotionTemplate, useMotionValue } from 'framer-motion';
 import { Heading } from '@/components/Heading';
 import { QuestionMarkIcon } from '@/components/icons/QuestionMarkIcon';
 import { UpdateIcon } from '@/components/icons/UpdateIcon';
 import { CrosschainIcon } from '@/components/icons/CrosschainIcon';
 import { EnvelopeIcon } from '@/components/icons/EnvelopeIcon';
+import { NewUpdateRequestModal } from '@/components/NewUpdateRequestModal';
+import { NewDataRequestModal } from '@/components/NewDataRequestModal';
+import { NewCrossChainSyncModal } from '@/components/NewCrossChainSyncModal';
 
 const services = [
   {
@@ -33,20 +36,6 @@ const services = [
       squares: [
         [-1, 2],
         [1, 3],
-      ],
-    },
-  },
-  {
-    href: '/dashboard',
-    name: 'Respond',
-    description:
-      'Learn about the message model and how to create, retrieve, update, delete, and list messages.',
-    icon: EnvelopeIcon,
-    pattern: {
-      y: 32,
-      squares: [
-        [0, 2],
-        [1, 4],
       ],
     },
   },
@@ -106,7 +95,7 @@ function ServicePattern({ mouseX, mouseY, ...gridProps }) {
   );
 }
 
-function Service({ service, useLink = true }) {
+function ServiceCard({ service, onCardClick, openModal, isSelected }) {
   let mouseX = useMotionValue(0);
   let mouseY = useMotionValue(0);
 
@@ -120,23 +109,20 @@ function Service({ service, useLink = true }) {
     <div
       key={service.name}
       onMouseMove={onMouseMove}
-      className="group relative flex rounded-2xl bg-zinc-50 transition-shadow hover:shadow-md hover:shadow-zinc-900/5 dark:bg-white/2.5 dark:hover:shadow-black/5"
+      onClick={() => {
+        onCardClick(service.name);
+        openModal(service.name); // Pass the service name to openModal
+      }}
+      className={`group relative flex rounded-2xl bg-zinc-50 transition-shadow hover:shadow-md hover:shadow-zinc-900/5 dark:bg-white/2.5 dark:hover:shadow-black/5 ${isSelected ? 'bg-zinc-900' : ''}`}
     >
       <ServicePattern {...service.pattern} mouseX={mouseX} mouseY={mouseY} />
       <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-zinc-900/7.5 group-hover:ring-zinc-900/10 dark:ring-white/10 dark:group-hover:ring-white/20" />
       <div className="relative rounded-2xl px-4 pt-16 pb-4">
         <ServiceIcon icon={service.icon} />
-        <h3 className="mt-4 text-sm font-semibold leading-7 text-zinc-900 dark:text-white">
-          {useLink ? (
-            <Link href={service.href}>
-              <span className="absolute inset-0 rounded-2xl" />
-              {service.name}
-            </Link>
-          ) : (
-            <span>{service.name}</span>
-          )}
+        <h3 className={`mt-4 text-sm font-semibold leading-7 text-${isSelected ? 'white' : 'zinc-900'} dark:text-white`}>
+          {service.name}
         </h3>
-        <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+        <p className={`mt-1 text-sm text-${isSelected ? 'white' : 'zinc-600'} dark:text-zinc-400`}>
           {service.description}
         </p>
       </div>
@@ -145,6 +131,12 @@ function Service({ service, useLink = true }) {
 }
 
 export function Services({ useLink = true }) {
+  const [selectedService, setSelectedService] = useState(null);
+
+  const openModal = (serviceName) => {
+    setSelectedService(serviceName);
+  };
+
   return (
     <div className="xl:max-w-none mt-16">
       <div className="my-16 xl:max-w-none">
@@ -153,10 +145,19 @@ export function Services({ useLink = true }) {
         </Heading>
         <div className="not-prose mt-4 grid grid-cols-1 gap-8 border-t border-zinc-900/5 pt-10 dark:border-white/5 sm:grid-cols-2 xl:grid-cols-4">
           {services.map((service) => (
-            <Service key={service.name} service={service} useLink={useLink} />
+            <ServiceCard
+              key={service.name}
+              service={service}
+              onCardClick={openModal}
+              openModal={openModal} // Just pass openModal function
+              isSelected={selectedService === service.name}
+            />
           ))}
         </div>
       </div>
+      {selectedService === 'Request Data' && <NewDataRequestModal open={true} onClose={() => setSelectedService(null)} />}
+      {selectedService === 'Request Update' && <NewUpdateRequestModal open={true} onClose={() => setSelectedService(null)} />}
+      {selectedService === 'Cross-Chain Backups' && <NewCrossChainSyncModal open={true} onClose={() => setSelectedService(null)} />}
     </div>
   );
 }

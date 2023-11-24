@@ -54,7 +54,7 @@ export function DashboardContext() {
       try {
         // Replace this with the actual fetch method when available
         // For now, use a placeholder value
-        const placeholderData = ["Medical Records", "Public Transport Information"];
+        const placeholderData = ["Medical Records", "Public Transport Information", "Insurance Card"];
         setUserDataFields(placeholderData);
       } catch (error) {
         console.error('Error fetching user data fields:', error);
