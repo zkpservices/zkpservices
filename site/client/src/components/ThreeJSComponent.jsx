@@ -24,14 +24,29 @@ export function ThreeJSComponent() {
       const camera = new window.THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
       const renderer = new window.THREE.WebGLRenderer({ antialias: true, alpha: true });
 
-      renderer.setSize(containerRef.current.clientWidth, containerRef.current.clientHeight);
+      let scale;
+
+      if (window.innerWidth >= 1650) {
+        scale = 1.4;
+      } else if (window.innerWidth >= 1200) {
+        scale = 1.15;
+      } else if (window.innerWidth >= 768) {
+        scale = 0.9;
+      } else {
+        scale = 0.55;
+      }
+
+      const canvasWidth = containerRef.current.clientWidth * scale;
+      const canvasHeight = (containerRef.current.clientWidth * scale) / (window.innerWidth / window.innerHeight);
+
+      renderer.setSize(canvasWidth, canvasHeight);
       containerRef.current.appendChild(renderer.domElement);
 
       let originalPositions;
       let points;
       let centroid = new window.THREE.Vector3();
 
-      fetch('zkp_geometry_clean_adjusted.obj.csv')
+      fetch('zkp.obj.csv')
         .then(response => response.text())
         .then(text => {
           const rows = text.split('\n').map(row => row.split(',').map(Number));
@@ -48,41 +63,37 @@ export function ThreeJSComponent() {
           const boundingBox = new window.THREE.Box3().setFromBufferAttribute(geometry.attributes.position);
           boundingBox.getCenter(centroid);
 
-
-          // Shift the camera slightly closer to the points
-          camera.position.set(centroid.x - 2, centroid.y+0.5, centroid.z + 4);
-
-          camera.aspect = containerRef.current.clientWidth / containerRef.current.clientHeight;
+          camera.aspect = canvasWidth / canvasHeight;
           camera.updateProjectionMatrix();
+          
+          // The camera position remains as it was before
+          camera.position.set(centroid.x - 2, centroid.y + 0.5, centroid.z + 4);
 
           let mouseX = 0;
-          let mouseY = 0;
           let isMouseMoving = false;
-          let rotationSpeedX = 0.002;
-          let rotationSpeedY = 0.002;
-          let rotationX = 0;
+          let rotationSpeed = 0.002;
           let rotationY = 0;
-          let rotationZ = 0;
-          let explosionFactor = 0.015;
+          let maxRotationY = Math.PI / 16; // Set the maximum rotation here
+          let explosionFactor = 0.02;
 
           document.addEventListener('mousemove', (event) => {
             isMouseMoving = true;
+
+            // Calculate the mouse's position relative to the canvas
             mouseX = (event.clientX / window.innerWidth) * 2 - 1;
-            mouseY = (event.clientY / window.innerHeight) * 2 - 1;
           });
 
           const animate = function () {
             requestAnimationFrame(animate);
 
             if (isMouseMoving) {
-              const direction = new window.THREE.Vector3(mouseX, mouseY, 0).normalize();
-              // Flip rotation direction for up and down mouse movement
-              rotationX += rotationSpeedX * direction.y;
-              rotationY += rotationSpeedY * direction.x;
-
-              points.rotation.x = rotationX;
+              const directionX = mouseX - (centroid.x / canvasWidth);
+              rotationY += rotationSpeed * directionX;
+              
+              // Clamping the rotation
+              rotationY = Math.max(-maxRotationY, Math.min(maxRotationY, rotationY));
+              
               points.rotation.y = rotationY;
-              points.rotation.z = rotationZ;
 
               for (let i = 0; i < vertices.length; i += 3) {
                 vertices[i] += (Math.random() - 0.5) * explosionFactor;
@@ -91,14 +102,10 @@ export function ThreeJSComponent() {
               }
               geometry.attributes.position.needsUpdate = true;
             } else {
-              let factor = .2
-              rotationX *= factor;
+              let factor = 0.2;
               rotationY *= factor;
-              rotationZ *= factor;
 
-              points.rotation.x = rotationX;
               points.rotation.y = rotationY;
-              // points.rotation.z = rotationZ;
 
               for (let i = 0; i < vertices.length; i++) {
                 vertices[i] += (originalPositions[i] - vertices[i]) * 0.1;
@@ -115,18 +122,31 @@ export function ThreeJSComponent() {
           animate();
         });
 
-      window.addEventListener('resize', () => {
-        const containerAspect = containerRef.current.clientWidth / containerRef.current.clientHeight;
-        camera.aspect = containerAspect;
-        camera.updateProjectionMatrix();
-
-        renderer.setSize(containerRef.current.clientWidth, containerRef.current.clientHeight);
-      });
-    }
-  }, [scriptLoaded]);
+        window.addEventListener('resize', () => {
+          if (containerRef.current) { // Check if containerRef.current is not null
+            if (window.innerWidth >= 1650) {
+              scale = 1.4;
+            } else if (window.innerWidth >= 1200) {
+              scale = 1.15;
+            } else if (window.innerWidth >= 768) {
+              scale = 0.9;
+            } else {
+              scale = 0.55;
+            }
+  
+            const newCanvasWidth = containerRef.current.clientWidth * scale;
+            const newCanvasHeight = (containerRef.current.clientWidth * scale) / (window.innerWidth / window.innerHeight);
+            renderer.setSize(newCanvasWidth, newCanvasHeight);
+  
+            camera.aspect = newCanvasWidth / newCanvasHeight;
+            camera.updateProjectionMatrix();
+          }
+        });
+      }
+    }, [scriptLoaded]);
 
   return (
-    <div className="w-full h-screen flex items-center justify-center" ref={containerRef}>
+    <div className="w-full flex items-center justify-center" ref={containerRef}>
       {/* Your HTML content here */}
     </div>
   );

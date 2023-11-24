@@ -111,7 +111,6 @@ export const Header = forwardRef(function Header({ className }, ref) {
   function loginButtonClicked() {
     if(loggedIn) {
       setLoggedIn(false)
-      disconnectWallet()
     }
   }
 
@@ -166,7 +165,7 @@ export const Header = forwardRef(function Header({ className }, ref) {
         onClick={() => { 
           updateWalletConnect()
         }}>
-            {isHovered ? 'Disconnect' : accountText}
+            {(isHovered && walletConnected) ? 'Disconnect' : accountText}
         </Button>
         <Button
       href="/login"

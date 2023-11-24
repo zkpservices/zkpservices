@@ -27,7 +27,7 @@ export const login = async (userId, password) => {
     "password": password,
     "action": "login"
   }
-  return makeAPICall('POST', data);
+  return await makeAPICall('POST', data);
 };
 
 export const createUser = async (userId, password, quickstart_JSON) => {
