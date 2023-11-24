@@ -2,8 +2,7 @@ import { Fragment, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 
-export function SendDataModal() {
-  const [is2FARequired, setIs2FARequired] = useState(false);
+export function SendDataModal({ is2FARequired = false }) {
   const [step2FA, setStep2FA] = useState(0); // 0: Initial, 1: Step 1, 2: Step 2
   const [open, setOpen] = useState(true);
 
@@ -50,7 +49,7 @@ export function SendDataModal() {
                   >
                     <span className="sr-only">Close</span>
                     <XMarkIcon
-                      className="h-6 w-6 text-emerald-500 dark:text-emerald-300 hover:text-emerald-600 dark:hover-text-emerald-400"
+                      className="h-6 w-6 text-emerald-500 dark:text-emerald-300 hover:text-emerald-600 dark:hover:text-emerald-400"
                       aria-hidden="true"
                     />
                   </button>
@@ -145,16 +144,14 @@ export function SendDataModal() {
 
                   <div className="mt-4">
                     <label htmlFor="require2FA" className="block text-sm font-medium leading-5 text-gray-900 dark:text-white">
-                      Require 2FA:
+                      2FA Required?
                     </label>
                     <input
                       type="checkbox"
                       id="require2FA"
-                      className="mt-2 ml-1 h-4 w-4 rounded border-gray-300 dark:border-gray-700 text-emerald-600 focus:ring-emerald-500"
-                      onChange={(e) => {
-                        setIs2FARequired(e.target.checked);
-                        setStep2FA(0); // Reset step when unchecked
-                      }}
+                      className="mt-2 ml-1 h-4 w-4 rounded border border-gray-300 dark:border-gray-700 text-emerald-600 focus:ring-emerald-500"
+                      disabled
+                      checked={is2FARequired}
                     />
                   </div>
 

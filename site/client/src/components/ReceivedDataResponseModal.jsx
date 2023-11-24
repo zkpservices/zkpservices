@@ -2,8 +2,7 @@ import { Fragment, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 
-export function ReceivedDataResponseModal() {
-  const [is2FARequired, setIs2FARequired] = useState(false);
+export function ReceivedDataResponseModal({ is2FARequired = true }) {
   const [open, setOpen] = useState(true);
 
   return (
@@ -136,13 +135,14 @@ export function ReceivedDataResponseModal() {
 
                   <div className="mt-4">
                     <label htmlFor="require2FA" className="block text-sm font-medium leading-5 text-gray-900 dark:text-white">
-                      Require 2FA:
+                      2FA Required?
                     </label>
                     <input
                       type="checkbox"
                       id="require2FA"
-                      className="mt-2 ml-1 h-4 w-4 rounded border-gray-300 dark:border-gray-700 text-emerald-600 focus:ring-emerald-500"
-                      onChange={(e) => setIs2FARequired(e.target.checked)}
+                      className="mt-2 ml-1 h-4 w-4 rounded border border-gray-300 dark:border-gray-700 text-emerald-600 focus:ring-emerald-500"
+                      disabled
+                      checked={is2FARequired}
                     />
                   </div>
 
