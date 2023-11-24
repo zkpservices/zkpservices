@@ -24,20 +24,25 @@ export function ThreeJSComponent() {
       const camera = new window.THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
       const renderer = new window.THREE.WebGLRenderer({ antialias: true, alpha: true });
 
-      let scale;
+      let canvasWidth;
+      let canvasHeight;
 
       if (window.innerWidth >= 1650) {
-        scale = 1.4;
+        canvasWidth = containerRef.current.clientWidth * 1.3;
+        canvasHeight = (containerRef.current.clientWidth * 1.3) / (window.innerWidth / window.innerHeight);
       } else if (window.innerWidth >= 1200) {
-        scale = 1.15;
+        canvasWidth = containerRef.current.clientWidth * 1.15;
+        canvasHeight = (containerRef.current.clientWidth * 1.15) / (window.innerWidth / window.innerHeight);
       } else if (window.innerWidth >= 768) {
-        scale = 0.9;
-      } else {
-        scale = 0.55;
+        canvasWidth = containerRef.current.clientWidth * 0.9;
+        canvasHeight = (containerRef.current.clientWidth * 0.9) / (window.innerWidth / window.innerHeight);
+      } else if (window.innerWidth >= 400) {
+        canvasWidth = containerRef.current.clientWidth * 0.55;
+        canvasHeight = (containerRef.current.clientWidth * 0.55) / (window.innerWidth / window.innerHeight);
+      } else { // Below 450
+        canvasWidth = 350; // Set a constant width
+        canvasHeight = 350; // Set a constant height
       }
-
-      const canvasWidth = containerRef.current.clientWidth * scale;
-      const canvasHeight = (containerRef.current.clientWidth * scale) / (window.innerWidth / window.innerHeight);
 
       renderer.setSize(canvasWidth, canvasHeight);
       containerRef.current.appendChild(renderer.domElement);
@@ -65,21 +70,18 @@ export function ThreeJSComponent() {
 
           camera.aspect = canvasWidth / canvasHeight;
           camera.updateProjectionMatrix();
-          
-          // The camera position remains as it was before
+
           camera.position.set(centroid.x - 2, centroid.y + 0.5, centroid.z + 4);
 
           let mouseX = 0;
           let isMouseMoving = false;
           let rotationSpeed = 0.002;
           let rotationY = 0;
-          let maxRotationY = Math.PI / 16; // Set the maximum rotation here
+          let maxRotationY = Math.PI / 16;
           let explosionFactor = 0.02;
 
           document.addEventListener('mousemove', (event) => {
             isMouseMoving = true;
-
-            // Calculate the mouse's position relative to the canvas
             mouseX = (event.clientX / window.innerWidth) * 2 - 1;
           });
 
@@ -89,10 +91,7 @@ export function ThreeJSComponent() {
             if (isMouseMoving) {
               const directionX = mouseX - (centroid.x / canvasWidth);
               rotationY += rotationSpeed * directionX;
-              
-              // Clamping the rotation
               rotationY = Math.max(-maxRotationY, Math.min(maxRotationY, rotationY));
-              
               points.rotation.y = rotationY;
 
               for (let i = 0; i < vertices.length; i += 3) {
@@ -104,7 +103,6 @@ export function ThreeJSComponent() {
             } else {
               let factor = 0.2;
               rotationY *= factor;
-
               points.rotation.y = rotationY;
 
               for (let i = 0; i < vertices.length; i++) {
@@ -122,28 +120,32 @@ export function ThreeJSComponent() {
           animate();
         });
 
-        window.addEventListener('resize', () => {
-          if (containerRef.current) { // Check if containerRef.current is not null
-            if (window.innerWidth >= 1650) {
-              scale = 1.4;
-            } else if (window.innerWidth >= 1200) {
-              scale = 1.15;
-            } else if (window.innerWidth >= 768) {
-              scale = 0.9;
-            } else {
-              scale = 0.55;
-            }
-  
-            const newCanvasWidth = containerRef.current.clientWidth * scale;
-            const newCanvasHeight = (containerRef.current.clientWidth * scale) / (window.innerWidth / window.innerHeight);
-            renderer.setSize(newCanvasWidth, newCanvasHeight);
-  
-            camera.aspect = newCanvasWidth / newCanvasHeight;
-            camera.updateProjectionMatrix();
+      window.addEventListener('resize', () => {
+        if (containerRef.current) {
+          if (window.innerWidth >= 1650) {
+            canvasWidth = containerRef.current.clientWidth * 1.3;
+            canvasHeight = (containerRef.current.clientWidth * 1.3) / (window.innerWidth / window.innerHeight);
+          } else if (window.innerWidth >= 1200) {
+            canvasWidth = containerRef.current.clientWidth * 1.15;
+            canvasHeight = (containerRef.current.clientWidth * 1.15) / (window.innerWidth / window.innerHeight);
+          } else if (window.innerWidth >= 768) {
+            canvasWidth = containerRef.current.clientWidth * 0.9;
+            canvasHeight = (containerRef.current.clientWidth * 0.9) / (window.innerWidth / window.innerHeight);
+          } else if (window.innerWidth >= 450) {
+            canvasWidth = containerRef.current.clientWidth * 0.55;
+            canvasHeight = (containerRef.current.clientWidth * 0.55) / (window.innerWidth / window.innerHeight);
+          } else { // Below 450
+            canvasWidth = 350; // Set a constant width
+            canvasHeight = 350; // Set a constant height
           }
-        });
-      }
-    }, [scriptLoaded]);
+
+          renderer.setSize(canvasWidth, canvasHeight);
+          camera.aspect = canvasWidth / canvasHeight;
+          camera.updateProjectionMatrix();
+        }
+      });
+    }
+  }, [scriptLoaded]);
 
   return (
     <div className="w-full flex items-center justify-center" ref={containerRef}>
