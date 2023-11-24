@@ -5,7 +5,6 @@ import { Heading } from '@/components/Heading';
 import { QuestionMarkIcon } from '@/components/icons/QuestionMarkIcon';
 import { UpdateIcon } from '@/components/icons/UpdateIcon';
 import { CrosschainIcon } from '@/components/icons/CrosschainIcon';
-import { EnvelopeIcon } from '@/components/icons/EnvelopeIcon';
 import { NewUpdateRequestModal } from '@/components/NewUpdateRequestModal';
 import { NewDataRequestModal } from '@/components/NewDataRequestModal';
 import { NewCrossChainSyncModal } from '@/components/NewCrossChainSyncModal';
@@ -120,6 +119,7 @@ function ServiceCard({ service, onCardClick, openModal, isSelected }) {
       <div className="relative rounded-2xl px-4 pt-16 pb-4">
         <ServiceIcon icon={service.icon} />
         <h3 className={`mt-4 text-sm font-semibold leading-7 text-${isSelected ? 'white' : 'zinc-900'} dark:text-white`}>
+          <span className="absolute inset-0 rounded-2xl" />
           {service.name}
         </h3>
         <p className={`mt-1 text-sm text-${isSelected ? 'white' : 'zinc-600'} dark:text-zinc-400`}>

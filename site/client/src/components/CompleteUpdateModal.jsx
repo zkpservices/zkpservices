@@ -71,7 +71,7 @@ export function CompleteUpdateModal({ is2FARequired = false }) {
                       className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
                       rows={1}
                       readOnly
-                      spellcheck="false"
+                      spellCheck="false"
                     />
                   </div>
 
@@ -84,7 +84,7 @@ export function CompleteUpdateModal({ is2FARequired = false }) {
                       className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
                       rows={1}
                       readOnly
-                      spellcheck="false"
+                      spellCheck="false"
                     />
                   </div>
 
@@ -97,7 +97,7 @@ export function CompleteUpdateModal({ is2FARequired = false }) {
                       className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
                       rows={8}
                       readOnly
-                      spellcheck="false"
+                      spellCheck="false"
                     />
                   </div>
 
@@ -112,7 +112,7 @@ export function CompleteUpdateModal({ is2FARequired = false }) {
                       className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
                       rows={1}
                       readOnly
-                      spellcheck="false"
+                      spellCheck="false"
                     />
                   </div>
 
@@ -125,7 +125,7 @@ export function CompleteUpdateModal({ is2FARequired = false }) {
                       className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
                       rows={1}
                       readOnly
-                      spellcheck="false"
+                      spellCheck="false"
                     />
                   </div>
 
@@ -138,7 +138,7 @@ export function CompleteUpdateModal({ is2FARequired = false }) {
                       className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
                       rows={1}
                       readOnly
-                      spellcheck="false"
+                      spellCheck="false"
                     />
                   </div>
 
@@ -166,7 +166,7 @@ export function CompleteUpdateModal({ is2FARequired = false }) {
                           className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
                           rows={1}
                           readOnly
-                          spellcheck="false"
+                          spellCheck="false"
                         />
                       </div>
 
@@ -179,7 +179,7 @@ export function CompleteUpdateModal({ is2FARequired = false }) {
                           className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
                           rows={1}
                           readOnly
-                          spellcheck="false"
+                          spellCheck="false"
                         />
                       </div>
 
@@ -192,7 +192,7 @@ export function CompleteUpdateModal({ is2FARequired = false }) {
                           className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
                           rows={1}
                           readOnly
-                          spellcheck="false"
+                          spellCheck="false"
                         />
                       </div>
 
@@ -235,7 +235,7 @@ export function CompleteUpdateModal({ is2FARequired = false }) {
                       className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
                       rows={1}
                       readOnly
-                      spellcheck="false"
+                      spellCheck="false"
                     />
                   </div>
 

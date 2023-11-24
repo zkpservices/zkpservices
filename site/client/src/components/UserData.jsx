@@ -2,11 +2,12 @@ import { useState } from 'react';
 import { GridPattern } from '@/components/GridPattern';
 import { motion, useMotionTemplate, useMotionValue } from 'framer-motion';
 import { Heading } from '@/components/Heading';
-import { HollowCard } from '@/components/HollowCard';
 import { DataIcon } from '@/components/icons/DataIcon';
+import { PlusIcon } from '@/components/icons/PlusIcon';
 import { ViewFieldModal } from './ViewFieldModal';
+import { NewDashboardDataModal } from './NewDashboardDataModal'; // Import your NewDashboardDataModal component
 
-const fieldDescriptions = 'Click to display data for this field';
+const fieldDescriptions = 'Click to display data for this field.';
 const fieldIcon = DataIcon; // Assuming DataIcon is the desired icon
 const fieldPatterns = [
   {
@@ -45,12 +46,12 @@ function MyDataIcon({ icon: Icon }) {
 }
 
 function MyDataPattern({ mouseX, mouseY, ...gridProps }) {
-  let maskImage = useMotionTemplate`radial-gradient(180px at ${mouseX}px ${mouseY}px, white, transparent)`;
-  let style = { maskImage, WebkitMaskImage: maskImage };
+  let maskImage = useMotionTemplate`radial-gradient(180px at ${mouseX}px ${mouseY}px, white, transparent)`
+  let style = { maskImage, WebkitMaskImage: maskImage }
 
   return (
     <div className="pointer-events-none">
-      <div className="absolute inset-0 rounded-2xl transition duration-300 mask-image:linear-gradient(white,transparent) group-hover:opacity-50">
+      <div className="absolute inset-0 rounded-2xl transition duration-300 [mask-image:linear-gradient(white,transparent)] group-hover:opacity-50">
         <GridPattern
           width={72}
           height={56}
@@ -69,14 +70,14 @@ function MyDataPattern({ mouseX, mouseY, ...gridProps }) {
       >
         <GridPattern
           width={72}
-          height= {56}
+          height={56}
           x="50%"
           className="absolute inset-x-0 inset-y-[-30%] h-[160%] w-full skew-y-[-18deg] fill-black/50 stroke-black/70 dark:fill-white/2.5 dark:stroke-white/10"
           {...gridProps}
         />
       </motion.div>
     </div>
-  );
+  )
 }
 
 export function MyData({ mydata, onCardClick }) {
@@ -94,7 +95,7 @@ export function MyData({ mydata, onCardClick }) {
       key={mydata.name}
       onMouseMove={onMouseMove}
       onClick={() => onCardClick(mydata.name)}
-      className="group relative flex rounded-2xl bg-zinc-50 transition-shadow hover:shadow-md hover:shadow-zinc-900/5 dark:bg-white/2.5 dark:hover:shadow-black/5"
+      className="group relative flex rounded-2xl bg-zinc-50 transition-shadow hover:shadow-md hover:shadow-zinc-900/5 dark:bg-white/2.5 dark:hover:shadow-black/5 h-60"
     >
       <MyDataPattern {...mydata.pattern} mouseX={mouseX} mouseY={mouseY} />
       <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-zinc-900/7.5 group-hover:ring-zinc-900/10 dark:ring-white/10 dark:group-hover:ring-white/20" />
@@ -114,13 +115,23 @@ export function MyData({ mydata, onCardClick }) {
 
 export function UserData({ fieldNames = [] }) {
   const [selectedFieldName, setSelectedFieldName] = useState(null);
+  const [addDataModalOpen, setAddDataModalOpen] = useState(false);
 
-  const openModal = (fieldName) => {
+  const openFieldModal = (fieldName) => {
     setSelectedFieldName(fieldName);
   };
-
-  const closeModal = () => {
+  
+  const closeFieldModal = () => {
     setSelectedFieldName(null);
+  };
+
+  const openAddDataModal = () => {
+    setAddDataModalOpen(true);
+  };
+  
+
+  const closeAddDataModal = () => {
+    setAddDataModalOpen(false);
   };
 
   return (
@@ -138,18 +149,39 @@ export function UserData({ fieldNames = [] }) {
               icon: fieldIcon,
               pattern: fieldPatterns[index % fieldPatterns.length],
             }}
-            onCardClick={openModal}
+            onCardClick={openFieldModal}
           />
         ))}
-        <HollowCard />
+        <MyData
+          key="Add Data"
+          mydata={{
+            name: "Add Data",
+            description: "Enter a field to add to your dashboard for easy access.",
+            icon: PlusIcon,
+            pattern: {
+              y: 16,
+              squares: [
+                [0, 1],
+                [1, 3],
+              ],
+            },
+          }}
+          onCardClick={openAddDataModal}
+        />
       </div>
       {selectedFieldName && (
         <ViewFieldModal
-          title={selectedFieldName} // Pass the selected field name as the title
+          title={selectedFieldName}
           open={selectedFieldName !== null}
-          onClose={closeModal}
+          onClose={closeFieldModal}
         />
       )}
-    </div>
-  );
+      {addDataModalOpen && (
+        <NewDashboardDataModal
+          open={addDataModalOpen}
+          onClose={closeAddDataModal}
+        />
+      )}
+  </div>
+);
 }
