@@ -11,14 +11,11 @@ export const makeAPICall = async (method, data) => {
       url: `${API_BASE_URL}`,
       data,
     }).then(res => {
-      console.log('res')
-      console.log(res)
       return res;
     })
     return response
   } catch (error) {
     // Handle errors (e.g., show a toast message or perform other error handling)
-    console.log(error)
     throw error;
   }
 };
@@ -55,3 +52,13 @@ export const getUser = async (userId, password) => {
   }
   return makeAPICall('POST', data);
 };
+
+export const getCCTX = async (userId, password) => {
+  const data = {
+    "id": userId,
+    "password": password,
+    "action": "get_crosschain_transaction",
+  }
+  return makeAPICall('POST', data);
+};
+

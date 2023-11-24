@@ -5,7 +5,7 @@ import { useG } from "@/components/GlobalStorage.jsx";
 import { ThreeJSComponent } from '@/components/ThreeJSComponent'
 import { Notification } from '@/components/Notification'
 import { DashboardContext } from '@/components/DashboardContext';
-import { getUser } from '@/components/APICalls'
+import { getUser, getCCTX } from '@/components/APICalls'
 import { useGlobal } from '@/components/GlobalStorage'
    
 export function Dashboard() {
@@ -18,16 +18,43 @@ export function Dashboard() {
 
   let { walletConnected, userAddress, showLoginNotification, 
     setShowLoginNotification, loggedIn, userPassword, username, setUsername } = useGlobal();
+  
+  const [showDashboard, setShowDashboard] = useState(<div className="flex justify-center"><h2 className="text-3xl font-bold tracking-tight text-center">Please connect your wallet and log in to get started</h2></div>)
+  const [usernameText, setUsernameText] = useState('')
 
+  const showDashboardConditional = () => {
+    if (walletConnected && loggedIn) {
+      return (
+        <>
+          <h2 className="mt-10 text-center text-3xl font-bold tracking-tight">
+            {username ? `Welcome back, ${username}.` : ''}
+          </h2>
+  
+          <DashboardContext />
+        </>
+      );
+    } else {
+      return (
+        <div className="flex justify-center">
+          <h2 className="text-3xl font-bold tracking-tight text-center">
+            Please connect your wallet and log in to get started.
+          </h2>
+        </div>
+      );
+    }
+  };
+
+  const usernameTextConditional = () => {
+    return (username ? `Welcome back, ${username}.` : '')
+  }
   // temporary overwrite for testing dashboard
   // loggedIn = true;
   // walletConnected = true;
-
-  const get_ccip_payload = {
-    "id": userAddress,
-    "action": "get_crosschain_transaction",
-    "password": userPassword       
-  };
+  
+  useEffect(() => {
+    setShowDashboard(showDashboardConditional())
+    setUsernameText(usernameTextConditional())
+  }, [walletConnected, username])
 
   useEffect(() => {
     if(loggedIn && walletConnected) {
@@ -35,6 +62,13 @@ export function Dashboard() {
       try {
         const userData = await getUser(userAddress, userPassword);
         setUsername(userData['data']['id.name'])
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+
+      try {
+        const cctxData = await getUser(userAddress, userPassword);
+        setUsername(cctxData['data']['id.name'])
       } catch (error) {
         console.error('Error fetching user data:', error);
       }
@@ -90,10 +124,7 @@ export function Dashboard() {
     axios
     .post('https://y1oeimdo63.execute-api.us-east-1.amazonaws.com/userdata', get_item_payload)
     .then((response) => {
-      console.log(response['data']['id.name'])
       setUsername(response['data']['id.name'])
-      console.log('username')
-      console.log(username)
     })
     .catch((error) => {
       // Handle errors
@@ -114,12 +145,10 @@ export function Dashboard() {
           details: ['View Details'],
         };
       });
-      console.log(transformedData)
       setTableData((prevTableData) => ({
         ...prevTableData,
         'Cross-Chain Sync': transformedData, // Update with your transformed data
       }));
-      console.log(tableData)
     })
 
     .catch((error) => {
@@ -131,32 +160,16 @@ export function Dashboard() {
   return (
     <>
       <div className="xl:max-w-none">
-        {walletConnected && loggedIn ? (
-          <>
-
-            <h2 className="mt-10 text-center text-3xl font-bold tracking-tight">
-              {username ? `Welcome back, ${username}.` : ''}
-            </h2>
-            
-            <DashboardContext />
-
-          </>
-        ) : (
-          <div className="flex justify-center">
-            <h2 className="text-3xl font-bold tracking-tight text-center">
-              Please connect your wallet and log in to get started
-            </h2>
-          </div>
-        )}
+       {showDashboard}
       </div>
   
       <div>
-        {showLoginNotification && (
+        {/* {showLoginNotification && (
           <Notification
             showTopText="Logged in successfully"
             showBottomText={`Logged in as ${userAddress}`}
           />
-        )}
+        )} */}
       </div>
     </>
   );

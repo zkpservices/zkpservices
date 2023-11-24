@@ -31,7 +31,7 @@ export function DashboardContext() {
       {/* <ViewFieldModal title="medical records"/>  */}
       {/* <NewDashboardDataModal /> */}
       {/* <NewUpdateRequestModal /> */}
-      <NewDataRequestModal />
+      {/* <NewDataRequestModal /> */}
       <UserData /> {/* to be fed a prop such as userdata eventually */}
       <Services useLink={false} />
       <History tableData={tableData} showRefresh={true} />
