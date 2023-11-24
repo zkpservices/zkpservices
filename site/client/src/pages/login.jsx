@@ -4,22 +4,8 @@ import { useGlobal } from "@/components/GlobalStorage.jsx";
 import { login } from '@/components/APICalls.jsx';
 import axios, { formToJSON } from 'axios';
 import Router from 'next/router';
-/*
-  This example requires some changes to your config:
-  
-  ```
-  // tailwind.config.js
-  module.exports = {
-    // ...
-    plugins: [
-      // ...
-      require('@tailwindcss/forms'),
-    ],
-  }
-  ```
-*/
 
-export default function Example() {
+export default function Login() {
   const { walletConnected, loggedIn, userAddress, setLoggedIn, userPassword, setUserPassword, showLoginNotification, setShowLoginNotification } = useGlobal();
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -59,41 +45,31 @@ export default function Example() {
     }
   };
   return (
-    <>
-      {/*
-        This example requires updating your template:
-
-        ```
-        <html class="h-full bg-gray-50">
-        <body class="h-full">
-        ```
-      */}
+    <div className="max-w-none">
       <div className="flex min-h-full items-center justify-center pt-6 pb-32 sm:px-6 lg:px-8">
         <div className="w-full max-w-md space-y-8">
           <div>
             <Logo className="mx-20" />
             {walletConnected ? (
-            <>
-            <h2 className="mt-10 text-center text-3xl font-bold tracking-tight ">
-              Sign in to your account
-            </h2>
-            <p className="mt-2 text-center text-sm">
-              Or{' '}
-              <a href="/quickstart" className="font-medium text-emerald-400 hover:text-emerald-600">
-                set up your account 
-              </a>
-            </p>
-            </>
+              <>
+                <h2 className="mt-10 text-center text-3xl font-bold tracking-tight">
+                  Sign in to your account
+                </h2>
+                <p className="mt-2 text-center text-sm">
+                  Or{' '}
+                  <a href="/quickstart" className="font-medium text-emerald-400 hover:text-emerald-600">
+                    set up your account
+                  </a>
+                </p>
+              </>
             ) : (
               <h2 className="mt-10 text-center text-3xl font-bold tracking-tight">
                 Please connect your wallet to get started.
               </h2>
             )}
           </div>
-          {walletConnected ? (
-          <>
-          <form className="mt-8 space-y-6" action="#" method="POST" onSubmit={handleSubmit}>
-
+          {walletConnected && (
+            <form className="mt-8 space-y-6" action="#" method="POST" onSubmit={handleSubmit}>
               <div>
                 <label htmlFor="provider" className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200">
                   Data Provider:
@@ -110,7 +86,6 @@ export default function Example() {
                   />
                 </div>
               </div>
-
               <div>
                 <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200">
                   Password:
@@ -126,44 +101,38 @@ export default function Example() {
                   />
                 </div>
               </div>
-
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <input
-                  id="remember-me"
-                  name="remember-me"
-                  type="checkbox"
-                  className="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
-                />
-                <label htmlFor="remember-me" className="ml-2 block text-sm ">
-                  Remember me
-                </label>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <input
+                    id="remember-me"
+                    name="remember-me"
+                    type="checkbox"
+                    className="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                  />
+                  <label htmlFor="remember-me" className="ml-2 block text-sm ">
+                    Remember me
+                  </label>
+                </div>
+                <div className="text-sm">
+                  <a href="#" className="font-medium text-emerald-400 hover:text-emerald-600">
+                    Forgot your password?
+                  </a>
+                </div>
               </div>
-
-              <div className="text-sm">
-                <a href="#" className="font-medium text-emerald-400 hover:text-emerald-600">
-                  Forgot your password?
-                </a>
+              <div>
+                <button
+                  type="submit"
+                  className="relative flex w-full justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                >
+                  <span className="absolute inset-y-0 left-0 flex items-center pl-3">
+                  </span>
+                  Sign in
+                </button>
               </div>
-            </div>
-
-            <div>
-              <button
-                type="submit"
-                className="relative flex w-full justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
-              >
-                <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-                </span>
-                Sign in
-              </button>
-            </div>
-          </form>
-          </>
-          ) : (
-            <></>
+            </form>
           )}
         </div>
       </div>
-    </>
-  )
-}
+    </div>
+  );
+};  
