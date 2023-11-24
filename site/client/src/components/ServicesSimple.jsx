@@ -1,15 +1,26 @@
-import { useState } from 'react';
 import { GridPattern } from '@/components/GridPattern';
 import { motion, useMotionTemplate, useMotionValue } from 'framer-motion';
 import { Heading } from '@/components/Heading';
 import { QuestionMarkIcon } from '@/components/icons/QuestionMarkIcon';
 import { UpdateIcon } from '@/components/icons/UpdateIcon';
 import { CrosschainIcon } from '@/components/icons/CrosschainIcon';
-import { NewUpdateRequestModal } from '@/components/NewUpdateRequestModal';
-import { NewDataRequestModal } from '@/components/NewDataRequestModal';
-import { NewCrossChainSyncModal } from '@/components/NewCrossChainSyncModal';
+import { DataIcon } from '@/components/icons/DataIcon'
 
 const services = [
+  {
+    href: '/dashboard',
+    name: 'Manage Your Data Securely',
+    description:
+      'Learn about the contact model and how to create, retrieve, update, delete, and list contacts.',
+    icon: DataIcon,
+    pattern: {
+      y: 16,
+      squares: [
+        [0, 1],
+        [1, 3],
+      ],
+    },
+  },
   {
     href: '/dashboard',
     name: 'Request Data',
@@ -17,9 +28,9 @@ const services = [
       'Learn about the contact model and how to create, retrieve, update, delete, and list contacts.',
     icon: QuestionMarkIcon,
     pattern: {
-      y: 16,
+      y: -6,
       squares: [
-        [0, 1],
+        [-1, 2],
         [1, 3],
       ],
     },
@@ -31,10 +42,10 @@ const services = [
       'Learn about the conversation model and how to create, retrieve, update, delete, and list conversations.',
     icon: UpdateIcon,
     pattern: {
-      y: -6,
+      y: 32,
       squares: [
-        [-1, 2],
-        [1, 3],
+        [0, 2],
+        [1, 4],
       ],
     },
   },
@@ -45,11 +56,8 @@ const services = [
       'Learn about the group model and how to create, retrieve, update, delete, and list groups.',
     icon: CrosschainIcon,
     pattern: {
-      y: 32,
-      squares: [
-        [0, 2],
-        [1, 4],
-      ],
+      y: 22,
+      squares: [[0, 1]],
     },
   },
 ];
@@ -111,10 +119,6 @@ function ServiceCard({ service, onCardClick, openModal, isSelected }) {
     <div
       key={service.name}
       onMouseMove={onMouseMove}
-      onClick={() => {
-        onCardClick(service.name);
-        openModal(service.name); // Pass the service name to openModal
-      }}
       className={`group relative flex rounded-2xl bg-zinc-50 transition-shadow hover:shadow-md hover:shadow-zinc-900/5 dark:bg-white/2.5 dark:hover:shadow-black/5 ${isSelected ? 'bg-zinc-900' : ''}`}
     >
       <ServicePattern {...service.pattern} mouseX={mouseX} mouseY={mouseY} />
@@ -133,12 +137,7 @@ function ServiceCard({ service, onCardClick, openModal, isSelected }) {
   );
 }
 
-export function Services() {
-  const [selectedService, setSelectedService] = useState(null);
-
-  const openModal = (serviceName) => {
-    setSelectedService(serviceName);
-  };
+export function ServicesSimple(){
 
   return (
     <div className="xl:max-w-none mt-16">
@@ -151,16 +150,10 @@ export function Services() {
             <ServiceCard
               key={service.name}
               service={service}
-              onCardClick={openModal}
-              openModal={openModal} // Just pass openModal function
-              isSelected={selectedService === service.name}
             />
           ))}
         </div>
       </div>
-      {selectedService === 'Request Data' && <NewDataRequestModal open={true} onClose={() => setSelectedService(null)} />}
-      {selectedService === 'Request Update' && <NewUpdateRequestModal open={true} onClose={() => setSelectedService(null)} />}
-      {selectedService === 'Cross-Chain Backups' && <NewCrossChainSyncModal open={true} onClose={() => setSelectedService(null)} />}
     </div>
   );
 }
