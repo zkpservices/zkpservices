@@ -89,7 +89,7 @@ export const Header = forwardRef(function Header({ className }, ref) {
     const handleChainChanged = (_chainId) => {
       // Handle the new chain.
       // You can also force a page reload if needed
-      // window.location.reload();
+      window.location.reload();
     };
   
     window.ethereum.on('chainChanged', handleChainChanged);

@@ -93,54 +93,21 @@ export function GlobalProvider({ children }) {
     return null;
   });
 
-  const [fujiCoreContract, setFujiCoreContract] = useState(() => {
+  const [coreContract, setCoreContract] = useState(() => {
     if (typeof window !== 'undefined') {
-      const localContract = localStorage.getItem('fujiCoreContract');
+      const localContract = localStorage.getItem('coreContract');
       return localContract || null;
     }
     return null;
   });
-
-  const [fujiTwoFAContract, setFujiTwoFAContract] = useState(() => {
+  
+  const [twoFAContract, setTwoFAContract] = useState(() => {
     if (typeof window !== 'undefined') {
-      const localContract = localStorage.getItem('fujiTwoFAContract');
+      const localContract = localStorage.getItem('twoFAContract');
       return localContract || null;
     }
     return null;
   });
-
-  const [mumbaiCoreContract, setMumbaiCoreContract] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const localContract = localStorage.getItem('mumbaiCoreContract');
-      return localContract || null;
-    }
-    return null;
-  });
-
-  const [mumbaiTwoFAContract, setMumbaiTwoFAContract] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const localContract = localStorage.getItem('mumbaiTwoFAContract');
-      return localContract || null;
-    }
-    return null;
-  });
-
-  const [rippleCoreContract, setRippleCoreContract] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const localContract = localStorage.getItem('rippleCoreContract');
-      return localContract || null;
-    }
-    return null;
-  });
-
-  const [rippleTwoFAContract, setRippleTwoFAContract] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const localContract = localStorage.getItem('rippleTwoFAContract');
-      return localContract || null;
-    }
-    return null;
-  });
-
 
   useEffect(() => {
     // Update localStorage when any relevant state variable changes
@@ -157,12 +124,8 @@ export function GlobalProvider({ children }) {
     localStorage.setItem('dashboard', dashboard);
     localStorage.setItem('availableDashboard', dashboard);
     localStorage.setItem('web3', dashboard);
-    localStorage.setItem('fujiCoreContract', dashboard);
-    localStorage.setItem('fujiTwoFAContract', dashboard);
-    localStorage.setItem('mumbaiCoreContract', dashboard);
-    localStorage.setItem('mumbaiTwoFAContract', dashboard);
-    localStorage.setItem('rippleCoreContract', dashboard);
-    localStorage.setItem('rippleTwoFAContract', dashboard);
+    localStorage.setItem('coreContract', dashboard);
+    localStorage.setItem('twoFAContract', dashboard);
   }, [
     userAddress,
     walletConnected,
@@ -177,12 +140,8 @@ export function GlobalProvider({ children }) {
     dashboard,
     availableDashboard,
     web3,
-    fujiCoreContract,
-    fujiTwoFAContract,
-    mumbaiCoreContract,
-    mumbaiTwoFAContract,
-    rippleCoreContract,
-    rippleTwoFAContract
+    coreContract,
+    twoFAContract
   ]);
 
   return (
@@ -191,9 +150,7 @@ export function GlobalProvider({ children }) {
       setUserPassword, username, setUsername, twoFactorAuthPassword, setTwoFactorAuthPassword, 
       contractPassword, setContractPassword, chainId, setChainId, fieldData, setFieldData, 
       dashboard, setDashboard, availableDashboard, setAvailableDashboard, web3, setWeb3,
-      fujiCoreContract, setFujiCoreContract, fujiTwoFAContract, setFujiTwoFAContract,
-      mumbaiCoreContract, setMumbaiCoreContract, mumbaiTwoFAContract, setMumbaiTwoFAContract,
-      rippleCoreContract, setRippleCoreContract, rippleTwoFAContract, setRippleTwoFAContract}}>
+      coreContract, setCoreContract, twoFAContract, setTwoFAContract}}>
       {children}
     </GlobalContext.Provider>
   );
