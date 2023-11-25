@@ -22,6 +22,9 @@ export function ZKPFaucetModal({open, onClose}) {
   async function handleRequestTokens() {
     try {
       if (coreContract) {
+        const currentBalance = await coreContract.methods.balanceOf(userAddress).call();
+        const balanceToAdd = 200; 
+
         const data = coreContract.methods.requestVaultTokens().encodeABI();
 
         const txObject = {
@@ -35,25 +38,24 @@ export function ZKPFaucetModal({open, onClose}) {
 
         console.log('Transaction Receipt:', receipt);
 
-        // Poll for the transaction receipt until it's available
-        const checkReceipt = async (txHash) => {
+        const waitForConfirmation = async (txHash) => {
           while (true) {
             const transactionReceipt = await web3.eth.getTransactionReceipt(txHash);
-            if (transactionReceipt) {
-              // Transaction is confirmed, you can fetch the new balance here
-              const updatedBalance = await coreContract.methods.balanceOf(userAddress).call();
-              const newBalance = Number(updatedBalance) / 10 ** 18;
-              console.log(newBalance);
+
+            if (transactionReceipt && transactionReceipt.status) {
+              const newBalance = (Number(currentBalance) / 10 ** 18) + balanceToAdd;
               setBalance(newBalance);
+              break;
+            } else if (transactionReceipt && !transactionReceipt.status) {
+              console.error('Transaction failed');
               break;
             }
 
-            // Sleep for a while
-            await new Promise(resolve => setTimeout(resolve, 2000)); 
+            await new Promise(resolve => setTimeout(resolve, 2000));
           }
         };
 
-        checkReceipt(receipt.transactionHash);
+        waitForConfirmation(receipt.transactionHash);
       }
     } catch (error) {
       console.error('Error requesting Vault Tokens:', error);
