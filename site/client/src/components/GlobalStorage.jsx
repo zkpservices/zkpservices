@@ -87,12 +87,12 @@ export function GlobalProvider({ children }) {
   });
   const [web3, setWeb3] = useState(() => {
     if (typeof window !== 'undefined') {
-      // Retrieve Web3 instance from localStorage, if available
       const localWeb3 = localStorage.getItem('web3');
       return localWeb3 || null;
     }
     return null;
   });
+
   const [coreContract, setCoreContract] = useState(() => {
     if (typeof window !== 'undefined') {
       const localContract = localStorage.getItem('coreContract');
@@ -103,7 +103,6 @@ export function GlobalProvider({ children }) {
   
   const [twoFAContract, setTwoFAContract] = useState(() => {
     if (typeof window !== 'undefined') {
-      // Retrieve contract instance from localStorage, if available
       const localContract = localStorage.getItem('twoFAContract');
       return localContract || null;
     }

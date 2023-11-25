@@ -1,3 +1,4 @@
+import Web3 from 'web3';
 import { useEffect, useRef, useState, useContext } from 'react';
 import { UserData }  from '@/components/UserData';
 import { Services }  from '@/components/Services';
@@ -19,9 +20,31 @@ import { ReceivedDataResponseModal } from '@/components/ReceivedDataResponseModa
 import { AwaitingUpdateCompletionModal} from '@/components/AwaitingUpdateCompletionModal'
 import { AwaitingDataModal } from '@/components/AwaitingDataModal'
 import { SendDataModal } from '@/components/SendDataModal'
-
+import coreContractABI from '../contract_ABIs/ZKPServicesCore.json'; // Adjust the file path as needed
+import twoFAContractABI from '../contract_ABIs/ZKPServicesVRF2FA.json'; // Adjust the file path as needed
 
 export function DashboardContext() {
+  let { walletConnected, userAddress, showLoginNotification, setShowLoginNotification, loggedIn, 
+    userPassword, username, setUsername, dashboard, setdashboard, setWeb3, setCoreContract, 
+    setTwoFAContract} = useGlobal();
+
+  function initializeWeb3(){
+    //these are too large for local storage and need to be reinstantiated each time
+    const web3Instance = new Web3(window.ethereum);
+    setWeb3(web3Instance);
+
+    const coreContractAbi = coreContractABI; 
+    const coreContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'; 
+
+    const coreContractInstance = new web3Instance.eth.Contract(coreContractAbi, coreContractAddress);
+    setCoreContract(coreContractInstance);
+
+    const twoFAContractAbi = twoFAContractABI;
+    const twoFAContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'; 
+
+    const twoFAContractInstance = new web3Instance.eth.Contract(twoFAContractAbi, twoFAContractAddress);
+    setTwoFAContract(twoFAContractInstance);
+  }
 
   const [tableData, setTableData] = useState({
     'Incoming': [],
@@ -30,8 +53,6 @@ export function DashboardContext() {
   });
   const [userDataFields, setUserDataFields] = useState([])
 
-  let { walletConnected, userAddress, showLoginNotification, 
-    setShowLoginNotification, loggedIn, userPassword, username, setUsername, dashboard, setdashboard } = useGlobal();
 
   function formatIncomingData(incomingRequests, incomingResponses, outgoingResponses) {
     const formattedRequests = incomingRequests.map((item) => {
@@ -173,6 +194,7 @@ export function DashboardContext() {
   useEffect(() => {
     loadAllHistory()
     fetchUserDataFields()
+    initializeWeb3()
   }, [dashboard]);
     
     
