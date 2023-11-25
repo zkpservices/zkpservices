@@ -1,6 +1,34 @@
 import { Fragment, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
+import { generateRandomAsciiString24 } from '@/components/HelperCalls';
+
+const handleGenerateRandomKey = () => {
+  try {
+    const key = generateRandomAsciiString24();
+    document.getElementById('oneTimeKey').value = key;
+  } catch (error) {
+    console.error('Error generating random key:', error);
+  }
+};
+
+const handleGenerateRandomSalt = () => {
+  try {
+    const salt = generateRandomAsciiString24();
+    document.getElementById('oneTimeSalt').value = salt;
+  } catch (error) {
+    console.error('Error generating random salt:', error);
+  }
+};
+
+const handleGenerateRandomID = () => {
+  try {
+    const id = generateRandomAsciiString24();
+    document.getElementById('twoFARequestID').value = id;
+  } catch (error) {
+    console.error('Error generating random ID:', error);
+  }
+};
 
 export function NewUpdateRequestModal({
   open,
@@ -17,12 +45,6 @@ export function NewUpdateRequestModal({
 }) {
 
   const [isTwoFAEnabled, setIsTwoFAEnabled] = useState(false); 
-
-  const generateRandomID = () => {
-    // Generate random ID logic here
-    const randomID = "12345"; // Replace with actual random ID generation
-    setTwoFARequestID(randomID);
-  };
 
   return (
     <Transition.Root show={open} as={Fragment}>
@@ -125,9 +147,7 @@ export function NewUpdateRequestModal({
                     />
                     <button
                       className="mt-2 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
-                      onClick={() => {
-                        // Generate random key logic here
-                      }}
+                      onClick={handleGenerateRandomKey}
                     >
                       Generate Random Key
                     </button>
@@ -146,9 +166,7 @@ export function NewUpdateRequestModal({
                     />
                     <button
                       className="mt-2 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
-                      onClick={() => {
-                        // Generate random key logic here
-                      }}
+                      onClick={handleGenerateRandomSalt}
                     >
                       Generate Random Salt
                     </button>
@@ -210,9 +228,7 @@ export function NewUpdateRequestModal({
                         />
                         <button
                           className="mt-2 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
-                          onClick={() => {
-                            // Generate random key logic here
-                          }}
+                          onClick={handleGenerateRandomID}
                         >
                           Generate Random ID
                         </button>
