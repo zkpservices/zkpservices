@@ -1,19 +1,21 @@
-import { forwardRef, useState, useEffect } from 'react'
 import Link from 'next/link'
+import Web3 from 'web3'; // Import the web3 library
 import clsx from 'clsx'
+import coreContractABI from '../contract_ABIs/ZKPServicesCore.json'; // Adjust the file path as needed
+import twoFAContractABI from '../contract_ABIs/ZKPServicesVRF2FA.json'; // Adjust the file path as needed
+import { forwardRef, useState, useEffect } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { MetaMaskSDK } from '@metamask/sdk';
 import { useGlobal } from './GlobalStorage';
-
 import { Button } from '@/components/Button'
 import { Logo } from '@/components/Logo'
+import { useMobileNavigationStore } from '@/components/MobileNavigation'
+import { ModeToggle } from '@/components/ModeToggle'
+import { MobileSearch, Search } from '@/components/Search'
 import {
   MobileNavigation,
   useIsInsideMobileNavigation,
 } from '@/components/MobileNavigation'
-import { useMobileNavigationStore } from '@/components/MobileNavigation'
-import { ModeToggle } from '@/components/ModeToggle'
-import { MobileSearch, Search } from '@/components/Search'
 
 function TopLevelNavItem({ href, children }) {
   return (
@@ -28,17 +30,6 @@ function TopLevelNavItem({ href, children }) {
   )
 }
 
-// const options = {
-//   injectProvider: false,
-//   dAppMetadata: {name: "zkp.services", url: "https://zkp.services"},
-//   communicationLayerPreference: 'webrtc',
-// };
-
-// const MMSDK = new MetaMaskSDK(options);
-
-// const ethereum = MMSDK.getProvider();
-
-
 export const Header = forwardRef(function Header({ className }, ref) {
   let { isOpen: mobileNavIsOpen } = useMobileNavigationStore()
   let isInsideMobileNavigation = useIsInsideMobileNavigation()
@@ -47,7 +38,9 @@ export const Header = forwardRef(function Header({ className }, ref) {
   let bgOpacityLight = useTransform(scrollY, [0, 72], [0.5, 0.5])
   let bgOpacityDark = useTransform(scrollY, [0, 72], [0.2, 0.2])
   const [accountText, setAccountText] = useState('');
-  const {walletConnected, setWalletConnected, userAddress, setUserAddress, loggedIn, setLoggedIn, chainId, setChainId} = useGlobal();
+  const {walletConnected, setWalletConnected, userAddress, setUserAddress, 
+        loggedIn, setLoggedIn, chainId, setChainId, web3, setWeb3, 
+        coreContract, setCoreContract, twoFAContract, setTwoFAContract} = useGlobal();
   const [isHovered, setIsHovered] = useState(false);
   const [textOpacity, setTextOpacity] = useState(1); // Initialize opacity to 1
   const [loginButtonText, setLoginButtonText] = useState('Login');
@@ -85,6 +78,21 @@ export const Header = forwardRef(function Header({ className }, ref) {
       setChainId(metamask_chain_id)
       console.log(metamask_chain_id)
       setUserAddress(accounts[0]);
+
+      const web3Instance = new Web3(window.ethereum);
+      setWeb3(web3Instance);
+
+      const coreContractAbi = coreContractABI; 
+      const coreContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'; 
+
+      const coreContractInstance = new web3Instance.eth.Contract(coreContractAbi, coreContractAddress);
+      setCoreContract(coreContractInstance);
+
+      const twoFAContractAbi = twoFAContractABI;
+      const twoFAContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'; 
+
+      const twoFAContractInstance = new web3Instance.eth.Contract(twoFAContractAbi, twoFAContractAddress);
+      setTwoFAContract(twoFAContractInstance);
     } catch (error) {
       // User denied access or there was an error
       console.error(error);

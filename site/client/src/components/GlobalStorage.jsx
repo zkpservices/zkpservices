@@ -85,6 +85,31 @@ export function GlobalProvider({ children }) {
     }
     return '';
   });
+  const [web3, setWeb3] = useState(() => {
+    if (typeof window !== 'undefined') {
+      // Retrieve Web3 instance from localStorage, if available
+      const localWeb3 = localStorage.getItem('web3');
+      return localWeb3 || null;
+    }
+    return null;
+  });
+  const [coreContract, setCoreContract] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const localContract = localStorage.getItem('coreContract');
+      return localContract || null;
+    }
+    return null;
+  });
+  
+  const [twoFAContract, setTwoFAContract] = useState(() => {
+    if (typeof window !== 'undefined') {
+      // Retrieve contract instance from localStorage, if available
+      const localContract = localStorage.getItem('twoFAContract');
+      return localContract || null;
+    }
+    return null;
+  });
+
   useEffect(() => {
     // Update localStorage when any relevant state variable changes
     localStorage.setItem('walletConnected', walletConnected);
@@ -99,6 +124,9 @@ export function GlobalProvider({ children }) {
     localStorage.setItem('fieldData', fieldData);
     localStorage.setItem('dashboard', dashboard);
     localStorage.setItem('availableDashboard', dashboard);
+    localStorage.setItem('web3', dashboard);
+    localStorage.setItem('coreContract', dashboard);
+    localStorage.setItem('twoFAContract', dashboard);
   }, [
     userAddress,
     walletConnected,
@@ -111,13 +139,19 @@ export function GlobalProvider({ children }) {
     chainId,
     fieldData,
     dashboard,
-    availableDashboard
+    availableDashboard,
+    web3,
+    coreContract,
+    twoFAContract
   ]);
 
   return (
-    <GlobalContext.Provider value={{ walletConnected, setWalletConnected, loggedIn, setLoggedIn, userAddress, setUserAddress, 
-      showLoginNotification, setShowLoginNotification, userPassword, setUserPassword, username, setUsername, twoFactorAuthPassword, setTwoFactorAuthPassword,
-      contractPassword, setContractPassword, chainId, setChainId, fieldData, setFieldData, dashboard, setdashboard, availableDashboard, setAvailableDashboard}}>
+    <GlobalContext.Provider value={{ walletConnected, setWalletConnected, loggedIn, setLoggedIn, 
+      userAddress, setUserAddress,  showLoginNotification, setShowLoginNotification, userPassword, 
+      setUserPassword, username, setUsername, twoFactorAuthPassword, setTwoFactorAuthPassword, 
+      contractPassword, setContractPassword, chainId, setChainId, fieldData, setFieldData, 
+      dashboard, setdashboard, availableDashboard, setAvailableDashboard, web3, setWeb3,
+      coreContract, setCoreContract, twoFAContract, setTwoFAContract}}>
       {children}
     </GlobalContext.Provider>
   );
