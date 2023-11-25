@@ -296,7 +296,7 @@ const handleSubmit = async (event) => {
                               name="rsa_enc_key_pub_check"
                               type="checkbox"
                               className="h-4 w-4 rounded border-gray-300 dark:border-gray-700 text-emerald-600 focus:ring-emerald-500"
-                              checked="true"
+                              defaultChecked
                             />
                           </div>
                           <div className="ml-3 text-sm">
@@ -313,7 +313,7 @@ const handleSubmit = async (event) => {
                               name="rsa_sign_key_pub_check"
                               type="checkbox"
                               className="h-4 w-4 rounded border-gray-300 dark:border-gray-700 text-emerald-600 focus:ring-emerald-500"
-                              checked="true"
+                              defaultChecked
                             />
                           </div>
                           <div className="ml-3 text-sm">
@@ -330,7 +330,7 @@ const handleSubmit = async (event) => {
                               name="userdata_check"
                               type="checkbox"
                               className="h-4 w-4 rounded border-gray-300 dark:border-gray-700 text-emerald-600 focus:ring-emerald-500"
-                              checked="true"
+                              defaultChecked
                             />
                           </div>
                           <div className="ml-3 text-sm">
