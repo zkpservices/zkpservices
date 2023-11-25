@@ -1,10 +1,42 @@
-import { Fragment, useState } from 'react';
+import { Fragment, useState, useEffect } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { ExclamationTriangleIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { useGlobal } from '@/components/GlobalStorage';
 
-export function ZKPFaucetModal({open, onClose, balanceProp=0}) {
-  const [balance, setBalance] = useState(balanceProp); // Use useState instead
-  
+export function ZKPFaucetModal({open, onClose}) { 
+  let { userAddress, coreContract } = useGlobal();
+  const [balance, setBalance] = useState(null); 
+
+  useEffect(() => {
+    if (coreContract && balance === null) {
+      async function fetchInitialBalance() {
+        let initialBalance = await coreContract.methods.balanceOf(userAddress).call();
+        initialBalance = Number(initialBalance) / 10 ** 18;
+        setBalance(initialBalance);
+      }
+      fetchInitialBalance();
+    }
+  }, [userAddress, coreContract]);
+
+  async function handleRequestTokens() {
+    try {
+      if (coreContract) {
+        const estimatedGas = await coreContract.methods.requestVaultTokens().estimateGas({ from: userAddress });
+        const txObject = {
+          from: userAddress,
+          gas: estimatedGas, 
+        };
+
+        const receipt = await coreContract.methods.requestVaultTokens().send(txObject);
+        const updatedBalance = await coreContract.methods.getBalance(userAddress).call();
+        const newBalance = Number(updatedBalance) / 10 ** 18;
+        setBalance(newBalance);
+      }
+    } catch (error) {
+      console.error('Error requesting tokens:', error);
+    }
+  }
+
   return (
     <Transition.Root show={open} as={Fragment}>
       <Dialog as="div" className="fixed inset-0 overflow-y-auto z-10 dark:bg-opacity-75" onClose={onClose}>
@@ -68,7 +100,7 @@ export function ZKPFaucetModal({open, onClose, balanceProp=0}) {
                         name="comment"
                         id="comment"
                         className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
-                        defaultValue={balance.toFixed(3)}
+                        value={balance !== null ? balance.toFixed(3) : 'Loading...'}
                         readOnly
                         spellCheck="false"
                       />
@@ -79,9 +111,9 @@ export function ZKPFaucetModal({open, onClose, balanceProp=0}) {
                   <button
                     type="button"
                     className="ml-3 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
-                    onClick={onClose}
+                    onClick={handleRequestTokens}
                   >
-                    Get 10,000 ZKP tokens
+                    Get 200 ZKP tokens
                   </button>    
                   <button
                     type="button"

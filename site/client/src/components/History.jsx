@@ -1,5 +1,8 @@
 import { Tab } from '@headlessui/react';
 import { Heading } from '@/components/Heading'
+import { ReceivedDataResponseModal } from '@/components/ReceivedDataResponseModal';
+import { SendDataModal } from '@/components/SendDataModal';
+import { useState } from 'react';
 
 const tabs = [
   { name: 'Incoming' },
@@ -12,13 +15,41 @@ const classNames = (...classes) => {
 };
 
 export function History({ tableData = {}, showRefresh = true , handleRefresh}) {
+  const [showReceivedDataResponseModal, setShowReceivedDataResponseModal] = useState(false);
+  const [selectedRowData, setSelectedRowData] = useState({});
   const handleRefreshAll = () => {
     // Call the loadAllHistory function from DashboardContext
     handleRefresh();
   };
 
+  const closeReceivedResponseModal = () => {
+    setShowReceivedDataResponseModal(false);
+  }
+
+  const openShowReceivedDataResponseModal = (rowData) => {
+    console.log(rowData)
+    setSelectedRowData(rowData)
+    setShowReceivedDataResponseModal(true)
+  }
+  
+
+
+
   return (
     <div className="xl:max-w-none">
+      <SendDataModal/>
+      {showReceivedDataResponseModal && <ReceivedDataResponseModal 
+      open={true} 
+      onClose={closeReceivedResponseModal}
+      addressOfSendingParty={selectedRowData.addressSender}
+      fieldRequested={selectedRowData.field[0]}
+      dataSnapshot={JSON.stringify(selectedRowData.data, null, 2)}
+      oneTimeKey={selectedRowData.key}
+      oneTimeSalt={selectedRowData.salt}
+      timeLimit={selectedRowData.limit}
+      responseFee={selectedRowData.response_fee}
+      require2FA={selectedRowData.require2FA}
+      />}
       <Heading level={2} id="history" className="mt-0">
         Recent Activity
       </Heading>
@@ -100,11 +131,13 @@ export function History({ tableData = {}, showRefresh = true , handleRefresh}) {
                                   </td>
                                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200 flex items-center">
                                     {rowData.status[1] === 'grey' ? (
-                                      <button className="px-2 py-1 rounded-md text-sm font-medium bg-gray-200 text-gray-400 dark:bg-gray-700 dark:text-gray-400">
+                                      <button
+                                        className="px-2 py-1 rounded-md text-sm font-medium bg-gray-200 text-gray-400 dark:bg-gray-700 dark:text-gray-400">
                                         {rowData.status[0]}
                                       </button>
                                     ) : rowData.status[1] === 'button' ? (
-                                      <button className="px-2 py-1 rounded-md text-sm font-medium bg-emerald-100 text-emerald-500 hover:bg-emerald-200 dark:bg-emerald-900 dark:text-emerald-400 dark:hover:bg-emerald-800">
+                                      <button onClick={() => {
+                                        openShowReceivedDataResponseModal(rowData)}} className="px-2 py-1 rounded-md text-sm font-medium bg-emerald-100 text-emerald-500 hover:bg-emerald-200 dark:bg-emerald-900 dark:text-emerald-400 dark:hover:bg-emerald-800">
                                         {rowData.status[0]}
                                       </button>
                                     ) : (
@@ -130,7 +163,8 @@ export function History({ tableData = {}, showRefresh = true , handleRefresh}) {
                                     </td>
                                   ) : null}
                                 </tr>
-                              ))}
+                              ))
+                              }
                             </tbody>
                           </table>
                         </div>

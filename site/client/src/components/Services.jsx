@@ -189,7 +189,7 @@ export function Services() {
         </div>
       </div>
       {selectedService === 'Request Data' && <NewDataRequestModal open={true} onClose={() => setSelectedService(null)} onSubmit={addNewRequest} />}
-      {selectedService === 'Request Update' && <NewUpdateRequestModal open={true} onClose={() => setSelectedService(null)} />}
+      {selectedService === 'Request Update' && <NewUpdateRequestModal open={true} onClose={() => setSelectedService(null)} onSubmit={addNewRequest}/>}
       {selectedService === 'Cross-Chain Backups' && <NewCrossChainSyncModal open={true} onClose={() => setSelectedService(null)} />}
       {selectedService === 'ZKP Tokens Faucet' && <ZKPFaucetModal open={true} onClose={() => setSelectedService(null)} />}
     </div>

@@ -47,6 +47,8 @@ export function DashboardContext() {
         field: [item.field, truncateAddress(item.address_receiver)],
         status: hasMatchingResponse ? ['Response Sent', 'grey'] : ['Send Response', 'button'],
         details: ['View Details', truncateAddress(item.requestID)],
+        addressSender: item.address_sender,
+        data: item.data,
       };
     });
   
@@ -55,8 +57,15 @@ export function DashboardContext() {
       return {
         operation: [operationText, `From ${truncateAddress(item.address_sender)}`],
         field: [item.field, truncateAddress(item.address_sender)],
-        status: ['Response Received', 'grey'],
+        status: ['Show Response', 'button'],
         details: ['View Details', truncateAddress(item.responseID)],
+        addressSender: item.address_sender,
+        data: item.data,
+        salt: item.salt,
+        limit: item.limit,
+        key: item.key,
+        response_fee: item.response_fee,
+        require2FA: item.require2FA
       };
     });
 

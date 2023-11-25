@@ -1,6 +1,7 @@
 import { Fragment, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
+import { formToJSON } from 'axios';
 import { generateRandomAsciiString24 } from '@/components/HelperCalls';
 
 const handleGenerateRandomKey = () => {
@@ -33,6 +34,7 @@ const handleGenerateRandomID = () => {
 export function NewUpdateRequestModal({
   open,
   onClose,
+  onSubmit,
   receiverAddress = "",
   fieldToUpdate = "",
   newData = "",
@@ -45,6 +47,42 @@ export function NewUpdateRequestModal({
 }) {
 
   const [isTwoFAEnabled, setIsTwoFAEnabled] = useState(false); 
+
+  const generateRandomID = () => {
+    // Generate random ID logic here
+    const randomID = "12345"; // Replace with actual random ID generation
+    setTwoFARequestID(randomID);
+  };
+
+  function generateRandomHexString(length) {
+    const characters = '0123456789abcdef';
+    let randomString = '';
+    for (let i = 0; i < length; i++) {
+      const randomIndex = Math.floor(Math.random() * characters.length);
+      randomString += characters[randomIndex];
+    }
+    return randomString;
+  }
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    const formData = new FormData(event.target)
+    const formDataJSON = formToJSON(formData);
+
+    const request = {
+      requestID: generateRandomHexString(30), // placeholder for real requestID generation implemented later
+      address_receiver: formDataJSON['receiverAddress'],
+      operation: "update",
+      field: formDataJSON['fieldToUpdate'],
+      key: formDataJSON['oneTimeSalt'][0],
+      limit: formDataJSON['timeLimit'],
+      timestamp: Date.now().toString(),
+      updated_data: formDataJSON['newData']
+    }
+    console.log(request)
+    const result = await onSubmit(request)
+    onClose()
+  }
 
   return (
     <Transition.Root show={open} as={Fragment}>
@@ -61,7 +99,7 @@ export function NewUpdateRequestModal({
           >
             <div className="fixed inset-0 bg-gray-500 bg-opacity-75 dark:bg-opacity-75" />
           </Transition.Child>
-
+          <form onSubmit={handleSubmit}>
           <Transition.Child
             as={Fragment}
             enter="ease-out duration-300"
@@ -71,7 +109,9 @@ export function NewUpdateRequestModal({
             leaveFrom="opacity-100 translate-y-0 sm:scale-100"
             leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
           >
+            
             <div>
+              
               <div className="relative bg-white rounded-lg max-w-screen-2xl mx-auto mt-6 px-4 pt-5 pb-4 text-left shadow-xl dark:bg-gray-800 sm:my-20 sm:w-full sm:max-w-3xl sm:p-6">
                 <div className="absolute right-0 top-0 hidden pr-4 pt-4 sm:block">
                   <button
@@ -99,6 +139,7 @@ export function NewUpdateRequestModal({
                     </label>
                     <textarea
                       id="receiverAddress"
+                      name="receiverAddress"
                       className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
                       rows={1}
                       spellCheck="false"
@@ -112,6 +153,7 @@ export function NewUpdateRequestModal({
                     </label>
                     <textarea
                       id="fieldToUpdate"
+                      name="fieldToUpdate"
                       className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
                       rows={1}
                       spellCheck="false"
@@ -125,6 +167,7 @@ export function NewUpdateRequestModal({
                     </label>
                     <textarea
                       id="newData"
+                      name="newData"
                       className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
                       rows={8}
                       spellCheck="false"
@@ -140,6 +183,7 @@ export function NewUpdateRequestModal({
                     </label>
                     <textarea
                       id="oneTimeKey"
+                      name="oneTimeKey"
                       className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
                       rows={1}
                       spellCheck="false"
@@ -159,6 +203,7 @@ export function NewUpdateRequestModal({
                     </label>
                     <textarea
                       id="oneTimeSalt"
+                      name="oneTimeSalt"
                       className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
                       rows={1}
                       spellCheck="false"
@@ -178,6 +223,7 @@ export function NewUpdateRequestModal({
                     </label>
                     <textarea
                       id="timeLimit"
+                      name="timeLimit"
                       className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
                       rows={1}
                       spellCheck="false"
@@ -192,6 +238,7 @@ export function NewUpdateRequestModal({
                     <input
                       type="checkbox"
                       id="require2FA"
+                      name="require2FA"
                       className="mt-2 ml-1 h-4 w-4 rounded border-gray-300 dark:border-gray-700 text-emerald-600 focus:ring-emerald-500"
                       value={isTwoFAEnabled} 
                       onChange={(e) => {
@@ -208,6 +255,7 @@ export function NewUpdateRequestModal({
                         </label>
                         <textarea
                           id="twoFAProvider"
+                          name="twoFAProvider"
                           className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
                           rows={1}
                           defaultValue={twoFAProvider}
@@ -221,6 +269,7 @@ export function NewUpdateRequestModal({
                         </label>
                         <textarea
                           id="twoFARequestID"
+                          name="twoFARequestID"
                           className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
                           rows={1}
                           defaultValue={twoFARequestID}
@@ -238,7 +287,7 @@ export function NewUpdateRequestModal({
                         <label htmlFor="attachToken" className="block text-sm font-medium leading-5 text-gray-900 dark:text-white">
                           Attach One Time Token to Request (optional)?
                         </label>
-                        <input type="checkbox" id="attachToken" className="mt-2 ml-1 h-4 w-4 rounded border-gray-300 dark:border-gray-700 text-emerald-600 focus:ring-emerald-500" />
+                        <input type="checkbox" id="attachToken" name= "attachToken" className="mt-2 ml-1 h-4 w-4 rounded border-gray-300 dark:border-gray-700 text-emerald-600 focus:ring-emerald-500" />
                       </div>
                     </>
                   )}
@@ -249,6 +298,7 @@ export function NewUpdateRequestModal({
                     </label>
                     <textarea
                       id="responseFee"
+                      name="responseFee"
                       className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
                       rows={1}
                       defaultValue={responseFee}
@@ -266,16 +316,18 @@ export function NewUpdateRequestModal({
                     Cancel
                   </button>
                  <button
-                    type="button"
+                    type="submit"
                     className="ml-3 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
-                    onClick={onClose}
+                    // onClick={onClose}
                   >
                     Call Smart Contract
                   </button> 
                 </div>
               </div>
             </div>
+            
           </Transition.Child>
+          </form>
         </div>
       </Dialog>
     </Transition.Root>

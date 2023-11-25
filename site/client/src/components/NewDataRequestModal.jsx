@@ -74,10 +74,17 @@ export function NewDataRequestModal({
       operation: "get",
       field: formDataJSON['fieldRequested'],
       key: formDataJSON['oneTimeSalt'][0],
+      salt: formDataJSON['oneTimeSalt'][1],
       limit: formDataJSON['timeLimit'],
-      timestamp: Date.now().toString()
+      timestamp: Date.now().toString(),
+      response_fee: formDataJSON['responseFee'],
+      require2FA: formDataJSON['require2FA'] === 'on',
+      twoFAProvider: formDataJSON['twoFAProvider'],
+      twoFARequestID: formDataJSON['twoFARequestID'],
+      attach_token: formDataJSON['attachToken'] === 'on'
     }
     const result = await onSubmit(request)
+    onClose()
   }
 
   return (
@@ -255,7 +262,7 @@ export function NewDataRequestModal({
                           name="twoFARequestID"
                           className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
                           rows={1}
-                          onChange={(e) => setTwoFARequestID(e.target.value)}
+                          // onChange={(e) => setTwoFARequestID(e.target.value)}
                           spellCheck="false"
                           defaultValue={twoFARequestID}
                         />
@@ -272,7 +279,7 @@ export function NewDataRequestModal({
                         <label htmlFor="attachToken" className="block text-sm font-medium leading-5 text-gray-900 dark:text-white">
                           Attach One Time Token to Request (optional)?
                         </label>
-                        <input type="checkbox" id="attachToken" className="mt-2 ml-1 h-4 w-4 rounded border-gray-300 dark:border-gray-700 text-emerald-600 focus:ring-emerald-500" />
+                        <input type="checkbox" name="attachToken" id="attachToken" className="mt-2 ml-1 h-4 w-4 rounded border-gray-300 dark:border-gray-700 text-emerald-600 focus:ring-emerald-500" />
                       </div>
                     </>
                   )}
