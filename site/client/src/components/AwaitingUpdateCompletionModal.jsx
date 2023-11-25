@@ -2,7 +2,19 @@ import { Fragment, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 
-export function AwaitingUpdateCompletionModal({ is2FARequired = false }) {
+export function AwaitingUpdateCompletionModal({ 
+  addressOfSendingParty = "",
+  fieldToUpdate = "",
+  snapshotAfterUpdate = "",
+  oneTimeKey = "",
+  oneTimeSalt = "",
+  timeLimit = "",
+  twoFAProvider = "",
+  twoFARequestID = "",
+  twoFAOneTimeToken = "",
+  responseFee = "",
+  is2FARequired = false
+}) {
   const [open, setOpen] = useState(true);
 
   return (
@@ -63,6 +75,7 @@ export function AwaitingUpdateCompletionModal({ is2FARequired = false }) {
                       rows={1}
                       readOnly
                       spellCheck="false"
+                      value={addressOfSendingParty}
                     />
                   </div>
 
@@ -76,6 +89,7 @@ export function AwaitingUpdateCompletionModal({ is2FARequired = false }) {
                       rows={1}
                       readOnly
                       spellCheck="false"
+                      value={fieldToUpdate}
                     />
                   </div>
 
@@ -89,6 +103,7 @@ export function AwaitingUpdateCompletionModal({ is2FARequired = false }) {
                       rows={8}
                       readOnly
                       spellCheck="false"
+                      value={snapshotAfterUpdate}
                     />
                   </div>
 
@@ -104,6 +119,7 @@ export function AwaitingUpdateCompletionModal({ is2FARequired = false }) {
                       rows={1}
                       readOnly
                       spellCheck="false"
+                      value={oneTimeKey}
                     />
                   </div>
 
@@ -117,6 +133,7 @@ export function AwaitingUpdateCompletionModal({ is2FARequired = false }) {
                       rows={1}
                       readOnly
                       spellCheck="false"
+                      value={oneTimeSalt}
                     />
                   </div>
 
@@ -130,6 +147,7 @@ export function AwaitingUpdateCompletionModal({ is2FARequired = false }) {
                       rows={1}
                       readOnly
                       spellCheck="false"
+                      value={timeLimit}
                     />
                   </div>
 
@@ -158,6 +176,7 @@ export function AwaitingUpdateCompletionModal({ is2FARequired = false }) {
                           rows={1}
                           readOnly
                           spellCheck="false"
+                          value={twoFAProvider}
                         />
                       </div>
 
@@ -171,6 +190,7 @@ export function AwaitingUpdateCompletionModal({ is2FARequired = false }) {
                           rows={1}
                           readOnly
                           spellCheck="false"
+                          value={twoFARequestID}
                         />
                       </div>
 
@@ -184,6 +204,7 @@ export function AwaitingUpdateCompletionModal({ is2FARequired = false }) {
                           rows={1}
                           readOnly
                           spellCheck="false"
+                          value={twoFAOneTimeToken}
                         />
                       </div>
                     </>
@@ -201,6 +222,7 @@ export function AwaitingUpdateCompletionModal({ is2FARequired = false }) {
                       rows={1}
                       readOnly
                       spellCheck="false"
+                      value={responseFee}
                     />
                   </div>
 

@@ -169,11 +169,6 @@ export function DashboardContext() {
     
   return (
     <div>
-      {/* <ZKPFaucetModal /> */}
-      {/* <ViewFieldModal title="medical records"/>  */}
-      {/* <NewDashboardDataModal /> */}
-      {/* <NewUpdateRequestModal /> */}
-      {/* <NewDataRequestModal /> */}
       <UserData fieldNames={userDataFields}/> 
       <Services useLink={false} />
       <History tableData={tableData} showRefresh={true} />
