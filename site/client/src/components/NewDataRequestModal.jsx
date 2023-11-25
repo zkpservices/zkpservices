@@ -2,10 +2,20 @@ import { Fragment, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 
-export function NewDataRequestModal({open, onClose}) {
-  const [is2FAEnabled, setIs2FAEnabled] = useState(false);
-  const [twoFAProvider, setTwoFAProvider] = useState("zkp.services VRF 2FA");
-  const [twoFARequestID, setTwoFARequestID] = useState("");
+export function NewDataRequestModal({
+  open,
+  onClose,
+  receiverAddress = "",
+  fieldRequested = "",
+  oneTimeKey = "",
+  oneTimeSalt = "",
+  timeLimit = "600",
+  twoFAProvider = "zkp.services VRF 2FA",
+  twoFARequestID = "",
+  responseFee = "10",
+}) {
+
+  const [isTwoFAEnabled, setIsTwoFAEnabled] = useState(false);
 
   const generateRandomID = () => {
     // Generate random ID logic here
@@ -70,6 +80,7 @@ export function NewDataRequestModal({open, onClose}) {
                       className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
                       rows={1}
                       spellCheck="false"
+                      defaultValue={receiverAddress}
                     />
                   </div>
 
@@ -82,6 +93,7 @@ export function NewDataRequestModal({open, onClose}) {
                       className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
                       rows={1}
                       spellCheck="false"
+                      defaultValue={fieldRequested}
                     />
                   </div>
 
@@ -96,6 +108,7 @@ export function NewDataRequestModal({open, onClose}) {
                       className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
                       rows={1}
                       spellCheck="false"
+                      defaultValue={oneTimeKey}
                     />
                     <button
                       className="mt-2 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
@@ -116,6 +129,7 @@ export function NewDataRequestModal({open, onClose}) {
                       className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
                       rows={1}
                       spellCheck="false"
+                      defaultValue={oneTimeSalt}
                     />
                     <button
                       className="mt-2 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
@@ -135,8 +149,8 @@ export function NewDataRequestModal({open, onClose}) {
                       id="timeLimit"
                       className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
                       rows={1}
-                      defaultValue="600"
                       spellCheck="false"
+                      defaultValue={timeLimit}
                     />
                   </div>
 
@@ -148,11 +162,14 @@ export function NewDataRequestModal({open, onClose}) {
                       type="checkbox"
                       id="require2FA"
                       className="mt-2 ml-1 h-4 w-4 rounded border-gray-300 dark:border-gray-700 text-emerald-600 focus:ring-emerald-500"
-                      onChange={(e) => setIs2FAEnabled(e.target.checked)}
+                      defaultValue={isTwoFAEnabled}
+                      onChange={(e) => {
+                        setIsTwoFAEnabled(!isTwoFAEnabled); // Update the state variable
+                      }}
                     />
                   </div>
 
-                  {is2FAEnabled && (
+                  {isTwoFAEnabled && (
                     <>
                       <div className="mt-4">
                         <label htmlFor="twoFAProvider" className="block text-sm font-medium leading-5 text-gray-900 dark:text-white">
@@ -175,9 +192,9 @@ export function NewDataRequestModal({open, onClose}) {
                           id="twoFARequestID"
                           className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
                           rows={1}
-                          value={twoFARequestID}
                           onChange={(e) => setTwoFARequestID(e.target.value)}
                           spellCheck="false"
+                          defaultValue={twoFARequestID}
                         />
                         <button
                           className="mt-2 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
@@ -206,7 +223,7 @@ export function NewDataRequestModal({open, onClose}) {
                       id="responseFee"
                       className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
                       rows={1}
-                      defaultValue="10"
+                      defaultValue={responseFee}
                       spellCheck="false"
                     />
                   </div>

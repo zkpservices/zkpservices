@@ -1,8 +1,8 @@
-import { Fragment, useState } from 'react';
+import { Fragment } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { ExclamationTriangleIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
-export function NewDashboardDataModal({open, onClose}) {
+export function NewDashboardDataModal({ open, onClose, options = ["Medical Records", "Public Transport Card", "Insurance Card"] }) {
 
   return (
     <Transition.Root show={open} as={Fragment}>
@@ -69,9 +69,9 @@ export function NewDashboardDataModal({open, onClose}) {
                           className="relative block w-full mt-2 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus-border-emerald-500 focus:outline-none focus:border-transparent focus:ring-emerald-500 focus:box-shadow-none bg-slate-100 dark:bg-slate-700 sm:text-sm sm:leading-6"
                           defaultValue="Medical Records"
                         >
-                          <option>Medical Records</option>
-                          <option>Passport</option>
-                          <option>Driving License</option>
+                          {options.map((option) => (
+                            <option key={option}>{option}</option>
+                          ))}
                         </select>
                       </div>
                     </div>

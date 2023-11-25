@@ -4,7 +4,9 @@ import { motion, useMotionTemplate, useMotionValue } from 'framer-motion';
 import { Heading } from '@/components/Heading';
 import { QuestionMarkIcon } from '@/components/icons/QuestionMarkIcon';
 import { UpdateIcon } from '@/components/icons/UpdateIcon';
+import { TokenIcon } from '@/components/icons/TokenIcon';
 import { CrosschainIcon } from '@/components/icons/CrosschainIcon';
+import { ZKPFaucetModal } from '@/components/ZKPFaucetModal';
 import { NewUpdateRequestModal } from '@/components/NewUpdateRequestModal';
 import { NewDataRequestModal } from '@/components/NewDataRequestModal';
 import { NewCrossChainSyncModal } from '@/components/NewCrossChainSyncModal';
@@ -50,6 +52,17 @@ const services = [
         [0, 2],
         [1, 4],
       ],
+    },
+  },
+  {
+    href: '/dashboard',
+    name: 'ZKP Tokens Faucet',
+    description:
+      'Get some test tokens for our ERC20 contract',
+    icon: TokenIcon,
+    pattern: {
+      y: 22,
+      squares: [[0, 1]],
     },
   },
 ];
@@ -161,6 +174,7 @@ export function Services() {
       {selectedService === 'Request Data' && <NewDataRequestModal open={true} onClose={() => setSelectedService(null)} />}
       {selectedService === 'Request Update' && <NewUpdateRequestModal open={true} onClose={() => setSelectedService(null)} />}
       {selectedService === 'Cross-Chain Backups' && <NewCrossChainSyncModal open={true} onClose={() => setSelectedService(null)} />}
+      {selectedService === 'ZKP Tokens Faucet' && <ZKPFaucetModal open={true} onClose={() => setSelectedService(null)} />}
     </div>
   );
 }

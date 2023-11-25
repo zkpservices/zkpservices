@@ -1,9 +1,18 @@
-import { Fragment, useState } from 'react';
+import { Fragment } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { ExclamationTriangleIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
-export function ViewFieldModal({ title, open, onClose }) {
-
+export function ViewFieldModal({
+  title,
+  open,
+  onClose,
+  fieldData = "",
+  dataLocation = "Default data location",
+  dataHash = "Default data hash",
+  obfuscationSalt = "Default obfuscation salt",
+  saltHash = "Salt hash",
+}) {
+  
   return (
     <Transition.Root show={open} as={Fragment}>
       <Dialog as="div" className="fixed inset-0 overflow-y-auto z-10 dark:bg-opacity-75" onClose={onClose}>
@@ -60,9 +69,9 @@ export function ViewFieldModal({ title, open, onClose }) {
                     </Dialog.Title>
                     <div className="mt-2 px-1 lg:max-h-[65vh] max-h-[40vh] overflow-y-auto min-w-[16rem] md:min-w-[40rem] lg:min-w-[40rem]">
                       <textarea
-                        rows={8}
+                        rows={8} 
                         className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
-                        defaultValue={''}
+                        defaultValue={fieldData}
                         readOnly
                         spellCheck="false"
                       />
@@ -78,11 +87,11 @@ export function ViewFieldModal({ title, open, onClose }) {
                           >
                             Data Location:
                           </label>
-                          <input
-                            type="text"
+                          <textarea
+                            rows={1} 
                             id="dataLocation"
                             className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
-                            defaultValue="Default data location"
+                            defaultValue={dataLocation}
                             readOnly
                           />
                         </div>
@@ -93,11 +102,11 @@ export function ViewFieldModal({ title, open, onClose }) {
                           >
                             Data Hash:
                           </label>
-                          <input
-                            type="text"
+                          <textarea
+                            rows={1} 
                             id="dataHash"
                             className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
-                            defaultValue="Default data hash"
+                            defaultValue={dataHash}
                             readOnly
                           />
                         </div>
@@ -108,11 +117,11 @@ export function ViewFieldModal({ title, open, onClose }) {
                           >
                             Obfuscation Salt:
                           </label>
-                          <input
-                            type="text"
+                          <textarea
+                            rows={1}
                             id="obfuscationSalt"
                             className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
-                            defaultValue="Default Obfuscation Salt"
+                            defaultValue={obfuscationSalt}
                             readOnly
                           />
                         </div>
@@ -123,11 +132,11 @@ export function ViewFieldModal({ title, open, onClose }) {
                           >
                             Salt Hash:
                           </label>
-                          <input
-                            type="text"
+                          <textarea
+                            rows={1} 
                             id="saltHash"
                             className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
-                            defaultValue="Salt Hash"
+                            defaultValue={saltHash}
                             readOnly
                           />
                         </div>
