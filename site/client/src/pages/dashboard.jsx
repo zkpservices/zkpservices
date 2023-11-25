@@ -79,7 +79,7 @@ export function Dashboard() {
         const userData = await getUser(userAddress, userPassword);
         setUsername(userData['data']['id.name'])
       } catch (error) {
-        console.error('Error fetching user data:', error);
+        console.error('Error fetching user data B:', error);
       }
     }
 

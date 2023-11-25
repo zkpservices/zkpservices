@@ -11,10 +11,10 @@ const classNames = (...classes) => {
   return classes.filter(Boolean).join(' ');
 };
 
-export function History({ tableData = {}, showRefresh = true , loadAllHistory}) {
+export function History({ tableData = {}, showRefresh = true , handleRefresh}) {
   const handleRefreshAll = () => {
     // Call the loadAllHistory function from DashboardContext
-    loadAllHistory();
+    handleRefresh();
   };
 
   return (

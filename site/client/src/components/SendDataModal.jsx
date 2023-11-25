@@ -2,19 +2,7 @@ import { Fragment, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 
-export function SendDataModal({ 
-  addressOfRequestingParty = "",
-  fieldRequested = "",
-  data = "",
-  oneTimeKey = "",
-  oneTimeSalt = "",
-  timeLimit = "",
-  twoFAProvider = "",
-  twoFARequestID = "",
-  twoFAOneTimeToken = "",
-  responseFee = "",
-  is2FARequired = false
-}) {
+export function SendDataModal({ is2FARequired = false }) {
   const [step2FA, setStep2FA] = useState(0); // 0: Initial, 1: Step 1, 2: Step 2
   const [open, setOpen] = useState(true);
 
@@ -84,7 +72,6 @@ export function SendDataModal({
                       rows={1}
                       readOnly
                       spellCheck="false"
-                      value={addressOfRequestingParty}
                     />
                   </div>
 
@@ -98,7 +85,6 @@ export function SendDataModal({
                       rows={1}
                       readOnly
                       spellCheck="false"
-                      value={fieldRequested}
                     />
                   </div>
 
@@ -112,7 +98,6 @@ export function SendDataModal({
                       rows={8}
                       readOnly
                       spellCheck="false"
-                      value={data}
                     />
                   </div>
 
@@ -128,7 +113,6 @@ export function SendDataModal({
                       rows={1}
                       readOnly
                       spellCheck="false"
-                      value={oneTimeKey}
                     />
                   </div>
 
@@ -142,7 +126,6 @@ export function SendDataModal({
                       rows={1}
                       readOnly
                       spellCheck="false"
-                      value={oneTimeSalt}
                     />
                   </div>
 
@@ -156,7 +139,6 @@ export function SendDataModal({
                       rows={1}
                       readOnly
                       spellCheck="false"
-                      value={timeLimit}
                     />
                   </div>
 
@@ -176,44 +158,41 @@ export function SendDataModal({
                   {is2FARequired && (
                     <>
                       <div className="mt-4">
-                        <label htmlFor="twoFAProvider" className="block text-sm font-medium leading-5 text-gray-900 dark:text-white">
+                        <label htmlFor="2FAProvider" className="block text-sm font-medium leading-5 text-gray-900 dark:text-white">
                           2FA Provider (address/name):
                         </label>
                         <textarea
-                          id="twoFAProvider"
+                          id="2FAProvider"
                           className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
                           rows={1}
                           readOnly
                           spellCheck="false"
-                          value={twoFAProvider}
                         />
                       </div>
 
                       <div className="mt-4">
-                        <label htmlFor="twoFARequestID" className="block text-sm font-medium leading-5 text-gray-900 dark:text-white">
+                        <label htmlFor="2FARequestID" className="block text-sm font-medium leading-5 text-gray-900 dark:text-white">
                           2FA Request ID:
                         </label>
                         <textarea
-                          id="twoFARequestID"
+                          id="2FARequestID"
                           className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
                           rows={1}
                           readOnly
                           spellCheck="false"
-                          value={twoFARequestID}
                         />
                       </div>
 
                       <div className="mt-4">
-                        <label htmlFor="twoFAOneTimeToken" className="block text-sm font-medium leading-5 text-gray-900 dark:text-white">
+                        <label htmlFor="2FAOneTimeToken" className="block text-sm font-medium leading-5 text-gray-900 dark:text-white">
                           2FA One Time Token:
                         </label>
                         <textarea
-                          id="twoFAOneTimeToken"
+                          id="2FAOneTimeToken"
                           className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
                           rows={1}
                           readOnly
                           spellCheck="false"
-                          value={twoFAOneTimeToken}
                         />
                       </div>
 
@@ -255,7 +234,6 @@ export function SendDataModal({
                       rows={1}
                       readOnly
                       spellCheck="false"
-                      value={responseFee}
                     />
                   </div>
 

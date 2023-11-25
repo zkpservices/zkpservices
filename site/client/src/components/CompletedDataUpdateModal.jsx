@@ -2,19 +2,7 @@ import { Fragment, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 
-export function CompletedDataUpdateModal({ 
-  addressOfRequestingParty = "",
-  fieldToUpdate = "",
-  snapshotDataAfterUpdate = "",
-  oneTimeKey = "",
-  oneTimeSalt = "",
-  timeLimit = "",
-  twoFAProvider = "",
-  twoFARequestID = "",
-  twoFAOneTimeToken ="",
-  responseFee = "",
-  is2FARequired = false
-}) {
+export function CompletedDataUpdateModal({ is2FARequired = false }) {
   const [open, setOpen] = useState(true);
 
   return (
@@ -75,7 +63,6 @@ export function CompletedDataUpdateModal({
                       rows={1}
                       readOnly
                       spellCheck="false"
-                      value={addressOfRequestingParty}
                     />
                   </div>
 
@@ -89,7 +76,6 @@ export function CompletedDataUpdateModal({
                       rows={1}
                       readOnly
                       spellCheck="false"
-                      value={fieldToUpdate}
                     />
                   </div>
 
@@ -103,7 +89,6 @@ export function CompletedDataUpdateModal({
                       rows={8}
                       readOnly
                       spellCheck="false"
-                      value={snapshotDataAfterUpdate}
                     />
                   </div>
 
@@ -119,7 +104,6 @@ export function CompletedDataUpdateModal({
                       rows={1}
                       readOnly
                       spellCheck="false"
-                      value={oneTimeKey}
                     />
                   </div>
 
@@ -133,7 +117,6 @@ export function CompletedDataUpdateModal({
                       rows={1}
                       readOnly
                       spellCheck="false"
-                      value={oneTimeSalt}
                     />
                   </div>
 
@@ -147,7 +130,6 @@ export function CompletedDataUpdateModal({
                       rows={1}
                       readOnly
                       spellCheck="false"
-                      value={timeLimit}
                     />
                   </div>
 
@@ -176,7 +158,6 @@ export function CompletedDataUpdateModal({
                           rows={1}
                           readOnly
                           spellCheck="false"
-                          value={twoFAProvider}
                         />
                       </div>
 
@@ -190,7 +171,6 @@ export function CompletedDataUpdateModal({
                           rows={1}
                           readOnly
                           spellCheck="false"
-                          value={twoFARequestID}
                         />
                       </div>
 
@@ -204,7 +184,6 @@ export function CompletedDataUpdateModal({
                           rows={1}
                           readOnly
                           spellCheck="false"
-                          value={twoFAOneTimeToken}
                         />
                       </div>
                     </>
@@ -222,7 +201,6 @@ export function CompletedDataUpdateModal({
                       rows={1}
                       readOnly
                       spellCheck="false"
-                      value={responseFee}
                     />
                   </div>
                 </div>

@@ -41,7 +41,7 @@ const handleSubmit = async (event) => {
         setLoggedIn(true);
         setShowLoginNotification(true);
       } catch (error) {
-        console.error('Error fetching user data:', error);
+        console.error('Error fetching user data C:', error);
       }
     }
     

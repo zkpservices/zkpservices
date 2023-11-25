@@ -2,18 +2,7 @@ import { Fragment, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 
-export function AwaitingDataModal({ 
-  addressOfSendingParty = "",
-  fieldRequested = "",
-  oneTimeKey = "",
-  oneTimeSalt = "",
-  timeLimit = "",
-  twoFAProvider = "",
-  twoFARequestID = "",
-  twoFAOneTimeToken = "",
-  responseFee = "",
-  is2FARequired = false
-}) {
+export function AwaitingDataModal({ is2FARequired = true }) {
   const [open, setOpen] = useState(true);
 
   return (
@@ -74,7 +63,6 @@ export function AwaitingDataModal({
                       rows={1}
                       readOnly
                       spellCheck="false"
-                      value={addressOfSendingParty}
                     />
                   </div>
 
@@ -87,7 +75,6 @@ export function AwaitingDataModal({
                       className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
                       rows={1}
                       spellCheck="false"
-                      value={fieldRequested}
                     />
                   </div>
 
@@ -102,7 +89,6 @@ export function AwaitingDataModal({
                       className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
                       rows={1}
                       spellCheck="false"
-                      value={oneTimeKey}
                     />
                   </div>
 
@@ -116,7 +102,6 @@ export function AwaitingDataModal({
                       rows={1}
                       readOnly
                       spellCheck="false"
-                      value={oneTimeSalt}
                     />
                   </div>
 
@@ -130,7 +115,6 @@ export function AwaitingDataModal({
                       rows={1}
                       readOnly
                       spellCheck="false"
-                      value={timeLimit}
                     />
                   </div>
 
@@ -159,7 +143,6 @@ export function AwaitingDataModal({
                           rows={1}
                           readOnly
                           spellCheck="false"
-                          value={twoFAProvider}
                         />
                       </div>
 
@@ -173,7 +156,6 @@ export function AwaitingDataModal({
                           rows={1}
                           readOnly
                           spellCheck="false"
-                          value={twoFARequestID}
                         />
                       </div>
 
@@ -187,7 +169,6 @@ export function AwaitingDataModal({
                           rows={1}
                           readOnly
                           spellCheck="false"
-                          value={twoFAOneTimeToken}
                         />
                       </div>
                     </>
@@ -205,7 +186,6 @@ export function AwaitingDataModal({
                       rows={1}
                       readOnly
                       spellCheck="false"
-                      value={responseFee}
                     />
                   </div>
 

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { GridPattern } from '@/components/GridPattern';
 import { motion, useMotionTemplate, useMotionValue } from 'framer-motion';
 import { Heading } from '@/components/Heading';
+import { addRequest } from '@/components/APICalls';
 import { QuestionMarkIcon } from '@/components/icons/QuestionMarkIcon';
 import { UpdateIcon } from '@/components/icons/UpdateIcon';
 import { TokenIcon } from '@/components/icons/TokenIcon';
@@ -10,7 +11,7 @@ import { ZKPFaucetModal } from '@/components/ZKPFaucetModal';
 import { NewUpdateRequestModal } from '@/components/NewUpdateRequestModal';
 import { NewDataRequestModal } from '@/components/NewDataRequestModal';
 import { NewCrossChainSyncModal } from '@/components/NewCrossChainSyncModal';
-
+import { useGlobal } from '@/components/GlobalStorage';
 const services = [
   {
     href: '/dashboard',
@@ -153,6 +154,22 @@ export function Services() {
     setSelectedService(serviceName);
   };
 
+  let {userAddress, userPassword, chainId} = useGlobal();
+
+  async function addNewRequest(requestData) {
+    //
+    const compiledRequestData = {
+      ...requestData,
+      address_sender: userAddress,
+      chain_id: chainId,
+    }
+    const finalRequestData = {
+      request: compiledRequestData
+    }
+    const addRequestResult = await addRequest(userAddress, userPassword, finalRequestData)
+    console.log(addRequestResult)
+  }
+
   return (
     <div className="xl:max-w-none mt-16">
       <div className="my-16 xl:max-w-none">
@@ -171,7 +188,7 @@ export function Services() {
           ))}
         </div>
       </div>
-      {selectedService === 'Request Data' && <NewDataRequestModal open={true} onClose={() => setSelectedService(null)} />}
+      {selectedService === 'Request Data' && <NewDataRequestModal open={true} onClose={() => setSelectedService(null)} onSubmit={addNewRequest} />}
       {selectedService === 'Request Update' && <NewUpdateRequestModal open={true} onClose={() => setSelectedService(null)} />}
       {selectedService === 'Cross-Chain Backups' && <NewCrossChainSyncModal open={true} onClose={() => setSelectedService(null)} />}
       {selectedService === 'ZKP Tokens Faucet' && <ZKPFaucetModal open={true} onClose={() => setSelectedService(null)} />}

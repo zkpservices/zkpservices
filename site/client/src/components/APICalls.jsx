@@ -134,3 +134,17 @@ export const removeFromDashboard = async (userId, password, service) => {
   }
   return makeAPICall('DELETE', data);
 };
+
+export const addRequest = async (userId, password, requestData) => {
+  const data = {
+    "id": userId,
+    "password": password,
+    "action": "add_request",
+  }
+  const mergedData = {
+    ...data,
+    ...requestData
+  }
+  console.log(`API Calls merged request data ${JSON.stringify(mergedData, null, 2)}`)
+  return makeAPICall('POST', mergedData);
+};

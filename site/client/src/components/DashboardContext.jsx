@@ -145,7 +145,7 @@ export function DashboardContext() {
           'Outgoing': outgoingFinal,
         }));
       } catch (error) {
-        console.error('Error fetching user data:', error);
+        console.error('Error fetching user data A:', error);
       }
     }
     fetchHistoryData();
@@ -169,9 +169,14 @@ export function DashboardContext() {
     
   return (
     <div>
+      {/* <ZKPFaucetModal /> */}
+      {/* <ViewFieldModal title="medical records"/>  */}
+      {/* <NewDashboardDataModal /> */}
+      {/* <NewUpdateRequestModal /> */}
+      {/* <NewDataRequestModal /> */}
       <UserData fieldNames={userDataFields}/> 
       <Services useLink={false} />
-      <History tableData={tableData} showRefresh={true} />
+      <History tableData={tableData} showRefresh={true} handleRefresh={loadAllHistory}/>
     </div>
   )
 }
