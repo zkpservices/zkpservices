@@ -3,6 +3,9 @@ import { Heading } from '@/components/Heading'
 import { ReceivedDataResponseModal } from '@/components/ReceivedDataResponseModal';
 import { SendDataModal } from '@/components/SendDataModal';
 import { useState } from 'react';
+import { getFieldData, addResponse, updateFieldData } from '@/components/APICalls';
+import { useGlobal } from '@/components/GlobalStorage';
+import { CompleteUpdateModal } from './CompleteUpdateModal';
 
 const tabs = [
   { name: 'Incoming' },
@@ -16,11 +19,26 @@ const classNames = (...classes) => {
 
 export function History({ tableData = {}, showRefresh = true , handleRefresh}) {
   const [showReceivedDataResponseModal, setShowReceivedDataResponseModal] = useState(false);
+  const [showSendDataModal, setShowSendDataModal] = useState(false);
+  const [showCompleteUpdateModal, setShowCompleteUpdateModal] = useState(false);
   const [selectedRowData, setSelectedRowData] = useState({});
+  let {userAddress, userPassword, chainId} = useGlobal();
   const handleRefreshAll = () => {
     // Call the loadAllHistory function from DashboardContext
     handleRefresh();
   };
+
+  const openModal = (rowData) => {
+    console.log(`openModal rowData: ${rowData}`)
+    if(rowData.type === "incoming_request_get") {
+      openSendDataModal(rowData)
+    } else if (rowData.type === "incoming_request_update") {
+      console.log("Bazinga!")
+      openCompleteUpdateModal(rowData)
+    } else {
+      openShowReceivedDataResponseModal(rowData)
+    }
+  }
 
   const closeReceivedResponseModal = () => {
     setShowReceivedDataResponseModal(false);
@@ -32,12 +50,92 @@ export function History({ tableData = {}, showRefresh = true , handleRefresh}) {
     setShowReceivedDataResponseModal(true)
   }
   
+  const closeSendDataModal = () => {
+    setShowSendDataModal(false);
+  }
 
+  const openSendDataModal = async (rowData) => {
+    const fieldData = await getFieldData(userAddress, userPassword, rowData.field[0])
+    const newRowData = {
+      ...rowData,
+      data: fieldData['data']
+    }
+    console.log(newRowData)
+    setSelectedRowData(newRowData)
+    setShowSendDataModal(true)
+  }
+
+  const addResponseToRequest = async () => {
+    const responseData = {
+      response: {
+        responseID: selectedRowData.requestID,
+        address_sender: userAddress,
+        address_receiver: selectedRowData.addressSender,
+        chainID: chainId,
+        operation: "get",
+        data: selectedRowData.data,
+        field: selectedRowData.field[0],
+        key: selectedRowData.key,
+        require2FA: selectedRowData.require2FA,
+        salt: selectedRowData.salt,
+        limit: selectedRowData.limit,
+        timestamp: Date.now().toString(),
+        response_fee: selectedRowData.response_fee,
+        twoFA_provider: selectedRowData.twoFAProvider,
+        twoFA_requestID: selectedRowData.twoFARequestID,
+        twoFA_one_time_token: selectedRowData.twoFAOneTimeToken
+      }
+    }
+    const result = await addResponse(userAddress, userPassword, responseData)
+    console.log(result)
+    handleRefresh()
+  }
+
+  const completeUpdate = async () => {
+
+    const updateData = {
+      key: selectedRowData.field[0],
+      data: selectedRowData.data
+    }
+
+    const responseData = {
+      response: {
+        responseID: selectedRowData.requestID,
+        address_sender: userAddress,
+        address_receiver: selectedRowData.addressSender,
+        chainID: chainId,
+        operation: "update",
+        data: selectedRowData.data,
+        field: selectedRowData.field[0],
+        key: selectedRowData.key,
+        require2FA: selectedRowData.require2FA,
+        salt: selectedRowData.salt,
+        limit: selectedRowData.limit,
+        timestamp: Date.now().toString(),
+        response_fee: selectedRowData.response_fee,
+        twoFA_provider: selectedRowData.twoFAProvider,
+        twoFA_requestID: selectedRowData.twoFARequestID,
+        twoFA_one_time_token: selectedRowData.twoFAOneTimeToken
+      }
+    }
+    const updateResult = await updateFieldData(userAddress, userPassword, updateData)
+    const responseResult = await addResponse(userAddress, userPassword, responseData)
+    closeCompleteUpdateModal()
+    handleRefresh()
+  }
+
+  const openCompleteUpdateModal = (rowData) => {
+    setSelectedRowData(rowData)
+    setShowCompleteUpdateModal(true);
+  }
+
+  const closeCompleteUpdateModal = () => {
+    setShowCompleteUpdateModal(false);
+  }
 
 
   return (
     <div className="xl:max-w-none">
-      <SendDataModal/>
       {showReceivedDataResponseModal && <ReceivedDataResponseModal 
       open={true} 
       onClose={closeReceivedResponseModal}
@@ -49,6 +147,43 @@ export function History({ tableData = {}, showRefresh = true , handleRefresh}) {
       timeLimit={selectedRowData.limit}
       responseFee={selectedRowData.response_fee}
       require2FA={selectedRowData.require2FA}
+      twoFAProvider={selectedRowData.twoFAProvider}
+      twoFARequestID={selectedRowData.twoFARequestID}
+      twoFAOneTimeToken={selectedRowData.twoFAOneTimeToken}
+      />}
+      {showSendDataModal && <SendDataModal 
+      open={true} 
+      onClose={closeSendDataModal}
+      onSubmit={addResponseToRequest}
+      addressOfRequestingParty={selectedRowData.addressSender}
+      fieldRequested={selectedRowData.field[0]}
+      requestID={selectedRowData.requestID}
+      data={JSON.stringify(selectedRowData.data, null, 2)}
+      oneTimeKey={selectedRowData.key}
+      oneTimeSalt={selectedRowData.salt}
+      timeLimit={selectedRowData.limit}
+      responseFee={selectedRowData.response_fee}
+      require2FA={selectedRowData.require2FA}
+      twoFAProvider={selectedRowData.twoFAProvider}
+      twoFARequestID={selectedRowData.twoFARequestID}
+      twoFAOneTimeToken={selectedRowData.twoFAOneTimeToken}
+      />}
+      {showCompleteUpdateModal && <CompleteUpdateModal 
+      open={true} 
+      onClose={closeCompleteUpdateModal}
+      onSubmit={completeUpdate}
+      addressOfRequestingParty={selectedRowData.addressSender}
+      fieldToUpdate={selectedRowData.field[0]}
+      requestID={selectedRowData.requestID}
+      newDataAfterUpdate={JSON.stringify(selectedRowData.data, null, 2)}
+      oneTimeKey={selectedRowData.key}
+      oneTimeSalt={selectedRowData.salt}
+      timeLimit={selectedRowData.limit}
+      responseFee={selectedRowData.response_fee}
+      require2FA={selectedRowData.require2FA}
+      twoFAProvider={selectedRowData.twoFAProvider}
+      twoFARequestID={selectedRowData.twoFARequestID}
+      twoFAOneTimeToken={selectedRowData.twoFAOneTimeToken}
       />}
       <Heading level={2} id="history" className="mt-0">
         Recent Activity
@@ -137,7 +272,8 @@ export function History({ tableData = {}, showRefresh = true , handleRefresh}) {
                                       </button>
                                     ) : rowData.status[1] === 'button' ? (
                                       <button onClick={() => {
-                                        openShowReceivedDataResponseModal(rowData)}} className="px-2 py-1 rounded-md text-sm font-medium bg-emerald-100 text-emerald-500 hover:bg-emerald-200 dark:bg-emerald-900 dark:text-emerald-400 dark:hover:bg-emerald-800">
+                                        openModal(rowData)}}
+                                       className="px-2 py-1 rounded-md text-sm font-medium bg-emerald-100 text-emerald-500 hover:bg-emerald-200 dark:bg-emerald-900 dark:text-emerald-400 dark:hover:bg-emerald-800">
                                         {rowData.status[0]}
                                       </button>
                                     ) : (

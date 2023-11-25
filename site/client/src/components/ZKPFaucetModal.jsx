@@ -4,7 +4,7 @@ import { ExclamationTriangleIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { useGlobal } from '@/components/GlobalStorage';
 
 export function ZKPFaucetModal({open, onClose}) { 
-  let { userAddress, coreContract } = useGlobal();
+  let { userAddress, coreContract, web3} = useGlobal();
   const [balance, setBalance] = useState(null); 
 
   useEffect(() => {
@@ -15,25 +15,48 @@ export function ZKPFaucetModal({open, onClose}) {
         setBalance(initialBalance);
       }
       fetchInitialBalance();
+      console.log(userAddress);
     }
   }, [userAddress, coreContract]);
 
   async function handleRequestTokens() {
     try {
       if (coreContract) {
-        const estimatedGas = await coreContract.methods.requestVaultTokens().estimateGas({ from: userAddress });
+        const data = coreContract.methods.requestVaultTokens().encodeABI();
+
         const txObject = {
           from: userAddress,
-          gas: estimatedGas, 
+          to: coreContract.options.address,
+          data: data,
+          gas: 1000000,
         };
 
-        const receipt = await coreContract.methods.requestVaultTokens().send(txObject);
-        const updatedBalance = await coreContract.methods.getBalance(userAddress).call();
-        const newBalance = Number(updatedBalance) / 10 ** 18;
-        setBalance(newBalance);
+        const receipt = await web3.eth.sendTransaction(txObject);
+
+        console.log('Transaction Receipt:', receipt);
+
+        // Poll for the transaction receipt until it's available
+        const checkReceipt = async (txHash) => {
+          while (true) {
+            const transactionReceipt = await web3.eth.getTransactionReceipt(txHash);
+            if (transactionReceipt) {
+              // Transaction is confirmed, you can fetch the new balance here
+              const updatedBalance = await coreContract.methods.balanceOf(userAddress).call();
+              const newBalance = Number(updatedBalance) / 10 ** 18;
+              console.log(newBalance);
+              setBalance(newBalance);
+              break;
+            }
+
+            // Sleep for a while
+            await new Promise(resolve => setTimeout(resolve, 2000)); 
+          }
+        };
+
+        checkReceipt(receipt.transactionHash);
       }
     } catch (error) {
-      console.error('Error requesting tokens:', error);
+      console.error('Error requesting Vault Tokens:', error);
     }
   }
 

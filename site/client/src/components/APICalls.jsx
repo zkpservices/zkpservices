@@ -148,3 +148,31 @@ export const addRequest = async (userId, password, requestData) => {
   console.log(`API Calls merged request data ${JSON.stringify(mergedData, null, 2)}`)
   return makeAPICall('POST', mergedData);
 };
+
+export const addResponse = async (userId, password, responseData) => {
+  const data = {
+    "id": userId,
+    "password": password,
+    "action": "add_response",
+  }
+  const mergedData = {
+    ...data,
+    ...responseData
+  }
+  console.log(mergedData)
+  return makeAPICall('POST', mergedData);
+};
+
+export const updateFieldData = async (userId, password, updatedData) => {
+  const data = {
+    "id": userId,
+    "password": password,
+    "action": "update_item",
+  }
+  const mergedData = {
+    ...data,
+    ...updatedData
+  }
+  console.log(`Ready to update item ${JSON.stringify(mergedData, null, 2)}`)
+  return makeAPICall('PUT', mergedData);
+};

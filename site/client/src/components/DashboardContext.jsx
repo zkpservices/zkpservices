@@ -58,7 +58,7 @@ export function DashboardContext() {
     const formattedRequests = incomingRequests.map((item) => {
       const hasMatchingResponse = outgoingResponses.some(
         (response) => {
-          console.log(response)
+          // console.log(response)
           return response.responseID === item.requestID
         }
       );
@@ -66,10 +66,21 @@ export function DashboardContext() {
       return {
         operation: [operationText, `From ${truncateAddress(item.address_sender)}`],
         field: [item.field, truncateAddress(item.address_receiver)],
-        status: hasMatchingResponse ? ['Response Sent', 'grey'] : ['Send Response', 'button'],
+        status: hasMatchingResponse ? ['Response Sent', 'grey'] : [item.operation === 'update' ? 'Complete Update' : 'Send Response', 'button'],
         details: ['View Details', truncateAddress(item.requestID)],
+        type: item.operation === 'update' ? 'incoming_request_update' : 'incoming_request_get',
+        requestID: item.requestID,
         addressSender: item.address_sender,
-        data: item.data,
+        data: item.operation === 'update' ? item.updated_data : item.data,
+        addressSender: item.address_sender,
+        salt: item.salt,
+        limit: item.limit,
+        key: item.key,
+        response_fee: item.response_fee,
+        require2FA: item.require2FA,
+        twoFAProvider: item.twoFA_provider,
+        twoFARequestID: item.twoFA_requestID,
+        twoFAOneTimeToken: item.twoFA_one_time_token
       };
     });
   
@@ -80,13 +91,17 @@ export function DashboardContext() {
         field: [item.field, truncateAddress(item.address_sender)],
         status: ['Show Response', 'button'],
         details: ['View Details', truncateAddress(item.responseID)],
+        type: "response",
         addressSender: item.address_sender,
         data: item.data,
         salt: item.salt,
         limit: item.limit,
         key: item.key,
         response_fee: item.response_fee,
-        require2FA: item.require2FA
+        require2FA: item.require2FA,
+        twoFAProvider: item.twoFA_provider,
+        twoFARequestID: item.twoFA_requestID,
+        twoFAOneTimeToken: item.twoFA_one_time_token
       };
     });
 
@@ -94,13 +109,14 @@ export function DashboardContext() {
   }
   
   function formatOutgoingData(outgoingRequests, outgoingResponses, incomingResponses) {
+    console.log(outgoingResponses)
     const formattedRequests = outgoingRequests.map((item) => {
       const hasMatchingResponse = incomingResponses.some(
         (response) => response.responseID === item.requestID
       );
       const operationText = item.operation === 'update' ? 'Update Requested' : 'Data Requested';
       return {
-        operation: [operationText, `From ${truncateAddress(item.address_sender)}`],
+        operation: [operationText, `To ${truncateAddress(item.address_sender)}`],
         field: [item.field, truncateAddress(item.address_receiver)],
         status: hasMatchingResponse ? ['Response Received', 'grey'] : ['Awaiting Response', 'grey'],
         details: ['View Details', truncateAddress(item.requestID)],
@@ -195,7 +211,7 @@ export function DashboardContext() {
     loadAllHistory()
     fetchUserDataFields()
     initializeWeb3()
-  }, [dashboard]);
+  }, []);
     
     
   return (

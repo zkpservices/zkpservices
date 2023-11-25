@@ -74,10 +74,16 @@ export function NewUpdateRequestModal({
       address_receiver: formDataJSON['receiverAddress'],
       operation: "update",
       field: formDataJSON['fieldToUpdate'],
-      key: formDataJSON['oneTimeSalt'][0],
+      key: formDataJSON['oneTimeKey'],
       limit: formDataJSON['timeLimit'],
       timestamp: Date.now().toString(),
-      updated_data: formDataJSON['newData']
+      updated_data: JSON.parse(formDataJSON['newData']),
+      salt: formDataJSON['oneTimeSalt'],
+      response_fee: formDataJSON['responseFee'],
+      require2FA: isTwoFAEnabled,
+      twoFAProvider: formDataJSON['twoFAProvider'],
+      twoFARequestID: formDataJSON['twoFARequestID'],
+      attach_token: formDataJSON['attachToken'] === 'on'
     }
     console.log(request)
     const result = await onSubmit(request)
@@ -191,6 +197,7 @@ export function NewUpdateRequestModal({
                     />
                     <button
                       className="mt-2 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                      type="button"
                       onClick={handleGenerateRandomKey}
                     >
                       Generate Random Key
@@ -210,6 +217,7 @@ export function NewUpdateRequestModal({
                       defaultValue={oneTimeSalt}
                     />
                     <button
+                      type="button"
                       className="mt-2 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
                       onClick={handleGenerateRandomSalt}
                     >
@@ -276,6 +284,7 @@ export function NewUpdateRequestModal({
                           spellCheck="false"
                         />
                         <button
+                          type="button"
                           className="mt-2 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
                           onClick={handleGenerateRandomID}
                         >

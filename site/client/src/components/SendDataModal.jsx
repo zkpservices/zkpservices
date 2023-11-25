@@ -3,6 +3,10 @@ import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 
 export function SendDataModal({ 
+  open = true,
+  onClose,
+  onSubmit,
+  requestID,
   addressOfRequestingParty = "",
   fieldRequested = "",
   data = "",
@@ -13,10 +17,9 @@ export function SendDataModal({
   twoFARequestID = "",
   twoFAOneTimeToken = "",
   responseFee = "",
-  is2FARequired = false
+  require2FA = false
 }) {
   const [step2FA, setStep2FA] = useState(0); // 0: Initial, 1: Step 1, 2: Step 2
-  const [open, setOpen] = useState(true);
 
   const handle2FAClick = () => {
     if (step2FA === 0) {
@@ -25,6 +28,11 @@ export function SendDataModal({
       setStep2FA(2);
     }
   };
+
+  const handleSubmit = () => {
+    onClose()
+    onSubmit()
+  }
 
   return (
     <Transition.Root show={open} as={Fragment}>
@@ -57,7 +65,7 @@ export function SendDataModal({
                   <button
                     type="button"
                     className="rounded-md bg-white dark:bg-gray-800 text-gray-400 dark:text-gray-600 hover:text-gray-500 dark:hover-text-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
-                    onClick={() => setOpen(false)}
+                    onClick={onClose}
                   >
                     <span className="sr-only">Close</span>
                     <XMarkIcon
@@ -169,11 +177,11 @@ export function SendDataModal({
                       id="require2FA"
                       className="mt-2 ml-1 h-4 w-4 rounded border border-gray-300 dark:border-gray-700 text-emerald-600 focus:ring-emerald-500"
                       disabled
-                      checked={is2FARequired}
+                      checked={require2FA}
                     />
                   </div>
 
-                  {is2FARequired && (
+                  {require2FA && (
                     <>
                       <div className="mt-4">
                         <label htmlFor="twoFAProvider" className="block text-sm font-medium leading-5 text-gray-900 dark:text-white">
@@ -265,14 +273,14 @@ export function SendDataModal({
                   <button
                     type="button"
                     className="mt-3 ml-3 inline-flex w-full justify-center rounded-md bg-slate-100 dark:bg-slate-800 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-slate-200 dark:hover:bg-slate-900 sm:mt-0 sm:w-auto"
-                    onClick={() => setOpen(false)}
+                    onClick={onClose}
                   >
                     Cancel
                   </button>
                   <button
                     type="button"
                     className="ml-3 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
-                    onClick={() => setOpen(false)}
+                    onClick={handleSubmit}
                   >
                     Send Data
                   </button> 
