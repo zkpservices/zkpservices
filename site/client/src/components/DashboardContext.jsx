@@ -20,19 +20,16 @@ import { ReceivedDataResponseModal } from '@/components/ReceivedDataResponseModa
 import { AwaitingUpdateCompletionModal} from '@/components/AwaitingUpdateCompletionModal'
 import { AwaitingDataModal } from '@/components/AwaitingDataModal'
 import { SendDataModal } from '@/components/SendDataModal'
-import { OnboardToNewChainModal } from '@/components/OnboardToNewChainModal';
 import coreContractABI from '../../public/contract_ABIs/ZKPServicesCore.json'; 
 import twoFAContractABI from '../../public/contract_ABIs/ZKPServicesVRF2FA.json'; 
-import batchSignUpABI from '../../public/contract_ABIs/BatchSignUp.json'
 
 export function DashboardContext() {
   let { walletConnected, userAddress, showLoginNotification, setShowLoginNotification, loggedIn, 
     userPassword, username, setUsername, dashboard, chainId, setDashboard, setWeb3, 
-    setFujiCoreContract, setFujiTwoFAContract, setFujiBatchSignUpContract, setMumbaiCoreContract,
-    setMumbaiTwoFAContract, setMumbaiBatchSignUpContract, setRippleCoreContract, 
-    setRippleTwoFAContract, setRippleBatchSignUpContract } = useGlobal();  
+    setFujiCoreContract, setFujiTwoFAContract, setMumbaiCoreContract, setMumbaiTwoFAContract,
+    setRippleCoreContract, setRippleTwoFAContract } = useGlobal();  
   
-  async function initializeWeb3(){
+  function initializeWeb3(){
     //these are too large for local storage and need to be reinstantiated each time
     const web3Instance = new Web3(window.ethereum);
     setWeb3(web3Instance);
@@ -41,6 +38,7 @@ export function DashboardContext() {
     const fujiCoreContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'; 
     const mumbaiCoreContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'; 
     const rippleCoreContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'; 
+
     const fujiCoreContractInstance = new web3Instance.eth.Contract(coreContractAbi, fujiCoreContractAddress);
     const mumbaiCoreContractInstance = new web3Instance.eth.Contract(coreContractAbi, mumbaiCoreContractAddress);
     const rippleCoreContractInstance = new web3Instance.eth.Contract(coreContractAbi, rippleCoreContractAddress);
@@ -52,23 +50,13 @@ export function DashboardContext() {
     const fujiTwoFAContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'; 
     const mumbaiTwoFAContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'; 
     const rippleTwoFAContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'; 
+
     const fujiTwoFAContractInstance = new web3Instance.eth.Contract(twoFAContractAbi, fujiTwoFAContractAddress);
     const mumbaiTwoFAContractInstance = new web3Instance.eth.Contract(twoFAContractAbi, mumbaiTwoFAContractAddress);
     const rippleTwoFAContractInstance = new web3Instance.eth.Contract(twoFAContractAbi, rippleTwoFAContractAddress);
     setFujiTwoFAContract(fujiTwoFAContractInstance);
     setMumbaiTwoFAContract(mumbaiTwoFAContractInstance);
     setRippleTwoFAContract(rippleTwoFAContractInstance);
-
-    const batchSignUpContractAbi = batchSignUpABI;
-    const fujiBatchSignUpContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d';
-    const mumbaiBatchSignUpContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d';
-    const rippleBatchSignUpContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d';
-    const fujiBatchSignUpContractInstance = new web3Instance.eth.Contract(batchSignUpContractAbi, fujiBatchSignUpContractAddress);
-    const mumbaiBatchSignUpContractInstance = new web3Instance.eth.Contract(batchSignUpContractAbi, mumbaiBatchSignUpContractAddress);
-    const rippleBatchSignUpContractInstance = new web3Instance.eth.Contract(batchSignUpContractAbi, rippleBatchSignUpContractAddress);
-    setFujiBatchSignUpContract(fujiBatchSignUpContractInstance);
-    setMumbaiBatchSignUpContract(mumbaiBatchSignUpContractInstance);
-    setRippleBatchSignUpContract(rippleBatchSignUpContractInstance);
   }
 
   const [tableData, setTableData] = useState({

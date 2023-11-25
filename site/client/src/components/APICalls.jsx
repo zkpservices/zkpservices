@@ -31,10 +31,9 @@ export const login = async (userId, password) => {
   return await makeAPICall('POST', data);
 };
 
-export const createUser = async (userId, password, quickstart_JSON) => {
+export const createUser = async (userId, quickstart_JSON) => {
   const data = {
     "id": userId,
-    "password": password,
     "action": "create_item"
   }
   const mergedData = {

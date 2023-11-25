@@ -138,9 +138,6 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
     //99.9999% put into the vault, 0.0001% transferred to deploying wallet
     uint256 private constant VAULT_AMOUNT = (TOTAL_SUPPLY * 999999) / 1000000;
 
-    // this contract helps expedite sign up to zkp.services via batched calls
-    address public batchSignUpContractAddress;
-
     constructor(
         address _coreResponseVerifierAddress,
         address _CCIPReceiverRouterAddress
@@ -155,17 +152,6 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
         requestFee = 1 * 10**18;
     }
 
-    function setBatchSignUpContractAddress(address _batchSignUpContractAddress)
-        public
-        onlyOwner
-    {
-        require(
-            batchSignUpContractAddress == address(0),
-            "Batch Sign Up contract address already set"
-        );
-        batchSignUpContractAddress = _batchSignUpContractAddress;
-    }
-
     function requestVaultTokens() public {
         _transfer(address(this), msg.sender, 200 * 10**18);
     }
@@ -178,40 +164,14 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
         rsaEncryptionKeys[msg.sender] = RSAEncryptionKey(rsaEncryptionKey);
     }
 
-    function setRSAEncryptionKeyBatchSignUpContractAddress(
-        string memory rsaEncryptionKey,
-        address userAddress
-    ) external {
-        require(msg.sender == batchSignUpContractAddress);
-        rsaEncryptionKeys[userAddress] = RSAEncryptionKey(rsaEncryptionKey);
-    }
-
     function setRSASigningKey(string memory rsaSigningKey) public {
         rsaSigningKeys[msg.sender] = RSASigningKey(rsaSigningKey);
-    }
-
-    function setRSASigningKeyBatchSignUpContractAddress(
-        string memory rsaSigningKey,
-        address userAddress
-    ) external {
-        require(msg.sender == batchSignUpContractAddress);
-        rsaSigningKeys[userAddress] = RSASigningKey(rsaSigningKey);
     }
 
     function setPublicUserInformation(string memory _publicUserInformation)
         public
     {
         publicUserInformation[msg.sender] = PublicUserInformation(
-            _publicUserInformation
-        );
-    }
-
-    function setPublicUserInformationBatchSignUpContractAddress(
-        string memory _publicUserInformation,
-        address userAddress
-    ) external {
-        require(msg.sender == batchSignUpContractAddress);
-        publicUserInformation[userAddress] = PublicUserInformation(
             _publicUserInformation
         );
     }
