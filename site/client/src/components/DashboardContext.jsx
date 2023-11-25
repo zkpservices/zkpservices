@@ -25,25 +25,38 @@ import twoFAContractABI from '../../public/contract_ABIs/ZKPServicesVRF2FA.json'
 
 export function DashboardContext() {
   let { walletConnected, userAddress, showLoginNotification, setShowLoginNotification, loggedIn, 
-    userPassword, username, setUsername, dashboard, chainId, setDashboard, setWeb3, setCoreContract, 
-    setTwoFAContract} = useGlobal();  
-
+    userPassword, username, setUsername, dashboard, chainId, setDashboard, setWeb3, 
+    setFujiCoreContract, setFujiTwoFAContract, setMumbaiCoreContract, setMumbaiTwoFAContract,
+    setRippleCoreContract, setRippleTwoFAContract } = useGlobal();  
+  
   function initializeWeb3(){
     //these are too large for local storage and need to be reinstantiated each time
     const web3Instance = new Web3(window.ethereum);
     setWeb3(web3Instance);
 
     const coreContractAbi = coreContractABI; 
-    const coreContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'; 
+    const fujiCoreContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'; 
+    const mumbaiCoreContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'; 
+    const rippleCoreContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'; 
 
-    const coreContractInstance = new web3Instance.eth.Contract(coreContractAbi, coreContractAddress);
-    setCoreContract(coreContractInstance);
+    const fujiCoreContractInstance = new web3Instance.eth.Contract(coreContractAbi, fujiCoreContractAddress);
+    const mumbaiCoreContractInstance = new web3Instance.eth.Contract(coreContractAbi, mumbaiCoreContractAddress);
+    const rippleCoreContractInstance = new web3Instance.eth.Contract(coreContractAbi, rippleCoreContractAddress);
+    setFujiCoreContract(fujiCoreContractInstance);
+    setMumbaiCoreContract(mumbaiCoreContractInstance);
+    setRippleCoreContract(rippleCoreContractInstance);
 
     const twoFAContractAbi = twoFAContractABI;
-    const twoFAContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'; 
+    const fujiTwoFAContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'; 
+    const mumbaiTwoFAContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'; 
+    const rippleTwoFAContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'; 
 
-    const twoFAContractInstance = new web3Instance.eth.Contract(twoFAContractAbi, twoFAContractAddress);
-    setTwoFAContract(twoFAContractInstance);
+    const fujiTwoFAContractInstance = new web3Instance.eth.Contract(twoFAContractAbi, fujiTwoFAContractAddress);
+    const mumbaiTwoFAContractInstance = new web3Instance.eth.Contract(twoFAContractAbi, mumbaiTwoFAContractAddress);
+    const rippleTwoFAContractInstance = new web3Instance.eth.Contract(twoFAContractAbi, rippleTwoFAContractAddress);
+    setFujiTwoFAContract(fujiTwoFAContractInstance);
+    setMumbaiTwoFAContract(mumbaiTwoFAContractInstance);
+    setRippleTwoFAContract(rippleTwoFAContractInstance);
   }
 
   const [tableData, setTableData] = useState({

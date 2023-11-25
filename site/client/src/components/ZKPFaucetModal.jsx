@@ -4,57 +4,64 @@ import { ExclamationTriangleIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { useGlobal } from '@/components/GlobalStorage';
 import { poseidon } from '@/components/PoseidonHash';
 
-export function ZKPFaucetModal({open, onClose}) { 
-  let { userAddress, coreContract, web3} = useGlobal();
-  const [balance, setBalance] = useState(null); 
+export function ZKPFaucetModal({ open, onClose }) {
+  let {
+    userAddress,
+    fujiCoreContract,
+    mumbaiCoreContract,
+    rippleCoreContract,
+    web3,
+    chainId
+  } = useGlobal();
+  const [balance, setBalance] = useState(null);
 
   useEffect(() => {
-    if (coreContract && balance === null) {
+    const contract = chainId == 43113 ? fujiCoreContract :
+                     chainId == 80001 ? mumbaiCoreContract :
+                     chainId == 1440002 ? rippleCoreContract : null;
+
+    if (contract && balance === null) {
       async function fetchInitialBalance() {
-        let initialBalance = await coreContract.methods.balanceOf(userAddress).call();
-        initialBalance = Number(initialBalance) / 10 ** 18;
-        setBalance(initialBalance);
+        const initialBalance = await contract.methods.balanceOf(userAddress).call();
+        setBalance(Number(initialBalance) / 10 ** 18);
       }
       fetchInitialBalance();
       console.log(userAddress);
     }
-  }, [userAddress, coreContract]);
+  }, [userAddress, fujiCoreContract, mumbaiCoreContract, rippleCoreContract, balance, chainId]);
 
   async function handleRequestTokens() {
     try {
-      //poseidon example
-      let res = await poseidon(["42","73","91111111"]);
-      console.log(res);
-      if (coreContract) {
-        const currentBalance = await coreContract.methods.balanceOf(userAddress).call();
-        const balanceToAdd = 200; 
+      let res = await poseidon(["42", "73", "91111111"]);
+      const contract = chainId == 43113 ? fujiCoreContract :
+                       chainId == 80001 ? mumbaiCoreContract :
+                       chainId == 1440002 ? rippleCoreContract : null;
 
-        const data = coreContract.methods.requestVaultTokens().encodeABI();
+      if (contract) {
+        const currentBalance = await contract.methods.balanceOf(userAddress).call();
+        const data = contract.methods.requestVaultTokens().encodeABI();
 
         const txObject = {
           from: userAddress,
-          to: coreContract.options.address,
+          to: contract.options.address,
           data: data,
           gas: 1000000,
         };
 
         const receipt = await web3.eth.sendTransaction(txObject);
-
         console.log('Transaction Receipt:', receipt);
 
         const waitForConfirmation = async (txHash) => {
           while (true) {
             const transactionReceipt = await web3.eth.getTransactionReceipt(txHash);
-
             if (transactionReceipt && transactionReceipt.status) {
-              const newBalance = (Number(currentBalance) / 10 ** 18) + balanceToAdd;
+              const newBalance = (Number(currentBalance) / 10 ** 18) + 200;
               setBalance(newBalance);
               break;
             } else if (transactionReceipt && !transactionReceipt.status) {
               console.error('Transaction failed');
               break;
             }
-
             await new Promise(resolve => setTimeout(resolve, 2000));
           }
         };
