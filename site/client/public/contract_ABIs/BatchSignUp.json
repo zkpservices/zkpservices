@@ -2,86 +2,6 @@
   {
     "inputs": [
       {
-        "internalType": "uint256",
-        "name": "_userSecretHash",
-        "type": "uint256"
-      },
-      {
-        "internalType": "string",
-        "name": "rsaEncryptionKey",
-        "type": "string"
-      },
-      {
-        "internalType": "string",
-        "name": "rsaSigningKey",
-        "type": "string"
-      },
-      {
-        "internalType": "string",
-        "name": "publicUserInformation",
-        "type": "string"
-      }
-    ],
-    "name": "batchSignUp",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "string",
-        "name": "_publicUserInformation",
-        "type": "string"
-      }
-    ],
-    "name": "setPublicUserInformation",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "string",
-        "name": "rsaEncryptionKey",
-        "type": "string"
-      }
-    ],
-    "name": "setRSAEncryptionKey",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "string",
-        "name": "rsaSigningKey",
-        "type": "string"
-      }
-    ],
-    "name": "setRSASigningKey",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "_userSecretHash",
-        "type": "uint256"
-      }
-    ],
-    "name": "setSecret",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "address",
         "name": "_2FAContractAddress",
         "type": "address"
@@ -109,6 +29,34 @@
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_userSecretHash",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "rsaEncryptionKey",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "rsaSigningKey",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "publicUserInformation",
+        "type": "string"
+      }
+    ],
+    "name": "batchSignUp",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "coreContract",
     "outputs": [
@@ -119,6 +67,78 @@
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "_publicUserInformation",
+        "type": "string"
+      },
+      {
+        "internalType": "address",
+        "name": "userAddress",
+        "type": "address"
+      }
+    ],
+    "name": "setPublicUserInformationBatchSignUpContractAddress",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "rsaEncryptionKey",
+        "type": "string"
+      },
+      {
+        "internalType": "address",
+        "name": "userAddress",
+        "type": "address"
+      }
+    ],
+    "name": "setRSAEncryptionKeyBatchSignUpContractAddress",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "rsaSigningKey",
+        "type": "string"
+      },
+      {
+        "internalType": "address",
+        "name": "userAddress",
+        "type": "address"
+      }
+    ],
+    "name": "setRSASigningKeyBatchSignUpContractAddress",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_userSecretHash",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "userAddress",
+        "type": "address"
+      }
+    ],
+    "name": "setSecretBatchSignUpContractAddress",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   }
 ]
