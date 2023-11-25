@@ -18,10 +18,7 @@ export function Dashboard() {
 
   let { walletConnected, userAddress, showLoginNotification, 
     setShowLoginNotification, loggedIn, userPassword, username, setUsername } = useGlobal();
-
-  loggedIn = true;
-  walletConnected = true;
-
+  
   const [showDashboard, setShowDashboard] = useState(<div className="flex justify-center"><h2 className="text-3xl font-bold tracking-tight text-center">Please connect your wallet and log in to get started</h2></div>)
   const [usernameText, setUsernameText] = useState('')
   const [loginNotification, setLoginNotification] = useState(<></>)

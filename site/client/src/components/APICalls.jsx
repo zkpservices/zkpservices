@@ -62,3 +62,28 @@ export const getCCTX = async (userId, password) => {
   return makeAPICall('POST', data);
 };
 
+export const getIncoming = async (userId, password) => {
+  const data = {
+    "id": userId,
+    "password": password,
+    "action": "get_incoming",
+  }
+  return makeAPICall('POST', data);
+};
+
+export const getOutgoing = async (userId, password) => {
+  const data = {
+    "id": userId,
+    "password": password,
+    "action": "get_outgoing",
+  }
+  return makeAPICall('POST', data);
+};
+
+export const truncateAddress = (address) => {
+  if (!address) return '';
+  const start = address.substring(0, 6);
+  const end = address.substring(address.length - 3);
+  return `${start}...${end}`;
+}
+

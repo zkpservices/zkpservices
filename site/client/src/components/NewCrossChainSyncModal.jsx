@@ -2,12 +2,13 @@ import { Fragment, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 
-export function NewCrossChainSyncModal({open, onClose}) {
+export function NewCrossChainSyncModal() {
+  const [open, setOpen] = useState(true);
   const destinationChainOptions = ["Polygon Testnet", "Avalanche Testnet", "Fantom Testnet"];
 
   return (
     <Transition.Root show={open} as={Fragment}>
-      <Dialog as="div" className="fixed inset-0 overflow-y-auto z-10 dark:bg-opacity-75" onClose={onClose}>
+      <Dialog as="div" className="fixed inset-0 overflow-y-auto z-10 dark:bg-opacity-75" onClose={() => setOpen(false)}>
         <div className="min-h-screen flex items-center justify-center">
           <Transition.Child
             as={Fragment}
@@ -36,7 +37,7 @@ export function NewCrossChainSyncModal({open, onClose}) {
                   <button
                     type="button"
                     className="rounded-md bg-white dark:bg-gray-800 text-gray-400 dark:text-gray-600 hover:text-gray-500 dark:hover:text-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
-                    onClick={onClose}
+                    onClick={() => setOpen(false)}
                   >
                     <span className="sr-only">Close</span>
                     <XMarkIcon
@@ -139,14 +140,14 @@ export function NewCrossChainSyncModal({open, onClose}) {
                   <button
                     type="button"
                     className="mt-3 ml-3 inline-flex w-full justify-center rounded-md bg-slate-100 dark:bg-slate-800 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-slate-200 dark:hover:bg-slate-900 sm:mt-0 sm:w-auto"
-                    onClick={onClose}
+                    onClick={() => setOpen(false)}
                   >
                     Cancel
                   </button>
                   <button
                     type="button"
                     className="ml-3 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
-                    onClick={onClose}
+                    onClick={() => setOpen(false)}
                   >
                     Call Smart Contract
                   </button> 

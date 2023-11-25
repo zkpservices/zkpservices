@@ -1,48 +1,71 @@
-import { useState } from 'react';
-import { GridPattern } from '@/components/GridPattern';
-import { motion, useMotionTemplate, useMotionValue } from 'framer-motion';
-import { Heading } from '@/components/Heading';
-import { DataIcon } from '@/components/icons/DataIcon';
-import { PlusIcon } from '@/components/icons/PlusIcon';
-import { ViewFieldModal } from './ViewFieldModal';
-import { NewDashboardDataModal } from './NewDashboardDataModal'; // Import your NewDashboardDataModal component
+import Link from 'next/link'
+import { GridPattern } from '@/components/GridPattern'
+import { motion, transform, useMotionTemplate, useMotionValue } from 'framer-motion'
+import { Heading } from '@/components/Heading'
+import { HollowCard } from '@/components/HollowCard'
+import { DataIcon } from '@/components/icons/DataIcon'
 
-const fieldDescriptions = 'Click to display data for this field.';
-const fieldIcon = DataIcon; // Assuming DataIcon is the desired icon
-const fieldPatterns = [
+// to be converted to a prop
+const userdata = [
   {
-    y: 16,
-    squares: [
-      [0, 1],
-      [1, 3],
-    ],
+    name: 'Request Data',
+    description:
+      'Learn about the contact model and how to create, retrieve, update, delete, and list contacts.',
+    icon: DataIcon,
+    pattern: {
+      y: 16,
+      squares: [
+        [0, 1],
+        [1, 3],
+      ],
+    },
   },
   {
-    y: -6,
-    squares: [
-      [-1, 2],
-      [1, 3],
-    ],
+    name: 'Request Update',
+    description:
+      'Learn about the conversation model and how to create, retrieve, update, delete, and list conversations.',
+    icon: DataIcon,
+    pattern: {
+      y: -6,
+      squares: [
+        [-1, 2],
+        [1, 3],
+      ],
+    },
   },
   {
-    y: 32,
-    squares: [
-      [0, 2],
-      [1, 4],
-    ],
+    name: 'Respond',
+    description:
+      'Learn about the message model and how to create, retrieve, update, delete, and list messages.',
+    icon: DataIcon,
+    pattern: {
+      y: 32,
+      squares: [
+        [0, 2],
+        [1, 4],
+      ],
+    },
   },
-  {
-    y: 22,
-    squares: [[0, 1]],
-  },
-];
+  // {
+  //   href: '/crosschain',
+  //   name: 'Cross-Chain Backups',
+  //   description:
+  //     'Learn about the group model and how to create, retrieve, update, delete, and list groups.',
+  //   icon: UsersIcon,
+  //   pattern: {
+  //     y: 22,
+  //     squares: [[0, 1]],
+  //   },
+  // },
+]
+
 
 function MyDataIcon({ icon: Icon }) {
   return (
     <div className="flex h-7 w-7 items-center justify-center rounded-full bg-zinc-900/5 ring-1 ring-zinc-900/25 backdrop-blur-[2px] transition duration-300 group-hover:bg-white/50 group-hover:ring-zinc-900/25 dark:bg-white/7.5 dark:ring-white/15 dark:group-hover:bg-sky-300/10 dark:group-hover:ring-sky-400">
       <Icon className="h-5 w-5 fill-zinc-700/10 stroke-zinc-700 transition-colors duration-300 group-hover:stroke-zinc-900 dark:fill-white/10 dark:stroke-zinc-400 dark:group-hover:fill-sky-300/10 dark:group-hover:stroke-sky-400" />
     </div>
-  );
+  )
 }
 
 function MyDataPattern({ mouseX, mouseY, ...gridProps }) {
@@ -80,108 +103,50 @@ function MyDataPattern({ mouseX, mouseY, ...gridProps }) {
   )
 }
 
-export function MyData({ mydata, onCardClick }) {
-  let mouseX = useMotionValue(0);
-  let mouseY = useMotionValue(0);
+export function MyData({ mydata }) {
+  let mouseX = useMotionValue(0)
+  let mouseY = useMotionValue(0)
 
   function onMouseMove({ currentTarget, clientX, clientY }) {
-    let { left, top } = currentTarget.getBoundingClientRect();
-    mouseX.set(clientX - left);
-    mouseY.set(clientY - top);
+    let { left, top } = currentTarget.getBoundingClientRect()
+    mouseX.set(clientX - left)
+    mouseY.set(clientY - top)
   }
 
   return (
     <div
       key={mydata.name}
       onMouseMove={onMouseMove}
-      onClick={() => onCardClick(mydata.name)}
-      className="group relative flex rounded-2xl bg-zinc-50 transition-shadow hover:shadow-md hover:shadow-zinc-900/5 dark:bg-white/2.5 dark:hover:shadow-black/5 h-60"
+      className="group relative flex rounded-2xl bg-zinc-50 transition-shadow hover:shadow-md hover:shadow-zinc-900/5 dark:bg-white/2.5 dark:hover:shadow-black/5"
     >
       <MyDataPattern {...mydata.pattern} mouseX={mouseX} mouseY={mouseY} />
       <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-zinc-900/7.5 group-hover:ring-zinc-900/10 dark:ring-white/10 dark:group-hover:ring-white/20" />
       <div className="relative rounded-2xl px-4 pt-16 pb-4">
         <MyDataIcon icon={mydata.icon} />
         <h3 className="mt-4 text-sm font-semibold leading-7 text-zinc-900 dark:text-white">
-          <span className="absolute inset-0 rounded-2xl" />
-          {mydata.name}
+            <span className="absolute inset-0 rounded-2xl" />
+            {mydata.name}
         </h3>
         <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
           {mydata.description}
         </p>
       </div>
     </div>
-  );
+  )
 }
 
-export function UserData({ fieldNames = [] }) {
-  const [selectedFieldName, setSelectedFieldName] = useState(null);
-  const [addDataModalOpen, setAddDataModalOpen] = useState(false);
-
-  const openFieldModal = (fieldName) => {
-    setSelectedFieldName(fieldName);
-  };
-  
-  const closeFieldModal = () => {
-    setSelectedFieldName(null);
-  };
-
-  const openAddDataModal = () => {
-    setAddDataModalOpen(true);
-  };
-  
-
-  const closeAddDataModal = () => {
-    setAddDataModalOpen(false);
-  };
-
+export function UserData() {
   return (
     <div className="my-16 xl:max-w-none">
       <Heading level={2} id="mydata">
         Access My Data
       </Heading>
       <div className="not-prose mt-4 grid grid-cols-1 gap-8 border-t border-zinc-900/5 pt-10 dark:border-white/5 sm:grid-cols-2 xl:grid-cols-4">
-        {fieldNames.map((fieldName, index) => (
-          <MyData
-            key={fieldName}
-            mydata={{
-              name: fieldName,
-              description: fieldDescriptions,
-              icon: fieldIcon,
-              pattern: fieldPatterns[index % fieldPatterns.length],
-            }}
-            onCardClick={openFieldModal}
-          />
+        {userdata.map((mydata) => (
+          <MyData key={mydata.name} mydata={mydata} />
         ))}
-        <MyData
-          key="Add Data"
-          mydata={{
-            name: "Add Data",
-            description: "Enter a field to add to your dashboard for easy access.",
-            icon: PlusIcon,
-            pattern: {
-              y: 16,
-              squares: [
-                [0, 1],
-                [1, 3],
-              ],
-            },
-          }}
-          onCardClick={openAddDataModal}
-        />
+        <HollowCard />
       </div>
-      {selectedFieldName && (
-        <ViewFieldModal
-          title={selectedFieldName}
-          open={selectedFieldName !== null}
-          onClose={closeFieldModal}
-        />
-      )}
-      {addDataModalOpen && (
-        <NewDashboardDataModal
-          open={addDataModalOpen}
-          onClose={closeAddDataModal}
-        />
-      )}
-  </div>
-);
+    </div>
+  )
 }

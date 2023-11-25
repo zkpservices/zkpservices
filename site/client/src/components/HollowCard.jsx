@@ -75,10 +75,10 @@ export function HollowCard() {
       <div className="relative rounded-2xl px-4 pt-16 pb-4">
         <HollowCardIcon icon={PlusIcon} /> {/* Here's the addition */}
         <h3 className="mt-4 text-sm font-semibold leading-7 text-zinc-900 dark:text-white">
-          Add Data
+          Coming Soon
         </h3>
         <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-          Enter a field to add to your dashboard for easy access. 
+          Additional features will be added here.
         </p>
       </div>
     </div>

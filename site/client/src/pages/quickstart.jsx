@@ -18,8 +18,7 @@ const handleSubmit = async (event) => {
   event.preventDefault();
 
   const formData = new FormData(event.target)
-  const formDataJSON = formToJSON(formData)
-;
+  const formDataJSON = formToJSON(formData);
   
   try {
     const quickstart_JSON = {
@@ -30,10 +29,9 @@ const handleSubmit = async (event) => {
       "rsa_sign_pub_key": formDataJSON['rsa_sign_pub_key'],
       "rsa_sign_priv_key": formDataJSON['rsa_sign_priv_key'],
       "data": JSON.parse(formDataJSON['data']),
-      "requests_sent": {},
-      "requests_received": {},
-      "responses_sent": {},
-      "responses_received": {}
+      "userdata_check": formDataJSON['userdata_check'] === 'on', // Set to true if checked, false if not
+      "rsa_enc_key_pub_check": formDataJSON['rsa_enc_key_pub_check'] === 'on', // Set to true if checked, false if not
+      "rsa_sign_key_pub_check": formDataJSON['rsa_sign_key_pub_check'] === 'on' // Set to true if checked, false if not
     }
     
     async function callCreateUser() {
@@ -282,8 +280,8 @@ const handleSubmit = async (event) => {
                         <div className="relative flex items-start">
                           <div className="flex h-5 items-center">
                             <input
-                              id="comments"
-                              name="comments"
+                              id="rsa_enc_key_pub_check"
+                              name="rsa_enc_key_pub_check"
                               type="checkbox"
                               className="h-4 w-4 rounded border-gray-300 dark:border-gray-700 text-emerald-600 focus:ring-emerald-500"
                             />
@@ -298,8 +296,8 @@ const handleSubmit = async (event) => {
                         <div className="relative flex items-start">
                           <div className="flex h-5 items-center">
                             <input
-                              id="candidates"
-                              name="candidates"
+                              id="rsa_sign_key_pub_check"
+                              name="rsa_sign_key_pub_check"
                               type="checkbox"
                               className="h-4 w-4 rounded border-gray-300 dark:border-gray-700 text-emerald-600 focus:ring-emerald-500"
                             />
@@ -314,8 +312,8 @@ const handleSubmit = async (event) => {
                         <div className="relative flex items-start">
                           <div className="flex h-5 items-center">
                             <input
-                              id="offers"
-                              name="offers"
+                              id="userdata_check"
+                              name="userdata_check"
                               type="checkbox"
                               className="h-4 w-4 rounded border-gray-300 dark:border-gray-700 text-emerald-600 focus:ring-emerald-500"
                             />

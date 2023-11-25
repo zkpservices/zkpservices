@@ -214,11 +214,11 @@ def create_item(item_data):
             "body": "Item with the specified ID already exists"
         }
     try:
-        requests_received_data_json = json.dumps(item_data.get('requests_received', {}))
-        responses_received_data_json = json.dumps(item_data.get('responses_received', {}))
-        requests_sent_data_json = json.dumps(item_data.get('requests_sent', {}))
-        responses_sent_data_json = json.dumps(item_data.get('responses_sent', {}))
-        crosschain_transactions = json.dumps(item_data.get('crosschain_transactions', {}))
+        requests_received_data = item_data.get('requests_received', '[]')
+        responses_received_data = item_data.get('responses_received', '[]')
+        requests_sent_data = item_data.get('requests_sent', '[]')
+        responses_sent_data = item_data.get('responses_sent', '[]')
+        crosschain_transactions = item_data.get('crosschain_transactions', '[]')
 
         # Initialize the available_dashboard list with objects from the data field
         available_dashboard = list(item_data['data'].keys())
@@ -237,16 +237,19 @@ def create_item(item_data):
             "password": item_data.get("password", ""),
             "2fa_password": item_data['2fa_password'],
             "contract_password": item_data['contract_password'],
-            "requests_received": requests_received_data_json,
-            "responses_received": responses_received_data_json,
-            "requests_sent": requests_sent_data_json,
-            "responses_sent": responses_sent_data_json,
+            "requests_received": requests_received_data,
+            "responses_received": responses_received_data,
+            "requests_sent": requests_sent_data,
+            "responses_sent": responses_sent_data,
             "available_dashboard": available_dashboard,  # Add the available_dashboard list
             "crosschain_transactions": crosschain_transactions,
             "rsa_enc_pub_key": item_data['rsa_enc_pub_key'],
             "rsa_enc_priv_key": item_data['rsa_enc_priv_key'],
             "rsa_sign_pub_key": item_data['rsa_sign_pub_key'],
             "rsa_sign_pub_key": item_data['rsa_sign_pub_key'],
+            "userdata_check": item_data['userdata_check'],
+            "rsa_enc_key_pub_check": item_data['rsa_enc_key_pub_check'],
+            "rsa_sign_key_pub_check": item_data['rsa_sign_key_pub_check']
         })
 
         return "Item created successfully!"
@@ -338,7 +341,8 @@ def update_timestamps(data):
 
 
 
-def add_request(sender_id, requests, password):
+def add_request(sender_id, request, password):
+    print("ADD REQUEST")
     # Authenticate the user
     password_auth_result = check_password(sender_id, password)
     if not password_auth_result == True:
@@ -354,8 +358,8 @@ def add_request(sender_id, requests, password):
                 "body": json.dumps("Sender not found")
             }
 
-        # Extract receiver's id from the requests object
-        receiver_id = requests[list(requests.keys())[0]]['id']
+        # Extract receiver's address from the requests object
+        receiver_id = request['address_receiver']
 
         # Get receiver's data from the database
         receiver_response = table.get_item(Key={"id": receiver_id})
@@ -367,14 +371,19 @@ def add_request(sender_id, requests, password):
                 "body": json.dumps("Receiver not found")
             }
 
+        print(sender_data.get('requests_sent'))
+        print(type(sender_data.get('requests_sent')))
         # Update sender's sent_requests
-        sender_requests_sent = json.loads(sender_data.get('requests_sent', '{}'))
-        sender_requests_sent.update(requests)
+        sender_requests_sent = json.loads(sender_data.get('requests_sent', '[]'))
+        print('mubunggg..')
+        print("sender_requests_sent")
+        print(sender_requests_sent)
+        sender_requests_sent.append(request)
         sender_requests_sent_json = json.dumps(sender_requests_sent)
 
         # Update receiver's received_requests
-        receiver_requests_received = json.loads(receiver_data.get('requests_received', '{}'))
-        receiver_requests_received.update(requests)
+        receiver_requests_received = json.loads(receiver_data.get('requests_received', '[]'))
+        receiver_requests_received.append(request)
         receiver_requests_received_json = json.dumps(receiver_requests_received)
 
         # Update sender's and receiver's data in the database
@@ -402,7 +411,7 @@ def add_request(sender_id, requests, password):
             "body": json.dumps(str(e))
         }
 
-def add_response(sender_id, responses, password):
+def add_response(sender_id, response, password):
     # Authenticate the user
     password_auth_result = check_password(sender_id, password)
     if not password_auth_result == True:
@@ -418,8 +427,8 @@ def add_response(sender_id, responses, password):
                 "body": json.dumps("Sender not found")
             }
 
-        # Extract receiver's id from the responses object
-        receiver_id = responses[list(responses.keys())[0]]['id']
+        # Extract receiver's address from the responses object
+        receiver_id = response['address_receiver']
 
         # Get receiver's data from the database
         receiver_response = table.get_item(Key={"id": receiver_id})
@@ -432,13 +441,13 @@ def add_response(sender_id, responses, password):
             }
 
         # Update sender's sent_responses
-        sender_responses_sent = json.loads(sender_data.get('responses_sent', '{}'))
-        sender_responses_sent.update(responses)
+        sender_responses_sent = json.loads(sender_data.get('responses_sent', '[]'))
+        sender_responses_sent.append(response)
         sender_responses_sent_json = json.dumps(sender_responses_sent)
 
         # Update receiver's received_responses
-        receiver_responses_received = json.loads(receiver_data.get('responses_received', '{}'))
-        receiver_responses_received.update(responses)
+        receiver_responses_received = json.loads(receiver_data.get('responses_received', '[]'))
+        receiver_responses_received.append(response)
         receiver_responses_received_json = json.dumps(receiver_responses_received)
 
         # Update sender's and receiver's data in the database
@@ -635,9 +644,9 @@ def add_crosschain_transaction(id, crosschain_transaction, password):
     password_auth_result = check_password(id, password)
     if not password_auth_result == True:
         return password_auth_result
+
     try:
-        
-        # Get users CCTXs from the database
+        # Get user's data from the database
         user = table.get_item(Key={"id": id})
         user_data = user.get("Item", None)
 
@@ -647,17 +656,21 @@ def add_crosschain_transaction(id, crosschain_transaction, password):
                 "body": json.dumps("User not found")
             }
 
-        # Update users cctx's
-        cctx = json.loads(user_data.get('crosschain_transactions', '{}'))
-        cctx.update(crosschain_transaction)
-        crosschain_transactions = json.dumps(cctx)
+        # Load the existing cctx data as a list
+        cctx = json.loads(user_data.get('crosschain_transactions', '[]'))
+        
+        # Update the new transaction with a "last_updated" timestamp
+        crosschain_transaction['last_updated'] = str(int(time.time()))
+        
+        # Append the new transaction to the list
+        cctx.append(crosschain_transaction)
 
         # Update cctx's in the database
         response = table.update_item(
             Key={"id": id},
             UpdateExpression="set #crosschain_transactions = :crosschain_transactions",
             ExpressionAttributeNames={"#crosschain_transactions": "crosschain_transactions"},
-            ExpressionAttributeValues={":crosschain_transactions": crosschain_transactions}
+            ExpressionAttributeValues={":crosschain_transactions": json.dumps(cctx)}
         )
 
         return {
@@ -671,25 +684,30 @@ def add_crosschain_transaction(id, crosschain_transaction, password):
             "body": json.dumps(str(e))
         }
 
-def get_crosschain_transcation(id, password):
+
+
+def get_crosschain_transaction(id, password):
     # Authenticate the user
     password_auth_result = check_password(id, password)
     if not password_auth_result == True:
         return password_auth_result
     try:
-
+        print("querying for crosschain transactions")
         # Query the DynamoDB table to fetch the "crosschain_transactions" attribute
         response = table.get_item(Key={"id": id}, ProjectionExpression="crosschain_transactions")
+        print("queried item successfully")
+        print(response)
         item = response.get("Item", None)
         if not item or "crosschain_transactions" not in item:
             return {
                 "statusCode": 404,
                 "body": json.dumps("Crosschain transactions list not found")
             }
+        print("retrieving list from the item")
 
         # Retrieve the "crosschain_transactions" list from the item
         cctx = item.get('crosschain_transactions', [])
-
+        print
         return {
             "statusCode": 200,
             "body": json.dumps(cctx)
@@ -699,30 +717,75 @@ def get_crosschain_transcation(id, password):
             "statusCode": 500,
             "body": json.dumps(str(e))
         }
-
-def get_crosschain_transaction(id, password):
+    
+def get_incoming(id, password):
     # Authenticate the user
     password_auth_result = check_password(id, password)
     if not password_auth_result == True:
         return password_auth_result
-    try:
 
-        # Query the DynamoDB table to fetch the "crosschain_transactions" attribute
-        response = table.get_item(Key={"id": id}, ProjectionExpression="crosschain_transactions")
+    try:
+        # Query the DynamoDB table to fetch the "requests_received" and "responses_received" attributes
+        response = table.get_item(Key={"id": id}, ProjectionExpression="requests_received, responses_received")
         item = response.get("Item", None)
-        if not item or "crosschain_transactions" not in item:
+
+        if not item:
             return {
                 "statusCode": 404,
-                "body": json.dumps("Crosschain transactions list not found")
+                "body": json.dumps("User not found")
             }
 
-        # Retrieve the "crosschain_transactions" list from the item
-        cctx = item.get('crosschain_transactions', [])
+        # Retrieve the "requests_received" and "responses_received" lists from the item
+        requests_received = item.get('requests_received', [])
+        responses_received = item.get('responses_received', [])
+
+        # Combine the two lists into one
+        incoming_data = {
+            "requests_received": requests_received,
+            "responses_received": responses_received
+        }
 
         return {
             "statusCode": 200,
-            "body": cctx
+            "body": json.dumps(incoming_data)
         }
+
+    except Exception as e:
+        return {
+            "statusCode": 500,
+            "body": json.dumps(str(e))
+        }
+
+def get_outgoing(id, password):
+    # Authenticate the user
+    password_auth_result = check_password(id, password)
+    if not password_auth_result == True:
+        return password_auth_result
+
+    try:
+        response = table.get_item(Key={"id": id}, ProjectionExpression="requests_sent, responses_sent")
+        item = response.get("Item", None)
+
+        if not item:
+            return {
+                "statusCode": 404,
+                "body": json.dumps("User not found")
+            }
+
+        requests_sent = item.get('requests_sent', [])
+        responses_sent = item.get('responses_sent', [])
+
+        # Combine the two lists into one
+        outgoing_data = {
+            "requests_sent": requests_sent,
+            "responses_sent": responses_sent
+        }
+
+        return {
+            "statusCode": 200,
+            "body": json.dumps(outgoing_data)
+        }
+
     except Exception as e:
         return {
             "statusCode": 500,
@@ -733,6 +796,8 @@ def get_crosschain_transaction(id, password):
 def handler(event, context):
     event = json.dumps(event)
     event = json.loads(event)
+    print("event")
+    print(event)
     request_context = event['requestContext']
     http_method = request_context["http"]["method"]
     if http_method == 'OPTIONS':
@@ -788,21 +853,21 @@ def handler(event, context):
                         "body": json.dumps("Missing 'id' or 'password' in the request body")
                     }
             elif body and 'action' in body and body['action'] == 'add_request':
-                if 'requests' in body and 'id' in body:
-                    return add_request(body['id'], body['requests'])
+                if 'request' in body and 'id' in body:
+                    return add_request(body['id'], body['request'], body['password'])
                 else:
                     return {
                         "statusCode": 400,
-                        "body": json.dumps("Missing 'requests' or 'id' in the request body")
+                        "body": json.dumps("Missing 'request' or 'id' in the request body")
                     }
 
             elif body and 'action' in body and body['action'] == 'add_response':
-                if 'responses' in body and 'id' in body:
-                    return add_response(body['id'], body['responses'], body['password'])
+                if 'response' in body and 'id' in body:
+                    return add_response(body['id'], body['response'], body['password'])
                 else:
                     return {
                         "statusCode": 400,
-                        "body": json.dumps("Missing 'responses' or 'id' in the request body")
+                        "body": json.dumps("Missing 'response' or 'id' in the request body")
                     }
 
             elif body['action'] == 'get_available_dashboard':
@@ -845,7 +910,23 @@ def handler(event, context):
                 else:
                     return {
                         "statusCode": 400,
-                        "body": json.dumps("Missing 'id', 'transaction' or 'password' in the request body")
+                        "body": json.dumps("Missing 'id' or 'password' in the request body")
+                        }
+            elif body['action'] == 'get_incoming':
+                if 'id' in body:
+                    return get_incoming(body['id'], body['password'])
+                else:
+                    return {
+                        "statusCode": 400,
+                        "body": json.dumps("Missing 'id' or 'password' in the request body")
+                        }
+            elif body['action'] == 'get_outgoing':
+                if 'id' in body:
+                    return get_outgoing(body['id'], body['password'])
+                else:
+                    return {
+                        "statusCode": 400,
+                        "body": json.dumps("Missing 'id' or 'password' in the request body")
                         }
 
             # Add handling for other POST actions here

@@ -47,10 +47,18 @@ export const Header = forwardRef(function Header({ className }, ref) {
   let bgOpacityLight = useTransform(scrollY, [0, 72], [0.5, 0.9])
   let bgOpacityDark = useTransform(scrollY, [0, 72], [0.2, 0.8])
   const [accountText, setAccountText] = useState('');
-  const {walletConnected, setWalletConnected, userAddress, setUserAddress, loggedIn, setLoggedIn} = useGlobal();
+  const {walletConnected, setWalletConnected, userAddress, setUserAddress, loggedIn, setLoggedIn, chainId, setChainId} = useGlobal();
   const [isHovered, setIsHovered] = useState(false);
   const [textOpacity, setTextOpacity] = useState(1); // Initialize opacity to 1
   const [loginButtonText, setLoginButtonText] = useState('Login');
+
+  function handleChainChanged(metamask_chain_id) {
+    // We recommend reloading the page, unless you must do otherwise.
+    setChainId(metamask_chain_id)
+    console.log(metamask_chain_id)
+  }
+
+  // window.ethereum.on('chainChanged', handleChainChanged);
 
   useEffect(() => {
     if (userAddress) {
@@ -73,6 +81,9 @@ export const Header = forwardRef(function Header({ className }, ref) {
       // User has granted access
       setWalletConnected(true);
       const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      const metamask_chain_id = await window.ethereum.request({ method: 'eth_chainId' });
+      setChainId(metamask_chain_id)
+      console.log(metamask_chain_id)
       setUserAddress(accounts[0]);
     } catch (error) {
       // User denied access or there was an error

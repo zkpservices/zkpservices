@@ -24,34 +24,14 @@ export function ThreeJSComponent() {
       const camera = new window.THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
       const renderer = new window.THREE.WebGLRenderer({ antialias: true, alpha: true });
 
-      let canvasWidth;
-      let canvasHeight;
-
-      if (window.innerWidth >= 1650) {
-        canvasWidth = containerRef.current.clientWidth * 1.3;
-        canvasHeight = (containerRef.current.clientWidth * 1.3) / (window.innerWidth / window.innerHeight);
-      } else if (window.innerWidth >= 1200) {
-        canvasWidth = containerRef.current.clientWidth * 1.15;
-        canvasHeight = (containerRef.current.clientWidth * 1.15) / (window.innerWidth / window.innerHeight);
-      } else if (window.innerWidth >= 768) {
-        canvasWidth = containerRef.current.clientWidth * 0.9;
-        canvasHeight = (containerRef.current.clientWidth * 0.9) / (window.innerWidth / window.innerHeight);
-      } else if (window.innerWidth >= 400) {
-        canvasWidth = containerRef.current.clientWidth * 0.55;
-        canvasHeight = (containerRef.current.clientWidth * 0.55) / (window.innerWidth / window.innerHeight);
-      } else { // Below 450
-        canvasWidth = 350; // Set a constant width
-        canvasHeight = 350; // Set a constant height
-      }
-
-      renderer.setSize(canvasWidth, canvasHeight);
+      renderer.setSize(containerRef.current.clientWidth, containerRef.current.clientHeight);
       containerRef.current.appendChild(renderer.domElement);
 
       let originalPositions;
       let points;
       let centroid = new window.THREE.Vector3();
 
-      fetch('zkp.obj.csv')
+      fetch('zkp_geometry_clean_adjusted.obj.csv')
         .then(response => response.text())
         .then(text => {
           const rows = text.split('\n').map(row => row.split(',').map(Number));
@@ -68,31 +48,41 @@ export function ThreeJSComponent() {
           const boundingBox = new window.THREE.Box3().setFromBufferAttribute(geometry.attributes.position);
           boundingBox.getCenter(centroid);
 
-          camera.aspect = canvasWidth / canvasHeight;
+
+          // Shift the camera slightly closer to the points
+          camera.position.set(centroid.x - 2, centroid.y+0.5, centroid.z + 4);
+
+          camera.aspect = containerRef.current.clientWidth / containerRef.current.clientHeight;
           camera.updateProjectionMatrix();
 
-          camera.position.set(centroid.x - 2, centroid.y + 0.5, centroid.z + 4);
-
           let mouseX = 0;
+          let mouseY = 0;
           let isMouseMoving = false;
-          let rotationSpeed = 0.002;
+          let rotationSpeedX = 0.002;
+          let rotationSpeedY = 0.002;
+          let rotationX = 0;
           let rotationY = 0;
-          let maxRotationY = Math.PI / 16;
-          let explosionFactor = 0.02;
+          let rotationZ = 0;
+          let explosionFactor = 0.015;
 
           document.addEventListener('mousemove', (event) => {
             isMouseMoving = true;
             mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+            mouseY = (event.clientY / window.innerHeight) * 2 - 1;
           });
 
           const animate = function () {
             requestAnimationFrame(animate);
 
             if (isMouseMoving) {
-              const directionX = mouseX - (centroid.x / canvasWidth);
-              rotationY += rotationSpeed * directionX;
-              rotationY = Math.max(-maxRotationY, Math.min(maxRotationY, rotationY));
+              const direction = new window.THREE.Vector3(mouseX, mouseY, 0).normalize();
+              // Flip rotation direction for up and down mouse movement
+              rotationX += rotationSpeedX * direction.y;
+              rotationY += rotationSpeedY * direction.x;
+
+              points.rotation.x = rotationX;
               points.rotation.y = rotationY;
+              points.rotation.z = rotationZ;
 
               for (let i = 0; i < vertices.length; i += 3) {
                 vertices[i] += (Math.random() - 0.5) * explosionFactor;
@@ -101,9 +91,14 @@ export function ThreeJSComponent() {
               }
               geometry.attributes.position.needsUpdate = true;
             } else {
-              let factor = 0.2;
+              let factor = .2
+              rotationX *= factor;
               rotationY *= factor;
+              rotationZ *= factor;
+
+              points.rotation.x = rotationX;
               points.rotation.y = rotationY;
+              // points.rotation.z = rotationZ;
 
               for (let i = 0; i < vertices.length; i++) {
                 vertices[i] += (originalPositions[i] - vertices[i]) * 0.1;
@@ -121,34 +116,17 @@ export function ThreeJSComponent() {
         });
 
       window.addEventListener('resize', () => {
-        if (containerRef.current) {
-          if (window.innerWidth >= 1650) {
-            canvasWidth = containerRef.current.clientWidth * 1.3;
-            canvasHeight = (containerRef.current.clientWidth * 1.3) / (window.innerWidth / window.innerHeight);
-          } else if (window.innerWidth >= 1200) {
-            canvasWidth = containerRef.current.clientWidth * 1.15;
-            canvasHeight = (containerRef.current.clientWidth * 1.15) / (window.innerWidth / window.innerHeight);
-          } else if (window.innerWidth >= 768) {
-            canvasWidth = containerRef.current.clientWidth * 0.9;
-            canvasHeight = (containerRef.current.clientWidth * 0.9) / (window.innerWidth / window.innerHeight);
-          } else if (window.innerWidth >= 450) {
-            canvasWidth = containerRef.current.clientWidth * 0.55;
-            canvasHeight = (containerRef.current.clientWidth * 0.55) / (window.innerWidth / window.innerHeight);
-          } else { // Below 450
-            canvasWidth = 350; // Set a constant width
-            canvasHeight = 350; // Set a constant height
-          }
+        const containerAspect = containerRef.current.clientWidth / containerRef.current.clientHeight;
+        camera.aspect = containerAspect;
+        camera.updateProjectionMatrix();
 
-          renderer.setSize(canvasWidth, canvasHeight);
-          camera.aspect = canvasWidth / canvasHeight;
-          camera.updateProjectionMatrix();
-        }
+        renderer.setSize(containerRef.current.clientWidth, containerRef.current.clientHeight);
       });
     }
   }, [scriptLoaded]);
 
   return (
-    <div className="w-full flex items-center justify-center" ref={containerRef}>
+    <div className="w-full h-screen flex items-center justify-center" ref={containerRef}>
       {/* Your HTML content here */}
     </div>
   );
