@@ -2,6 +2,7 @@ import { Fragment, useState, useEffect } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { ExclamationTriangleIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useGlobal } from '@/components/GlobalStorage';
+import { poseidon } from '@/components/PoseidonHash';
 
 export function ZKPFaucetModal({open, onClose}) { 
   let { userAddress, coreContract, web3} = useGlobal();
@@ -21,6 +22,9 @@ export function ZKPFaucetModal({open, onClose}) {
 
   async function handleRequestTokens() {
     try {
+      //poseidon example
+      let res = await poseidon(["42","73","91111111"]);
+      console.log(res);
       if (coreContract) {
         const currentBalance = await coreContract.methods.balanceOf(userAddress).call();
         const balanceToAdd = 200; 
