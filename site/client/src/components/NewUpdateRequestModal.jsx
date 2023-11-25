@@ -2,9 +2,8 @@ import { Fragment, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 
-export function NewUpdateRequestModal() {
+export function NewUpdateRequestModal({open, onClose}) {
   const [is2FAEnabled, setIs2FAEnabled] = useState(false);
-  const [open, setOpen] = useState(true);
   const [twoFAProvider, setTwoFAProvider] = useState("zkp.services VRF 2FA"); 
   const [twoFARequestID, setTwoFARequestID] = useState("");
 
@@ -16,7 +15,7 @@ export function NewUpdateRequestModal() {
 
   return (
     <Transition.Root show={open} as={Fragment}>
-      <Dialog as="div" className="fixed inset-0 overflow-y-auto z-10 dark:bg-opacity-75" onClose={() => setOpen(false)}>
+      <Dialog as="div" className="fixed inset-0 overflow-y-auto z-10 dark:bg-opacity-75" onClose={onClose}>
         <div className="min-h-screen flex items-center justify-center">
           <Transition.Child
             as={Fragment}
@@ -45,7 +44,7 @@ export function NewUpdateRequestModal() {
                   <button
                     type="button"
                     className="rounded-md bg-white dark:bg-gray-800 text-gray-400 dark:text-gray-600 hover:text-gray-500 dark:hover:text-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
-                    onClick={() => setOpen(false)}
+                    onClick={onClose}
                   >
                     <span className="sr-only">Close</span>
                     <XMarkIcon
@@ -69,7 +68,7 @@ export function NewUpdateRequestModal() {
                       id="receiverAddress"
                       className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
                       rows={1}
-                      spellcheck="false"
+                      spellCheck="false"
                     />
                   </div>
 
@@ -81,7 +80,7 @@ export function NewUpdateRequestModal() {
                       id="fieldToUpdate"
                       className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
                       rows={1}
-                      spellcheck="false"
+                      spellCheck="false"
                     />
                   </div>
 
@@ -93,7 +92,7 @@ export function NewUpdateRequestModal() {
                       id="newData"
                       className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
                       rows={8}
-                      spellcheck="false"
+                      spellCheck="false"
                     />
                   </div>
 
@@ -107,7 +106,7 @@ export function NewUpdateRequestModal() {
                       id="oneTimeKey"
                       className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
                       rows={1}
-                      spellcheck="false"
+                      spellCheck="false"
                     />
                     <button
                       className="mt-2 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
@@ -127,7 +126,7 @@ export function NewUpdateRequestModal() {
                       id="oneTimeSalt"
                       className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
                       rows={1}
-                      spellcheck="false"
+                      spellCheck="false"
                     />
                     <button
                       className="mt-2 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
@@ -148,7 +147,7 @@ export function NewUpdateRequestModal() {
                       className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
                       rows={1}
                       defaultValue="600"
-                      spellcheck="false"
+                      spellCheck="false"
                     />
                   </div>
 
@@ -175,7 +174,7 @@ export function NewUpdateRequestModal() {
                           className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
                           rows={1}
                           defaultValue={twoFAProvider}
-                          spellcheck="false"
+                          spellCheck="false"
                         />
                       </div>
 
@@ -189,7 +188,7 @@ export function NewUpdateRequestModal() {
                           rows={1}
                           value={twoFARequestID}
                           onChange={(e) => setTwoFARequestID(e.target.value)}
-                          spellcheck="false"
+                          spellCheck="false"
                         />
                         <button
                           className="mt-2 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
@@ -219,7 +218,7 @@ export function NewUpdateRequestModal() {
                       className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
                       rows={1}
                       defaultValue="10"
-                      spellcheck="false"
+                      spellCheck="false"
                     />
                   </div>
                 </div>
@@ -228,14 +227,14 @@ export function NewUpdateRequestModal() {
                   <button
                     type="button"
                     className="mt-3 ml-3 inline-flex w-full justify-center rounded-md bg-slate-100 dark:bg-slate-800 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-slate-200 dark:hover:bg-slate-900 sm:mt-0 sm:w-auto"
-                    onClick={() => setOpen(false)}
+                    onClick={onClose}
                   >
                     Cancel
                   </button>
                  <button
                     type="button"
                     className="ml-3 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
-                    onClick={() => setOpen(false)}
+                    onClick={onClose}
                   >
                     Call Smart Contract
                   </button> 

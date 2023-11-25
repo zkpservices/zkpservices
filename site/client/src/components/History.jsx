@@ -11,7 +11,12 @@ const classNames = (...classes) => {
   return classes.filter(Boolean).join(' ');
 };
 
-export function History({ tableData = {}, showRefresh = true }) {
+export function History({ tableData = {}, showRefresh = true , loadAllHistory}) {
+  const handleRefreshAll = () => {
+    // Call the loadAllHistory function from DashboardContext
+    loadAllHistory();
+  };
+
   return (
     <div className="xl:max-w-none">
       <Heading level={2} id="history" className="mt-0">
@@ -42,7 +47,7 @@ export function History({ tableData = {}, showRefresh = true }) {
                 </Tab.List>
                 <button
                   className="px-3 py-2 text-sm mr-1.5 font-medium bg-emerald-100 text-emerald-500 hover:bg-emerald-200 dark:bg-emerald-900 dark:text-emerald-400 dark:hover:bg-emerald-800 rounded-md"
-                  onClick={() => {}}
+                  onClick={handleRefreshAll}
                 >
                   Refresh All
                 </button>
@@ -70,8 +75,8 @@ export function History({ tableData = {}, showRefresh = true }) {
                                 <th className="px-6 py-3 text-left text-xs text-gray-500 uppercase dark:text-gray-300">
                                   Details
                                 </th>
-                                {showRefresh && tab.name !== 'Incoming' ? (
-                                  <th className="px-6 py-3 text-left text-xs text-gray-500 uppercase dark:text-gray-300">
+                                {showRefresh ? (
+                                  <th className="px-6 py-3 text-left text-xs text-gray-500 uppercase dark:text-gray-300" onClick={handleRefreshAll}>
                                     Refresh
                                   </th>
                                 ) : null}
@@ -116,14 +121,12 @@ export function History({ tableData = {}, showRefresh = true }) {
                                       {rowData.details[1]}
                                     </div>
                                   </td>
-                                  {showRefresh && tab.name !== 'Incoming' ? (
+                                  {showRefresh ? (
                                     <td className="px-6 py-4 whitespace-nowrap text-left text-sm">
                                       {/* Conditionally render the Refresh button */}
-                                      {rowData.status[1] === 'grey' ? (
-                                        <button className="px-2 py-1 rounded-md text-sm font-medium bg-emerald-100 text-emerald-500 hover:bg-emerald-200 dark:bg-emerald-900 dark:text-emerald-400 dark:hover:bg-emerald-800">
+                                        <button className="px-2 py-1 rounded-md text-sm font-medium bg-emerald-100 text-emerald-500 hover:bg-emerald-200 dark:bg-emerald-900 dark:text-emerald-400 dark:hover:bg-emerald-800" onClick={handleRefreshAll}>
                                           Refresh
                                         </button>
-                                      ) : null}
                                     </td>
                                   ) : null}
                                 </tr>
