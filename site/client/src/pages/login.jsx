@@ -120,7 +120,8 @@ export default function Login() {
   useEffect(() => {
     setLoginHeader(showLoginHeader(walletConnected))
     setLoginForm(showLoginForm(walletConnected))
-  }, [walletConnected])
+    setUserAddressLocal(userAddress)
+  }, [walletConnected, userAddress])
 
   const handleSubmit = async (event) => {
      event.preventDefault();
@@ -131,7 +132,7 @@ export default function Login() {
     if (walletConnected) {
       try {
         const formDataJSON = formToJSON(formData)
-        const response = await login(userAddressLocal, formDataJSON['password'])
+        const response = await login(userAddress, formDataJSON['password'])
         setLoggedIn(true);
         setUserPassword(formDataJSON['password'])
         setShowLoginNotification(true)

@@ -22,6 +22,7 @@ export const makeAPICall = async (method, data) => {
 
 // You can create more specific functions for different API endpoints
 export const login = async (userId, password) => {
+  console.log(`logging in with the following data, userId: ${userId}`)
   const data = {
     "id": userId,
     "password": password,
@@ -43,15 +44,15 @@ export const createUser = async (userId, password, quickstart_JSON) => {
   return makeAPICall('POST', mergedData);
 };
 
-export const getUser = async (userId, password) => {
-  const data = {
-    "id": userId,
-    "password": password,
-    "action": "get_item",
-    "key": "id.name"
-  }
-  return makeAPICall('POST', data);
-};
+// export const getUser = async (userId, password) => {
+//   const data = {
+//     "id": userId,
+//     "password": password,
+//     "action": "get_item",
+//     "key": "id.name"
+//   }
+//   return makeAPICall('POST', data);
+// };
 
 export const getCCTX = async (userId, password) => {
   const data = {

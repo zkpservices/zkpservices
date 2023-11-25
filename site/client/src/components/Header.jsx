@@ -94,6 +94,7 @@ export const Header = forwardRef(function Header({ className }, ref) {
       setUserAddress('');
       setLoggedIn(false)
       setWalletConnected(false);
+      localStorage.clear()
     } catch (error) {
       console.error(error);
     }

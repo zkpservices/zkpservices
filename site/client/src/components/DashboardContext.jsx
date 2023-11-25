@@ -20,8 +20,8 @@ import { ReceivedDataResponseModal } from '@/components/ReceivedDataResponseModa
 import { AwaitingUpdateCompletionModal} from '@/components/AwaitingUpdateCompletionModal'
 import { AwaitingDataModal } from '@/components/AwaitingDataModal'
 import { SendDataModal } from '@/components/SendDataModal'
-import coreContractABI from '../../public/contract_ABIs/ZKPServicesCore.json'; 
-import twoFAContractABI from '../../public/contract_ABIs/ZKPServicesVRF2FA.json'; 
+import coreContractABI from '../contract_ABIs/ZKPServicesCore.json'; // Adjust the file path as needed
+import twoFAContractABI from '../contract_ABIs/ZKPServicesVRF2FA.json'; // Adjust the file path as needed
 
 export function DashboardContext() {
   let { walletConnected, userAddress, showLoginNotification, setShowLoginNotification, loggedIn, 

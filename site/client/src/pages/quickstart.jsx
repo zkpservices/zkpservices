@@ -9,7 +9,7 @@ import { generateRSAKeys, generateRSASigningKeys } from '@/components/HelperCall
 export default function Quickstart() {
   let { walletConnected, userAddress, showLoginNotification, 
     setShowLoginNotification, loggedIn, setLoggedIn, userPassword, setUserPassword, username, setUsername, twoFactorAuthPassword, setTwoFactorAuthPassword,
-    contractPassword, setContractPassword } = useGlobal();
+    contractPassword, setContractPassword, chainId } = useGlobal();
   const [showQuickstart, setShowQuickstart] = useState(<h2 className="mt-10 text-center text-3xl font-bold tracking-tight">
   Please connect your wallet to get started.
 </h2>)
@@ -50,6 +50,7 @@ const handleSubmit = async (event) => {
       "rsa_enc_priv_key": formDataJSON['rsa_enc_priv_key'],
       "rsa_sign_pub_key": formDataJSON['rsa_sign_pub_key'],
       "rsa_sign_priv_key": formDataJSON['rsa_sign_priv_key'],
+      "chain_id": chainId,
       "data": JSON.parse(formDataJSON['data']),
       "userdata_check": formDataJSON['userdata_check'] === 'on', // Set to true if checked, false if not
       "rsa_enc_key_pub_check": formDataJSON['rsa_enc_key_pub_check'] === 'on', // Set to true if checked, false if not

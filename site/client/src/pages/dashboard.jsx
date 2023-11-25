@@ -19,8 +19,8 @@ export function Dashboard() {
   let { walletConnected, userAddress, showLoginNotification, 
     setShowLoginNotification, loggedIn, userPassword, username, setUsername } = useGlobal();
 
-  loggedIn = true;
-  walletConnected = true;
+  // loggedIn = true;
+  // walletConnected = true;
 
   const [showDashboard, setShowDashboard] = useState(<div className="flex justify-center"><h2 className="text-3xl font-bold tracking-tight text-center">Please connect your wallet and log in to get started</h2></div>)
   const [usernameText, setUsernameText] = useState('')
@@ -30,10 +30,6 @@ export function Dashboard() {
     if (walletConnected && loggedIn) {
       return (
         <>
-          <h2 className="mt-10 text-center text-3xl font-bold tracking-tight">
-            {username ? `Welcome back, ${username}.` : ''}
-          </h2>
-  
           <DashboardContext />
         </>
       );
@@ -73,18 +69,6 @@ export function Dashboard() {
   }, [loggedIn])
 
   useEffect(() => {
-    if(loggedIn && walletConnected) {
-    async function fetchUsername() {
-      try {
-        const userData = await getUser(userAddress, userPassword);
-        setUsername(userData['data']['id.name'])
-      } catch (error) {
-        console.error('Error fetching user data B:', error);
-      }
-    }
-
-    fetchUsername()
-  }
 
     // After 5000 milliseconds (5 seconds), hide the notification
     const notificationTimeout = setTimeout(() => {
