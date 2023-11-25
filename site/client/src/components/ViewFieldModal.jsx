@@ -64,6 +64,7 @@ export function ViewFieldModal({
                     <Dialog.Title
                       as="h3"
                       className="text-base mb-4 font-semibold leading-6 text-gray-900 dark:text-white"
+                      style={{textTransform: 'capitalize'}}
                     >
                       {title}
                     </Dialog.Title>

@@ -97,3 +97,30 @@ export const getFieldData = async (userId, password, key) => {
   return makeAPICall('POST', data);
 };
 
+export const getDashboard = async (userId, password) => {
+  const data = {
+    "id": userId,
+    "password": password,
+    "action": "get_dashboard",
+  }
+  return makeAPICall('POST', data);
+};
+
+export const getAvailableDashboard = async (userId, password) => {
+  const data = {
+    "id": userId,
+    "password": password,
+    "action": "get_available_dashboard",
+  }
+  return makeAPICall('POST', data);
+};
+
+export const addToDashboard = async (userId, password, service) => {
+  const data = {
+    "id": userId,
+    "password": password,
+    "action": "add_to_dashboard",
+    "service": service
+  }
+  return makeAPICall('POST', data);
+};

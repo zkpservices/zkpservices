@@ -1,9 +1,15 @@
 import { Fragment } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { ExclamationTriangleIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { formToJSON } from 'axios';
 
-export function NewDashboardDataModal({ open, onClose, options = ["Medical Records", "Public Transport Card", "Insurance Card"] }) {
-
+export function NewDashboardDataModal({ open, onClose, onSubmit, options = ["Medical Records", "Public Transport Card", "Insurance Card"] }) {
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    const formData = new FormData(event.target)
+    const formDataJSON = formToJSON(formData);
+    const result = await onSubmit(formDataJSON['field'])
+  }
   return (
     <Transition.Root show={open} as={Fragment}>
       <Dialog as="div" className="fixed inset-0 overflow-y-auto z-10" onClose={onClose}>
@@ -30,6 +36,7 @@ export function NewDashboardDataModal({ open, onClose, options = ["Medical Recor
             leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
           >
             <div className="mx-1 xl:max-w-screen-lg">
+              <form onSubmit={handleSubmit}>
               <div className="relative bg-white rounded-lg max-w-screen-md mx-auto mt-6 px-4 pt-5 pb-4 text-left shadow-xl dark:bg-gray-800 sm:my-20 sm:w-full sm:max-w-3xl sm:p-6">
                 <div className="absolute right-0 top-0 hidden pr-4 pt-4 sm:block">
                   <button
@@ -60,12 +67,13 @@ export function NewDashboardDataModal({ open, onClose, options = ["Medical Recor
                     </Dialog.Title>
                     <div className="mt-2 lg:max-h-[65vh] max-h-[40vh] overflow-y-auto">
                       <div className="m-2">
-                        <label htmlFor="location" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
+                        <label htmlFor="field" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
                           Field Name
                         </label>
                         <select
-                          id="location"
-                          name="location"
+                          id="field"
+                          name="field"
+                          style={{textTransform: 'capitalize'}}
                           className="relative block w-full mt-2 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus-border-emerald-500 focus:outline-none focus:border-transparent focus:ring-emerald-500 focus:box-shadow-none bg-slate-100 dark:bg-slate-700 sm:text-sm sm:leading-6"
                           defaultValue="Medical Records"
                         >
@@ -79,9 +87,8 @@ export function NewDashboardDataModal({ open, onClose, options = ["Medical Recor
                 </div>
                 <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
                   <button
-                    type="button"
+                    type="submit"
                     className="ml-3 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
-                    onClick={onClose}
                   >
                    Add Field to Dashboard 
                   </button> 
@@ -94,6 +101,7 @@ export function NewDashboardDataModal({ open, onClose, options = ["Medical Recor
                   </button>
                 </div>
               </div>
+              </form>
             </div>
           </Transition.Child>
         </div>

@@ -3,7 +3,7 @@ import { UserData }  from '@/components/UserData';
 import { Services }  from '@/components/Services';
 import { History } from '@/components/History'
 import { useGlobal } from '@/components/GlobalStorage';
-import { getCCTX, getIncoming, getOutgoing, truncateAddress } from '@/components/APICalls';
+import { getCCTX, getIncoming, getOutgoing, truncateAddress, getDashboard } from '@/components/APICalls';
 import { ZKPFaucetModal } from '@/components/ZKPFaucetModal'
 import { ViewFieldModal } from '@/components/ViewFieldModal'
 import { NewDashboardDataModal } from '@/components/NewDashboardDataModal'
@@ -31,7 +31,7 @@ export function DashboardContext() {
   const [userDataFields, setUserDataFields] = useState([])
 
   let { walletConnected, userAddress, showLoginNotification, 
-    setShowLoginNotification, loggedIn, userPassword, username, setUsername } = useGlobal();
+    setShowLoginNotification, loggedIn, userPassword, username, setUsername, dashboard, setdashboard } = useGlobal();
 
   function formatIncomingData(incomingRequests, incomingResponses, outgoingResponses) {
     const formattedRequests = incomingRequests.map((item) => {
@@ -151,12 +151,11 @@ export function DashboardContext() {
     fetchHistoryData();
   }
 
-  async function fetchUserDataFields() {
+  async function fetchUserDataFields() {  
     try {
-      // Replace this with the actual fetch method when available
-      // For now, use a placeholder value
-      const placeholderData = ["Medical Records", "Public Transport Information", "Insurance Card"];
-      setUserDataFields(placeholderData);
+      const localdashboard = await getDashboard(userAddress, userPassword)
+      setdashboard(localdashboard['data'])
+      setUserDataFields(localdashboard['data']);
     } catch (error) {
       console.error('Error fetching user data fields:', error);
     }

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { GridPattern } from '@/components/GridPattern';
 import { motion, useMotionTemplate, useMotionValue } from 'framer-motion';
 import { useGlobal } from '@/components/GlobalStorage'
-import { getFieldData } from '@/components/APICalls';
+import { getFieldData, getAvailableDashboard, addToDashboard } from '@/components/APICalls';
 import { Heading } from '@/components/Heading';
 import { DataIcon } from '@/components/icons/DataIcon';
 import { PlusIcon } from '@/components/icons/PlusIcon';
@@ -103,7 +103,7 @@ export function MyData({ mydata, onCardClick }) {
       <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-zinc-900/7.5 group-hover:ring-zinc-900/10 dark:ring-white/10 dark:group-hover:ring-white/20" />
       <div className="relative rounded-2xl px-4 pt-16 pb-4">
         <MyDataIcon icon={mydata.icon} />
-        <h3 className="mt-4 text-sm font-semibold leading-7 text-zinc-900 dark:text-white">
+        <h3 className="mt-4 text-sm font-semibold leading-7 text-zinc-900 dark:text-white" style={{textTransform: 'capitalize'}}>
           <span className="absolute inset-0 rounded-2xl" />
           {mydata.name}
         </h3>
@@ -118,7 +118,12 @@ export function MyData({ mydata, onCardClick }) {
 export function UserData({ fieldNames = [] }) {
   const [selectedFieldName, setSelectedFieldName] = useState(null);
   const [addDataModalOpen, setAddDataModalOpen] = useState(false);
-  let {userAddress, userPassword, fieldData, setFieldData} = useGlobal();
+  let {userAddress, userPassword, fieldData, setFieldData, availableDashboard, setAvailableDashboard, dashboard, setDashboard} = useGlobal();
+
+  async function addServiceToDashboard(service) {
+    const addToDashboardResult = await addToDashboard(userAddress, userPassword, service)
+    console.log(addToDashboardResult)
+  }
 
   async function openFieldModal(fieldName) {
     let localFieldData = await getFieldData(userAddress, userPassword, fieldName.toLowerCase())
@@ -130,7 +135,13 @@ export function UserData({ fieldNames = [] }) {
     setSelectedFieldName(null);
   };
 
-  const openAddDataModal = () => {
+  async function openAddDataModal() {
+    const localAvailableDashboard = await getAvailableDashboard(userAddress, userPassword)
+    console.log(fieldNames)
+    const differenceDashboard = fieldNames.filter((item) => !localAvailableDashboard['data'].includes(item));
+    
+    console.log(differenceDashboard)
+    setAvailableDashboard(differenceDashboard)
     setAddDataModalOpen(true);
   };
   
@@ -185,7 +196,9 @@ export function UserData({ fieldNames = [] }) {
       {addDataModalOpen && (
         <NewDashboardDataModal
           open={addDataModalOpen}
+          onSubmit={addServiceToDashboard}
           onClose={closeAddDataModal}
+          options={availableDashboard}
         />
       )}
   </div>
