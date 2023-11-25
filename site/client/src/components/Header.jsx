@@ -11,6 +11,7 @@ import { MobileSearch, Search } from '@/components/Search'
 import Web3 from 'web3';
 import coreContractABI from '../../public/contract_ABIs/ZKPServicesCore.json'; 
 import twoFAContractABI from '../../public/contract_ABIs/ZKPServicesVRF2FA.json'; 
+import batchSignUpABI from '../../public/contract_ABIs/BatchSignUp.json'
 import {
   MobileNavigation,
   useIsInsideMobileNavigation,
@@ -38,11 +39,10 @@ export const Header = forwardRef(function Header({ className }, ref) {
   let bgOpacityDark = useTransform(scrollY, [0, 72], [0.2, 0.2])
   const [accountText, setAccountText] = useState('');
   const {walletConnected, setWalletConnected, userAddress, setUserAddress, 
-        loggedIn, setLoggedIn, chainId, setChainId, web3, fujiCoreContract, fujiTwoFAContract, 
-        mumbaiCoreContract, mumbaiTwoFAContract, rippleCoreContract,
-        rippleTwoFAContract, setWeb3, setFujiCoreContract,
-        setFujiTwoFAContract, setMumbaiCoreContract, setMumbaiTwoFAContract,
-        setRippleCoreContract, setRippleTwoFAContract } = useGlobal();
+        loggedIn, setLoggedIn, chainId, setChainId, setWeb3, setFujiCoreContract,
+        setFujiTwoFAContract, setFujiBatchSignUpContract, setMumbaiCoreContract, 
+        setMumbaiTwoFAContract, setMumbaiBatchSignUpContract, setRippleCoreContract, 
+        setRippleTwoFAContract, setRippleBatchSignUpContract} = useGlobal();
   const [isHovered, setIsHovered] = useState(false);
   const [textOpacity, setTextOpacity] = useState(1); // Initialize opacity to 1
   const [loginButtonText, setLoginButtonText] = useState('Login');
@@ -140,12 +140,10 @@ export const Header = forwardRef(function Header({ className }, ref) {
     const fujiCoreContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'; 
     const mumbaiCoreContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'; 
     const rippleCoreContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'; 
-
     const fujiCoreContractInstance = new web3Instance.eth.Contract(coreContractAbi, fujiCoreContractAddress);
     const mumbaiCoreContractInstance = new web3Instance.eth.Contract(coreContractAbi, mumbaiCoreContractAddress);
     const rippleCoreContractInstance = new web3Instance.eth.Contract(coreContractAbi, rippleCoreContractAddress);
     setFujiCoreContract(fujiCoreContractInstance);
-    console.log(`fujiCoreContractInstance: ${fujiCoreContractInstance}`)
     setMumbaiCoreContract(mumbaiCoreContractInstance);
     setRippleCoreContract(rippleCoreContractInstance);
 
@@ -153,13 +151,23 @@ export const Header = forwardRef(function Header({ className }, ref) {
     const fujiTwoFAContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'; 
     const mumbaiTwoFAContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'; 
     const rippleTwoFAContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'; 
-
     const fujiTwoFAContractInstance = new web3Instance.eth.Contract(twoFAContractAbi, fujiTwoFAContractAddress);
     const mumbaiTwoFAContractInstance = new web3Instance.eth.Contract(twoFAContractAbi, mumbaiTwoFAContractAddress);
     const rippleTwoFAContractInstance = new web3Instance.eth.Contract(twoFAContractAbi, rippleTwoFAContractAddress);
     setFujiTwoFAContract(fujiTwoFAContractInstance);
     setMumbaiTwoFAContract(mumbaiTwoFAContractInstance);
     setRippleTwoFAContract(rippleTwoFAContractInstance);
+
+    const batchSignUpContractAbi = batchSignUpABI;
+    const fujiBatchSignUpContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d';
+    const mumbaiBatchSignUpContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d';
+    const rippleBatchSignUpContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d';
+    const fujiBatchSignUpContractInstance = new web3Instance.eth.Contract(batchSignUpContractAbi, fujiBatchSignUpContractAddress);
+    const mumbaiBatchSignUpContractInstance = new web3Instance.eth.Contract(batchSignUpContractAbi, mumbaiBatchSignUpContractAddress);
+    const rippleBatchSignUpContractInstance = new web3Instance.eth.Contract(batchSignUpContractAbi, rippleBatchSignUpContractAddress);
+    setFujiBatchSignUpContract(fujiBatchSignUpContractInstance);
+    setMumbaiBatchSignUpContract(mumbaiBatchSignUpContractInstance);
+    setRippleBatchSignUpContract(rippleBatchSignUpContractInstance);
   }
   
   function updateWalletConnect() {

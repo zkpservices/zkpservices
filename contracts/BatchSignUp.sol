@@ -8,8 +8,11 @@ interface _2FAInterface {
 // Interface for CoreContract
 interface CoreContractInterface {
     function setRSAEncryptionKey(string memory rsaEncryptionKey) external;
+
     function setRSASigningKey(string memory rsaSigningKey) external;
-    function setPublicUserInformation(string memory _publicUserInformation) external;
+
+    function setPublicUserInformation(string memory _publicUserInformation)
+        external;
 }
 
 contract BatchSignUp is _2FAInterface, CoreContractInterface {
@@ -22,19 +25,47 @@ contract BatchSignUp is _2FAInterface, CoreContractInterface {
     }
 
     function setSecret(uint256 _userSecretHash) external override {
-        _2FAContract.setSecret(_userSecretHash);
+        // Use delegatecall to relay msg.sender to _2FAContract
+        (bool success, ) = address(_2FAContract).delegatecall(
+            abi.encodeWithSignature("setSecret(uint256)", _userSecretHash)
+        );
+        require(success, "SetSecret delegatecall failed");
     }
 
-    function setRSAEncryptionKey(string memory rsaEncryptionKey) external override {
-        coreContract.setRSAEncryptionKey(rsaEncryptionKey);
+    function setRSAEncryptionKey(string memory rsaEncryptionKey)
+        external
+        override
+    {
+        // Use delegatecall to relay msg.sender to coreContract
+        (bool success, ) = address(coreContract).delegatecall(
+            abi.encodeWithSignature(
+                "setRSAEncryptionKey(string)",
+                rsaEncryptionKey
+            )
+        );
+        require(success, "SetRSAEncryptionKey delegatecall failed");
     }
 
     function setRSASigningKey(string memory rsaSigningKey) external override {
-        coreContract.setRSASigningKey(rsaSigningKey);
+        // Use delegatecall to relay msg.sender to coreContract
+        (bool success, ) = address(coreContract).delegatecall(
+            abi.encodeWithSignature("setRSASigningKey(string)", rsaSigningKey)
+        );
+        require(success, "SetRSASigningKey delegatecall failed");
     }
 
-    function setPublicUserInformation(string memory _publicUserInformation) external override {
-        coreContract.setPublicUserInformation(_publicUserInformation);
+    function setPublicUserInformation(string memory _publicUserInformation)
+        external
+        override
+    {
+        // Use delegatecall to relay msg.sender to coreContract
+        (bool success, ) = address(coreContract).delegatecall(
+            abi.encodeWithSignature(
+                "setPublicUserInformation(string)",
+                _publicUserInformation
+            )
+        );
+        require(success, "SetPublicUserInformation delegatecall failed");
     }
 
     function batchSignUp(
@@ -43,9 +74,34 @@ contract BatchSignUp is _2FAInterface, CoreContractInterface {
         string memory rsaSigningKey,
         string memory publicUserInformation
     ) external {
-        _2FAContract.setSecret(_userSecretHash);
-        coreContract.setRSAEncryptionKey(rsaEncryptionKey);
-        coreContract.setRSASigningKey(rsaSigningKey);
-        coreContract.setPublicUserInformation(publicUserInformation);
+        // Use delegatecall to relay msg.sender to _2FAContract
+        (bool success, ) = address(_2FAContract).delegatecall(
+            abi.encodeWithSignature("setSecret(uint256)", _userSecretHash)
+        );
+        require(success, "SetSecret delegatecall failed");
+
+        // Use delegatecall to relay msg.sender to coreContract
+        (success, ) = address(coreContract).delegatecall(
+            abi.encodeWithSignature(
+                "setRSAEncryptionKey(string)",
+                rsaEncryptionKey
+            )
+        );
+        require(success, "SetRSAEncryptionKey delegatecall failed");
+
+        // Use delegatecall to relay msg.sender to coreContract
+        (success, ) = address(coreContract).delegatecall(
+            abi.encodeWithSignature("setRSASigningKey(string)", rsaSigningKey)
+        );
+        require(success, "SetRSASigningKey delegatecall failed");
+
+        // Use delegatecall to relay msg.sender to coreContract
+        (success, ) = address(coreContract).delegatecall(
+            abi.encodeWithSignature(
+                "setPublicUserInformation(string)",
+                publicUserInformation
+            )
+        );
+        require(success, "SetPublicUserInformation delegatecall failed");
     }
 }
