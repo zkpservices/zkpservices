@@ -44,8 +44,8 @@ export const Header = forwardRef(function Header({ className }, ref) {
   let isInsideMobileNavigation = useIsInsideMobileNavigation()
 
   let { scrollY } = useScroll()
-  let bgOpacityLight = useTransform(scrollY, [0, 72], [0.5, 0.9])
-  let bgOpacityDark = useTransform(scrollY, [0, 72], [0.2, 0.8])
+  let bgOpacityLight = useTransform(scrollY, [0, 72], [0.5, 0.5])
+  let bgOpacityDark = useTransform(scrollY, [0, 72], [0.2, 0.2])
   const [accountText, setAccountText] = useState('');
   const {walletConnected, setWalletConnected, userAddress, setUserAddress, loggedIn, setLoggedIn, chainId, setChainId} = useGlobal();
   const [isHovered, setIsHovered] = useState(false);
