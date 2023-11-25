@@ -20,6 +20,7 @@ import { ReceivedDataResponseModal } from '@/components/ReceivedDataResponseModa
 import { AwaitingUpdateCompletionModal} from '@/components/AwaitingUpdateCompletionModal'
 import { AwaitingDataModal } from '@/components/AwaitingDataModal'
 import { SendDataModal } from '@/components/SendDataModal'
+import { OnboardToNewChainModal } from '@/components/OnboardToNewChainModal';
 import coreContractABI from '../../public/contract_ABIs/ZKPServicesCore.json'; 
 import twoFAContractABI from '../../public/contract_ABIs/ZKPServicesVRF2FA.json'; 
 import batchSignUpABI from '../../public/contract_ABIs/BatchSignUp.json'

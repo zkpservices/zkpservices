@@ -12,6 +12,7 @@ import { NewUpdateRequestModal } from '@/components/NewUpdateRequestModal';
 import { NewDataRequestModal } from '@/components/NewDataRequestModal';
 import { NewCrossChainSyncModal } from '@/components/NewCrossChainSyncModal';
 import { useGlobal } from '@/components/GlobalStorage';
+import { OnboardToNewChainModal } from './OnboardToNewChainModal';
 const services = [
   {
     href: '/dashboard',
@@ -64,6 +65,20 @@ const services = [
     pattern: {
       y: 22,
       squares: [[0, 1]],
+    },
+  },
+  {
+    href: '/dashboard',
+    name: 'Onboard To New Chain',
+    description:
+      'Learn about the conversation model and how to create, retrieve, update, delete, and list conversations.',
+    icon: UpdateIcon,
+    pattern: {
+      y: -6,
+      squares: [
+        [-1, 2],
+        [1, 3],
+      ],
     },
   },
 ];
@@ -191,6 +206,7 @@ export function Services() {
       {selectedService === 'Request Update' && <NewUpdateRequestModal open={true} onClose={() => setSelectedService(null)} onSubmit={addNewRequest}/>}
       {selectedService === 'Cross-Chain Backups' && <NewCrossChainSyncModal open={true} onClose={() => setSelectedService(null)} />}
       {selectedService === 'ZKP Tokens Faucet' && <ZKPFaucetModal open={true} onClose={() => setSelectedService(null)} />}
+      {selectedService === 'Onboard To New Chain' && <OnboardToNewChainModal open={true} onClose={() => setSelectedService(null)} />}
     </div>
   );
 }
