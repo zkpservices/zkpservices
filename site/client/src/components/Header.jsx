@@ -8,6 +8,9 @@ import { Logo } from '@/components/Logo'
 import { useMobileNavigationStore } from '@/components/MobileNavigation'
 import { ModeToggle } from '@/components/ModeToggle'
 import { MobileSearch, Search } from '@/components/Search'
+import Web3 from 'web3';
+import coreContractABI from '../../public/contract_ABIs/ZKPServicesCore.json'; 
+import twoFAContractABI from '../../public/contract_ABIs/ZKPServicesVRF2FA.json'; 
 import {
   MobileNavigation,
   useIsInsideMobileNavigation,
@@ -35,7 +38,11 @@ export const Header = forwardRef(function Header({ className }, ref) {
   let bgOpacityDark = useTransform(scrollY, [0, 72], [0.2, 0.2])
   const [accountText, setAccountText] = useState('');
   const {walletConnected, setWalletConnected, userAddress, setUserAddress, 
-        loggedIn, setLoggedIn, chainId, setChainId } = useGlobal();
+        loggedIn, setLoggedIn, chainId, setChainId, web3, fujiCoreContract, fujiTwoFAContract, 
+        mumbaiCoreContract, mumbaiTwoFAContract, rippleCoreContract,
+        rippleTwoFAContract, setWeb3, setFujiCoreContract,
+        setFujiTwoFAContract, setMumbaiCoreContract, setMumbaiTwoFAContract,
+        setRippleCoreContract, setRippleTwoFAContract } = useGlobal();
   const [isHovered, setIsHovered] = useState(false);
   const [textOpacity, setTextOpacity] = useState(1); // Initialize opacity to 1
   const [loginButtonText, setLoginButtonText] = useState('Login');
@@ -79,6 +86,7 @@ export const Header = forwardRef(function Header({ className }, ref) {
       setChainId(metamask_chain_id)
       console.log(metamask_chain_id)
       setUserAddress(accounts[0]);
+      initializeWeb3();
     } catch (error) {
       // User denied access or there was an error
       console.error(error);
@@ -86,6 +94,8 @@ export const Header = forwardRef(function Header({ className }, ref) {
   }
 
   useEffect(() => {
+    initializeWeb3();
+    
     const handleChainChanged = (_chainId) => {
       // Handle the new chain.
       // You can also force a page reload if needed
@@ -119,6 +129,37 @@ export const Header = forwardRef(function Header({ className }, ref) {
     } catch (error) {
       console.error(error);
     }
+  }
+
+  async function initializeWeb3(){
+    //these are too large for local storage and need to be reinstantiated each time
+    const web3Instance = new Web3(window.ethereum);
+    setWeb3(web3Instance);
+
+    const coreContractAbi = coreContractABI; 
+    const fujiCoreContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'; 
+    const mumbaiCoreContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'; 
+    const rippleCoreContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'; 
+
+    const fujiCoreContractInstance = new web3Instance.eth.Contract(coreContractAbi, fujiCoreContractAddress);
+    const mumbaiCoreContractInstance = new web3Instance.eth.Contract(coreContractAbi, mumbaiCoreContractAddress);
+    const rippleCoreContractInstance = new web3Instance.eth.Contract(coreContractAbi, rippleCoreContractAddress);
+    setFujiCoreContract(fujiCoreContractInstance);
+    console.log(`fujiCoreContractInstance: ${fujiCoreContractInstance}`)
+    setMumbaiCoreContract(mumbaiCoreContractInstance);
+    setRippleCoreContract(rippleCoreContractInstance);
+
+    const twoFAContractAbi = twoFAContractABI;
+    const fujiTwoFAContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'; 
+    const mumbaiTwoFAContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'; 
+    const rippleTwoFAContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'; 
+
+    const fujiTwoFAContractInstance = new web3Instance.eth.Contract(twoFAContractAbi, fujiTwoFAContractAddress);
+    const mumbaiTwoFAContractInstance = new web3Instance.eth.Contract(twoFAContractAbi, mumbaiTwoFAContractAddress);
+    const rippleTwoFAContractInstance = new web3Instance.eth.Contract(twoFAContractAbi, rippleTwoFAContractAddress);
+    setFujiTwoFAContract(fujiTwoFAContractInstance);
+    setMumbaiTwoFAContract(mumbaiTwoFAContractInstance);
+    setRippleTwoFAContract(rippleTwoFAContractInstance);
   }
   
   function updateWalletConnect() {

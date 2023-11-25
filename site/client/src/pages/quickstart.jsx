@@ -60,9 +60,9 @@ export default function Quickstart() {
     const coreContract = targetChainId == chains['fuji'] ? fujiCoreContract :
                         targetChainId == chains['mumbai'] ? mumbaiCoreContract :
                         rippleCoreContract;
+    console.log(`targetChainId: ${targetChainId}, chains['fuji']:`)
                     
-    console.log(chainId);
-    console.log(coreContract, targetChainId);
+    console.log(`coreContract: ${coreContract}, chainId: ${chainId}`);
 
     const twoFAContract = targetChainId == chains['fuji'] ? fujiTwoFAContract :
                         targetChainId == chains['mumbai'] ? mumbaiTwoFAContract :
@@ -159,21 +159,21 @@ export default function Quickstart() {
       const userSecretHash = await poseidon([userSecretHashBigint.toString()]);
       const chainsToSwitch = Object.entries(chains).filter(([key, value]) => formDataJSON[key + '_checkbox'] === 'on').map(([key, value]) => value);
 
-      // for (const targetChainId of chainsToSwitch) {
-      //   await switchChain(targetChainId);
-      //   console.log(`targetChainId: ${targetChainId}, formDataJSON: ${formDataJSON}, userSecretHash: ${userSecretHash}, formDataJSON['data']: ${formDataJSON['data']}`)
-      //   await callContractMethods(targetChainId, formDataJSON, userSecretHash, formDataJSON['data']);
-      // }
+      for (const targetChainId of chainsToSwitch) {
+        await switchChain(targetChainId);
+        console.log(`targetChainId: ${targetChainId}, formDataJSON: ${formDataJSON}, userSecretHash: ${userSecretHash}, formDataJSON['data']: ${formDataJSON['data']}`)
+        await callContractMethods(targetChainId, formDataJSON, userSecretHash, formDataJSON['data']);
+      }
 
-      // try {
-      //   await window.ethereum.request({
-      //     method: 'wallet_switchEthereumChain',
-      //     params: [{ chainId: chainId }],
-      //   });
-      // } catch {
-      //   // Log the error
-      //   console.log('User Rejected Switching to Original Chain');
-      // }
+      try {
+        await window.ethereum.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: chainId }],
+        });
+      } catch {
+        // Log the error
+        console.log('User Rejected Switching to Original Chain');
+      }
 
       async function callCreateUser() {
         try {
@@ -520,7 +520,14 @@ export default function Quickstart() {
 
   useEffect(() => {
     setShowQuickstart(showQuickstartConditional())
-  }, [walletConnected])
+    initializeWeb3();
+  }, [walletConnected, userAddress])
+
+  useEffect(() => {
+    // Call the initialization function when the component mounts
+    console.log("useEffect initializeWeb3 called")
+    initializeWeb3();
+  }, []);; 
 
   return (
     <div className="max-w-none">
