@@ -10,6 +10,7 @@ import { stringToBigInt } from '@/components/HelperCalls';
 import { generateRSAKeys, generateRSASigningKeys } from '@/components/HelperCalls';
 import coreContractABI from '../../public/contract_ABIs/ZKPServicesCore.json'; 
 import twoFAContractABI from '../../public/contract_ABIs/ZKPServicesVRF2FA.json'; 
+import batchSignUpABI from '../../public/contract_ABIs/BatchSignUp.json'
 
 const chains = {
   "fuji": 43113, 
@@ -23,10 +24,13 @@ export default function Quickstart() {
     setUserPassword, username, setUsername, twoFactorAuthPassword, 
     setTwoFactorAuthPassword, contractPassword, setContractPassword, 
     chainId, web3, fujiCoreContract, fujiTwoFAContract, 
-    mumbaiCoreContract, mumbaiTwoFAContract, rippleCoreContract,
-    rippleTwoFAContract, setWeb3, setFujiCoreContract,
+    fujiBatchSignUpContract, mumbaiCoreContract, mumbaiTwoFAContract, 
+    mumbaiBatchSignUpContract, rippleCoreContract, rippleTwoFAContract, 
+    rippleBatchSignUpContract, setWeb3, setFujiCoreContract,
     setFujiTwoFAContract, setMumbaiCoreContract, setMumbaiTwoFAContract,
-    setRippleCoreContract, setRippleTwoFAContract } = useGlobal();
+    setRippleCoreContract, setRippleTwoFAContract, 
+    setFujiBatchSignUpContract, setMumbaiBatchSignUpContract,
+    setRippleBatchSignUpContract } = useGlobal();
   const [showQuickstart, setShowQuickstart] = useState(<h2 className="mt-10 text-center text-3xl font-bold tracking-tight">
   Please connect your wallet to get started.
 </h2>)
@@ -54,62 +58,35 @@ export default function Quickstart() {
   };
 
   const callContractMethods = async (targetChainId, formDataJSON, userSecretHash, publicInformation) => {
-    if(fujiCoreContract === null){
+    if (fujiCoreContract === null) {
       await initializeWeb3();
     }
-    const coreContract = targetChainId == chains['fuji'] ? fujiCoreContract :
-                        targetChainId == chains['mumbai'] ? mumbaiCoreContract :
-                        rippleCoreContract;
-    console.log(`targetChainId: ${targetChainId}, chains['fuji']:`)
-                    
-    console.log(`coreContract: ${coreContract}, chainId: ${chainId}`);
 
-    const twoFAContract = targetChainId == chains['fuji'] ? fujiTwoFAContract :
-                        targetChainId == chains['mumbai'] ? mumbaiTwoFAContract :
-                        rippleTwoFAContract;
+    const batchSignUpContract = targetChainId == chains['fuji'] ? fujiBatchSignUpContract :
+      targetChainId == chains['mumbai'] ? mumbaiBatchSignUpContract :
+      rippleBatchSignUpContract;
 
-    let data = coreContract.methods.setRSAEncryptionKey(formDataJSON['rsa_enc_pub_key']).encodeABI();
+    console.log(`targetChainId: ${targetChainId}, chains['fuji']:`);
+    console.log(`batchSignUpContract: ${batchSignUpContract}, chainId: ${chainId}`);
+
+    let data = batchSignUpContract.methods.batchSignUp(
+      userSecretHash,
+      formDataJSON['rsa_enc_pub_key'],
+      formDataJSON['rsa_sign_pub_key'],
+      publicInformation
+    ).encodeABI();
+
     let txObject = {
       from: userAddress,
-      to: coreContract.options.address,
+      to: batchSignUpContract.options.address,
       data: data,
-      gas: 1000000,
+      gas: 3000000,
     };
+
     let receipt = await web3.eth.sendTransaction(txObject);
-    console.log('RSA Encryption Key Transaction Receipt:', receipt);
-
-    data = coreContract.methods.setRSASigningKey(formDataJSON['rsa_sign_pub_key']).encodeABI();
-    txObject = {
-      from: userAddress,
-      to: coreContract.options.address,
-      data: data,
-      gas: 1000000,
-    };
-    receipt = await web3.eth.sendTransaction(txObject);
-    console.log('RSA Signing Key Transaction Receipt:', receipt);
-
-    if(publicInformation.length>0){
-      data = coreContract.methods.setPublicUserInformation(publicInformation).encodeABI();
-      txObject = {
-        from: userAddress,
-        to: coreContract.options.address,
-        data: data,
-        gas: 1000000,
-      };
-      receipt = await web3.eth.sendTransaction(txObject);
-      console.log('Set Public Information Transaction Receipt:', receipt);
-    }
-    
-    data = twoFAContract.methods.setSecret(userSecretHash).encodeABI();
-    txObject = {
-      from: userAddress,
-      to: twoFAContract.options.address,
-      data: data,
-      gas: 1000000, 
-    };
-    receipt = await web3.eth.sendTransaction(txObject);
-    console.log('2FA Secret Set Transaction Receipt:', receipt);
+    console.log('Batch SignUp Transaction Receipt:', receipt);
   };
+
 
   const switchChain = async (targetChainId) => {
     const chainIdHex = `0x${targetChainId.toString(16)}`; 
@@ -209,12 +186,10 @@ export default function Quickstart() {
     const fujiCoreContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'; 
     const mumbaiCoreContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'; 
     const rippleCoreContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'; 
-
     const fujiCoreContractInstance = new web3Instance.eth.Contract(coreContractAbi, fujiCoreContractAddress);
     const mumbaiCoreContractInstance = new web3Instance.eth.Contract(coreContractAbi, mumbaiCoreContractAddress);
     const rippleCoreContractInstance = new web3Instance.eth.Contract(coreContractAbi, rippleCoreContractAddress);
     setFujiCoreContract(fujiCoreContractInstance);
-    console.log(`fujiCoreContractInstance: ${fujiCoreContractInstance}`)
     setMumbaiCoreContract(mumbaiCoreContractInstance);
     setRippleCoreContract(rippleCoreContractInstance);
 
@@ -222,13 +197,23 @@ export default function Quickstart() {
     const fujiTwoFAContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'; 
     const mumbaiTwoFAContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'; 
     const rippleTwoFAContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'; 
-
     const fujiTwoFAContractInstance = new web3Instance.eth.Contract(twoFAContractAbi, fujiTwoFAContractAddress);
     const mumbaiTwoFAContractInstance = new web3Instance.eth.Contract(twoFAContractAbi, mumbaiTwoFAContractAddress);
     const rippleTwoFAContractInstance = new web3Instance.eth.Contract(twoFAContractAbi, rippleTwoFAContractAddress);
     setFujiTwoFAContract(fujiTwoFAContractInstance);
     setMumbaiTwoFAContract(mumbaiTwoFAContractInstance);
     setRippleTwoFAContract(rippleTwoFAContractInstance);
+
+    const batchSignUpContractAbi = batchSignUpABI;
+    const fujiBatchSignUpContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d';
+    const mumbaiBatchSignUpContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d';
+    const rippleBatchSignUpContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d';
+    const fujiBatchSignUpContractInstance = new web3Instance.eth.Contract(batchSignUpContractAbi, fujiBatchSignUpContractAddress);
+    const mumbaiBatchSignUpContractInstance = new web3Instance.eth.Contract(batchSignUpContractAbi, mumbaiBatchSignUpContractAddress);
+    const rippleBatchSignUpContractInstance = new web3Instance.eth.Contract(batchSignUpContractAbi, rippleBatchSignUpContractAddress);
+    setFujiBatchSignUpContract(fujiBatchSignUpContractInstance);
+    setMumbaiBatchSignUpContract(mumbaiBatchSignUpContractInstance);
+    setRippleBatchSignUpContract(rippleBatchSignUpContractInstance);
   }
 
   const showQuickstartConditional = () => {

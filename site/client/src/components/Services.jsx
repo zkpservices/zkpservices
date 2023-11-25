@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { GridPattern } from '@/components/GridPattern';
 import { motion, useMotionTemplate, useMotionValue } from 'framer-motion';
 import { Heading } from '@/components/Heading';
-import { addRequest } from '@/components/APICalls';
+import { addRequest, getChainData } from '@/components/APICalls';
 import { QuestionMarkIcon } from '@/components/icons/QuestionMarkIcon';
 import { UpdateIcon } from '@/components/icons/UpdateIcon';
 import { TokenIcon } from '@/components/icons/TokenIcon';
@@ -12,6 +12,9 @@ import { NewUpdateRequestModal } from '@/components/NewUpdateRequestModal';
 import { NewDataRequestModal } from '@/components/NewDataRequestModal';
 import { NewCrossChainSyncModal } from '@/components/NewCrossChainSyncModal';
 import { useGlobal } from '@/components/GlobalStorage';
+import { OnboardToNewChainModal } from './OnboardToNewChainModal';
+import { poseidon } from '@/components/PoseidonHash';
+import { stringToBigInt } from '@/components/HelperCalls';
 const services = [
   {
     href: '/dashboard',
@@ -64,6 +67,20 @@ const services = [
     pattern: {
       y: 22,
       squares: [[0, 1]],
+    },
+  },
+  {
+    href: '/dashboard',
+    name: 'Onboard To New Chain',
+    description:
+      'Learn about the conversation model and how to create, retrieve, update, delete, and list conversations.',
+    icon: UpdateIcon,
+    pattern: {
+      y: -6,
+      squares: [
+        [-1, 2],
+        [1, 3],
+      ],
     },
   },
 ];
@@ -149,6 +166,14 @@ function ServiceCard({ service, onCardClick, openModal, isSelected }) {
 
 export function Services() {
   const [selectedService, setSelectedService] = useState(null);
+  const [availableChains, setAvailableChains] = useState(["Avalanche Fuji", "Polygon Mumbai", "Ripple EVM Devnet"])
+  const [props, setProps] = useState({});
+
+  const chains = {
+    "0xa869": "Avalanche Fuji", 
+    "0x13881": "Polygon Mumbai", 
+    "0x15f902": "Ripple EVM Devnet"
+  }
 
   const openModal = (serviceName) => {
     setSelectedService(serviceName);
@@ -156,8 +181,21 @@ export function Services() {
 
   let {userAddress, userPassword, chainId} = useGlobal();
 
+  const pullChainData = async (userAddress, userPassword, chainId) => {
+    const chainData = await getChainData(userAddress, userPassword, chainId)
+    let keysList = Object.keys(chainData['data']).filter(a => a !== "2fa_password")
+    const userSecretHashBigint = stringToBigInt(chainData['data']['props']['2fa_password']);
+    const userSecretHashLocal = await poseidon([userSecretHashBigint.toString()]);
+    const filteredKeysList = Object.keys(chains).filter(item => !keysList.includes(item));
+    const result = filteredKeysList.map(key => chains[key])
+    console.log(result)
+    setAvailableChains(result)
+    const propsLocal = chainData['data']['props']
+    propsLocal['userSecretHash'] = userSecretHashLocal
+    setProps(propsLocal)
+  }
+
   async function addNewRequest(requestData) {
-    //
     const compiledRequestData = {
       ...requestData,
       address_sender: userAddress,
@@ -168,6 +206,13 @@ export function Services() {
     }
     const addRequestResult = await addRequest(userAddress, userPassword, finalRequestData, chainId)
   }
+
+  useEffect(() => {
+    if(userAddress) {
+      pullChainData(userAddress, userPassword, chainId)
+    }
+   
+  }, [userAddress])
 
   return (
     <div className="xl:max-w-none mt-16">
@@ -191,6 +236,7 @@ export function Services() {
       {selectedService === 'Request Update' && <NewUpdateRequestModal open={true} onClose={() => setSelectedService(null)} onSubmit={addNewRequest}/>}
       {selectedService === 'Cross-Chain Backups' && <NewCrossChainSyncModal open={true} onClose={() => setSelectedService(null)} />}
       {selectedService === 'ZKP Tokens Faucet' && <ZKPFaucetModal open={true} onClose={() => setSelectedService(null)} />}
+      {selectedService === 'Onboard To New Chain' && <OnboardToNewChainModal open={true} props={props} options={availableChains} onClose={() => setSelectedService(null)} />}
     </div>
   );
 }

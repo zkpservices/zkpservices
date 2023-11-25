@@ -2,11 +2,14 @@ pragma solidity ^0.8.7;
 
 import "../interfaces/IVRF.sol";
 import "../interfaces/IGroth16VerifierP2.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract ZKPServicesVRF2FA {
+contract ZKPServicesVRF2FA is Ownable {
     IVRF private vrf;
     IGroth16VerifierP2 private responseVerifier;
     IGroth16VerifierP2 private passwordChangeVerifier;
+    // this contract helps expedite sign up to zkp.services via batched calls
+    address public batchSignUpContractAddress;
 
     struct TwoFactorData {
         bool success;
@@ -23,7 +26,7 @@ contract ZKPServicesVRF2FA {
         address _vrfAddress,
         address _vrf2FAResponseVerifierAddress,
         address _vrf2FAPasswordChangeVerifierAddress
-    ) {
+    ) Ownable(msg.sender) {
         vrf = IVRF(_vrfAddress);
         responseVerifier = IGroth16VerifierP2(_vrf2FAResponseVerifierAddress);
         passwordChangeVerifier = IGroth16VerifierP2(
@@ -110,6 +113,17 @@ contract ZKPServicesVRF2FA {
         twoFactorData[_id].timestamp = block.timestamp;
     }
 
+    function setBatchSignUpContractAddress(address _batchSignUpContractAddress)
+        public
+        onlyOwner
+    {
+        require(
+            batchSignUpContractAddress == address(0),
+            "Batch Sign Up contract address already set"
+        );
+        batchSignUpContractAddress = _batchSignUpContractAddress;
+    }
+
     // User method to store initialize 2FA secret
     function setSecret(uint256 _userSecretHash) external {
         require(
@@ -117,6 +131,18 @@ contract ZKPServicesVRF2FA {
             "User secret already set, use updateSecret instead"
         );
         userSecrets[msg.sender] = _userSecretHash;
+    }
+
+    function setSecretBatchSignUpContractAddress(
+        uint256 _userSecretHash,
+        address userAddress
+    ) external {
+        require(msg.sender == batchSignUpContractAddress);
+        require(
+            userSecrets[userAddress] == 0,
+            "User secret already set, use updateSecret instead"
+        );
+        userSecrets[userAddress] = _userSecretHash;
     }
 
     // Method for users to update their 2FA secret.

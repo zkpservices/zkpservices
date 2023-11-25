@@ -1,11 +1,9 @@
 // GlobalStorage.jsx
-
 import { createContext, useContext, useState, useEffect } from 'react';
 
 // Create a context
 const GlobalContext = createContext();
 
-// Create a context provider component
 // Create a context provider component
 export function GlobalProvider({ children }) {
   const [walletConnected, setWalletConnected] = useState(() => {
@@ -109,6 +107,14 @@ export function GlobalProvider({ children }) {
     return null;
   });
 
+  const [fujiBatchSignUpContract, setFujiBatchSignUpContract] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const localContract = localStorage.getItem('fujiBatchSignUpContract');
+      return localContract || null;
+    }
+    return null;
+  });
+
   const [mumbaiCoreContract, setMumbaiCoreContract] = useState(() => {
     if (typeof window !== 'undefined') {
       const localContract = localStorage.getItem('mumbaiCoreContract');
@@ -125,6 +131,14 @@ export function GlobalProvider({ children }) {
     return null;
   });
 
+  const [mumbaiBatchSignUpContract, setMumbaiBatchSignUpContract] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const localContract = localStorage.getItem('mumbaiBatchSignUpContract');
+      return localContract || null;
+    }
+    return null;
+  });
+
   const [rippleCoreContract, setRippleCoreContract] = useState(() => {
     if (typeof window !== 'undefined') {
       const localContract = localStorage.getItem('rippleCoreContract');
@@ -136,6 +150,14 @@ export function GlobalProvider({ children }) {
   const [rippleTwoFAContract, setRippleTwoFAContract] = useState(() => {
     if (typeof window !== 'undefined') {
       const localContract = localStorage.getItem('rippleTwoFAContract');
+      return localContract || null;
+    }
+    return null;
+  });
+
+  const [rippleBatchSignUpContract, setRippleBatchSignUpContract] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const localContract = localStorage.getItem('rippleBatchSignUpContract');
       return localContract || null;
     }
     return null;
@@ -159,10 +181,13 @@ export function GlobalProvider({ children }) {
     localStorage.setItem('web3', dashboard);
     localStorage.setItem('fujiCoreContract', dashboard);
     localStorage.setItem('fujiTwoFAContract', dashboard);
+    localStorage.setItem('fujiBatchSignUpContract', dashboard);
     localStorage.setItem('mumbaiCoreContract', dashboard);
     localStorage.setItem('mumbaiTwoFAContract', dashboard);
+    localStorage.setItem('mumbaiBatchSignUpContract', dashboard);
     localStorage.setItem('rippleCoreContract', dashboard);
     localStorage.setItem('rippleTwoFAContract', dashboard);
+    localStorage.setItem('rippleBatchSignUpContract', dashboard);
   }, [
     userAddress,
     walletConnected,
@@ -179,10 +204,13 @@ export function GlobalProvider({ children }) {
     web3,
     fujiCoreContract,
     fujiTwoFAContract,
+    fujiBatchSignUpContract,
     mumbaiCoreContract,
     mumbaiTwoFAContract,
+    mumbaiBatchSignUpContract,
     rippleCoreContract,
-    rippleTwoFAContract
+    rippleTwoFAContract,
+    rippleBatchSignUpContract
   ]);
 
   return (
@@ -192,8 +220,10 @@ export function GlobalProvider({ children }) {
       contractPassword, setContractPassword, chainId, setChainId, fieldData, setFieldData, 
       dashboard, setDashboard, availableDashboard, setAvailableDashboard, web3, setWeb3,
       fujiCoreContract, setFujiCoreContract, fujiTwoFAContract, setFujiTwoFAContract,
-      mumbaiCoreContract, setMumbaiCoreContract, mumbaiTwoFAContract, setMumbaiTwoFAContract,
-      rippleCoreContract, setRippleCoreContract, rippleTwoFAContract, setRippleTwoFAContract}}>
+      fujiBatchSignUpContract, setFujiBatchSignUpContract, mumbaiCoreContract, setMumbaiCoreContract, 
+      mumbaiTwoFAContract, setMumbaiTwoFAContract, mumbaiBatchSignUpContract, setMumbaiBatchSignUpContract,
+      rippleCoreContract, setRippleCoreContract, rippleTwoFAContract, setRippleTwoFAContract,
+      rippleBatchSignUpContract, setRippleBatchSignUpContract}}>
       {children}
     </GlobalContext.Provider>
   );

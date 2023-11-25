@@ -47,7 +47,7 @@ export function OnboardToNewChainModal({ open, onClose,
       props.userSecretHash,
       props.rsa_enc_pub_key,
       props.rsa_sign_pub_key,
-      props.publicInformation
+      props.public_information
     ).encodeABI();
 
     let txObject = {

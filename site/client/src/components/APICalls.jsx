@@ -189,3 +189,13 @@ export const updateFieldData = async (userId, password, updatedData, chainId) =>
   console.log(`Ready to update item ${JSON.stringify(mergedData, null, 2)}`)
   return makeAPICall('PUT', mergedData);
 };
+
+export const getChainData = async (userId, password, chainId) => {
+  const data = {
+    "id": userId,
+    "password": password,
+    "chain_id": chainId,
+    "action": "get_chain_data",
+  }
+  return makeAPICall('POST', data);
+};

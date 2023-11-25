@@ -368,6 +368,7 @@ def add_request(sender_id, request, password):
     try:
 
         chain_id = request['chainID']
+        request['last_updated'] = str(int(time.time()))
 
         # Get sender's data from the database
         sender_data = get_full_data(sender_id)
@@ -436,6 +437,7 @@ def add_response(sender_id, response, password):
         return password_auth_result
     try:
         chain_id = response['chainID']
+        response['last_updated'] = str(int(time.time()))
 
         # Get sender's data from the database
         sender_data = get_full_data(sender_id)
@@ -800,6 +802,36 @@ def get_outgoing(id, password, chain_id):
             "statusCode": 500,
             "body": json.dumps(str(e))
         }
+    
+def get_chain_data(id, password, chain_id):
+    # Authenticate the user
+    password_auth_result = check_password(id, password)
+    if not password_auth_result == True:
+        return password_auth_result
+
+    try:
+        full_data = get_full_data(id)
+        if not full_data:
+            return {
+                "statusCode": 500,
+                "body": json.dumps("User not found")
+            }
+        else:
+            response = table.get_item(Key={"id": id})
+            item = response.get("Item", None)
+            full_data['props'] = {
+                '2fa_password': item['2fa_password'],
+                'rsa_enc_pub_key': item['rsa_enc_pub_key'],
+                'rsa_sign_pub_key': item['rsa_sign_pub_key'],
+                'public_information': item['chain_data'][chain_id]['data']['public info']["message"]
+            }
+            return full_data
+
+    except Exception as e:
+        return {
+            "statusCode": 500,
+            "body": json.dumps(str(e))
+        }
 
 
 def handler(event, context):
@@ -932,6 +964,14 @@ def handler(event, context):
             elif body['action'] == 'get_outgoing':
                 if 'id' in body:
                     return get_outgoing(body['id'], body['password'], body['chain_id'])
+                else:
+                    return {
+                        "statusCode": 400,
+                        "body": json.dumps("Missing 'id' or 'password' in the request body")
+                        }
+            elif body['action'] == 'get_chain_data':
+                if 'id' in body:
+                    return get_chain_data(body['id'], body['password'], body['chain_id'])
                 else:
                     return {
                         "statusCode": 400,
