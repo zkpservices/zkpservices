@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { GridPattern } from '@/components/GridPattern';
 import { motion, useMotionTemplate, useMotionValue } from 'framer-motion';
+import { useGlobal } from '@/components/GlobalStorage'
+import { getFieldData } from '@/components/APICalls';
 import { Heading } from '@/components/Heading';
 import { DataIcon } from '@/components/icons/DataIcon';
 import { PlusIcon } from '@/components/icons/PlusIcon';
@@ -116,8 +118,11 @@ export function MyData({ mydata, onCardClick }) {
 export function UserData({ fieldNames = [] }) {
   const [selectedFieldName, setSelectedFieldName] = useState(null);
   const [addDataModalOpen, setAddDataModalOpen] = useState(false);
+  let {userAddress, userPassword, fieldData, setFieldData} = useGlobal();
 
-  const openFieldModal = (fieldName) => {
+  async function openFieldModal(fieldName) {
+    let localFieldData = await getFieldData(userAddress, userPassword, fieldName.toLowerCase())
+    setFieldData(JSON.stringify(localFieldData['data'], null, 2))
     setSelectedFieldName(fieldName);
   };
   
@@ -174,6 +179,7 @@ export function UserData({ fieldNames = [] }) {
           title={selectedFieldName}
           open={selectedFieldName !== null}
           onClose={closeFieldModal}
+          fieldData={fieldData}
         />
       )}
       {addDataModalOpen && (

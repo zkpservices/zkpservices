@@ -2,8 +2,16 @@ import { Fragment, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline'; // Import the XMarkIcon
 
-export function CrossChainSyncStatusModal() {
+export function CrossChainSyncStatusModal({
+  sourceChain="", 
+  destinationChain="", 
+  parameterSynced="", 
+  parameterKey="", 
+  parameterValue="", 
+  ccipRequestID=""}){
+  
   const [open, setOpen] = useState(true);
+  const [status, setStatus] = useState("Incomplete");
 
   return (
     <Transition.Root show={open} as={Fragment}>
@@ -51,7 +59,7 @@ export function CrossChainSyncStatusModal() {
                 >
                   Cross-Chain Sync Status
                 </Dialog.Title>
-                <div className="mt-2 px-1 lg:max-h-[65vh] max-h-[40vh] overflow-y-auto min-w-[16rem] md:min-w-[40rem] lg:min-w-[40rem]">
+                <div className="mt-2 px-1 pb-1 lg:max-h-[65vh] max-h-[40vh] overflow-y-auto min-w-[16rem] md:min-w-[40rem] lg:min-w-[40rem]">
 
                   <div className="mt-4">
                     <label htmlFor="sourceChain" className="block text-sm font-medium leading-5 text-gray-900 dark:text-white">
@@ -63,6 +71,7 @@ export function CrossChainSyncStatusModal() {
                       rows={1}
                       readOnly
                       spellCheck="false"
+                      value={sourceChain}
                     />
                   </div>
 
@@ -76,6 +85,7 @@ export function CrossChainSyncStatusModal() {
                       rows={1}
                       readOnly
                       spellCheck="false"
+                      value={destinationChain}
                     />
                   </div>
 
@@ -89,6 +99,7 @@ export function CrossChainSyncStatusModal() {
                       rows={1}
                       readOnly
                       spellCheck="false"
+                      value={parameterSynced}
                     />
                   </div>
 
@@ -102,6 +113,7 @@ export function CrossChainSyncStatusModal() {
                       rows={1}
                       readOnly
                       spellCheck="false"
+                      value={parameterKey}
                     />
                   </div>
 
@@ -115,6 +127,7 @@ export function CrossChainSyncStatusModal() {
                       rows={8}
                       readOnly
                       spellCheck="false"
+                      value={parameterValue}
                     />
                   </div>
 
@@ -136,7 +149,7 @@ export function CrossChainSyncStatusModal() {
 
                   <div className="mt-4">
                     <label htmlFor="ccipRequestID" className="block text-sm font-medium leading-5 text-gray-900 dark:text-white">
-                      CCIP Request ID:
+                      CCIP Message ID (Request ID):
                     </label>
                     <textarea
                       id="ccipRequestID"
@@ -144,6 +157,7 @@ export function CrossChainSyncStatusModal() {
                       rows={1}
                       readOnly
                       spellCheck="false"
+                      value={ccipRequestID}
                     />
                   </div>
 
@@ -151,14 +165,30 @@ export function CrossChainSyncStatusModal() {
                     <label htmlFor="ccipExplorerURL" className="block text-sm font-medium leading-5 text-gray-900 dark:text-white">
                       CCIP Explorer URL:
                     </label>
-                    <a
-                      href="https://ccip.chain.link/"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-emerald-600 underline mt-2"
-                    >
-                      https://ccip.chain.link/
-                    </a>
+                    <div className="mt-1 mr-4">
+                      <a
+                        href={`https://ccip.chain.link/msg/${ccipRequestID}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-emerald-600 underline"
+                      >
+                        {`https://ccip.chain.link/msg/${ccipRequestID}`}
+                      </a>
+                    </div>
+                  </div>
+
+                  <div className="mt-4">
+                    <label htmlFor="status" className="block text-sm font-medium leading-5 text-gray-900 dark:text-white">
+                      Status:
+                    </label>
+                    <textarea
+                      id="status"
+                      className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
+                      rows={1}
+                      defaultValue={status}
+                      readOnly
+                      spellCheck="false"
+                    />
                   </div>
 
                 </div>
@@ -174,6 +204,7 @@ export function CrossChainSyncStatusModal() {
                     <button
                       type="button"
                       className="ml-3 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                      // set the status contingent upon whether the destination chain has received the data yet
                       onClick={() => setOpen(false)}
                     >
                       Refresh Status

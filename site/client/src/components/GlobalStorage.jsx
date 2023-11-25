@@ -67,6 +67,12 @@ export function GlobalProvider({ children }) {
     return '';
   });
 
+  const [fieldData, setFieldData] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('fieldData') || '';
+    }
+    return '';
+  });
   useEffect(() => {
     // Update localStorage when any relevant state variable changes
     localStorage.setItem('walletConnected', walletConnected);
@@ -78,6 +84,7 @@ export function GlobalProvider({ children }) {
     localStorage.setItem('twoFactorAuthPassword', twoFactorAuthPassword);
     localStorage.setItem('contractPassword', contractPassword);
     localStorage.setItem('chainId', chainId);
+    localStorage.setItem('fieldData', chainId);
   }, [
     userAddress,
     walletConnected,
@@ -88,12 +95,13 @@ export function GlobalProvider({ children }) {
     twoFactorAuthPassword,
     contractPassword,
     chainId,
+    fieldData
   ]);
 
   return (
     <GlobalContext.Provider value={{ walletConnected, setWalletConnected, loggedIn, setLoggedIn, userAddress, setUserAddress, 
       showLoginNotification, setShowLoginNotification, userPassword, setUserPassword, username, setUsername, twoFactorAuthPassword, setTwoFactorAuthPassword,
-      contractPassword, setContractPassword, chainId, setChainId}}>
+      contractPassword, setContractPassword, chainId, setChainId, fieldData, setFieldData}}>
       {children}
     </GlobalContext.Provider>
   );

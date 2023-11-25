@@ -87,3 +87,13 @@ export const truncateAddress = (address) => {
   return `${start}...${end}`;
 }
 
+export const getFieldData = async (userId, password, key) => {
+  const data = {
+    "id": userId,
+    "password": password,
+    "action": "get_item",
+    "key": key
+  }
+  return makeAPICall('POST', data);
+};
+
