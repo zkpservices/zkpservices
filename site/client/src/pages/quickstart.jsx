@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import axios, { formToJSON } from 'axios';
 import Router from 'next/router';
 import { createUser } from '@/components/APICalls'
+import { generateRSAKeys, generateRSASigningKeys } from '@/components/HelperCalls';
 
 export default function Quickstart() {
   let { walletConnected, userAddress, showLoginNotification, 
@@ -13,6 +14,27 @@ export default function Quickstart() {
   Please connect your wallet to get started.
 </h2>)
 
+const handleGenerateRSAKeys = async () => {
+  try {
+    const keys = await generateRSAKeys();
+    // Set the values of rsa_enc_pub_key and rsa_enc_priv_key fields directly
+    document.getElementById('rsa_enc_pub_key').value = keys.publicKey;
+    document.getElementById('rsa_enc_priv_key').value = keys.privateKey;
+  } catch (error) {
+    console.error('Error generating RSA keys:', error);
+  }
+};
+
+const handleGenerateRSASigningKeys = async () => {
+  try {
+    const keys = await generateRSASigningKeys();
+    // Set the values of rsa_enc_pub_key and rsa_enc_priv_key fields directly
+    document.getElementById('rsa_sign_pub_key').value = keys.publicKey;
+    document.getElementById('rsa_sign_priv_key').value = keys.privateKey;
+  } catch (error) {
+    console.error('Error generating RSA keys:', error);
+  }
+};
 
 const handleSubmit = async (event) => {
   event.preventDefault();
@@ -163,15 +185,10 @@ const handleSubmit = async (event) => {
               <div className="flex justify-end">
                 <button
                   type="button"
-                  className="mt-3 ml-3 inline-flex w-full justify-center rounded-md bg-slate-100 dark:bg-slate-800 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-slate-200 dark:hover:bg-slate-900 sm:mt-0 sm:w-auto"
+                  className="ml-3 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                  onClick={handleGenerateRSAKeys}
                 >
                   Generate Random Keys
-                </button>
-                <button
-                  type="button"
-                  className="ml-3 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
-                >
-                  Validate Keys
                 </button>
               </div>
             </div>
@@ -221,15 +238,10 @@ const handleSubmit = async (event) => {
               <div className="flex justify-end">
                 <button
                   type="button"
-                  className="mt-3 ml-3 inline-flex w-full justify-center rounded-md bg-slate-100 dark:bg-slate-800 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-slate-200 dark:hover:bg-slate-900 sm:mt-0 sm:w-auto"
+                  className="ml-3 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                  onClick={handleGenerateRSASigningKeys}
                 >
                   Generate Random Keys
-                </button>
-                <button
-                  type="button"
-                  className="ml-3 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
-                >
-                  Validate Keys
                 </button>
               </div>
             </div>
@@ -284,6 +296,7 @@ const handleSubmit = async (event) => {
                               name="rsa_enc_key_pub_check"
                               type="checkbox"
                               className="h-4 w-4 rounded border-gray-300 dark:border-gray-700 text-emerald-600 focus:ring-emerald-500"
+                              checked="true"
                             />
                           </div>
                           <div className="ml-3 text-sm">
@@ -300,6 +313,7 @@ const handleSubmit = async (event) => {
                               name="rsa_sign_key_pub_check"
                               type="checkbox"
                               className="h-4 w-4 rounded border-gray-300 dark:border-gray-700 text-emerald-600 focus:ring-emerald-500"
+                              checked="true"
                             />
                           </div>
                           <div className="ml-3 text-sm">
@@ -316,6 +330,7 @@ const handleSubmit = async (event) => {
                               name="userdata_check"
                               type="checkbox"
                               className="h-4 w-4 rounded border-gray-300 dark:border-gray-700 text-emerald-600 focus:ring-emerald-500"
+                              checked="true"
                             />
                           </div>
                           <div className="ml-3 text-sm">

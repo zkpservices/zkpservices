@@ -2,7 +2,19 @@ import { Fragment, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 
-export function CompleteUpdateModal({ is2FARequired = false }) {
+export function CompleteUpdateModal({ 
+  addressOfRequestingParty = "",
+  fieldToUpdate = "",
+  newDataAfterUpdate = "",
+  oneTimeKey = "",
+  oneTimeSalt = "",
+  timeLimit = "",
+  twoFAProvider = "",
+  twoFARequestID = "",
+  twoFAOneTimeToken = "",
+  responseFee = "",
+  is2FARequired = false
+}) {
   const [step2FA, setStep2FA] = useState(0); // 0: Initial, 1: Step 1, 2: Step 2
   const [open, setOpen] = useState(true);
 
@@ -60,7 +72,7 @@ export function CompleteUpdateModal({ is2FARequired = false }) {
                 >
                   Complete Update Requested
                 </Dialog.Title>
-                <div className="mt-2 px-1 lg:max-h-[65vh] max-h-[40vh] overflow-y-auto min-w-[16rem] md:min-w-[40rem] lg:min-w-[40rem]">
+                <div className="mt-2 px-1 pb-1 lg:max-h-[65vh] max-h-[40vh] overflow-y-auto min-w-[16rem] md:min-w-[40rem] lg:min-w-[40rem]">
 
                   <div className="mt-4">
                     <label htmlFor="addressOfRequestingParty" className="block text-sm font-medium leading-5 text-gray-900 dark:text-white">
@@ -72,6 +84,7 @@ export function CompleteUpdateModal({ is2FARequired = false }) {
                       rows={1}
                       readOnly
                       spellCheck="false"
+                      value={addressOfRequestingParty}
                     />
                   </div>
 
@@ -85,6 +98,7 @@ export function CompleteUpdateModal({ is2FARequired = false }) {
                       rows={1}
                       readOnly
                       spellCheck="false"
+                      value={fieldToUpdate}
                     />
                   </div>
 
@@ -98,6 +112,7 @@ export function CompleteUpdateModal({ is2FARequired = false }) {
                       rows={8}
                       readOnly
                       spellCheck="false"
+                      value={newDataAfterUpdate}
                     />
                   </div>
 
@@ -113,6 +128,7 @@ export function CompleteUpdateModal({ is2FARequired = false }) {
                       rows={1}
                       readOnly
                       spellCheck="false"
+                      value={oneTimeKey}
                     />
                   </div>
 
@@ -126,6 +142,7 @@ export function CompleteUpdateModal({ is2FARequired = false }) {
                       rows={1}
                       readOnly
                       spellCheck="false"
+                      value={oneTimeSalt}
                     />
                   </div>
 
@@ -139,6 +156,7 @@ export function CompleteUpdateModal({ is2FARequired = false }) {
                       rows={1}
                       readOnly
                       spellCheck="false"
+                      value={timeLimit}
                     />
                   </div>
 
@@ -167,6 +185,7 @@ export function CompleteUpdateModal({ is2FARequired = false }) {
                           rows={1}
                           readOnly
                           spellCheck="false"
+                          value={twoFAProvider}
                         />
                       </div>
 
@@ -180,6 +199,7 @@ export function CompleteUpdateModal({ is2FARequired = false }) {
                           rows={1}
                           readOnly
                           spellCheck="false"
+                          value={twoFARequestID}
                         />
                       </div>
 
@@ -193,6 +213,7 @@ export function CompleteUpdateModal({ is2FARequired = false }) {
                           rows={1}
                           readOnly
                           spellCheck="false"
+                          value={twoFAOneTimeToken}
                         />
                       </div>
 
@@ -236,6 +257,7 @@ export function CompleteUpdateModal({ is2FARequired = false }) {
                       rows={1}
                       readOnly
                       spellCheck="false"
+                      value={responseFee}
                     />
                   </div>
 
