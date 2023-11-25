@@ -2,7 +2,20 @@ import { Fragment, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 
-export function ReceivedDataResponseModal({ is2FARequired = true }) {
+export function ReceivedDataResponseModal({ 
+  addressOfSendingParty = "",
+  fieldRequested = "",
+  dataSnapshot = "",
+  oneTimeKey = "",
+  oneTimeSalt = "",
+  timeLimit = "",
+  require2FA = "",
+  twoFAProvider = "",
+  twoFARequestID = "",
+  twoFAOneTimeToken = "",
+  responseFee = "",
+  is2FARequired = false
+}) {
   const [open, setOpen] = useState(true);
 
   return (
@@ -63,6 +76,7 @@ export function ReceivedDataResponseModal({ is2FARequired = true }) {
                       rows={1}
                       readOnly
                       spellCheck="false"
+                      value={addressOfSendingParty}
                     />
                   </div>
 
@@ -76,6 +90,7 @@ export function ReceivedDataResponseModal({ is2FARequired = true }) {
                       rows={1}
                       readOnly
                       spellCheck="false"
+                      value={fieldRequested}
                     />
                   </div>
 
@@ -89,6 +104,7 @@ export function ReceivedDataResponseModal({ is2FARequired = true }) {
                       rows={8}
                       readOnly
                       spellCheck="false"
+                      value={dataSnapshot}
                     />
                   </div>
 
@@ -104,6 +120,7 @@ export function ReceivedDataResponseModal({ is2FARequired = true }) {
                       rows={1}
                       readOnly
                       spellCheck="false"
+                      value={oneTimeKey}
                     />
                   </div>
 
@@ -117,6 +134,7 @@ export function ReceivedDataResponseModal({ is2FARequired = true }) {
                       rows={1}
                       readOnly
                       spellCheck="false"
+                      value={oneTimeSalt}
                     />
                   </div>
 
@@ -130,6 +148,7 @@ export function ReceivedDataResponseModal({ is2FARequired = true }) {
                       rows={1}
                       readOnly
                       spellCheck="false"
+                      value={timeLimit}
                     />
                   </div>
 
@@ -158,6 +177,7 @@ export function ReceivedDataResponseModal({ is2FARequired = true }) {
                           rows={1}
                           readOnly
                           spellCheck="false"
+                          value={twoFAProvider}
                         />
                       </div>
 
@@ -171,6 +191,7 @@ export function ReceivedDataResponseModal({ is2FARequired = true }) {
                           rows={1}
                           readOnly
                           spellCheck="false"
+                          value={twoFARequestID}
                         />
                       </div>
 
@@ -184,6 +205,7 @@ export function ReceivedDataResponseModal({ is2FARequired = true }) {
                           rows={1}
                           readOnly
                           spellCheck="false"
+                          value={twoFAOneTimeToken}
                         />
                       </div>
                     </>
@@ -201,6 +223,7 @@ export function ReceivedDataResponseModal({ is2FARequired = true }) {
                       rows={1}
                       readOnly
                       spellCheck="false"
+                      value={responseFee}
                     />
                   </div>
 

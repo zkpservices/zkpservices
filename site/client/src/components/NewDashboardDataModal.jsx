@@ -10,6 +10,7 @@ export function NewDashboardDataModal({ open, onClose, onSubmit, options = ["Med
     const formDataJSON = formToJSON(formData);
     const result = await onSubmit(formDataJSON['field'])
   }
+
   return (
     <Transition.Root show={open} as={Fragment}>
       <Dialog as="div" className="fixed inset-0 overflow-y-auto z-10" onClose={onClose}>

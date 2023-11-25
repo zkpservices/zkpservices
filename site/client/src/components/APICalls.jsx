@@ -124,3 +124,13 @@ export const addToDashboard = async (userId, password, service) => {
   }
   return makeAPICall('POST', data);
 };
+
+export const removeFromDashboard = async (userId, password, service) => {
+  const data = {
+    "id": userId,
+    "password": password,
+    "action": "remove_from_dashboard",
+    "service": service
+  }
+  return makeAPICall('DELETE', data);
+};

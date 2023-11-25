@@ -164,7 +164,7 @@ export function DashboardContext() {
   useEffect(() => {
     loadAllHistory()
     fetchUserDataFields()
-  }, []);
+  }, [dashboard]);
     
     
   return (
@@ -176,7 +176,7 @@ export function DashboardContext() {
       {/* <NewDataRequestModal /> */}
       <UserData fieldNames={userDataFields}/> 
       <Services useLink={false} />
-      <History tableData={tableData} showRefresh={true} loadAllHistory={loadAllHistory} />
+      <History tableData={tableData} showRefresh={true} />
     </div>
   )
 }

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { GridPattern } from '@/components/GridPattern';
 import { motion, useMotionTemplate, useMotionValue } from 'framer-motion';
 import { useGlobal } from '@/components/GlobalStorage'
-import { getFieldData, getAvailableDashboard, addToDashboard } from '@/components/APICalls';
+import { getFieldData, getAvailableDashboard, addToDashboard, removeFromDashboard } from '@/components/APICalls';
 import { Heading } from '@/components/Heading';
 import { DataIcon } from '@/components/icons/DataIcon';
 import { PlusIcon } from '@/components/icons/PlusIcon';
@@ -121,8 +121,13 @@ export function UserData({ fieldNames = [] }) {
   let {userAddress, userPassword, fieldData, setFieldData, availableDashboard, setAvailableDashboard, dashboard, setDashboard} = useGlobal();
 
   async function addServiceToDashboard(service) {
+    setAddDataModalOpen(false);
     const addToDashboardResult = await addToDashboard(userAddress, userPassword, service)
-    console.log(addToDashboardResult)
+  }
+
+  async function removeServiceFromDashboard(service) {
+    setSelectedFieldName(null);
+    const removeServiceFromDashboardResult = await removeFromDashboard(userAddress, userPassword, service)
   }
 
   async function openFieldModal(fieldName) {
@@ -135,10 +140,17 @@ export function UserData({ fieldNames = [] }) {
     setSelectedFieldName(null);
   };
 
+  function findUniqueElements(list1, list2) {
+    const uniqueInList1 = list1.filter((item) => !list2.includes(item));
+    const uniqueInList2 = list2.filter((item) => !list1.includes(item));
+    return [...uniqueInList1, ...uniqueInList2];
+  }
+
   async function openAddDataModal() {
     const localAvailableDashboard = await getAvailableDashboard(userAddress, userPassword)
     console.log(fieldNames)
-    const differenceDashboard = fieldNames.filter((item) => !localAvailableDashboard['data'].includes(item));
+    console.log(localAvailableDashboard['data'])
+    const differenceDashboard = findUniqueElements(localAvailableDashboard['data'], fieldNames)
     
     console.log(differenceDashboard)
     setAvailableDashboard(differenceDashboard)
@@ -189,6 +201,7 @@ export function UserData({ fieldNames = [] }) {
         <ViewFieldModal
           title={selectedFieldName}
           open={selectedFieldName !== null}
+          onDelete={removeServiceFromDashboard}
           onClose={closeFieldModal}
           fieldData={fieldData}
         />

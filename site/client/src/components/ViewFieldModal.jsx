@@ -6,12 +6,17 @@ export function ViewFieldModal({
   title,
   open,
   onClose,
+  onDelete,
   fieldData = "",
   dataLocation = "Default data location",
   dataHash = "Default data hash",
   obfuscationSalt = "Default obfuscation salt",
   saltHash = "Salt hash",
 }) {
+
+  async function handleDelete() {
+    onDelete(title.toLowerCase())
+  }
   
   return (
     <Transition.Root show={open} as={Fragment}>
@@ -156,7 +161,7 @@ export function ViewFieldModal({
                   <button
                     type="button"
                     className="ml-3 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
-                    onClick={onClose}
+                    onClick={handleDelete}
                   >
                     Remove from Dashboard
                   </button>    
