@@ -55,7 +55,7 @@ export function History({ tableData = {}, showRefresh = true , handleRefresh}) {
   }
 
   const openSendDataModal = async (rowData) => {
-    const fieldData = await getFieldData(userAddress, userPassword, rowData.field[0])
+    const fieldData = await getFieldData(userAddress, userPassword, rowData.field[0], chainId)
     const newRowData = {
       ...rowData,
       data: fieldData['data']
@@ -86,8 +86,7 @@ export function History({ tableData = {}, showRefresh = true , handleRefresh}) {
         twoFA_one_time_token: selectedRowData.twoFAOneTimeToken
       }
     }
-    const result = await addResponse(userAddress, userPassword, responseData)
-    console.log(result)
+    const result = await addResponse(userAddress, userPassword, responseData, chainId)
     handleRefresh()
   }
 
@@ -118,8 +117,8 @@ export function History({ tableData = {}, showRefresh = true , handleRefresh}) {
         twoFA_one_time_token: selectedRowData.twoFAOneTimeToken
       }
     }
-    const updateResult = await updateFieldData(userAddress, userPassword, updateData)
-    const responseResult = await addResponse(userAddress, userPassword, responseData)
+    const updateResult = await updateFieldData(userAddress, userPassword, updateData, chainId)
+    const responseResult = await addResponse(userAddress, userPassword, responseData, chainId)
     closeCompleteUpdateModal()
     handleRefresh()
   }

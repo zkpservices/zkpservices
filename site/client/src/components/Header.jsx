@@ -49,6 +49,12 @@ export const Header = forwardRef(function Header({ className }, ref) {
   // window.ethereum.on('chainChanged', handleChainChanged);
 
   useEffect(() => {
+    if(walletConnected) {
+      connectToMetaMask()
+    }
+  }, [])
+
+  useEffect(() => {
     if (userAddress) {
       // Update accountText when account changes
       setAccountText(truncateAddress(userAddress));
@@ -78,6 +84,21 @@ export const Header = forwardRef(function Header({ className }, ref) {
       console.error(error);
     }
   }
+
+  useEffect(() => {
+    const handleChainChanged = (_chainId) => {
+      // Handle the new chain.
+      // You can also force a page reload if needed
+      window.location.reload();
+    };
+  
+    window.ethereum.on('chainChanged', handleChainChanged);
+  
+    return () => {
+      // Clean up the event listener when the component is unmounted
+      window.ethereum.removeListener('chainChanged', handleChainChanged);
+    };
+  }, []);
 
   const truncateAddress = (address) => {
     if (!address) return '';

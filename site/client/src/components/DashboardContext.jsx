@@ -20,30 +20,43 @@ import { ReceivedDataResponseModal } from '@/components/ReceivedDataResponseModa
 import { AwaitingUpdateCompletionModal} from '@/components/AwaitingUpdateCompletionModal'
 import { AwaitingDataModal } from '@/components/AwaitingDataModal'
 import { SendDataModal } from '@/components/SendDataModal'
-import coreContractABI from '../contract_ABIs/ZKPServicesCore.json'; // Adjust the file path as needed
-import twoFAContractABI from '../contract_ABIs/ZKPServicesVRF2FA.json'; // Adjust the file path as needed
+import coreContractABI from '../../public/contract_ABIs/ZKPServicesCore.json'; 
+import twoFAContractABI from '../../public/contract_ABIs/ZKPServicesVRF2FA.json'; 
 
 export function DashboardContext() {
   let { walletConnected, userAddress, showLoginNotification, setShowLoginNotification, loggedIn, 
-    userPassword, username, setUsername, dashboard, setdashboard, setWeb3, setCoreContract, 
-    setTwoFAContract} = useGlobal();
-
+    userPassword, username, setUsername, dashboard, chainId, setDashboard, setWeb3, 
+    setFujiCoreContract, setFujiTwoFAContract, setMumbaiCoreContract, setMumbaiTwoFAContract,
+    setRippleCoreContract, setRippleTwoFAContract } = useGlobal();  
+  
   function initializeWeb3(){
     //these are too large for local storage and need to be reinstantiated each time
     const web3Instance = new Web3(window.ethereum);
     setWeb3(web3Instance);
 
     const coreContractAbi = coreContractABI; 
-    const coreContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'; 
+    const fujiCoreContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'; 
+    const mumbaiCoreContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'; 
+    const rippleCoreContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'; 
 
-    const coreContractInstance = new web3Instance.eth.Contract(coreContractAbi, coreContractAddress);
-    setCoreContract(coreContractInstance);
+    const fujiCoreContractInstance = new web3Instance.eth.Contract(coreContractAbi, fujiCoreContractAddress);
+    const mumbaiCoreContractInstance = new web3Instance.eth.Contract(coreContractAbi, mumbaiCoreContractAddress);
+    const rippleCoreContractInstance = new web3Instance.eth.Contract(coreContractAbi, rippleCoreContractAddress);
+    setFujiCoreContract(fujiCoreContractInstance);
+    setMumbaiCoreContract(mumbaiCoreContractInstance);
+    setRippleCoreContract(rippleCoreContractInstance);
 
     const twoFAContractAbi = twoFAContractABI;
-    const twoFAContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'; 
+    const fujiTwoFAContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'; 
+    const mumbaiTwoFAContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'; 
+    const rippleTwoFAContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'; 
 
-    const twoFAContractInstance = new web3Instance.eth.Contract(twoFAContractAbi, twoFAContractAddress);
-    setTwoFAContract(twoFAContractInstance);
+    const fujiTwoFAContractInstance = new web3Instance.eth.Contract(twoFAContractAbi, fujiTwoFAContractAddress);
+    const mumbaiTwoFAContractInstance = new web3Instance.eth.Contract(twoFAContractAbi, mumbaiTwoFAContractAddress);
+    const rippleTwoFAContractInstance = new web3Instance.eth.Contract(twoFAContractAbi, rippleTwoFAContractAddress);
+    setFujiTwoFAContract(fujiTwoFAContractInstance);
+    setMumbaiTwoFAContract(mumbaiTwoFAContractInstance);
+    setRippleTwoFAContract(rippleTwoFAContractInstance);
   }
 
   const [tableData, setTableData] = useState({
@@ -138,15 +151,11 @@ export function DashboardContext() {
   async function loadAllHistory() {
     async function fetchHistoryData() {
       try {
-        const cctxData = await getCCTX(userAddress, userPassword);
-        const rawData = cctxData['data'];
+        const cctxData = await getCCTX(userAddress, userPassword, chainId);
+        const dataArray = cctxData['data']
   
-        // Check if rawData is a string
-        if (typeof rawData === 'string') {
           try {
-            // Attempt to parse the string into an array
-            const dataArray = JSON.parse(rawData);
-  
+            // Attempt to parse the string into an array  
             // Check if dataArray is an array
             if (Array.isArray(dataArray)) {
               // The parsed data is an array
@@ -168,20 +177,14 @@ export function DashboardContext() {
             // JSON parsing error
             console.error('Error parsing JSON data:', error);
           }
-        } else {
-          // Handle the case where rawData is not a string
-          console.error('Data is not a string.');
-        }
   
         // Fetch incoming and outgoing data
-        const incoming = await getIncoming(userAddress, userPassword);
-        const outgoing = await getOutgoing(userAddress, userPassword);
-        const incomingData = incoming['data']
-        const outgoingData = outgoing['data']
-        const incomingRequests = JSON.parse(incomingData['requests_received']);
-        const outgoingRequests = JSON.parse(outgoingData['requests_sent']);
-        const incomingResponses = JSON.parse(incomingData['responses_received']);
-        const outgoingResponses = JSON.parse(outgoingData['responses_sent']);
+        const incoming = await getIncoming(userAddress, userPassword, chainId);
+        const outgoing = await getOutgoing(userAddress, userPassword, chainId);
+        const incomingRequests = incoming['data']['requests_received']
+        const outgoingRequests = outgoing['data']['requests_sent']
+        const incomingResponses = incoming['data']['responses_received']
+        const outgoingResponses = outgoing['data']['responses_sent']
         const incomingFinal = formatIncomingData(incomingRequests, incomingResponses, outgoingResponses)
         const outgoingFinal = formatOutgoingData(outgoingRequests, outgoingResponses, incomingResponses)
   
@@ -199,8 +202,8 @@ export function DashboardContext() {
 
   async function fetchUserDataFields() {  
     try {
-      const localdashboard = await getDashboard(userAddress, userPassword)
-      setdashboard(localdashboard['data'])
+      const localdashboard = await getDashboard(userAddress, userPassword, chainId)
+      setDashboard(localdashboard['data'])
       setUserDataFields(localdashboard['data']);
     } catch (error) {
       console.error('Error fetching user data fields:', error);
@@ -208,15 +211,24 @@ export function DashboardContext() {
   }
 
   useEffect(() => {
+    console.log("DashboardContext useEffect triggered")
     loadAllHistory()
     fetchUserDataFields()
     initializeWeb3()
   }, []);
+
+  const removeField = (fieldToRemove) => {
+    setUserDataFields(userDataFields.filter(i => i !== fieldToRemove))
+  }
+
+  const addField = (fieldToAdd) => {
+    setUserDataFields([...userDataFields, fieldToAdd])
+  }
     
     
   return (
     <div>
-      <UserData fieldNames={userDataFields}/> 
+      <UserData fieldNames={userDataFields} handleRemove={removeField} handleAdd={addField}/> 
       <Services useLink={false} />
       <History tableData={tableData} showRefresh={true} handleRefresh={loadAllHistory}/>
     </div>

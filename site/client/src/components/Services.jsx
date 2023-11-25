@@ -161,13 +161,12 @@ export function Services() {
     const compiledRequestData = {
       ...requestData,
       address_sender: userAddress,
-      chain_id: chainId,
+      chainID: chainId,
     }
     const finalRequestData = {
       request: compiledRequestData
     }
-    const addRequestResult = await addRequest(userAddress, userPassword, finalRequestData)
-    console.log(addRequestResult)
+    const addRequestResult = await addRequest(userAddress, userPassword, finalRequestData, chainId)
   }
 
   return (

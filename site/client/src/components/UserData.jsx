@@ -115,23 +115,25 @@ export function MyData({ mydata, onCardClick }) {
   );
 }
 
-export function UserData({ fieldNames = [] }) {
+export function UserData({ fieldNames = [], handleRemove, handleAdd}) {
   const [selectedFieldName, setSelectedFieldName] = useState(null);
   const [addDataModalOpen, setAddDataModalOpen] = useState(false);
-  let {userAddress, userPassword, fieldData, setFieldData, availableDashboard, setAvailableDashboard, dashboard, setDashboard} = useGlobal();
+  let {userAddress, userPassword, fieldData, setFieldData, availableDashboard, setAvailableDashboard, dashboard, setDashboard, chainId} = useGlobal();
 
   async function addServiceToDashboard(service) {
     setAddDataModalOpen(false);
-    const addToDashboardResult = await addToDashboard(userAddress, userPassword, service)
+    handleAdd(service)
+    const addToDashboardResult = await addToDashboard(userAddress, userPassword, service, chainId)
   }
 
   async function removeServiceFromDashboard(service) {
     setSelectedFieldName(null);
-    const removeServiceFromDashboardResult = await removeFromDashboard(userAddress, userPassword, service)
+    handleRemove(service)
+    const removeServiceFromDashboardResult = await removeFromDashboard(userAddress, userPassword, service, chainId)
   }
 
   async function openFieldModal(fieldName) {
-    let localFieldData = await getFieldData(userAddress, userPassword, fieldName.toLowerCase())
+    let localFieldData = await getFieldData(userAddress, userPassword, fieldName.toLowerCase(), chainId)
     setFieldData(JSON.stringify(localFieldData['data'], null, 2))
     setSelectedFieldName(fieldName);
   };
@@ -147,7 +149,7 @@ export function UserData({ fieldNames = [] }) {
   }
 
   async function openAddDataModal() {
-    const localAvailableDashboard = await getAvailableDashboard(userAddress, userPassword)
+    const localAvailableDashboard = await getAvailableDashboard(userAddress, userPassword, chainId)
     console.log(fieldNames)
     console.log(localAvailableDashboard['data'])
     const differenceDashboard = findUniqueElements(localAvailableDashboard['data'], fieldNames)

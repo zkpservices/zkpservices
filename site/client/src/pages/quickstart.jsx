@@ -6,10 +6,18 @@ import Router from 'next/router';
 import { createUser } from '@/components/APICalls'
 import { generateRSAKeys, generateRSASigningKeys } from '@/components/HelperCalls';
 
+const chains = {
+  "fuji": "43113", 
+  "mumbai": "80001", 
+  "ripple": "1440002"
+}
+
 export default function Quickstart() {
   let { walletConnected, userAddress, showLoginNotification, 
-    setShowLoginNotification, loggedIn, setLoggedIn, userPassword, setUserPassword, username, setUsername, twoFactorAuthPassword, setTwoFactorAuthPassword,
-    contractPassword, setContractPassword, chainId } = useGlobal();
+    setShowLoginNotification, loggedIn, setLoggedIn, userPassword, 
+    setUserPassword, username, setUsername, twoFactorAuthPassword, 
+    setTwoFactorAuthPassword, contractPassword, setContractPassword, 
+    chainId, web3, coreContract, twoFAContract  } = useGlobal();
   const [showQuickstart, setShowQuickstart] = useState(<h2 className="mt-10 text-center text-3xl font-bold tracking-tight">
   Please connect your wallet to get started.
 </h2>)
@@ -38,10 +46,11 @@ const handleGenerateRSASigningKeys = async () => {
 
 const handleSubmit = async (event) => {
   event.preventDefault();
+  console.log(`userAddress: ${userAddress}`)
 
   const formData = new FormData(event.target)
   const formDataJSON = formToJSON(formData);
-  
+
   try {
     const quickstart_JSON = {
       "contract_password": formDataJSON['contract_password'],
@@ -50,11 +59,14 @@ const handleSubmit = async (event) => {
       "rsa_enc_priv_key": formDataJSON['rsa_enc_priv_key'],
       "rsa_sign_pub_key": formDataJSON['rsa_sign_pub_key'],
       "rsa_sign_priv_key": formDataJSON['rsa_sign_priv_key'],
-      "chain_id": chainId,
-      "data": JSON.parse(formDataJSON['data']),
-      "userdata_check": formDataJSON['userdata_check'] === 'on', // Set to true if checked, false if not
-      "rsa_enc_key_pub_check": formDataJSON['rsa_enc_key_pub_check'] === 'on', // Set to true if checked, false if not
-      "rsa_sign_key_pub_check": formDataJSON['rsa_sign_key_pub_check'] === 'on' // Set to true if checked, false if not
+      "chain_data": {
+        [chainId]: {
+          "data": JSON.parse(formDataJSON['data'])
+        }
+      },
+      "userdata_check": formDataJSON['userdata_check'] === 'on', 
+      "rsa_enc_key_pub_check": formDataJSON['rsa_enc_key_pub_check'] === 'on', 
+      "rsa_sign_key_pub_check": formDataJSON['rsa_sign_key_pub_check'] === 'on' 
     }
     
     async function callCreateUser() {
@@ -275,8 +287,8 @@ const handleSubmit = async (event) => {
           <div className="space-y-6 divide-y divide-gray-200 dark:divide-gray-700 pt-8 sm:space-y-5 sm:pt-10">
             <div>
               <h3 className="text-lg font-medium leading-6">Onboard to Smart Contract</h3>
-              <p className="mt-1 max-w-2xl text-sm">
-                Please select which of the parameters you would like to onboard to the smart contract.
+              <p className="mt-1 max-w-none text-sm">
+                Please select to which chains you'd like to onboard immediately. You can onboard to other chains in the "onboard to new chains" section.
               </p>
             </div>
             <div className="space-y-6 divide-y divide-gray-200 dark:divide-gray-700 sm:space-y-5">
@@ -285,7 +297,7 @@ const handleSubmit = async (event) => {
                   <div className="sm:grid sm:grid-cols-3 sm:items-baseline sm:gap-4">
                     <div>
                       <div className="text-base font-medium sm:text-sm" id="label-email">
-                        Parameter:
+                        Blockchain:
                       </div>
                     </div>
                     <div className="mt-4 sm:col-span-2 sm:mt-0">
@@ -293,16 +305,16 @@ const handleSubmit = async (event) => {
                         <div className="relative flex items-start">
                           <div className="flex h-5 items-center">
                             <input
-                              id="rsa_enc_key_pub_check"
-                              name="rsa_enc_key_pub_check"
+                              id="fuji_checkbox"
+                              name="fuji_checkbox"
                               type="checkbox"
-                              className="h-4 w-4 rounded border-gray-300 dark:border-gray-700 text-emerald-600 focus:ring-emerald-500"
+                              className="h-4 w-4 mt-1 rounded border-gray-300 dark:border-gray-700 text-emerald-600 focus:ring-emerald-500"
                               defaultChecked
                             />
                           </div>
                           <div className="ml-3 text-sm">
                             <label htmlFor="comments" className="font-medium">
-                              RSA Encryption Key - Public
+                              Avalanche Fuji Testnet
                             </label>
                             <p>Allows others to look up your public key through the smart contract.</p>
                           </div>
@@ -310,16 +322,16 @@ const handleSubmit = async (event) => {
                         <div className="relative flex items-start">
                           <div className="flex h-5 items-center">
                             <input
-                              id="rsa_sign_key_pub_check"
-                              name="rsa_sign_key_pub_check"
+                              id="mumbai_checkbox"
+                              name="mumbai_checkbox"
                               type="checkbox"
-                              className="h-4 w-4 rounded border-gray-300 dark:border-gray-700 text-emerald-600 focus:ring-emerald-500"
+                              className="h-4 w-4 mt-1 rounded border-gray-300 dark:border-gray-700 text-emerald-600 focus:ring-emerald-500"
                               defaultChecked
                             />
                           </div>
                           <div className="ml-3 text-sm">
                             <label htmlFor="candidates" className="font-medium">
-                              RSA Signing Key - Public
+                               Polygon Mumbai Testnet
                             </label>
                             <p>Allows others to verify your signatures.</p>
                           </div>
@@ -327,16 +339,16 @@ const handleSubmit = async (event) => {
                         <div className="relative flex items-start">
                           <div className="flex h-5 items-center">
                             <input
-                              id="userdata_check"
-                              name="userdata_check"
+                              id="ripple_checkbox"
+                              name="ripple_checkbox"
                               type="checkbox"
-                              className="h-4 w-4 rounded border-gray-300 dark:border-gray-700 text-emerald-600 focus:ring-emerald-500"
+                              className="h-4 w-4 mt-1 rounded border-gray-300 dark:border-gray-700 text-emerald-600 focus:ring-emerald-500"
                               defaultChecked
                             />
                           </div>
                           <div className="ml-3 text-sm">
                             <label htmlFor="offers" className="font-medium">
-                              Public Information
+                              Ripple EVM Sidechain
                             </label>
                             <p>Allows others to look up public information associated with your account.</p>
                           </div>

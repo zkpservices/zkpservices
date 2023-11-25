@@ -25,18 +25,6 @@ table_name = "userdata"
 # Get the DynamoDB table with the specified name
 table = dynamodb.Table(table_name)
 
-# def create_item(item_id, item_data, context):
-#     # Convert Python decimal to JSON number string for serialization
-#     item_data = DecimalEncoder(item_data)
-
-#     # Update DynamoDB item
-#     response = table.put_item(Item={'id': item_id, **item_data})
-
-#     return {
-#         "statusCode": 200,
-#         "body": json.dumps("Item created successfully!")
-#     }
-
 def update_json(obj1, obj2):
     for key, value in obj2.items():
         if isinstance(value, dict) and key in obj1 and isinstance(obj1[key], dict):
@@ -49,23 +37,24 @@ def update_json(obj1, obj2):
 
     return obj1
 
-def get_item(item_id, key=None):
-    # Authenticate the user
-    # password_auth_result = check_password(item_id, password)
-    # if not password_auth_result == True:
-    #     return None
-    response = table.get_item(Key={"id": item_id})
-    item = response.get("Item", None)
+def get_item(item_id, chain_id, key=None):
+    chain_data = get_full_data(item_id)
 
-    if item and 'data' in item:
-        data = item['data']
+    # Check if the specified chain_id exists
+    if chain_id in chain_data:
+        data = chain_data[chain_id]['data']
+        print(data)
+
         if key is None:
             return data
         else:
+            print("getting nested value...")
             value = get_nested_value(data, key)
+            print("value")
             return {key: value} if value is not None else {}
-    
+
     return None
+
 
 def login(item_id, password):
     # Authenticate the user
@@ -81,7 +70,7 @@ def login(item_id, password):
     
 def get_nested_value(data, key):
     keys = key.split('.')
-    value = json.loads(data)
+    value = data
     for k in keys:
         if '[' in k and ']' in k:
             # Handle list index
@@ -206,68 +195,93 @@ def update_password(item_id, new_password, old_password, context):
 
 def create_item(item_data):
     # Check if the item with the given ID already exists
-    existing_item = get_item(item_data['id'])
+    existing_item = get_full_data(item_data['id'])
 
     if existing_item:
         return {
             "statusCode": 409,
             "body": "Item with the specified ID already exists"
         }
+    
     try:
-        requests_received_data = item_data.get('requests_received', '[]')
-        responses_received_data = item_data.get('responses_received', '[]')
-        requests_sent_data = item_data.get('requests_sent', '[]')
-        responses_sent_data = item_data.get('responses_sent', '[]')
-        crosschain_transactions = item_data.get('crosschain_transactions', '[]')
-
-        # Initialize the available_dashboard list with objects from the data field
-        available_dashboard = list(item_data['data'].keys())
-
-        # Add a "last_updated" timestamp for each parent level in the "data" field
-        data_with_timestamps = item_data['data']
-        for key in data_with_timestamps:
-            data_with_timestamps[key]['last_updated'] = str(int(time.time()))
-        item_data_json = json.dumps(data_with_timestamps, cls=DecimalEncoder)
-        # Add a "last_updated" timestamp for columns outside the "data" field
-        item_data['last_updated'] = str(int(time.time()))
-
-        response = table.put_item(Item={
+        # Initialize the user item with common user information
+        user_item = {
             "id": item_data['id'],
-            "data": item_data_json,  # Use the updated "data" field
             "password": item_data.get("password", ""),
             "2fa_password": item_data['2fa_password'],
             "contract_password": item_data['contract_password'],
-            "requests_received": requests_received_data,
-            "responses_received": responses_received_data,
-            "requests_sent": requests_sent_data,
-            "responses_sent": responses_sent_data,
-            "available_dashboard": available_dashboard,  # Add the available_dashboard list
-            "crosschain_transactions": crosschain_transactions,
             "rsa_enc_pub_key": item_data['rsa_enc_pub_key'],
             "rsa_enc_priv_key": item_data['rsa_enc_priv_key'],
             "rsa_sign_pub_key": item_data['rsa_sign_pub_key'],
-            "rsa_sign_pub_key": item_data['rsa_sign_pub_key'],
+            "rsa_sign_priv_key": item_data['rsa_sign_priv_key'],
             "userdata_check": item_data['userdata_check'],
             "rsa_enc_key_pub_check": item_data['rsa_enc_key_pub_check'],
-            "rsa_sign_key_pub_check": item_data['rsa_sign_key_pub_check']
-        })
+            "rsa_sign_key_pub_check": item_data['rsa_sign_key_pub_check'],
+        }
+
+        # Create a "chain_data" dictionary to store chain-specific data
+        chain_data = {}
+
+        # Add data for each chain_id to the "chain_data" dictionary
+        for chain_id in item_data['chain_data']:
+            # Initialize chain-specific data
+            body_data = item_data['chain_data'][chain_id]['data']
+            available_dashboard = []
+            for key in body_data.keys():
+                if key not in available_dashboard:
+                    available_dashboard.append(key)
+            chain_item = {
+                "data": item_data['chain_data'][chain_id]['data'],  # Chain-specific data
+                "requests_received": [],  # Chain-specific requests_received
+                "responses_received": [],  # Chain-specific responses_received
+                "requests_sent": [],  # Chain-specific requests_sent
+                "responses_sent": [],  # Chain-specific responses_sent
+                "dashboard": [],
+                "available_dashboard": available_dashboard,
+                "crosschain_transactions": []
+            }
+
+
+            # Add "last_updated" timestamp to immediate child records under "data"
+            for key in chain_item['data']:
+                chain_item['data'][key]['last_updated'] = str(int(time.time()))
+
+            # # If the user has crosschain_transactions, add them
+            # if "crosschain_transactions" in item_data['chain_data'][chain_id]:
+            #     chain_item['crosschain_transactions'] = item_data['chain_data'][chain_id]['crosschain_transactions']
+
+            chain_data[chain_id] = chain_item
+
+        # Add the "chain_data" dictionary to the user item
+        user_item["chain_data"] = chain_data
+
+        # Set the last_updated for the entire user_item
+        user_item['last_updated'] = str(int(time.time()))
+
+        # Add the user item to the table
+        response = table.put_item(Item=user_item)
 
         return "Item created successfully!"
     except Exception as e:
         return str(e)
 
-def update_item(id, password, body):
+def get_full_data(item_id):
+    response = table.get_item(Key={"id": item_id})
+    item = response.get("Item", None)
+
+    if item and "chain_data" in item:
+        return item["chain_data"]
+    else:
+        return None
+
+
+
+
+def update_item(id, password, chain_id, body):
     # Authenticate the user
     password_auth_result = check_password(id, password)
     if not password_auth_result == True:
         return password_auth_result
-    # Check if the item with the given ID exists
-    existing_item = get_item(id)
-    if not existing_item:
-        return {
-            "statusCode": 404,
-            "body": json.dumps("Item with the specified ID not found")
-        }
 
     try:
         item_id = id
@@ -278,44 +292,47 @@ def update_item(id, password, body):
             }
 
         # Fetch the existing item from the database
-        existing_item = get_item(item_id)
+        existing_item = get_full_data(item_id)
         if not existing_item:
             return {
                 "statusCode": 404,
                 "body": json.dumps("Item not found")
             }
-        
-        # Fetch the existing "available_dashboard" set from the database
-        response = table.get_item(Key={"id": item_id}, ProjectionExpression="available_dashboard")
-        existing_available_dashboard_set = response.get("Item", {}).get("available_dashboard", [])
 
-        # Convert the DynamoDB set to a Python list
-        existing_available_dashboard = list(existing_available_dashboard_set)
+        # Fetch the existing "available_dashboard" list specific to the chain
+        existing_available_dashboard = existing_item[chain_id].get("available_dashboard", [])
 
         # Update the "available_dashboard" list with keys from the "body" object
         for key in body.keys():
             if key not in existing_available_dashboard:
                 existing_available_dashboard.append(key)
-        
-        existing_item = json.loads(existing_item)
 
         for key in body:
-            body[key]['last_updated'] = str(int(time.time()))
-        
-        # Merge the new data into the existing data, preserving the "last_updated" timestamps
-        merged_item = update_json(existing_item, body)
-        
-        # Update the "last_updated" timestamps for each parent key in the "data" column
+            if key != 'chain_id':
+                body[key]['last_updated'] = str(int(time.time()))
 
-        # Convert Decimal fields to float for serialization
-        item_data_json = json.dumps(merged_item, cls=DecimalEncoder)
+        # Merge the new data into the existing data for the specified chain
+        existing_data = existing_item[chain_id]['data']
+        merged_data = update_json(existing_data, body)
+
+        # Update the "last_updated" timestamp for the parent key in the "data" column
+        if 'last_updated' not in existing_data:
+            existing_data['last_updated'] = str(int(time.time()))
 
         # Update the item in the database
         response = table.update_item(
             Key={"id": item_id},
-            UpdateExpression="set #data = :data, #available_dashboard = :available_dashboard",
-            ExpressionAttributeNames={"#data": "data", "#available_dashboard": "available_dashboard"},
-            ExpressionAttributeValues={":data": item_data_json, ":available_dashboard": existing_available_dashboard},
+            UpdateExpression=f"set #chain_data.#chain_id.#data = :data, #chain_data.#chain_id.#available_dashboard = :available_dashboard",
+            ExpressionAttributeNames={
+                "#chain_data": "chain_data",
+                "#chain_id": chain_id,
+                "#data": "data",
+                "#available_dashboard": "available_dashboard"
+            },
+            ExpressionAttributeValues={
+                ":data": merged_data,
+                ":available_dashboard": existing_available_dashboard
+            },
             ReturnValues="UPDATED_NEW"
         )
 
@@ -326,6 +343,8 @@ def update_item(id, password, body):
             "statusCode": 500,
             "body": json.dumps(str(e))
         }
+
+
 
 def update_timestamps(data):
     # Recursive function to update "last_updated" timestamps for parent keys in the "data" object
@@ -342,15 +361,16 @@ def update_timestamps(data):
 
 
 def add_request(sender_id, request, password):
-    print("ADD REQUEST")
     # Authenticate the user
     password_auth_result = check_password(sender_id, password)
     if not password_auth_result == True:
         return password_auth_result
     try:
+
+        chain_id = request['chainID']
+
         # Get sender's data from the database
-        sender_response = table.get_item(Key={"id": sender_id})
-        sender_data = sender_response.get("Item", None)
+        sender_data = get_full_data(sender_id)
 
         if not sender_data:
             return {
@@ -362,42 +382,39 @@ def add_request(sender_id, request, password):
         receiver_id = request['address_receiver']
 
         # Get receiver's data from the database
-        receiver_response = table.get_item(Key={"id": receiver_id})
-        receiver_data = receiver_response.get("Item", None)
+        receiver_data = get_full_data(receiver_id)
 
         if not receiver_data:
             return {
                 "statusCode": 404,
                 "body": json.dumps("Receiver not found")
             }
+        
 
-        print(sender_data.get('requests_sent'))
-        print(type(sender_data.get('requests_sent')))
         # Update sender's sent_requests
-        sender_requests_sent = json.loads(sender_data.get('requests_sent', '[]'))
-        print('mubunggg..')
-        print("sender_requests_sent")
-        print(sender_requests_sent)
+        sender_chain_data = sender_data[chain_id]
+        sender_requests_sent = sender_chain_data['requests_sent']
         sender_requests_sent.append(request)
-        sender_requests_sent_json = json.dumps(sender_requests_sent)
+        
+        sender_data[chain_id]['requests_sent'] = sender_requests_sent
 
         # Update receiver's received_requests
-        receiver_requests_received = json.loads(receiver_data.get('requests_received', '[]'))
+        receiver_chain_data = receiver_data[chain_id]
+        receiver_requests_received = receiver_chain_data['requests_received']
         receiver_requests_received.append(request)
-        receiver_requests_received_json = json.dumps(receiver_requests_received)
-
+        receiver_data[chain_id]['requests_received'] = receiver_requests_received
         # Update sender's and receiver's data in the database
         response = table.update_item(
             Key={"id": sender_id},
-            UpdateExpression="set #requests_sent = :requests_sent",
-            ExpressionAttributeNames={"#requests_sent": "requests_sent"},
-            ExpressionAttributeValues={":requests_sent": sender_requests_sent_json}
+            UpdateExpression="set #chain_data = :chain_data",
+            ExpressionAttributeNames={"#chain_data": "chain_data"},
+            ExpressionAttributeValues={":chain_data": sender_data}
         )
         response = table.update_item(
             Key={"id": receiver_id},
-            UpdateExpression="set #requests_received = :requests_received",
-            ExpressionAttributeNames={"#requests_received": "requests_received"},
-            ExpressionAttributeValues={":requests_received": receiver_requests_received_json}
+            UpdateExpression="set #chain_data = :chain_data",
+            ExpressionAttributeNames={"#chain_data": "chain_data"},
+            ExpressionAttributeValues={":chain_data": receiver_data}
         )
 
         return {
@@ -411,15 +428,17 @@ def add_request(sender_id, request, password):
             "body": json.dumps(str(e))
         }
 
+
 def add_response(sender_id, response, password):
     # Authenticate the user
     password_auth_result = check_password(sender_id, password)
     if not password_auth_result == True:
         return password_auth_result
     try:
+        chain_id = response['chainID']
+
         # Get sender's data from the database
-        sender_response = table.get_item(Key={"id": sender_id})
-        sender_data = sender_response.get("Item", None)
+        sender_data = get_full_data(sender_id)
 
         if not sender_data:
             return {
@@ -427,41 +446,43 @@ def add_response(sender_id, response, password):
                 "body": json.dumps("Sender not found")
             }
 
-        # Extract receiver's address from the responses object
+        # Extract receiver's address from the response object
         receiver_id = response['address_receiver']
 
         # Get receiver's data from the database
-        receiver_response = table.get_item(Key={"id": receiver_id})
-        receiver_data = receiver_response.get("Item", None)
+        receiver_data = get_full_data(receiver_id)
 
         if not receiver_data:
             return {
                 "statusCode": 404,
                 "body": json.dumps("Receiver not found")
             }
-
+        
         # Update sender's sent_responses
-        sender_responses_sent = json.loads(sender_data.get('responses_sent', '[]'))
+        sender_chain_data = sender_data[chain_id]
+        sender_responses_sent = sender_chain_data['responses_sent']
         sender_responses_sent.append(response)
-        sender_responses_sent_json = json.dumps(sender_responses_sent)
+        
+        sender_data[chain_id]['responses_sent'] = sender_responses_sent
 
         # Update receiver's received_responses
-        receiver_responses_received = json.loads(receiver_data.get('responses_received', '[]'))
+        receiver_chain_data = receiver_data[chain_id]
+        receiver_responses_received = receiver_chain_data['responses_received']
         receiver_responses_received.append(response)
-        receiver_responses_received_json = json.dumps(receiver_responses_received)
+        receiver_data[chain_id]['responses_received'] = receiver_responses_received
 
         # Update sender's and receiver's data in the database
         response = table.update_item(
             Key={"id": sender_id},
-            UpdateExpression="set #responses_sent = :responses_sent",
-            ExpressionAttributeNames={"#responses_sent": "responses_sent"},
-            ExpressionAttributeValues={":responses_sent": sender_responses_sent_json}
+            UpdateExpression="set #chain_data = :chain_data",
+            ExpressionAttributeNames={"#chain_data": "chain_data"},
+            ExpressionAttributeValues={":chain_data": sender_data}
         )
         response = table.update_item(
             Key={"id": receiver_id},
-            UpdateExpression="set #responses_received = :responses_received",
-            ExpressionAttributeNames={"#responses_received": "responses_received"},
-            ExpressionAttributeValues={":responses_received": receiver_responses_received_json}
+            UpdateExpression="set #chain_data = :chain_data",
+            ExpressionAttributeNames={"#chain_data": "chain_data"},
+            ExpressionAttributeValues={":chain_data": receiver_data}
         )
 
         return {
@@ -475,16 +496,16 @@ def add_response(sender_id, response, password):
             "body": json.dumps(str(e))
         }
 
-def get_available_dashboard(item_id, password):
+def get_available_dashboard(item_id, password, chain_id):
     # Authenticate the user
     password_auth_result = check_password(item_id, password)
     if not password_auth_result == True:
         return password_auth_result
     try:
         # Query the DynamoDB table to fetch the available_dashboard attribute
-        response = table.get_item(Key={"id": item_id}, ProjectionExpression="available_dashboard")
+        response = get_full_data(item_id)
 
-        item = response.get("Item", None)
+        item = response[chain_id]
         if not item or "available_dashboard" not in item:
             return {
                 "statusCode": 404,
@@ -504,7 +525,7 @@ def get_available_dashboard(item_id, password):
             "body": json.dumps(str(e))
         }
 
-def get_dashboard(item_id, password):
+def get_dashboard(item_id, password, chain_id):
     # Authenticate the user
     password_auth_result = check_password(item_id, password)
     if not password_auth_result == True:
@@ -512,13 +533,8 @@ def get_dashboard(item_id, password):
     try:
 
         # Query the DynamoDB table to fetch the "dashboard" attribute
-        response = table.get_item(Key={"id": item_id}, ProjectionExpression="dashboard")
-        item = response.get("Item", None)
-        if not item or "dashboard" not in item:
-            return {
-                "statusCode": 404,
-                "body": json.dumps("Dashboard not found")
-            }
+        response = get_full_data(item_id)
+        item = response[chain_id]
 
         # Retrieve the "dashboard" list from the item
         dashboard = item.get('dashboard', [])
@@ -533,17 +549,16 @@ def get_dashboard(item_id, password):
             "body": json.dumps(str(e))
         }
 
-def add_to_dashboard(item_id, service, password):
+def add_to_dashboard(item_id, service, password, chain_id):
     # Authenticate the user
     password_auth_result = check_password(item_id, password)
     if not password_auth_result == True:
         return password_auth_result
     try:
 
-        # Query the DynamoDB table to fetch the "available_dashboard" attribute
-        response = table.get_item(Key={"id": item_id}, ProjectionExpression="available_dashboard")
+        response = get_full_data(item_id)
+        item = response[chain_id]
 
-        item = response.get("Item", None)
         if not item or "available_dashboard" not in item:
             return {
                 "statusCode": 404,
@@ -553,10 +568,7 @@ def add_to_dashboard(item_id, service, password):
         # Retrieve the "available_dashboard" list from the item
         available_dashboard = item.get('available_dashboard', [])
 
-        # Query the DynamoDB table to fetch the "dashboard" attribute
-        response = table.get_item(Key={"id": item_id}, ProjectionExpression="dashboard")
 
-        item = response.get("Item", None)
         if not service or "dashboard" not in item:
             return {
                 "statusCode": 404,
@@ -564,7 +576,6 @@ def add_to_dashboard(item_id, service, password):
             }
         dashboard = item.get('dashboard', [])
 
-        # Check if the "item" already exists in the "dashboard" list
         if service in dashboard:
             return {
                 "statusCode": 400,
@@ -578,11 +589,13 @@ def add_to_dashboard(item_id, service, password):
         # Add the new item to the "dashboard" list
         dashboard.append(service)
 
+        response[chain_id]['dashboard'] = dashboard
+
         # Update the "dashboard" list in DynamoDB
         response = table.update_item(
             Key={"id": item_id},
-            UpdateExpression="SET dashboard = :dashboard",
-            ExpressionAttributeValues={":dashboard": dashboard}
+            UpdateExpression="SET chain_data = :chain_data",
+            ExpressionAttributeValues={":chain_data": response}
         )
 
         return {
@@ -595,16 +608,15 @@ def add_to_dashboard(item_id, service, password):
             "body": json.dumps(str(e))
         }
 
-def remove_from_dashboard(item_id, service, password):
+def remove_from_dashboard(item_id, service, password, chain_id):
     # Authenticate the user
     password_auth_result = check_password(item_id, password)
     if not password_auth_result == True:
         return password_auth_result
     try:
         # Query the DynamoDB table to fetch the "dashboard" attribute
-        response = table.get_item(Key={"id": item_id}, ProjectionExpression="dashboard")
-
-        item = response.get("Item", None)
+        response = get_full_data(item_id)
+        item = response[chain_id]
         if not service or "dashboard" not in item:
             return {
                 "statusCode": 404,
@@ -622,11 +634,13 @@ def remove_from_dashboard(item_id, service, password):
         # Add the new item to the "dashboard" list
         dashboard.remove(service)
 
+        response[chain_id]['dashboard'] = dashboard
+
         # Update the "dashboard" list in DynamoDB
         response = table.update_item(
             Key={"id": item_id},
-            UpdateExpression="SET dashboard = :dashboard",
-            ExpressionAttributeValues={":dashboard": dashboard}
+            UpdateExpression="SET chain_data = :chain_data",
+            ExpressionAttributeValues={":chain_data": response}
         )
 
         return {
@@ -639,7 +653,7 @@ def remove_from_dashboard(item_id, service, password):
             "body": json.dumps(str(e))
         }
 
-def add_crosschain_transaction(id, crosschain_transaction, password):
+def add_crosschain_transaction(id, crosschain_transaction, password, chain_id):
     # Authenticate the user
     password_auth_result = check_password(id, password)
     if not password_auth_result == True:
@@ -647,8 +661,7 @@ def add_crosschain_transaction(id, crosschain_transaction, password):
 
     try:
         # Get user's data from the database
-        user = table.get_item(Key={"id": id})
-        user_data = user.get("Item", None)
+        user_data = get_full_data(id)
 
         if not user_data:
             return {
@@ -657,20 +670,21 @@ def add_crosschain_transaction(id, crosschain_transaction, password):
             }
 
         # Load the existing cctx data as a list
-        cctx = json.loads(user_data.get('crosschain_transactions', '[]'))
+        cctx = user_data[chain_id]['crosschain_transactions']
         
         # Update the new transaction with a "last_updated" timestamp
         crosschain_transaction['last_updated'] = str(int(time.time()))
         
         # Append the new transaction to the list
         cctx.append(crosschain_transaction)
+        user_data[chain_id]['crosschain_transactions'] = cctx
 
         # Update cctx's in the database
         response = table.update_item(
             Key={"id": id},
-            UpdateExpression="set #crosschain_transactions = :crosschain_transactions",
-            ExpressionAttributeNames={"#crosschain_transactions": "crosschain_transactions"},
-            ExpressionAttributeValues={":crosschain_transactions": json.dumps(cctx)}
+            UpdateExpression="set #chain_data = :chain_data",
+            ExpressionAttributeNames={"#chain_data": "chain_data"},
+            ExpressionAttributeValues={":chain_data": user_data}
         )
 
         return {
@@ -686,28 +700,22 @@ def add_crosschain_transaction(id, crosschain_transaction, password):
 
 
 
-def get_crosschain_transaction(id, password):
+def get_crosschain_transaction(id, password, chain_id):
     # Authenticate the user
     password_auth_result = check_password(id, password)
     if not password_auth_result == True:
         return password_auth_result
     try:
-        print("querying for crosschain transactions")
         # Query the DynamoDB table to fetch the "crosschain_transactions" attribute
-        response = table.get_item(Key={"id": id}, ProjectionExpression="crosschain_transactions")
-        print("queried item successfully")
-        print(response)
-        item = response.get("Item", None)
-        if not item or "crosschain_transactions" not in item:
+        response = get_full_data(id)[chain_id]
+        if not response or "crosschain_transactions" not in response:
             return {
                 "statusCode": 404,
                 "body": json.dumps("Crosschain transactions list not found")
             }
-        print("retrieving list from the item")
 
         # Retrieve the "crosschain_transactions" list from the item
-        cctx = item.get('crosschain_transactions', [])
-        print
+        cctx = response.get('crosschain_transactions', [])
         return {
             "statusCode": 200,
             "body": json.dumps(cctx)
@@ -717,23 +725,23 @@ def get_crosschain_transaction(id, password):
             "statusCode": 500,
             "body": json.dumps(str(e))
         }
-    
-def get_incoming(id, password):
+        
+def get_incoming(id, password, chain_id):
     # Authenticate the user
     password_auth_result = check_password(id, password)
     if not password_auth_result == True:
         return password_auth_result
 
     try:
-        # Query the DynamoDB table to fetch the "requests_received" and "responses_received" attributes
-        response = table.get_item(Key={"id": id}, ProjectionExpression="requests_received, responses_received")
-        item = response.get("Item", None)
+        full_data = get_full_data(id)
 
-        if not item:
+        if not full_data:
             return {
                 "statusCode": 404,
                 "body": json.dumps("User not found")
             }
+
+        item = full_data[chain_id]
 
         # Retrieve the "requests_received" and "responses_received" lists from the item
         requests_received = item.get('requests_received', [])
@@ -756,34 +764,35 @@ def get_incoming(id, password):
             "body": json.dumps(str(e))
         }
 
-def get_outgoing(id, password):
+def get_outgoing(id, password, chain_id):
     # Authenticate the user
     password_auth_result = check_password(id, password)
     if not password_auth_result == True:
         return password_auth_result
 
     try:
-        response = table.get_item(Key={"id": id}, ProjectionExpression="requests_sent, responses_sent")
-        item = response.get("Item", None)
+        full_data = get_full_data(id)
 
-        if not item:
+        if not full_data:
             return {
                 "statusCode": 404,
                 "body": json.dumps("User not found")
             }
 
-        requests_sent = item.get('requests_sent', [])
-        responses_sent = item.get('responses_sent', [])
+        item = full_data[chain_id]
+
+        requests_received = item.get('requests_sent', [])
+        responses_received = item.get('responses_sent', [])
 
         # Combine the two lists into one
-        outgoing_data = {
-            "requests_sent": requests_sent,
-            "responses_sent": responses_sent
+        incoming_data = {
+            "requests_sent": requests_received,
+            "responses_sent": responses_received
         }
 
         return {
             "statusCode": 200,
-            "body": json.dumps(outgoing_data)
+            "body": json.dumps(incoming_data)
         }
 
     except Exception as e:
@@ -829,7 +838,7 @@ def handler(event, context):
                             key = body['key']
                         
                         key = body['key'] if 'key' in body else None
-                        return get_item(body['id'], key)
+                        return get_item(body['id'], body['chain_id'], key)
                     else:
                         return {
                             "statusCode": 400,
@@ -837,12 +846,12 @@ def handler(event, context):
                         }
 
             elif body and 'action' in body and body['action'] == 'create_item':
-                if 'id' in body and 'data' in body:
+                if 'id' in body and 'chain_data' in body:
                     return create_item(body)
                 else:
                     return {
                         "statusCode": 400,
-                        "body": json.dumps("Missing 'id' or 'data' in the request body")
+                        "body": json.dumps("Missing 'id' or 'chain_data' in the request body")
                     }
             elif body and 'action' in body and body['action'] == 'login':
                 if 'id' in body and 'password' in body:
@@ -872,7 +881,7 @@ def handler(event, context):
 
             elif body['action'] == 'get_available_dashboard':
                 if 'id' in body:
-                    return get_available_dashboard(body['id'], body['password'])
+                    return get_available_dashboard(body['id'], body['password'], body['chain_id'])
                 else:
                     return {
                         "statusCode": 400,
@@ -881,7 +890,7 @@ def handler(event, context):
 
             elif body['action'] == 'get_dashboard':
                 if 'id' in body:
-                    return get_dashboard(body['id'], body['password'])
+                    return get_dashboard(body['id'], body['password'], body['chain_id'])
                 else:
                     return {
                         "statusCode": 400,
@@ -890,7 +899,7 @@ def handler(event, context):
 
             elif body['action'] == 'add_to_dashboard':
                 if 'id' in body and 'password' in body and 'service' in body:
-                    return add_to_dashboard(body['id'], body['service'], body['password'])
+                    return add_to_dashboard(body['id'], body['service'], body['password'], body['chain_id'])
                 else:
                     return {
                         "statusCode": 400,
@@ -898,7 +907,7 @@ def handler(event, context):
                         }
             elif body['action'] == 'add_crosschain_transaction':
                 if 'id' in body:
-                    return add_crosschain_transaction(body['id'], body['transaction'], body['password'])
+                    return add_crosschain_transaction(body['id'], body['transaction'], body['password'], body['chain_id'])
                 else:
                     return {
                         "statusCode": 400,
@@ -906,7 +915,7 @@ def handler(event, context):
                         }
             elif body['action'] == 'get_crosschain_transaction':
                 if 'id' in body:
-                    return get_crosschain_transaction(body['id'], body['password'])
+                    return get_crosschain_transaction(body['id'], body['password'], body['chain_id'])
                 else:
                     return {
                         "statusCode": 400,
@@ -914,7 +923,7 @@ def handler(event, context):
                         }
             elif body['action'] == 'get_incoming':
                 if 'id' in body:
-                    return get_incoming(body['id'], body['password'])
+                    return get_incoming(body['id'], body['password'], body['chain_id'])
                 else:
                     return {
                         "statusCode": 400,
@@ -922,7 +931,7 @@ def handler(event, context):
                         }
             elif body['action'] == 'get_outgoing':
                 if 'id' in body:
-                    return get_outgoing(body['id'], body['password'])
+                    return get_outgoing(body['id'], body['password'], body['chain_id'])
                 else:
                     return {
                         "statusCode": 400,
@@ -940,7 +949,7 @@ def handler(event, context):
             
             if body and 'action' in body and body['action'] == 'update_item':
                 if 'id' in body and 'data' in body and 'password' in body:
-                    return update_item(body['id'], body['password'], body['data'])
+                    return update_item(body['id'], body['password'], body['chain_id'], body['data'])
                 else:
                     return {
                         "statusCode": 400,
@@ -964,7 +973,7 @@ def handler(event, context):
             if body and 'action' in body:
                 if body['action'] == 'remove_from_dashboard':
                     if 'id' in body and 'password' in body and 'service' in body:
-                        return remove_from_dashboard(body['id'], body['service'], body['password'])
+                        return remove_from_dashboard(body['id'], body['service'], body['password'], body['chain_id'])
                     else:
                         return {
                             "statusCode": 400,

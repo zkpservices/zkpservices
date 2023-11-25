@@ -333,44 +333,7 @@ export async function flattenJsonAndComputeHash(data) {
   return { sorted, hashes, rootHash };
 }
 
-//inputs is up to 5 ints in an array
-export async function poseidonHash(inputs) {
-    const wasmExecScript = document.createElement("script");
-    wasmExecScript.src = "../poseidon/wasm_exec.js";
-    document.head.appendChild(wasmExecScript);
-
-    await new Promise((resolve) => {
-        wasmExecScript.onload = resolve;
-    });
-
-    const go = new Go();
-    const wasmBytes = await fetch('../poseidon/main.wasm').then(response => response.arrayBuffer());
-    const wasmRes = await WebAssembly.instantiate(wasmBytes, go.importObject);
-    go.run(wasmRes.instance);
-
-    const validInputs = inputs.filter(input => input.trim() !== "");
-
-    if (validInputs.length === 0) {
-        return "No valid inputs provided.";
-    }
-
-    const hashFunction = globalThis.hash;
-
-    const result = await hashFunction.apply(null, validInputs);
-
-    return result;
-}
-
 export async function generateCoreProof(inputs) {
-  // Load snarkjs within the function
-  const snarkjsScript = document.createElement("script");
-  snarkjsScript.src = "../snarkjs_and_circuit_components/snarkjs.min.js";
-  document.head.appendChild(snarkjsScript);
-
-  await new Promise((resolve) => {
-    snarkjsScript.onload = resolve;
-  });
-
   const snarkjs = window.snarkjs;
 
   const input = {
@@ -386,12 +349,17 @@ export async function generateCoreProof(inputs) {
     "provided_salt_hash": inputs.provided_salt_hash
   };
 
-  const circuitWasm = "../snarkjs_and_circuit_components/circuit_wasms_and_keys/ZKPServicesCoreResponse/build/ZKPServicesCoreResponse_js/ZKPServicesCoreResponse.wasm";
-  const circuitZkey = "../snarkjs_and_circuit_components/circuit_wasms_and_keys/ZKPServicesCoreResponse/circuit.zkey";
+  const circuitWasm = "/circuit_wasms_and_keys/ZKPServicesCoreResponse/build/ZKPServicesCoreResponse_js/ZKPServicesCoreResponse.wasm";
+  const circuitZkey = "/circuit_wasms_and_keys/ZKPServicesCoreResponse/circuit.zkey";
 
-  // Fetch the vKey JSON from the file
-  const response = await fetch('../snarkjs_and_circuit_components/circuit_wasms_and_keys/ZKPServicesCoreResponse/verification_key.json');
-  const vKey = await response.json();
+  let vKey;
+  const response = await fetch('/circuit_wasms_and_keys/ZKPServicesCoreResponse/verification_key.json');
+  if (response.ok) {
+      vKey = await response.json();
+      console.log("vKey:", vKey);
+  } else {
+      console.error('Failed to fetch verification key.');
+  }
 
   try {
     const { proof, publicSignals } = await snarkjs.groth16.fullProve(input, circuitWasm, circuitZkey);
@@ -406,7 +374,7 @@ export async function generateCoreProof(inputs) {
       const _pC = [proof.pi_c[0], proof.pi_c[1]];
       const _pubSignals = publicSignals;
 
-      return {
+      const res = {
         result: "Verification OK",
         proof: {
           pi_a: _pA,
@@ -414,7 +382,11 @@ export async function generateCoreProof(inputs) {
           pi_c: _pC,
           pubSignals: _pubSignals
         }
-      };
+      }
+
+      console.log(res);
+
+      return res;
     } else {
       return { result: "Invalid proof" };
     }
@@ -425,15 +397,6 @@ export async function generateCoreProof(inputs) {
 }
 
 export async function generateVRF2FAProof(inputs) {
-  // Load snarkjs within the function
-  const snarkjsScript = document.createElement("script");
-  snarkjsScript.src = "../snarkjs_and_circuit_components/snarkjs.min.js";
-  document.head.appendChild(snarkjsScript);
-
-  await new Promise((resolve) => {
-    snarkjsScript.onload = resolve;
-  });
-
   const snarkjs = window.snarkjs;
 
   const input = {
@@ -442,12 +405,17 @@ export async function generateVRF2FAProof(inputs) {
     "secret_hash": inputs.secret_hash
   };
 
-  const circuitWasm = "../snarkjs_and_circuit_components/circuit_wasms_and_keys/ZKPServicesVRF2FAResponse/build/ZKPServicesVRF2FAResponse_js/ZKPServicesVRF2FAResponse.wasm";
-  const circuitZkey = "../snarkjs_and_circuit_components/circuit_wasms_and_keys/ZKPServicesVRF2FAResponse/circuit.zkey";
+  const circuitWasm = "/circuit_wasms_and_keys/ZKPServicesVRF2FAResponse/build/ZKPServicesVRF2FAResponse_js/ZKPServicesVRF2FAResponse.wasm";
+  const circuitZkey = "/circuit_wasms_and_keys/ZKPServicesVRF2FAResponse/circuit.zkey";
 
-  // Fetch the vKey JSON from the file
-  const response = await fetch('../snarkjs_and_circuit_components/circuit_wasms_and_keys/ZKPServicesVRF2FAResponse/verification_key.json');
-  const vKey = await response.json();
+  let vKey;
+  const response = await fetch('/circuit_wasms_and_keys/ZKPServicesVRF2FAResponse/verification_key.json');
+  if (response.ok) {
+      vKey = await response.json();
+      console.log("vKey:", vKey);
+  } else {
+      console.error('Failed to fetch verification key.');
+  }
 
   try {
     const { proof, publicSignals } = await snarkjs.groth16.fullProve(input, circuitWasm, circuitZkey);
@@ -462,7 +430,7 @@ export async function generateVRF2FAProof(inputs) {
       const _pC = [proof.pi_c[0], proof.pi_c[1]];
       const _pubSignals = publicSignals;
 
-      return {
+      const res = {
         result: "Verification OK",
         proof: {
           pi_a: _pA,
@@ -471,6 +439,8 @@ export async function generateVRF2FAProof(inputs) {
           pubSignals: _pubSignals
         }
       };
+      console.log(res);
+      return res;
     } else {
       return { result: "Invalid proof" };
     }
@@ -481,15 +451,6 @@ export async function generateVRF2FAProof(inputs) {
 }
 
 export async function generatePasswordChangeProof(inputs) {
-  // Load snarkjs within the function
-  const snarkjsScript = document.createElement("script");
-  snarkjsScript.src = "../snarkjs_and_circuit_components/snarkjs.min.js";
-  document.head.appendChild(snarkjsScript);
-
-  await new Promise((resolve) => {
-    snarkjsScript.onload = resolve;
-  });
-
   const snarkjs = window.snarkjs;
 
   const input = {
@@ -499,12 +460,17 @@ export async function generatePasswordChangeProof(inputs) {
     "new_secret_hash": inputs.new_secret_hash
   };
 
-  const circuitWasm = "../snarkjs_and_circuit_components/circuit_wasms_and_keys/ZKPServicesVRF2FAPasswordChange/build/ZKPServicesVRF2FAPasswordChange_js/ZKPServicesVRF2FAPasswordChange.wasm";
-  const circuitZkey = "../snarkjs_and_circuit_components/circuit_wasms_and_keys/ZKPServicesVRF2FAPasswordChange/circuit.zkey";
+  const circuitWasm = "/circuit_wasms_and_keys/ZKPServicesVRF2FAPasswordChange/build/ZKPServicesVRF2FAPasswordChange_js/ZKPServicesVRF2FAPasswordChange.wasm";
+  const circuitZkey = "/circuit_wasms_and_keys/ZKPServicesVRF2FAPasswordChange/circuit.zkey";
 
-  // Fetch the vKey JSON from the file
-  const response = await fetch('../snarkjs_and_circuit_components/circuit_wasms_and_keys/ZKPServicesVRF2FAPasswordChange/verification_key.json');
-  const vKey = await response.json();
+  let vKey;
+  const response = await fetch('/circuit_wasms_and_keys/ZKPServicesVRF2FAPasswordChange/verification_key.json');
+  if (response.ok) {
+      vKey = await response.json();
+      console.log("vKey:", vKey);
+  } else {
+      console.error('Failed to fetch verification key.');
+  }
 
   try {
     const { proof, publicSignals } = await snarkjs.groth16.fullProve(input, circuitWasm, circuitZkey);
@@ -519,7 +485,7 @@ export async function generatePasswordChangeProof(inputs) {
       const _pC = [proof.pi_c[0], proof.pi_c[1]];
       const _pubSignals = publicSignals;
 
-      return {
+      const res = {
         result: "Verification OK",
         proof: {
           pi_a: _pA,
@@ -528,6 +494,8 @@ export async function generatePasswordChangeProof(inputs) {
           pubSignals: _pubSignals
         }
       };
+      console.log(res);
+      return res;
     } else {
       return { result: "Invalid proof" };
     }
