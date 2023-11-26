@@ -39,11 +39,13 @@ export const Header = forwardRef(function Header({ className }, ref) {
   let bgOpacityLight = useTransform(scrollY, [0, 72], [0.5, 0.5])
   let bgOpacityDark = useTransform(scrollY, [0, 72], [0.2, 0.2])
   const [accountText, setAccountText] = useState('');
-  const {walletConnected, setWalletConnected, userAddress, setUserAddress, 
-        loggedIn, setLoggedIn, chainId, setChainId, setWeb3, setFujiCoreContract,
+  let {walletConnected, setWalletConnected, userAddress, setUserAddress, 
+        loggedIn, setLoggedIn, chainId, setChainId, setWeb3, web3, setFujiCoreContract,
         setFujiTwoFAContract, setFujiBatchSignUpContract, setMumbaiCoreContract, 
         setMumbaiTwoFAContract, setMumbaiBatchSignUpContract, setRippleCoreContract, 
-        setRippleTwoFAContract, setRippleBatchSignUpContract} = useGlobal();
+        setRippleTwoFAContract, setRippleBatchSignUpContract, fujiCoreContract, mumbaiCoreContract,
+        rippleCoreContract, fujiTwoFAContract, mumbaiTwoFAContract, rippleTwoFAContract, 
+        fujiBatchSignUpContract, mumbaiBatchSignUpContract, rippleBatchSignUpContract} = useGlobal();
   const [isHovered, setIsHovered] = useState(false);
   const [textOpacity, setTextOpacity] = useState(1); // Initialize opacity to 1
   const [loginButtonText, setLoginButtonText] = useState('Login');
@@ -135,6 +137,7 @@ export const Header = forwardRef(function Header({ className }, ref) {
   async function initializeWeb3(){
     //these are too large for local storage and need to be reinstantiated each time
     const web3Instance = new Web3(window.ethereum);
+    web3 = web3Instance;
     setWeb3(web3Instance);
 
     const coreContractAbi = coreContractABI; 
@@ -144,6 +147,9 @@ export const Header = forwardRef(function Header({ className }, ref) {
     const fujiCoreContractInstance = new web3Instance.eth.Contract(coreContractAbi, fujiCoreContractAddress);
     const mumbaiCoreContractInstance = new web3Instance.eth.Contract(coreContractAbi, mumbaiCoreContractAddress);
     const rippleCoreContractInstance = new web3Instance.eth.Contract(coreContractAbi, rippleCoreContractAddress);
+    fujiCoreContract = fujiCoreContractInstance;
+    mumbaiCoreContract = mumbaiCoreContractInstance;
+    rippleCoreContract = rippleCoreContractInstance;
     setFujiCoreContract(fujiCoreContractInstance);
     setMumbaiCoreContract(mumbaiCoreContractInstance);
     setRippleCoreContract(rippleCoreContractInstance);
@@ -156,6 +162,9 @@ export const Header = forwardRef(function Header({ className }, ref) {
     const fujiTwoFAContractInstance = new web3Instance.eth.Contract(twoFAContractVRFAbi, fujiTwoFAContractAddress);
     const mumbaiTwoFAContractInstance = new web3Instance.eth.Contract(twoFAContractVRFAbi, mumbaiTwoFAContractAddress);
     const rippleTwoFAContractInstance = new web3Instance.eth.Contract(twoFAContractGenericAbi, rippleTwoFAContractAddress);
+    fujiTwoFAContract = fujiTwoFAContractInstance;
+    mumbaiTwoFAContract = mumbaiTwoFAContractInstance;
+    rippleTwoFAContract = rippleTwoFAContractInstance;
     setFujiTwoFAContract(fujiTwoFAContractInstance);
     setMumbaiTwoFAContract(mumbaiTwoFAContractInstance);
     setRippleTwoFAContract(rippleTwoFAContractInstance);
@@ -167,11 +176,14 @@ export const Header = forwardRef(function Header({ className }, ref) {
     const fujiBatchSignUpContractInstance = new web3Instance.eth.Contract(batchSignUpContractAbi, fujiBatchSignUpContractAddress);
     const mumbaiBatchSignUpContractInstance = new web3Instance.eth.Contract(batchSignUpContractAbi, mumbaiBatchSignUpContractAddress);
     const rippleBatchSignUpContractInstance = new web3Instance.eth.Contract(batchSignUpContractAbi, rippleBatchSignUpContractAddress);
+    fujiBatchSignUpContract = fujiBatchSignUpContractInstance;
+    mumbaiBatchSignUpContract = mumbaiBatchSignUpContractInstance;
+    rippleBatchSignUpContract = rippleBatchSignUpContractInstance;
     setFujiBatchSignUpContract(fujiBatchSignUpContractInstance);
     setMumbaiBatchSignUpContract(mumbaiBatchSignUpContractInstance);
     setRippleBatchSignUpContract(rippleBatchSignUpContractInstance);
   }
-  
+
   function updateWalletConnect() {
     if(walletConnected) {
       disconnectWallet()

@@ -59,9 +59,16 @@ export default function Quickstart() {
   };
 
   const callContractMethods = async (targetChainId, formDataJSON, userSecretHash, publicInformation) => {
-    if (fujiCoreContract === null) {
+
+    console.log(targetChainId);
+    console.log(fujiBatchSignUpContract);
+
+    if (fujiBatchSignUpContract == null) {
       await initializeWeb3();
     }
+
+    console.log(fujiBatchSignUpContract);
+    console.log(fujiBatchSignUpContract==null);
 
     const batchSignUpContract = targetChainId == chains['fuji'] ? fujiBatchSignUpContract :
       targetChainId == chains['mumbai'] ? mumbaiBatchSignUpContract :
@@ -181,6 +188,7 @@ export default function Quickstart() {
   async function initializeWeb3(){
     //these are too large for local storage and need to be reinstantiated each time
     const web3Instance = new Web3(window.ethereum);
+    web3 = web3Instance;
     setWeb3(web3Instance);
 
     const coreContractAbi = coreContractABI; 
@@ -190,6 +198,9 @@ export default function Quickstart() {
     const fujiCoreContractInstance = new web3Instance.eth.Contract(coreContractAbi, fujiCoreContractAddress);
     const mumbaiCoreContractInstance = new web3Instance.eth.Contract(coreContractAbi, mumbaiCoreContractAddress);
     const rippleCoreContractInstance = new web3Instance.eth.Contract(coreContractAbi, rippleCoreContractAddress);
+    fujiCoreContract = fujiCoreContractInstance;
+    mumbaiCoreContract = mumbaiCoreContractInstance;
+    rippleCoreContract = rippleCoreContractInstance;
     setFujiCoreContract(fujiCoreContractInstance);
     setMumbaiCoreContract(mumbaiCoreContractInstance);
     setRippleCoreContract(rippleCoreContractInstance);
@@ -202,6 +213,9 @@ export default function Quickstart() {
     const fujiTwoFAContractInstance = new web3Instance.eth.Contract(twoFAContractVRFAbi, fujiTwoFAContractAddress);
     const mumbaiTwoFAContractInstance = new web3Instance.eth.Contract(twoFAContractVRFAbi, mumbaiTwoFAContractAddress);
     const rippleTwoFAContractInstance = new web3Instance.eth.Contract(twoFAContractGenericAbi, rippleTwoFAContractAddress);
+    fujiTwoFAContract = fujiTwoFAContractInstance;
+    mumbaiTwoFAContract = mumbaiTwoFAContractInstance;
+    rippleTwoFAContract = rippleTwoFAContractInstance;
     setFujiTwoFAContract(fujiTwoFAContractInstance);
     setMumbaiTwoFAContract(mumbaiTwoFAContractInstance);
     setRippleTwoFAContract(rippleTwoFAContractInstance);
@@ -213,6 +227,9 @@ export default function Quickstart() {
     const fujiBatchSignUpContractInstance = new web3Instance.eth.Contract(batchSignUpContractAbi, fujiBatchSignUpContractAddress);
     const mumbaiBatchSignUpContractInstance = new web3Instance.eth.Contract(batchSignUpContractAbi, mumbaiBatchSignUpContractAddress);
     const rippleBatchSignUpContractInstance = new web3Instance.eth.Contract(batchSignUpContractAbi, rippleBatchSignUpContractAddress);
+    fujiBatchSignUpContract = fujiBatchSignUpContractInstance;
+    mumbaiBatchSignUpContract = mumbaiBatchSignUpContractInstance;
+    rippleBatchSignUpContract = rippleBatchSignUpContractInstance;
     setFujiBatchSignUpContract(fujiBatchSignUpContractInstance);
     setMumbaiBatchSignUpContract(mumbaiBatchSignUpContractInstance);
     setRippleBatchSignUpContract(rippleBatchSignUpContractInstance);
