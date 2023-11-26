@@ -30,7 +30,7 @@ Initializes the contract, sets the Groth16 verifier, mints the total ZKP tokens 
 - **`setObfuscatedData`**: Store obfuscated data and its associated signature.
 - **`addTwoFAProvider` & `removeTwoFAProvider`**: Functions for the owner to manage approved 2FA providers.
 - **`requestData` & `requestUpdate`**: Functions for users to initiate encrypted data requests or updates.
-- **`respond`**: Used by users to answer to requests or updates using zero-knowledge proofs for data verification.
+- **`respond`**: Used by users to answer requests or updates using zero-knowledge proofs for data verification.
 
 ## Security & Authentication
 - **RSA & AES Encryption:** Ensures encrypted data transfer, only accessible by designated recipients.
