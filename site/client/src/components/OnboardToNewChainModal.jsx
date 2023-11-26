@@ -59,6 +59,7 @@ export function OnboardToNewChainModal({ open, onClose,
 
     let receipt = await web3.eth.sendTransaction(txObject);
     console.log('Batch SignUp Transaction Receipt:', receipt);
+    onClose();
   };
 
   return (

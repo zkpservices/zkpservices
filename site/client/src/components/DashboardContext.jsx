@@ -243,6 +243,13 @@ export function DashboardContext() {
     initializeWeb3()
   }, []);
 
+  useEffect(() => {
+    console.log(`the chain ID has been changed`)
+    loadAllHistory()
+    fetchUserDataFields()
+    initializeWeb3()
+  }, [chainId]);
+
   const removeField = (fieldToRemove) => {
     setUserDataFields(userDataFields.filter(i => i !== fieldToRemove))
   }
