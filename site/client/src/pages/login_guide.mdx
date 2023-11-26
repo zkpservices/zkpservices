@@ -3,11 +3,11 @@ export const description =
 
 # User Data
 
-User data is the foundation of the zkp.services solution. On this page, we'll dive into the API requests that our dApp makes with our backend API in order to control your data securely. {{ className: 'lead' }}
+User data is the foundation of the zkp.services solution. On this page, we'll dive into the API requests that our dApp makes with our backend API to control your data securely. {{ className: 'lead' }}
 
 ## The structure of user data
 
-Our data model is an extremely versatile JSON object that gives way to an endless number of data points a user is able to store, for countless different services. As such, below we will provide an example of a potential data structure for user data, but note that none of the fields in the data object are specifically required.
+Our data model is an extremely versatile JSON object that gives way to an endless number of data points a user can store for countless different services. As such, below, we will provide an example of a potential data structure for user data, but note that none of the fields in the data object are specifically required.
 
 ### Properties
 
@@ -28,7 +28,7 @@ Our data model is an extremely versatile JSON object that gives way to an endles
     A list of responses sent by the user.
   </Property>
   <Property name="responses_received" type="JSON Object[]">
-    A list of responses received by the user, of other users data.
+    A list of responses received by the user, of other user's data.
   </Property>
 </Properties>
 
@@ -39,7 +39,7 @@ Our data model is an extremely versatile JSON object that gives way to an endles
 <Row>
   <Col>
 
-    This endpoint allows you to retrieve either the entire, or a subset, of the "data" object for the self user.
+    This endpoint allows you to retrieve either the entire or a subset of the "data" object for the self-user.
 
     Authorization is required.
 
@@ -65,7 +65,7 @@ Our data model is an extremely versatile JSON object that gives way to an endles
     <Properties>
       <Property name="key" type="string">
         The flattened JSON key for the property trying to be retrieved, for example, "medical records - pharmacy central melbourne.data.active prescriptions".
-        If not provided, will return the entire data set for user.
+        If not provided, will return the entire data set for the user.
       </Property>
     </Properties>
 
@@ -326,7 +326,7 @@ $.ajax(settings).done(function (response) {
 <Row>
   <Col>
 
-    This endpoint allows you update the data object for a specific user. <br/><br/>
+    This endpoint allows you to update the data object for a specific user. <br/><br/>
     This is an <b>incremental</b> function, meaning that you supply the data \{\} json object containing only the fields you wish to update. The fields you do not specify will not be modified. If you specify a field that does not exist, it will be created.
 
     ### Required attributes
@@ -612,7 +612,7 @@ $.ajax(settings).done(function (response) {
         The action of this request, which is "add_request".
       </Property>
       <Property name="requests" type="JSON Object">
-        A set of the JSON requests to append to the users received requests.
+        A set of the JSON requests to append to the user's received requests.
       </Property>
     </Properties>
 
