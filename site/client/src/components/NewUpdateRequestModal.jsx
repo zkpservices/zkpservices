@@ -13,6 +13,15 @@ const handleGenerateRandomKey = () => {
   }
 };
 
+const handleGenerateRandomToken = () => {
+  try {
+    const key = generateRandomAsciiString24();
+    document.getElementById('twoFAOneTimeToken').value = key;
+  } catch (error) {
+    console.error('Error generating random token:', error);
+  }
+};
+
 const handleGenerateRandomSalt = () => {
   try {
     const salt = generateRandomAsciiString24();
@@ -43,6 +52,7 @@ export function NewUpdateRequestModal({
   timeLimit = "600",
   twoFAProvider = "zkp.services VRF 2FA",
   twoFARequestID = "",
+  twoFAOneTimeToken = "",
   responseFee = "10",
 }) {
 
@@ -83,6 +93,7 @@ export function NewUpdateRequestModal({
       require2FA: isTwoFAEnabled,
       twoFAProvider: formDataJSON['twoFAProvider'],
       twoFARequestID: formDataJSON['twoFARequestID'],
+      twoFAOneTimeToken: formDataJSON['twoFAOneTimeToken'],
       attach_token: formDataJSON['attachToken'] === 'on'
     }
     console.log(request)
@@ -289,6 +300,28 @@ export function NewUpdateRequestModal({
                           onClick={handleGenerateRandomID}
                         >
                           Generate Random ID
+                        </button>
+                      </div>
+
+                      <div className="mt-4">
+                        <label htmlFor="twoFAOneTimeToken" className="block text-sm font-medium leading-5 text-gray-900 dark:text-white">
+                          2FA One Time Token:
+                        </label>
+                        <textarea
+                          id="twoFAOneTimeToken"
+                          name="twoFAOneTimeToken"
+                          className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
+                          rows={1}
+                          // onChange={(e) => setTwoFARequestID(e.target.value)}
+                          spellCheck="false"
+                          defaultValue={twoFAOneTimeToken}
+                        />
+                        <button
+                          className="mt-2 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                          type="button"
+                          onClick={handleGenerateRandomToken}
+                        >
+                          Generate Random Token
                         </button>
                       </div>
 

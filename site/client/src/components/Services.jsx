@@ -5,6 +5,7 @@ import { Heading } from '@/components/Heading';
 import { addRequest, getChainData } from '@/components/APICalls';
 import { QuestionMarkIcon } from '@/components/icons/QuestionMarkIcon';
 import { UpdateIcon } from '@/components/icons/UpdateIcon';
+import { PlusIcon } from '@/components/icons/PlusIcon';
 import { TokenIcon } from '@/components/icons/TokenIcon';
 import { CrosschainIcon } from '@/components/icons/CrosschainIcon';
 import { ZKPFaucetModal } from '@/components/ZKPFaucetModal';
@@ -74,7 +75,7 @@ const services = [
     name: 'Onboard To New Chain',
     description:
       'Learn about the conversation model and how to create, retrieve, update, delete, and list conversations.',
-    icon: UpdateIcon,
+    icon: PlusIcon,
     pattern: {
       y: -6,
       squares: [
