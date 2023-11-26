@@ -33,7 +33,6 @@ export function History({ tableData = {}, showRefresh = true , handleRefresh}) {
     if(rowData.type === "incoming_request_get") {
       openSendDataModal(rowData)
     } else if (rowData.type === "incoming_request_update") {
-      console.log("Bazinga!")
       openCompleteUpdateModal(rowData)
     } else {
       openShowReceivedDataResponseModal(rowData)
@@ -130,6 +129,7 @@ export function History({ tableData = {}, showRefresh = true , handleRefresh}) {
 
   const closeCompleteUpdateModal = () => {
     setShowCompleteUpdateModal(false);
+    handleRefresh();
   }
 
 
@@ -281,9 +281,10 @@ export function History({ tableData = {}, showRefresh = true , handleRefresh}) {
                                   </td>
                                   <td className="px-6 py-4 whitespace-nowrap text-left text-sm">
                                     <div>
-                                      <a className="text-blue-500 hover:text-blue-700 dark:text-blue-300 dark:hover:text-blue-500" href="#">
+                                      <button className="text-blue-500 hover:text-blue-700 dark:text-blue-300 dark:hover:text-blue-500" onClick={() => {
+                                        openModal(rowData)}}>
                                         {rowData.details[0]}
-                                      </a>
+                                      </button>
                                     </div>
                                     <div className="text-gray-500 dark:text-gray-300">
                                       {rowData.details[1]}

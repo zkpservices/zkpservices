@@ -2,7 +2,7 @@
 
 ## **Introduction**
 
-In a data-driven world, zkp.services provides a straightforward solution to manage information with precision and trust. Powered by the Ethereum Virtual Machine (EVM) and fine-tuned for all Solidity-compatible chains, we’re changing the playbook on data management.
+In a data-driven world, zkp.services is providing a straightforward solution to manage information with precision and trust. Powered by the Ethereum Virtual Machine (EVM) and fine-tuned for all Solidity-compatible chains, we’re changing the playbook on data management.
 
 We believe in clarity, not complexity.
 
@@ -26,7 +26,7 @@ ZKP makes this possible.
 
 Combining this cryptographic technique with smart contracts, zkp.services manages and verifies obfuscated (hidden or scrambled) data.
 
-We use advanced encryption techniques like RSA and AES to ensure data is securely stored and transferred. We also add layers of security with features like 2-factor authentication ("2FA") and token systems while maintaining data privacy.
+We use advanced encryption techniques like RSA and AES to ensure data is securely stored and transferred. We also add layers of security with features like 2-factor authentication ("2FA") and token systems while still maintaining data privacy.
 
 Our protocol offers a secure solution where data can be stored, requested, updated, and validated without sensitive data becoming exposed. Instead, mathematical proofs verify the authenticity and integrity of the data, ensuring both privacy and trustworthiness.
 
@@ -92,7 +92,7 @@ There is no shortage of use cases that zkp.services can fit into. Here are some 
 
 1. **Identity**
 
-Identity is the primary use case that most relevant ZKP protocols are pursuing in some way, shape, or form.
+Identity is the primary use case that most relevant ZKP protocols are currently pursuing in some way, shape, or form.
 
 There are many things about our identity that we are forced to share with authorities. In most cases, these are justified requests. But in all instances, we reveal more than we have to.
 
@@ -112,7 +112,7 @@ Take, for instance, the following scenarios:&#x20;
 
 Sharing medical data is often necessary, but traditional systems can overshare and compromise patient privacy.
 
-In the medical field, unauthorized or accidental access to patient data, such as with system oversights or third-party data breaches, compromises patient confidentiality and trust. ZKP allows medical professionals to verify necessary patient information without exposing the entirety of their medical history.
+In the medical field, unauthorized or accidental access to patient data, such as with system oversights of third-party data breaches, compromises patient confidentiality and trust. ZKP allows medical professionals to verify necessary patient information without exposing the entirety of their medical history.
 
 Only relevant data is accessed whilst patient privacy is preserved.
 
@@ -163,7 +163,7 @@ Take, for instance, the following scenarios:
 
 The legal sector needs to improve its operational inefficiencies and dated working methods.
 
-It is not uncommon for both parties in a legal dispute to be compelled to reveal irrelevant data. Although the standard discovery process allows for confidential information to be redacted, other parties, such as the judge, may still have access to it, regardless of whether it is shared with the opposing party.
+It is not uncommon for both parties in a legal dispute to be compelled to reveal irrelevant data. Although the standard discovery process allows for confidential information to be redacted, other parties such as the judge may still have access to it, regardless of whether it is shared with the opposing party.h the opposing party or not.
 
 Take, for instance, the following scenarios:
 

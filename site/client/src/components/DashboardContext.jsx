@@ -241,7 +241,7 @@ export function DashboardContext() {
   return (
     <div>
       <UserData fieldNames={userDataFields} handleRemove={removeField} handleAdd={addField}/> 
-      <Services useLink={false} />
+      <Services useLink={false} handleRefresh={loadAllHistory}/>
       <History tableData={tableData} showRefresh={true} handleRefresh={loadAllHistory}/>
     </div>
   )

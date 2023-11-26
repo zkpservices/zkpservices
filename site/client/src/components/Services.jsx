@@ -164,7 +164,7 @@ function ServiceCard({ service, onCardClick, openModal, isSelected }) {
   );
 }
 
-export function Services() {
+export function Services({handleRefresh}) {
   const [selectedService, setSelectedService] = useState(null);
   const [availableChains, setAvailableChains] = useState(["Avalanche Fuji", "Polygon Mumbai", "Ripple EVM Devnet"])
   const [props, setProps] = useState({});
@@ -213,6 +213,10 @@ export function Services() {
     }
    
   }, [userAddress])
+
+  useEffect(() => {
+    handleRefresh()
+  }, [selectedService])
 
   return (
     <div className="xl:max-w-none mt-16">
