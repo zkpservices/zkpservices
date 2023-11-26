@@ -17,9 +17,10 @@ export function CompleteUpdateModal({
   twoFARequestID = "",
   twoFAOneTimeToken = "",
   responseFee = "",
-  require2FA = false
+  require2FA = false,
+  progress2FA = 0,
 }) {
-  const [step2FA, setStep2FA] = useState(0); // 0: Initial, 1: Step 1, 2: Step 2
+  const [step2FA, setStep2FA] = useState(progress2FA); // 0: Initial, 1: Step 1, 2: Step 2
   // const [open, setOpen] = useState(true);
 
   const handleSubmit = () => {
@@ -226,30 +227,43 @@ export function CompleteUpdateModal({
                         />
                       </div>
 
-                      <div className="mt-2">
-                        {step2FA === 0 && (
-                          <button
-                            className="mt-2 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
-                            onClick={handle2FAClick}
-                          >
-                            Complete 2FA (1/2)
-                          </button>
-                        )}
-                        {step2FA === 1 && (
-                          <button
-                            className="mt-2 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
-                            onClick={handle2FAClick}
-                          >
-                            Complete 2FA (2/2)
-                          </button>
-                        )}
-                        {step2FA === 2 && (
-                          <button
-                            className="mt-2 bg-emerald-600 dark:bg-emerald-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-500 dark:hover:bg-emerald-400 rounded-md"
-                          >
-                            2FA Completed
-                          </button>
-                        )}
+                      {twoFAProvider.includes("zkp.services") && (
+                        <>
+                          <div className="mt-2">
+                            {step2FA === 0 && (
+                              <button
+                                className="mt-2 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                                onClick={handle2FAClick}
+                              >
+                                Complete 2FA (1/2)
+                              </button>
+                            )}
+                            {step2FA === 1 && (
+                              <button
+                                className="mt-2 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                                onClick={handle2FAClick}
+                              >
+                                Complete 2FA (2/2)
+                              </button>
+                            )}
+                            {step2FA === 2 && (
+                              <button
+                                className="mt-2 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                              >
+                                2FA Completed
+                              </button>
+                            )}
+                          </div>
+                        </>
+                      )}
+
+                      <div className="mt-6">
+                        <label htmlFor="disclaimer" className="block text-sm font-bold leading-5 text-gray-900 dark:text-white">
+                          Disclaimer:
+                        </label>
+                        <p className="text-gray-500 dark:text-gray-300 mt-2 whitespace-normal">
+                          2FA can only be completed via this dApp if a zkp.services 2FA provider has been chosen and the one time token was attached. For other providers, please use the dApp/frontend/etc. to complete 2FA.
+                        </p>
                       </div>
                     </>
                   )}
