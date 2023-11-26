@@ -10,7 +10,8 @@ import { ModeToggle } from '@/components/ModeToggle'
 import { MobileSearch, Search } from '@/components/Search'
 import Web3 from 'web3';
 import coreContractABI from '../../public/contract_ABIs/ZKPServicesCore.json'; 
-import twoFAContractABI from '../../public/contract_ABIs/ZKPServicesVRF2FA.json'; 
+import twoFAContractVRFABI from '../../public/contract_ABIs/ZKPServicesVRF2FA.json'; 
+import twoFAContractGenericABI from '../../public/contract_ABIs/ZKPServicesGeneric2FA.json'; 
 import batchSignUpABI from '../../public/contract_ABIs/BatchSignUp.json'
 import {
   MobileNavigation,
@@ -147,13 +148,14 @@ export const Header = forwardRef(function Header({ className }, ref) {
     setMumbaiCoreContract(mumbaiCoreContractInstance);
     setRippleCoreContract(rippleCoreContractInstance);
 
-    const twoFAContractAbi = twoFAContractABI;
+    const twoFAContractVRFAbi = twoFAContractVRFABI;
+    const twoFAContractGenericAbi = twoFAContractGenericABI;
     const fujiTwoFAContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'; 
     const mumbaiTwoFAContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'; 
     const rippleTwoFAContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'; 
-    const fujiTwoFAContractInstance = new web3Instance.eth.Contract(twoFAContractAbi, fujiTwoFAContractAddress);
-    const mumbaiTwoFAContractInstance = new web3Instance.eth.Contract(twoFAContractAbi, mumbaiTwoFAContractAddress);
-    const rippleTwoFAContractInstance = new web3Instance.eth.Contract(twoFAContractAbi, rippleTwoFAContractAddress);
+    const fujiTwoFAContractInstance = new web3Instance.eth.Contract(twoFAContractVRFAbi, fujiTwoFAContractAddress);
+    const mumbaiTwoFAContractInstance = new web3Instance.eth.Contract(twoFAContractVRFAbi, mumbaiTwoFAContractAddress);
+    const rippleTwoFAContractInstance = new web3Instance.eth.Contract(twoFAContractGenericAbi, rippleTwoFAContractAddress);
     setFujiTwoFAContract(fujiTwoFAContractInstance);
     setMumbaiTwoFAContract(mumbaiTwoFAContractInstance);
     setRippleTwoFAContract(rippleTwoFAContractInstance);
