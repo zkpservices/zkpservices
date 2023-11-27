@@ -159,6 +159,18 @@ export function DashboardContext() {
         field: [item.field, truncateAddress(item.address_receiver)],
         status: hasMatchingResponse ? ['Response Received', 'grey'] : ['Awaiting Response', 'grey'],
         details: ['View Details', truncateAddress(item.requestID)],
+        requestID: item.requestID,
+        addressSender: item.address_sender,
+        data: item.operation === 'update' ? item.updated_data : item.data,
+        addressSender: item.address_sender,
+        salt: item.salt,
+        limit: item.limit,
+        key: item.key,
+        response_fee: item.response_fee,
+        require2FA: item.require2FA,
+        twoFAProvider: item.twoFA_provider,
+        twoFARequestID: item.twoFA_requestID,
+        twoFAOneTimeToken: item.twoFA_one_time_token
       };
     });
 
@@ -169,6 +181,18 @@ export function DashboardContext() {
         field: [item.field, truncateAddress(item.address_sender)],
         status: ['Response Sent', 'grey'],
         details: ['View Details', truncateAddress(item.responseID)],
+        requestID: item.requestID,
+        addressSender: item.address_sender,
+        data: item.data,
+        addressSender: item.address_sender,
+        salt: item.salt,
+        limit: item.limit,
+        key: item.key,
+        response_fee: item.response_fee,
+        require2FA: item.require2FA,
+        twoFAProvider: item.twoFA_provider,
+        twoFARequestID: item.twoFA_requestID,
+        twoFAOneTimeToken: item.twoFA_one_time_token
       };
     });
     return [...formattedRequests, ...formattedResponses];
@@ -237,18 +261,18 @@ export function DashboardContext() {
   }
 
   useEffect(() => {
-    console.log("DashboardContext useEffect triggered")
-    loadAllHistory()
-    fetchUserDataFields()
-    initializeWeb3()
-  }, []);
+    if(loggedIn && userAddress && chainId) {
+      loadAllHistory()
+      fetchUserDataFields()
+      initializeWeb3()
+    }
+  }, [loggedIn, userAddress, chainId]);
 
-  useEffect(() => {
-    console.log(`the chain ID has been changed`)
-    loadAllHistory()
-    fetchUserDataFields()
-    initializeWeb3()
-  }, [chainId]);
+  // useEffect(() => {
+  //   console.log(`the chain ID has been changed`)
+  //   loadAllHistory()
+  //   fetchUserDataFields()
+  // }, [chainId]);
 
   const removeField = (fieldToRemove) => {
     setUserDataFields(userDataFields.filter(i => i !== fieldToRemove))

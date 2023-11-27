@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { getFieldData, addResponse, updateFieldData } from '@/components/APICalls';
 import { useGlobal } from '@/components/GlobalStorage';
 import { CompleteUpdateModal } from './CompleteUpdateModal';
+import { CompletedDataUpdateModal } from './CompletedDataUpdateModal';
 
 const tabs = [
   { name: 'Incoming' },
@@ -21,6 +22,7 @@ export function History({ tableData = {}, showRefresh = true , handleRefresh}) {
   const [showReceivedDataResponseModal, setShowReceivedDataResponseModal] = useState(false);
   const [showSendDataModal, setShowSendDataModal] = useState(false);
   const [showCompleteUpdateModal, setShowCompleteUpdateModal] = useState(false);
+  const [showCompletedUpdateModal, setShowCompletedUpdateModal] = useState(false);
   const [selectedRowData, setSelectedRowData] = useState({});
   let {userAddress, userPassword, chainId} = useGlobal();
   const handleRefreshAll = () => {
@@ -33,7 +35,11 @@ export function History({ tableData = {}, showRefresh = true , handleRefresh}) {
     if(rowData.type === "incoming_request_get") {
       openSendDataModal(rowData)
     } else if (rowData.type === "incoming_request_update") {
-      openCompleteUpdateModal(rowData)
+      if(rowData.status[0] === "Response Sent") {
+        openCompletedUpdateModal(rowData)
+      } else {
+        openCompleteUpdateModal(rowData)
+      }
     } else {
       openShowReceivedDataResponseModal(rowData)
     }
@@ -132,6 +138,16 @@ export function History({ tableData = {}, showRefresh = true , handleRefresh}) {
     handleRefresh();
   }
 
+  const openCompletedUpdateModal = (rowData) => {
+    setSelectedRowData(rowData)
+    setShowCompletedUpdateModal(true);
+  }
+
+  const closeCompletedUpdateModal = () => {
+    setShowCompletedUpdateModal(false);
+    // handleRefresh();
+  }
+
 
   return (
     <div className="xl:max-w-none">
@@ -175,6 +191,23 @@ export function History({ tableData = {}, showRefresh = true , handleRefresh}) {
       fieldToUpdate={selectedRowData.field[0]}
       requestID={selectedRowData.requestID}
       newDataAfterUpdate={JSON.stringify(selectedRowData.data, null, 2)}
+      oneTimeKey={selectedRowData.key}
+      oneTimeSalt={selectedRowData.salt}
+      timeLimit={selectedRowData.limit}
+      responseFee={selectedRowData.response_fee}
+      require2FA={selectedRowData.require2FA}
+      twoFAProvider={selectedRowData.twoFAProvider}
+      twoFARequestID={selectedRowData.twoFARequestID}
+      twoFAOneTimeToken={selectedRowData.twoFAOneTimeToken}
+      />}
+      {showCompletedUpdateModal && <CompletedDataUpdateModal 
+      open={true} 
+      onClose={closeCompletedUpdateModal}
+      onSubmit={completeUpdate}
+      addressOfRequestingParty={selectedRowData.addressSender}
+      fieldToUpdate={selectedRowData.field[0]}
+      requestID={selectedRowData.requestID}
+      snapshotDataAfterUpdate={JSON.stringify(selectedRowData.data, null, 2)}
       oneTimeKey={selectedRowData.key}
       oneTimeSalt={selectedRowData.salt}
       timeLimit={selectedRowData.limit}

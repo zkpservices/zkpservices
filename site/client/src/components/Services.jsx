@@ -216,7 +216,9 @@ export function Services({handleRefresh}) {
   }, [userAddress])
 
   useEffect(() => {
-    handleRefresh()
+    if(selectedService) {
+      handleRefresh()
+    }
   }, [selectedService])
 
   return (
