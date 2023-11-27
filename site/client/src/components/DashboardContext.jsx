@@ -157,7 +157,7 @@ export function DashboardContext() {
       return {
         operation: [operationText, `To ${truncateAddress(item.address_sender)}`],
         field: [item.field, truncateAddress(item.address_receiver)],
-        status: hasMatchingResponse ? ['Response Received', 'grey'] : ['Awaiting Response', 'grey'],
+        status: hasMatchingResponse ? ['Response Sent', 'grey'] : ['Awaiting Response', 'grey'],
         details: ['View Details', truncateAddress(item.requestID)],
         requestID: item.requestID,
         addressSender: item.address_sender,
@@ -177,7 +177,7 @@ export function DashboardContext() {
     const formattedResponses = outgoingResponses.map((item) => {
       const operationText = item.operation === 'update' ? 'Update Completed' : 'Data Sent';
       return {
-        operation: [operationText, `From ${truncateAddress(item.address_sender)}`],
+        operation: [operationText, `By you`],
         field: [item.field, truncateAddress(item.address_sender)],
         status: ['Response Sent', 'grey'],
         details: ['View Details', truncateAddress(item.responseID)],

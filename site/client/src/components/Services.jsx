@@ -239,10 +239,22 @@ export function Services({handleRefresh}) {
           ))}
         </div>
       </div>
-      {selectedService === 'Request Data' && <NewDataRequestModal open={true} onClose={() => setSelectedService(null)} onSubmit={addNewRequest} />}
-      {selectedService === 'Request Update' && <NewUpdateRequestModal open={true} onClose={() => setSelectedService(null)} onSubmit={addNewRequest}/>}
-      {selectedService === 'Cross-Chain Backups' && <NewCrossChainSyncModal open={true} onClose={() => setSelectedService(null)} />}
-      {selectedService === 'ZKP Tokens Faucet' && <ZKPFaucetModal open={true} onClose={() => setSelectedService(null)} />}
+      {selectedService === 'Request Data' && <NewDataRequestModal open={true} onClose={() => {
+        setSelectedService(null)
+        handleRefresh()
+      }} onSubmit={addNewRequest} />}
+      {selectedService === 'Request Update' && <NewUpdateRequestModal open={true} onClose={() => {
+        setSelectedService(null)
+        handleRefresh()
+      }} onSubmit={addNewRequest}/>}
+      {selectedService === 'Cross-Chain Backups' && <NewCrossChainSyncModal open={true} onClose={() => {
+        setSelectedService(null)
+        handleRefresh()
+      }} />}
+      {selectedService === 'ZKP Tokens Faucet' && <ZKPFaucetModal open={true} onClose={() => {
+        setSelectedService(null)
+        handleRefresh()
+      }} />}
       {selectedService === 'Onboard To New Chain' && <OnboardToNewChainModal open={true} props={props} options={availableChains} onClose={() => {
         pullChainData(userAddress, userPassword, chainId)
         setSelectedService(null)}}
