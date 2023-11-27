@@ -23,6 +23,7 @@ export function History({ tableData = {}, showRefresh = true , handleRefresh}) {
   const [showSendDataModal, setShowSendDataModal] = useState(false);
   const [showCompleteUpdateModal, setShowCompleteUpdateModal] = useState(false);
   const [showCompletedUpdateModal, setShowCompletedUpdateModal] = useState(false);
+  const [showReceivedUpdateResponseModal, setShowReceivedUpdateResponseModal] = useState(false);
   const [selectedRowData, setSelectedRowData] = useState({});
   let {userAddress, userPassword, chainId} = useGlobal();
   const handleRefreshAll = () => {
@@ -40,9 +41,28 @@ export function History({ tableData = {}, showRefresh = true , handleRefresh}) {
       } else {
         openCompleteUpdateModal(rowData)
       }
-    } else {
-      openShowReceivedDataResponseModal(rowData)
+    } else if (rowData.type === "incoming_response_get") {
+      openReceivedDataResponseModal(rowData)
+    } else if (rowData.type === "incoming_response_update") {
+      openReceiv
+    } else if (rowData.type === "outgoing_request_get") {
+      if(rowData.status[0] === "Response Sent") {
+        //receivedDataResponseModal
+      } else {
+        //awaitingUpdateCompletionModal
+      }
+    } else if (rowData.type === "outgoing_request_update") {
+      if(rowData.status[0] === "Response Sent") {
+        //receivedDataUpdateModal
+      } else {
+        //awaitingDataModal
+      }
+    } else if (rowData.type === "outgoing_response_get") {
+      //sendDataModal
+    } else if (rowData.type === "outgoing_response_update") {
+      //completedDataUpdateModal
     }
+
   }
 
   const closeReceivedResponseModal = () => {
@@ -146,6 +166,15 @@ export function History({ tableData = {}, showRefresh = true , handleRefresh}) {
   const closeCompletedUpdateModal = () => {
     setShowCompletedUpdateModal(false);
     // handleRefresh();
+  }
+
+  const openReceivedDataResponseModal = (rowData) => {
+    setSelectedRowData(rowData)
+    setShowReceivedDataResponseModal(true)
+  }
+
+  const closeReceivedDataResponseModal = (rowData) => {
+    setShowReceivedDataResponseModal(false)
   }
 
 

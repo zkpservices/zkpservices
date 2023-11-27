@@ -80,7 +80,7 @@ export function NewDataRequestModal({
 
     const request = {
       requestID: generateRandomHexString(30), // placeholder for real requestID generation implemented later
-      address_receiver: formDataJSON['receiverAddress'],
+      address_receiver: formDataJSON['receiverAddress'].toLowerCase(),
       operation: "get",
       field: formDataJSON['fieldRequested'],
       key: formDataJSON['oneTimeSalt'][0],

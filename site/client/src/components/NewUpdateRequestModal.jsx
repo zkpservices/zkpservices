@@ -81,7 +81,7 @@ export function NewUpdateRequestModal({
 
     const request = {
       requestID: generateRandomHexString(30), // placeholder for real requestID generation implemented later
-      address_receiver: formDataJSON['receiverAddress'],
+      address_receiver: formDataJSON['receiverAddress'].toLowerCase(),
       operation: "update",
       field: formDataJSON['fieldToUpdate'],
       key: formDataJSON['oneTimeKey'],
