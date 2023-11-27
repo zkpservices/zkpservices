@@ -2,7 +2,6 @@ import { Fragment, useState, useEffect } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { ExclamationTriangleIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useGlobal } from '@/components/GlobalStorage';
-import { poseidon } from '@/components/PoseidonHash';
 
 export function ZKPFaucetModal({ open, onClose }) {
   let {
@@ -32,7 +31,6 @@ export function ZKPFaucetModal({ open, onClose }) {
 
   async function handleRequestTokens() {
     try {
-      let res = await poseidon(["42", "73", "91111111"]);
       const contract = chainId == 43113 ? fujiCoreContract :
                        chainId == 80001 ? mumbaiCoreContract :
                        chainId == 1440002 ? rippleCoreContract : null;

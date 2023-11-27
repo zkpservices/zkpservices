@@ -21,7 +21,7 @@ export async function poseidon(inputs) {
     throw new Error('WASM is not initialized yet.');
   }
   
-  const filteredInputs = inputs.filter(input => input.trim() !== "");
+  const filteredInputs = inputs.map(input => String(input).trim()).filter(input => input !== "");
   if (filteredInputs.length === 0) {
     throw new Error('No valid inputs provided.');
   }
