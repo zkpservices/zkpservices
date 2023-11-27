@@ -419,6 +419,7 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
     mapping(string => uint256) public receiverCCIPFees;
     mapping(string => address) public receiverAddress;
     mapping(bytes32 => bool) public originPolicy;
+    event CCIPMessageID(bytes32 messageId);
 
     function setSender(address routerAddress, address linkAddress)
         public
@@ -598,6 +599,7 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
             evm2AnyMessage
         );
 
+        emit CCIPMessageID(messageId);
         return messageId;
     }
 
