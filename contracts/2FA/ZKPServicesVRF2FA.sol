@@ -3,8 +3,9 @@ pragma solidity ^0.8.7;
 import "../interfaces/IVRF.sol";
 import "../interfaces/IGroth16VerifierP2.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@chainlink/contracts/src/v0.8/automation/AutomationCompatible.sol";
 
-contract ZKPServicesVRF2FA is Ownable {
+contract ZKPServicesVRF2FA is Ownable, AutomationCompatibleInterface  {
     IVRF private vrf;
     IGroth16VerifierP2 private responseVerifier;
     IGroth16VerifierP2 private passwordChangeVerifier;
@@ -19,8 +20,15 @@ contract ZKPServicesVRF2FA is Ownable {
     mapping(uint256 => TwoFactorData) public twoFactorData; // 2FA ID => (boolean indicating success, timestamp, expired)
     mapping(uint256 => bytes32) public oneTimeKeyHashes; // 2FA ID => hash of one time key for 2FA request
     mapping(address => uint256) public userSecrets; // address => hash of 2FA secret/password
-    mapping(uint256 => uint256) public requestIds; // 2FA ID => VRF request ID
     mapping(uint256 => address) private requesters; // 2FA ID => address of the requester
+
+    // 50 blocks *~2 second finality => valid random number to prove timeliness trustlessly
+    // for all 2FA requests for ~100 seconds 
+    uint256 public WINDOW_SIZE = 50; 
+    mapping(uint256 => bool) public windowVRFRequestRequired; // determine if a random number is needed for a window
+    mapping(uint256 => bool) public windowVRFRequested; // determine if a random number has been requested for a window
+    mapping(uint256 => uint256) public windowToVRFRequestIds; // map window number to VRF request IDs
+    mapping(uint256 => uint256) public _2FARequestIdsToWindow; // map 2FA request IDs (not VRF) to window numbers
 
     constructor(
         address _vrfAddress,
@@ -32,6 +40,45 @@ contract ZKPServicesVRF2FA is Ownable {
         passwordChangeVerifier = IGroth16VerifierP2(
             _vrf2FAPasswordChangeVerifierAddress
         );
+    }
+
+    function setWindowSize(uint256 _window) onlyOwner{
+        WINDOW_SIZE = _window;
+    }
+    
+    function checkUpkeep(
+        bytes calldata /* checkData */
+    )
+        external
+        view
+        override
+        returns (bool upkeepNeeded, bytes memory /* performData */)
+    {
+        uint256 currentWindow = block.number / WINDOW_SIZE;
+        upkeepNeeded = !windowVRFRequested[currentWindow] && windowVRFRequestRequired[currentWindow];
+    }
+
+    function performUpkeep(bytes calldata /* performData */) external override {
+        uint256 currentWindow = block.number / WINDOW_SIZE;
+        uint256 priorWindow = currentWindow - 1;
+
+        // prevent block overlap problem
+        // example: with a WINDOW_SIZE of 50, a request for a random number is made at block 50
+        // but the minimum block height difference to generate a VRF + to trigger chainlink 
+        // automation would only make it available at block 50 + vrf_difference + trigger_difference
+        // meaning it would only be available in the next window
+        // vrf_difference + trigger_difference is assumed to be roughly 5-6 blocks at most, thus 
+        // maintaining a WINDOW_SIZE of 10 or more is very reasonable and ensuring both the 
+        // prior window and the current window have an assigned VRF in cases of overlap is sufficient
+        if (!windowVRFRequested[priorWindow] && windowVRFRequestRequired[priorWindow]) {
+            windowToVRFRequestIds[priorWindow] = vrf.requestRandomWords();
+            windowVRFRequested[priorWindow] = true;
+        }
+
+        if (!windowVRFRequested[currentWindow] && windowVRFRequestRequired[currentWindow]) {
+            windowToVRFRequestIds[currentWindow] = vrf.requestRandomWords();
+            windowVRFRequested[currentWindow] = true;
+        }
     }
 
     function generate2FA(uint256 _id, bytes32 _oneTimeKeyHash) external {
@@ -55,13 +102,13 @@ contract ZKPServicesVRF2FA is Ownable {
             "Random number already requested"
         );
 
-        uint256 requestId = vrf.requestRandomWords(); // Call the VRF contract
-        requestIds[_id] = requestId; // Store the request ID
+        _2FARequestIdsToWindow[_id] = block.number / WINDOW_SIZE;
         requesters[_id] = msg.sender;
+        windowVRFRequestRequired[block.number/WINDOW_SIZE] = true;
     }
 
     function getRandomNumber(uint256 _id) public view returns (uint256) {
-        uint256 requestId = requestIds[_id];
+        uint256 requestId = windowToVRFRequestIds[_2FARequestIdsToWindow[_id]];
         (bool fulfilled, uint256[] memory randomWords) = vrf.getRequestStatus(
             requestId
         );
