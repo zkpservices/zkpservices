@@ -4,7 +4,12 @@ import axios from 'axios';
 
 const API_BASE_URL = 'https://y1oeimdo63.execute-api.us-east-1.amazonaws.com/userdata';
 
+let api_call_count = 0
+
 export const makeAPICall = async (method, data) => {
+  api_call_count++;
+  console.log(api_call_count)
+  console.log(data["action"])
   try {
     const response = await axios({
       method,

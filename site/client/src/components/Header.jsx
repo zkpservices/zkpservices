@@ -100,9 +100,8 @@ export const Header = forwardRef(function Header({ className }, ref) {
     initializeWeb3();
     
     const handleChainChanged = (_chainId) => {
-      // Handle the new chain.
-      // You can also force a page reload if needed
-      // window.location.reload();
+      console.log(_chainId)
+      setChainId(_chainId)
     };
   
     window.ethereum.on('chainChanged', handleChainChanged);
