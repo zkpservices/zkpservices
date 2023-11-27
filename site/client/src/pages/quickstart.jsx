@@ -110,6 +110,7 @@ export default function Quickstart() {
   };
 
   const handleSubmit = async (event) => {
+    console.log(userAddress)
 
     event.preventDefault();
 
@@ -117,6 +118,12 @@ export default function Quickstart() {
     const formDataJSON = formToJSON(formData); 
 
     try {
+      const chainsToSwitch = Object.entries(chains).filter(([key, value]) => formDataJSON[key + '_checkbox'] === 'on').map(([key, value]) => value);
+      console.log(chainsToSwitch)
+      let chain_data = {}
+      chainsToSwitch.forEach(chain => {
+        chain_data[`0x${chain.toString(16)}`] = {}
+      })
       const quickstart_JSON = {
         "contract_password": formDataJSON['contract_password'],
         "2fa_password": formDataJSON['2fa_password'],
@@ -125,25 +132,19 @@ export default function Quickstart() {
         "rsa_enc_priv_key": formDataJSON['rsa_enc_priv_key'],
         "rsa_sign_pub_key": formDataJSON['rsa_sign_pub_key'],
         "rsa_sign_priv_key": formDataJSON['rsa_sign_priv_key'],
-        "chain_data": {
-          [chainId]: {
-            "data": {
-              "public info": {
-                "message": formDataJSON['data']
-              } 
-            }
-          }
-        },
+        "chain_data": chain_data,
         "rsa_enc_key_pub_check": formDataJSON['rsa_enc_key_pub_check'] === 'on', 
         "rsa_sign_key_pub_check": formDataJSON['rsa_sign_key_pub_check'] === 'on' ,
         "userdata_check": true,
         "rsa_enc_key_pub_check": true,
-        "rsa_sign_key_pub_check": true
+        "rsa_sign_key_pub_check": true,
+        "public_info":  formDataJSON['data']
       };
+
+      console.log(quickstart_JSON)
 
       const userSecretHashBigint = stringToBigInt(formDataJSON['2fa_password']);
       const userSecretHash = await poseidon([userSecretHashBigint.toString()]);
-      const chainsToSwitch = Object.entries(chains).filter(([key, value]) => formDataJSON[key + '_checkbox'] === 'on').map(([key, value]) => value);
 
       for (const targetChainId of chainsToSwitch) {
         await switchChain(targetChainId);

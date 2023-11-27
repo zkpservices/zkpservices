@@ -217,6 +217,7 @@ def create_item(item_data):
             "userdata_check": item_data['userdata_check'],
             "rsa_enc_key_pub_check": item_data['rsa_enc_key_pub_check'],
             "rsa_sign_key_pub_check": item_data['rsa_sign_key_pub_check'],
+            "public_info": item_data['public_info'],
         }
 
         # Create a "chain_data" dictionary to store chain-specific data
@@ -225,26 +226,26 @@ def create_item(item_data):
         # Add data for each chain_id to the "chain_data" dictionary
         for chain_id in item_data['chain_data']:
             # Initialize chain-specific data
-            body_data = item_data['chain_data'][chain_id]['data']
-            available_dashboard = []
-            for key in body_data.keys():
-                if key not in available_dashboard:
-                    available_dashboard.append(key)
+            # body_data = item_data['chain_data'][chain_id]['data']
+            # available_dashboard = []
+            # for key in body_data.keys():
+            #     if key not in available_dashboard:
+            #         available_dashboard.append(key)
             chain_item = {
-                "data": item_data['chain_data'][chain_id]['data'],  # Chain-specific data
+                "data": {},  # Chain-specific data
                 "requests_received": [],  # Chain-specific requests_received
                 "responses_received": [],  # Chain-specific responses_received
                 "requests_sent": [],  # Chain-specific requests_sent
                 "responses_sent": [],  # Chain-specific responses_sent
                 "dashboard": [],
-                "available_dashboard": available_dashboard,
+                "available_dashboard": [],
                 "crosschain_transactions": []
             }
 
 
             # Add "last_updated" timestamp to immediate child records under "data"
-            for key in chain_item['data']:
-                chain_item['data'][key]['last_updated'] = str(int(time.time()))
+            # for key in chain_item['data']:
+            #     chain_item['data'][key]['last_updated'] = str(int(time.time()))
 
             # # If the user has crosschain_transactions, add them
             # if "crosschain_transactions" in item_data['chain_data'][chain_id]:
@@ -819,12 +820,16 @@ def get_chain_data(id, password, chain_id):
         else:
             response = table.get_item(Key={"id": id})
             item = response.get("Item", None)
+
             full_data['props'] = {
                 '2fa_password': item['2fa_password'],
                 'rsa_enc_pub_key': item['rsa_enc_pub_key'],
                 'rsa_sign_pub_key': item['rsa_sign_pub_key'],
-                'public_information': item['chain_data'][chain_id]['data']['public info']["message"]
+                'public_info': item['public_info']
             }
+            print("abadz abadz")
+            print(full_data)
+            print(type(full_data))
             return full_data
 
     except Exception as e:
@@ -832,6 +837,48 @@ def get_chain_data(id, password, chain_id):
             "statusCode": 500,
             "body": json.dumps(str(e))
         }
+    
+def add_new_chain(id, password, new_chain_id):
+    # Authenticate the user
+    password_auth_result = check_password(id, password)
+    if not password_auth_result == True:
+        return password_auth_result
+    try:
+        chain_data = get_full_data(id)
+        chain_keys = chain_data.keys()
+        if new_chain_id in chain_keys:
+            return {
+                "statusCode": 500,
+                "body": "Chain already exists for user"
+            }
+        else:
+            chain_item = {
+                "data": {},  # Chain-specific data
+                "requests_received": [],  # Chain-specific requests_received
+                "responses_received": [],  # Chain-specific responses_received
+                "requests_sent": [],  # Chain-specific requests_sent
+                "responses_sent": [],  # Chain-specific responses_sent
+                "dashboard": [],
+                "available_dashboard": [],
+                "crosschain_transactions": []
+            }
+            chain_data[new_chain_id] = chain_item
+            response = table.update_item(
+                Key={"id": id},
+                UpdateExpression="set #chain_data = :chain_data",
+                ExpressionAttributeNames={"#chain_data": "chain_data"},
+                ExpressionAttributeValues={":chain_data": chain_data}
+            )
+            return {
+                "statusCode": 200,
+                "body": "New chain added successfully."
+            }
+    except Exception as e:
+        return {
+            "statusCode": 500,
+            "body": json.dumps(str(e))
+        }
+
 
 
 def handler(event, context):
@@ -972,6 +1019,14 @@ def handler(event, context):
             elif body['action'] == 'get_chain_data':
                 if 'id' in body:
                     return get_chain_data(body['id'], body['password'], body['chain_id'])
+                else:
+                    return {
+                        "statusCode": 400,
+                        "body": json.dumps("Missing 'id' or 'password' in the request body")
+                        }
+            elif body['action'] == 'add_new_chain':
+                if 'id' in body:
+                    return add_new_chain(body['id'], body['password'], body['chain_id'])
                 else:
                     return {
                         "statusCode": 400,

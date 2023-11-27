@@ -241,7 +241,10 @@ export function Services({handleRefresh}) {
       {selectedService === 'Request Update' && <NewUpdateRequestModal open={true} onClose={() => setSelectedService(null)} onSubmit={addNewRequest}/>}
       {selectedService === 'Cross-Chain Backups' && <NewCrossChainSyncModal open={true} onClose={() => setSelectedService(null)} />}
       {selectedService === 'ZKP Tokens Faucet' && <ZKPFaucetModal open={true} onClose={() => setSelectedService(null)} />}
-      {selectedService === 'Onboard To New Chain' && <OnboardToNewChainModal open={true} props={props} options={availableChains} onClose={() => setSelectedService(null)} />}
+      {selectedService === 'Onboard To New Chain' && <OnboardToNewChainModal open={true} props={props} options={availableChains} onClose={() => {
+        pullChainData(userAddress, userPassword, chainId)
+        setSelectedService(null)}}
+         />}
     </div>
   );
 }

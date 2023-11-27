@@ -2,6 +2,8 @@ import { Fragment } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { ExclamationTriangleIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useGlobal } from '@/components/GlobalStorage';
+import { addNewChain } from '@/components/APICalls';
+
 
 export function OnboardToNewChainModal({ open, onClose, 
   props = {"userSecretHash": 333333333, 
@@ -17,7 +19,7 @@ export function OnboardToNewChainModal({ open, onClose,
   }
 
   let { web3, fujiBatchSignUpContract, mumbaiBatchSignUpContract,
-    rippleBatchSignUpContract, userAddress, chainId} = useGlobal();  
+    rippleBatchSignUpContract, userAddress, userPassword, chainId} = useGlobal();  
 
   const handleSubmit = async () => {
     const selectedValue = document.getElementById("chain").value;
@@ -47,7 +49,7 @@ export function OnboardToNewChainModal({ open, onClose,
       props.userSecretHash,
       props.rsa_enc_pub_key,
       props.rsa_sign_pub_key,
-      props.public_information
+      props.public_info
     ).encodeABI();
 
     let txObject = {
@@ -59,6 +61,7 @@ export function OnboardToNewChainModal({ open, onClose,
 
     let receipt = await web3.eth.sendTransaction(txObject);
     console.log('Batch SignUp Transaction Receipt:', receipt);
+    addNewChain(userAddress, userPassword, `0x${targetChainId.toString(16)}`)
     onClose();
   };
 

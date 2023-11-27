@@ -176,25 +176,39 @@ export function CrossChainSyncStatusModal({
                       </a>
                     </div>
                   </div>
-                </div>
 
-                <div className="mt-6">
-                  <label htmlFor="disclaimer" className="block text-sm font-bold leading-5 text-gray-900 dark:text-white">
-                    Disclaimer:
-                  </label>
-                  <p className="text-gray-500 dark:text-gray-300 mt-2 whitespace-normal">
-                    Data is synced across data sources when the CCIP transaction succeeds on the source chain immediately. To monitor if the sync has been fully completed on the destination chain, please check the status of the CCIP tx on the CCIP explorer link above.
-                  </p>
+                  <div className="mt-4">
+                    <label htmlFor="status" className="block text-sm font-medium leading-5 text-gray-900 dark:text-white">
+                      Status:
+                    </label>
+                    <textarea
+                      id="status"
+                      className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
+                      rows={1}
+                      defaultValue={status}
+                      readOnly
+                      spellCheck="false"
+                    />
+                  </div>
+
                 </div>
 
                 <div className="mt-6 flex justify-end">
                   <button
                       type="button"
-                      className="mt-3 inline-flex w-full justify-center rounded-md bg-slate-100 dark:bg-slate-800 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-slate-200 dark:hover:bg-slate-900 sm:mt-0 sm:w-auto"
+                      className="mt-3 ml-3 inline-flex w-full justify-center rounded-md bg-slate-100 dark:bg-slate-800 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-slate-200 dark:hover:bg-slate-900 sm:mt-0 sm:w-auto"
                       onClick={() => setOpen(false)}
                     >
                       Close
-                  </button>
+                    </button>
+                    <button
+                      type="button"
+                      className="ml-3 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                      // set the status contingent upon whether the destination chain has received the data yet
+                      onClick={() => setOpen(false)}
+                    >
+                      Refresh Status
+                    </button> 
                 </div>
               </div>
             </div>
