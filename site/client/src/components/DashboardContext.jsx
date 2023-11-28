@@ -5,6 +5,22 @@ import { Services }  from '@/components/Services';
 import { History } from '@/components/History'
 import { useGlobal } from '@/components/GlobalStorage';
 import { getCCTX, getIncoming, getOutgoing, truncateAddress, getDashboard } from '@/components/APICalls';
+import { ZKPFaucetModal } from '@/components/ZKPFaucetModal'
+import { ViewFieldModal } from '@/components/ViewFieldModal'
+import { NewDashboardDataModal } from '@/components/NewDashboardDataModal'
+import { NewUpdateRequestModal } from '@/components/NewUpdateRequestModal'
+import { NewDataRequestModal } from '@/components/NewDataRequestModal'
+import { NewCrossChainSyncModal } from '@/components/NewCrossChainSyncModal'
+import { CrossChainSyncStatusModal } from '@/components/CrossChainSyncStatusModal'
+import { CompleteUpdateModal } from '@/components/CompleteUpdateModal'
+import { CompletedDataUpdateModal } from '@/components/CompletedDataUpdateModal'
+import { RequestedDataSentModal } from '@/components/RequestedDataSentModal'
+import { ReceivedUpdateResponseModal } from '@/components/ReceivedUpdateResponseModal'
+import { ReceivedDataResponseModal } from '@/components/ReceivedDataResponseModal'
+import { AwaitingUpdateCompletionModal} from '@/components/AwaitingUpdateCompletionModal'
+import { AwaitingDataModal } from '@/components/AwaitingDataModal'
+import { SendDataModal } from '@/components/SendDataModal'
+import { OnboardToNewChainModal } from '@/components/OnboardToNewChainModal';
 import coreContractABI from '../../public/contract_ABIs/ZKPServicesCore.json'; 
 import twoFAContractVRFABI from '../../public/contract_ABIs/ZKPServicesVRF2FA.json'; 
 import twoFAContractGenericABI from '../../public/contract_ABIs/ZKPServicesGeneric2FA.json'; 
@@ -87,7 +103,7 @@ export function DashboardContext() {
       );
       const operationText = item.operation === 'update' ? 'Update Requested' : 'Data Requested';
       return {
-        operation: [operationText, `From: ${truncateAddress(item.address_sender)}`],
+        operation: [operationText, `From ${truncateAddress(item.address_sender)}`],
         field: [item.field, truncateAddress(item.address_receiver)],
         status: hasMatchingResponse ? ['Response Sent', 'grey'] : [item.operation === 'update' ? 'Complete Update' : 'Send Response', 'button'],
         details: ['View Details', truncateAddress(item.requestID)],
@@ -101,16 +117,16 @@ export function DashboardContext() {
         key: item.key,
         response_fee: item.response_fee,
         require2FA: item.require2FA,
-        twoFAProvider: item.twoFA_provider,
-        twoFARequestID: item.twoFA_requestID,
-        twoFAOneTimeToken: item.twoFA_one_time_token
+        twoFAProvider: item.twoFAProvider,
+        twoFARequestID: item.twoFARequestID,
+        twoFAOneTimeToken: item.twoFAOneTimeToken
       };
     });
   
     const formattedResponses = incomingResponses.map((item) => {
       const operationText = item.operation === 'update' ? 'Update Completed' : 'Data Received';
       return {
-        operation: [operationText, `From: ${truncateAddress(item.address_sender)}`],
+        operation: [operationText, `From ${truncateAddress(item.address_sender)}`],
         field: [item.field, truncateAddress(item.address_sender)],
         status: ['Show Response', 'button'],
         details: ['View Details', truncateAddress(item.responseID)],
@@ -122,9 +138,9 @@ export function DashboardContext() {
         key: item.key,
         response_fee: item.response_fee,
         require2FA: item.require2FA,
-        twoFAProvider: item.twoFA_provider,
-        twoFARequestID: item.twoFA_requestID,
-        twoFAOneTimeToken: item.twoFA_one_time_token
+        twoFAProvider: item.twoFAProvider,
+        twoFARequestID: item.twoFARequestID,
+        twoFAOneTimeToken: item.twoFAOneTimeToken
       };
     });
 
@@ -139,7 +155,7 @@ export function DashboardContext() {
       );
       const operationText = item.operation === 'update' ? 'Update Requested' : 'Data Requested';
       return {
-        operation: [operationText, `To: ${truncateAddress(item.address_sender)}`],
+        operation: [operationText, `To ${truncateAddress(item.address_sender)}`],
         field: [item.field, truncateAddress(item.address_receiver)],
         status: hasMatchingResponse ? ['Response Sent', 'grey'] : ['Awaiting Response', 'grey'],
         details: ['View Details', truncateAddress(item.requestID)],
@@ -153,9 +169,9 @@ export function DashboardContext() {
         key: item.key,
         response_fee: item.response_fee,
         require2FA: item.require2FA,
-        twoFAProvider: item.twoFA_provider,
-        twoFARequestID: item.twoFA_requestID,
-        twoFAOneTimeToken: item.twoFA_one_time_token
+        twoFAProvider: item.twoFAProvider,
+        twoFARequestID: item.twoFARequestID,
+        twoFAOneTimeToken: item.twoFAOneTimeToken
       };
     });
 
@@ -176,9 +192,9 @@ export function DashboardContext() {
         key: item.key,
         response_fee: item.response_fee,
         require2FA: item.require2FA,
-        twoFAProvider: item.twoFA_provider,
-        twoFARequestID: item.twoFA_requestID,
-        twoFAOneTimeToken: item.twoFA_one_time_token
+        twoFAProvider: item.twoFAProvider,
+        twoFARequestID: item.twoFARequestID,
+        twoFAOneTimeToken: item.twoFAOneTimeToken
       };
     });
     return [...formattedRequests, ...formattedResponses];
@@ -197,7 +213,7 @@ export function DashboardContext() {
               // The parsed data is an array
               const transformedData = dataArray.map((item) => ({
                 operation: ['Sync Data'],
-                field: [item.field, `From: ${item.source_chain} to ${item.destination_chain}`],
+                field: [item.field, `From ${item.source_chain} to ${item.destination_chain}`],
                 status: ['Sync Completed', 'button'],
                 details: ['View Details', `${truncateAddress(item.ccid_id)}`],
               }));

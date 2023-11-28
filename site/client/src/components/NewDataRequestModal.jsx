@@ -2,9 +2,7 @@ import { Fragment, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { formToJSON } from 'axios';
 import { XMarkIcon } from '@heroicons/react/24/outline';
-import { generateRandomAsciiString24, stringToBigInt } from '@/components/HelperCalls';
-import { poseidon } from '@/components/PoseidonHash';
-import { useGlobal } from '@/components/GlobalStorage';
+import { generateRandomAsciiString24 } from '@/components/HelperCalls';
 
 const handleGenerateRandomKey = () => {
   try {
@@ -51,141 +49,51 @@ export function NewDataRequestModal({
   oneTimeKey = "",
   oneTimeSalt = "",
   timeLimit = "600",
-  twoFAProvider = "zkp.services",
+  twoFAProvider = "zkp.services VRF 2FA",
   twoFARequestID = "",
   twoFAOneTimeToken = "",
   responseFee = "10",
 }) {
 
-  let {
-    userAddress,
-    fujiCoreContract,
-    mumbaiCoreContract,
-    rippleCoreContract,
-    fujiTwoFAContract,
-    mumbaiTwoFAContract,
-    rippleTwoFAContract,
-    web3,
-    chainId
-  } = useGlobal();
-  console.log(web3);
-
-  const coreContract = chainId == 43113 ? fujiCoreContract :
-                    chainId == 80001 ? mumbaiCoreContract :
-                    chainId == 1440002 ? rippleCoreContract : null;
-  const _2FAContract = chainId == 43113 ? fujiTwoFAContract:
-                    chainId == 80001 ? mumbaiTwoFAContract:
-                    chainId == 1440002 ? rippleTwoFAContract: null;
-
   const [isTwoFAEnabled, setIsTwoFAEnabled] = useState(false);
+
+  const generateRandomID = () => {
+    // Generate random ID logic here
+    const randomID = "12345"; // Replace with actual random ID generation
+    setTwoFARequestID(randomID);
+  };
+
+  function generateRandomHexString(length) {
+    const characters = '0123456789abcdef';
+    let randomString = '';
+    for (let i = 0; i < length; i++) {
+      const randomIndex = Math.floor(Math.random() * characters.length);
+      randomString += characters[randomIndex];
+    }
+    return randomString;
+  }
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     const formData = new FormData(event.target)
     const formDataJSON = formToJSON(formData);
 
-    const requestID = await poseidon([
-              stringToBigInt(formDataJSON['fieldRequested'].substring(0, 24)),
-              stringToBigInt(formDataJSON['fieldRequested'].substring(24, 48)),
-              stringToBigInt(formDataJSON['oneTimeKey'].substring(0, 24)),
-              stringToBigInt(formDataJSON['oneTimeKey'].substring(24, 48))
-            ])
-    
     const request = {
+      requestID: generateRandomHexString(30), // placeholder for real requestID generation implemented later
       address_receiver: formDataJSON['receiverAddress'].toLowerCase(),
-      requestID: requestID,
       operation: "get",
       field: formDataJSON['fieldRequested'],
-      key: formDataJSON['oneTimeKey'],
-      salt: formDataJSON['oneTimeSalt'],
+      key: formDataJSON['oneTimeSalt'][0],
+      salt: formDataJSON['oneTimeSalt'][1],
       limit: formDataJSON['timeLimit'],
       timestamp: Date.now().toString(),
       response_fee: formDataJSON['responseFee'],
-      require2FA: isTwoFAEnabled,
-      twoFAProvider: formDataJSON['twoFAProvider'] == "zkp.services" ?
-                     _2FAContract["_address"] : formDataJSON['twoFAProvider'],
-      twoFARequestID: String(stringToBigInt(formDataJSON['twoFARequestID'])),
+      require2FA: formDataJSON['require2FA'] === 'on',
+      twoFAProvider: formDataJSON['twoFAProvider'],
+      twoFARequestID: formDataJSON['twoFARequestID'],
       twoFAOneTimeToken: formDataJSON['twoFAOneTimeToken'],
       attach_token: formDataJSON['attachToken'] === 'on'
     }
-
-    const _2FASmartContractCallData = {
-      _id: String(stringToBigInt(formDataJSON['twoFARequestID'])),
-      _oneTimeKeyHash: web3.utils.keccak256(formDataJSON['twoFAOneTimeToken'])
-    }
-
-    const coreContractCallData = {
-      requestID: requestID,
-      encryptedRequest: "",
-      encryptedKey: "",
-      timeLimit: formDataJSON['timeLimit'],
-      _2FAProvider: formDataJSON['twoFAProvider'] == "zkp.services" ?
-                    _2FAContract["_address"] : formDataJSON['twoFAProvider'],
-      _2FAID: String(stringToBigInt(formDataJSON['twoFARequestID'])),
-      responseFeeAmount: formDataJSON['responseFee'],
-    }
-
-    console.log(_2FASmartContractCallData);
-    console.log(coreContractCallData);
-
-    try {
-      const _2FASmartContractCallData = {
-        _id: String(stringToBigInt(formDataJSON['twoFARequestID'])),
-        _oneTimeKeyHash: web3.utils.keccak256(formDataJSON['twoFAOneTimeToken'])
-      };
-
-      const data = _2FAContract.methods.generate2FA(_2FASmartContractCallData._id, _2FASmartContractCallData._oneTimeKeyHash).encodeABI();
-
-      const txObject = {
-        from: userAddress,
-        to: _2FAContract.options.address,
-        data: data,
-        gas: 500000
-      };
-
-      const receipt = await web3.eth.sendTransaction(txObject);
-      console.log('2FA Contract Transaction Receipt:', receipt);
-    } catch (error) {
-      console.error('Error in 2FA Contract Call:', error);
-    }
-
-    try {
-      const coreContractCallData = {
-        requestID: requestID,
-        encryptedRequest: "",
-        encryptedKey: "",
-        timeLimit: formDataJSON['timeLimit'],
-        _2FAProvider: formDataJSON['twoFAProvider'] == "zkp.services" ?
-                     _2FAContract["_address"] : formDataJSON['twoFAProvider'],
-        _2FAID: String(stringToBigInt(formDataJSON['twoFARequestID'])),
-        responseFeeAmount: formDataJSON['responseFee'],
-      };
-
-      const data = coreContract.methods.requestData(
-        coreContractCallData.requestID,
-        coreContractCallData.encryptedRequest,
-        coreContractCallData.encryptedKey,
-        coreContractCallData.timeLimit,
-        coreContractCallData._2FAProvider,
-        coreContractCallData._2FAID,
-        coreContractCallData.responseFeeAmount,
-      ).encodeABI();
-
-      const txObject = {
-        from: userAddress,
-        to: coreContract.options.address,
-        data: data,
-        gas: 500000
-      };
-
-      const receipt = await web3.eth.sendTransaction(txObject);
-      console.log('Core Contract Transaction Receipt:', receipt);
-    } catch (error) {
-      console.error('Error in Core Contract Call:', error);
-    }
-
-    console.log(request)
-
     const result = await onSubmit(request)
     onClose()
   }
@@ -274,7 +182,7 @@ export function NewDataRequestModal({
                     </label>
                     <textarea
                       id="oneTimeKey"
-                      name="oneTimeKey"
+                      name="oneTimeSalt"
                       className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
                       rows={1}
                       spellCheck="false"
@@ -404,7 +312,7 @@ export function NewDataRequestModal({
                         <label htmlFor="attachToken" className="block text-sm font-medium leading-5 text-gray-900 dark:text-white">
                           Attach One Time Token to Request (optional)?
                         </label>
-                        <input type="checkbox" name="attachToken" id="attachToken" defaultChecked className="mt-2 ml-1 h-4 w-4 rounded border-gray-300 dark:border-gray-700 text-emerald-600 focus:ring-emerald-500" />
+                        <input type="checkbox" name="attachToken" id="attachToken" className="mt-2 ml-1 h-4 w-4 rounded border-gray-300 dark:border-gray-700 text-emerald-600 focus:ring-emerald-500" />
                       </div>
                     </>
                   )}

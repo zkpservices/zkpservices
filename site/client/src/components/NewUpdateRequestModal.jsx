@@ -2,7 +2,7 @@ import { Fragment, useState, useEffect } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { formToJSON } from 'axios';
-import { generateRandomAsciiString24, stringToBigInt, flattenJsonAndComputeHash } from '@/components/HelperCalls';
+import { generateRandomAsciiString24, stringToBigInt, bigIntToString, flattenJsonAndComputeHash } from '@/components/HelperCalls';
 import { poseidon } from '@/components/PoseidonHash';
 import { useGlobal } from '@/components/GlobalStorage';
 
@@ -86,13 +86,16 @@ export function NewUpdateRequestModal({
     const formData = new FormData(event.target)
     const formDataJSON = formToJSON(formData);
 
+    const fieldEnd = stringToBigInt(formDataJSON['fieldToUpdate'].substring(24, 48)) ? stringToBigInt(formDataJSON['fieldToUpdate'].substring(24, 48)) : ""
+    const oneTimeKeyEnd = stringToBigInt(formDataJSON['oneTimeKey'].substring(24, 48)) ? stringToBigInt(formDataJSON['oneTimeKey'].substring(24, 48)) : ""
     const requestID = await poseidon([
                   stringToBigInt(formDataJSON['fieldToUpdate'].substring(0, 24)),
-                  stringToBigInt(formDataJSON['fieldToUpdate'].substring(24, 48)),
+                  fieldEnd,
                   stringToBigInt(formDataJSON['oneTimeKey'].substring(0, 24)),
-                  stringToBigInt(formDataJSON['oneTimeKey'].substring(24, 48))
+                  oneTimeKeyEnd
                 ])
 
+    const twoFARequestIDBigInt = stringToBigInt(formDataJSON['twoFARequestID']) ? stringToBigInt(formDataJSON['twoFARequestID']) : ""
     const request = {
       address_receiver: formDataJSON['receiverAddress'].toLowerCase(),
       requestID: requestID,
@@ -107,7 +110,7 @@ export function NewUpdateRequestModal({
       require2FA: isTwoFAEnabled,
       twoFAProvider: formDataJSON['twoFAProvider'] == "zkp.services" ?
                      _2FAContract["_address"] : formDataJSON['twoFAProvider'],
-      twoFARequestID: String(stringToBigInt(formDataJSON['twoFARequestID'])),
+      twoFARequestID: String(twoFARequestIDBigInt),
       twoFAOneTimeToken: formDataJSON['twoFAOneTimeToken'],
       attach_token: formDataJSON['attachToken'] === 'on'
     }
@@ -117,7 +120,7 @@ export function NewUpdateRequestModal({
     console.log("rootHash", rootHash);
 
     const _2FASmartContractCallData = {
-      _id: String(stringToBigInt(formDataJSON['twoFARequestID'])),
+      _id: String(twoFARequestIDBigInt),
       _oneTimeKeyHash: web3.utils.keccak256(formDataJSON['twoFAOneTimeToken'])
     }
 
@@ -128,7 +131,7 @@ export function NewUpdateRequestModal({
       timeLimit: formDataJSON['timeLimit'],
       _2FAProvider: formDataJSON['twoFAProvider'] == "zkp.services" ?
                     _2FAContract["_address"] : formDataJSON['twoFAProvider'],
-      _2FAID: String(stringToBigInt(formDataJSON['twoFARequestID'])),
+      _2FAID: String(twoFARequestIDBigInt),
       responseFeeAmount: formDataJSON['responseFee'],
       dataHash: rootHash,
       saltHash: await poseidon([
@@ -142,7 +145,7 @@ export function NewUpdateRequestModal({
 
     try {
       const _2FASmartContractCallData = {
-        _id: String(stringToBigInt(formDataJSON['twoFARequestID'])),
+        _id: String(twoFARequestIDBigInt),
         _oneTimeKeyHash: web3.utils.keccak256(formDataJSON['twoFAOneTimeToken'])
       };
 

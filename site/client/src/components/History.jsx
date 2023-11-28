@@ -7,6 +7,7 @@ import { getFieldData, addResponse, updateFieldData } from '@/components/APICall
 import { useGlobal } from '@/components/GlobalStorage';
 import { CompleteUpdateModal } from './CompleteUpdateModal';
 import { CompletedDataUpdateModal } from './CompletedDataUpdateModal';
+import { RequestedDataSentModal } from './RequestedDataSentModal';
 
 const tabs = [
   { name: 'Incoming' },
@@ -24,6 +25,9 @@ export function History({ tableData = {}, showRefresh = true , handleRefresh}) {
   const [showCompleteUpdateModal, setShowCompleteUpdateModal] = useState(false);
   const [showCompletedUpdateModal, setShowCompletedUpdateModal] = useState(false);
   const [showReceivedUpdateResponseModal, setShowReceivedUpdateResponseModal] = useState(false);
+  const [showAwaitingDataModal, setShowAwaitingDataModal] = useState(false);
+  const [showAwaitingUpdateModal, setShowAwaitingUpdateModal] = useState(false);
+  const [showRequestedDataSentModal, setShowRequestedDataSentModal] = useState(false);
   const [selectedRowData, setSelectedRowData] = useState({});
   let {userAddress, userPassword, chainId} = useGlobal();
   const handleRefreshAll = () => {
@@ -32,9 +36,13 @@ export function History({ tableData = {}, showRefresh = true , handleRefresh}) {
   };
 
   const openModal = (rowData) => {
-    console.log(`openModal rowData: ${rowData}`)
+    console.log(`openModal rowData: ${JSON.stringify(rowData, null, 2)}`)
     if(rowData.type === "incoming_request_get") {
-      openSendDataModal(rowData)
+      if(rowData.status[0] === "Response Sent") {
+        openRequestedDataSentModal(rowData)
+      } else {
+        openSendDataModal(rowData)
+      }
     } else if (rowData.type === "incoming_request_update") {
       if(rowData.status[0] === "Response Sent") {
         openCompletedUpdateModal(rowData)
@@ -44,23 +52,23 @@ export function History({ tableData = {}, showRefresh = true , handleRefresh}) {
     } else if (rowData.type === "incoming_response_get") {
       openReceivedDataResponseModal(rowData)
     } else if (rowData.type === "incoming_response_update") {
-      openReceiv
+      openReceivedUpdateResponseModal(rowData)
     } else if (rowData.type === "outgoing_request_get") {
       if(rowData.status[0] === "Response Sent") {
-        //receivedDataResponseModal
+        openReceivedDataResponseModal(rowData)
       } else {
-        //awaitingUpdateCompletionModal
+        openAwaitingDataModal(rowData)
       }
     } else if (rowData.type === "outgoing_request_update") {
       if(rowData.status[0] === "Response Sent") {
-        //receivedDataUpdateModal
+        openReceivedUpdateResponseModal(rowData)
       } else {
-        //awaitingDataModal
+        openAwaitingUpdateModal(rowData)
       }
     } else if (rowData.type === "outgoing_response_get") {
-      //sendDataModal
+      openRequestedDataSentModal(rowData)
     } else if (rowData.type === "outgoing_response_update") {
-      //completedDataUpdateModal
+      openCompletedUpdateModal(rowData)
     }
 
   }
@@ -177,6 +185,42 @@ export function History({ tableData = {}, showRefresh = true , handleRefresh}) {
     setShowReceivedDataResponseModal(false)
   }
 
+  const openReceivedUpdateResponseModal = (rowData) => {
+    setSelectedRowData(rowData)
+    setShowReceivedUpdateResponseModal(true)
+  }
+
+  const closeReceivedUpdateResponseModal = (rowData) => {
+    setShowReceivedUpdateResponseModal(false)
+  }
+
+  const openAwaitingDataModal = (rowData) => {
+    setSelectedRowData(rowData)
+    setShowAwaitingDataModal(true)
+  }
+
+  const closeAwaitingDataModal = (rowData) => {
+    setShowAwaitingDataModal(false)
+  }
+
+  const openAwaitingUpdateModal = (rowData) => {
+    setSelectedRowData(rowData)
+    setShowAwaitingUpdateModal(true)
+  }
+
+  const closeAwaitingUpdateModal = (rowData) => {
+    setShowAwaitingUpdateModal(false)
+  }
+
+  const openRequestedDataSentModal = (rowData) => {
+    setSelectedRowData(rowData)
+    setShowRequestedDataSentModal(true)
+  }
+
+  const closeRequestedDataSentModal = (rowData) => {
+    setShowRequestedDataSentModal(false)
+  }
+
 
   return (
     <div className="xl:max-w-none">
@@ -230,6 +274,23 @@ export function History({ tableData = {}, showRefresh = true , handleRefresh}) {
       twoFAOneTimeToken={selectedRowData.twoFAOneTimeToken}
       />}
       {showCompletedUpdateModal && <CompletedDataUpdateModal 
+      open={true} 
+      onClose={closeCompletedUpdateModal}
+      onSubmit={completeUpdate}
+      addressOfRequestingParty={selectedRowData.addressSender}
+      fieldToUpdate={selectedRowData.field[0]}
+      requestID={selectedRowData.requestID}
+      snapshotDataAfterUpdate={JSON.stringify(selectedRowData.data, null, 2)}
+      oneTimeKey={selectedRowData.key}
+      oneTimeSalt={selectedRowData.salt}
+      timeLimit={selectedRowData.limit}
+      responseFee={selectedRowData.response_fee}
+      require2FA={selectedRowData.require2FA}
+      twoFAProvider={selectedRowData.twoFAProvider}
+      twoFARequestID={selectedRowData.twoFARequestID}
+      twoFAOneTimeToken={selectedRowData.twoFAOneTimeToken}
+      />}
+      {showRequestedDataSentModal && <RequestedDataSentModal 
       open={true} 
       onClose={closeCompletedUpdateModal}
       onSubmit={completeUpdate}
