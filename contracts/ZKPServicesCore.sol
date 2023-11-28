@@ -135,10 +135,10 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
 
     //note: proper tokenomics not implemented, only token utility demonstrated
     uint256 private constant TOTAL_SUPPLY = 10000000000 * 10**18;
-    //99.9999% put into the vault, 0.0001% transferred to deploying wallet
-    uint256 private constant VAULT_AMOUNT = (TOTAL_SUPPLY * 999999) / 1000000;
+    //100% put into the vault
+    uint256 private constant VAULT_AMOUNT = TOTAL_SUPPLY;
 
-    // this contract helps expedite sign up to zkp.services via batched calls
+    // this contract helps expedite signing up to zkp.services via batched calls
     address public batchSignUpContractAddress;
 
     constructor(

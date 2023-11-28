@@ -138,10 +138,10 @@ export function NewCrossChainSyncModal({open, onClose}) {
       console.log('Transaction Receipt:', receipt);
 
       let messageId;
-      if (receipt.events && receipt.events.CCIPMessageID) {
-        messageId = receipt.events.CCIPMessageID.returnValues.messageId;
+      if (receipt.logs){
+        messageId = receipt.logs[receipt.logs.length-1]["data"];
       }
-  
+
       console.log('Message ID:', messageId);
 
       onClose();
