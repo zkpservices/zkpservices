@@ -80,8 +80,8 @@ export function NewCrossChainSyncModal({open, onClose}) {
       let encodedData;
       let dataTypeByte;
       const contract = chainId == 43113 ? fujiCoreContract :
-                      chainId == 80001 ? mumbaiCoreContract :
-                      chainId == 1440002 ? rippleCoreContract : null;
+                      chainId == 80001 ? mumbaiCoreContract : null;
+      const receiver = chainId == 43113 ? "mumbai" : "fuji";
 
       if (!contract) {
         console.error('No contract instance available for the current chain');
@@ -124,7 +124,7 @@ export function NewCrossChainSyncModal({open, onClose}) {
       }
 
       let dataBytes = dataTypeByte + encodedData.slice(2); // Removing '0x' from encodedData
-      let data = contract.methods.sendMessage("mumbai", dataBytes).encodeABI();
+      let data = contract.methods.sendMessage(receiver, dataBytes).encodeABI();
 
       // 3000000 = gas limit for CCIP
       let txObject = {
