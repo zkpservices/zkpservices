@@ -168,6 +168,7 @@ function ServiceCard({ service, onCardClick, openModal, isSelected }) {
 export function Services({handleRefresh}) {
   const [selectedService, setSelectedService] = useState(null);
   const [availableChains, setAvailableChains] = useState(["Avalanche Fuji", "Polygon Mumbai", "Ripple EVM Devnet"])
+  const [usedChains, setUsedChains] = useState([])
   const [props, setProps] = useState({});
 
   const chains = {
@@ -185,11 +186,12 @@ export function Services({handleRefresh}) {
   const pullChainData = async (userAddress, userPassword, chainId) => {
     const chainData = await getChainData(userAddress, userPassword, chainId)
     let keysList = Object.keys(chainData['data']).filter(a => a !== "2fa_password")
+    const filteredKeysList = Object.keys(chains).filter(item => !keysList.includes(item));
+    const usedChainsList = Object.keys(chains).filter(item => keysList.includes(item)).map(key => chains[key]);
+    setUsedChains(usedChainsList)
+    const result = filteredKeysList.map(key => chains[key])
     const userSecretHashBigint = stringToBigInt(chainData['data']['props']['2fa_password']);
     const userSecretHashLocal = await poseidon([userSecretHashBigint.toString()]);
-    const filteredKeysList = Object.keys(chains).filter(item => !keysList.includes(item));
-    const result = filteredKeysList.map(key => chains[key])
-    console.log(result)
     setAvailableChains(result)
     const propsLocal = chainData['data']['props']
     propsLocal['userSecretHash'] = userSecretHashLocal
@@ -247,7 +249,7 @@ export function Services({handleRefresh}) {
         setSelectedService(null)
         handleRefresh()
       }} onSubmit={addNewRequest}/>}
-      {selectedService === 'Cross-Chain Backups' && <NewCrossChainSyncModal open={true} onClose={() => {
+      {selectedService === 'Cross-Chain Backups' && <NewCrossChainSyncModal open={true} destinationChainOptions={usedChains} onClose={() => {
         setSelectedService(null)
         handleRefresh()
       }} />}

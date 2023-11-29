@@ -1,10 +1,167 @@
-import { Fragment, useState } from 'react';
+import { Fragment, useState, useRef } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
+import { useGlobal } from '@/components/GlobalStorage';
+import { poseidon } from './PoseidonHash';
+import { getFieldData } from './APICalls';
+import { stringToBigInt } from './HelperCalls';
 
-export function NewCrossChainSyncModal({open, onClose}) {
-  const destinationChainOptions = ["Polygon Testnet", "Avalanche Testnet", "Fantom Testnet"];
+export function NewCrossChainSyncModal({open, onClose, destinationChainOptions}) {
+  let {
+    userAddress,
+    fujiCoreContract,
+    mumbaiCoreContract,
+    rippleCoreContract,
+    web3,
+    chainId,
+    contractPassword,
+    userPassword
+  } = useGlobal();
+
   const [parameterValue, setParameterValue] = useState('');
+  let paramKey = useRef('');
+  let paramToSync = useRef('');
+  
+  async function handleFetchValue() {
+    try {
+
+      let fetchedValue;
+      console.log("chainID");
+      console.log(chainId);
+
+      const contract = chainId == 43113 ? fujiCoreContract :
+                      chainId == 80001 ? mumbaiCoreContract :
+                      chainId == 1440002 ? rippleCoreContract : null;
+
+      if (!contract) {
+        console.error('No contract instance available for the current chain');
+        return;
+      }
+
+      paramToSync = document.getElementById('parameterToSync').value;
+      let paramKeyRaw = document.getElementById('parameterKey').value;
+
+      const fieldDataRequest = await getFieldData(userAddress, userPassword, paramKeyRaw, chainId)
+      const fieldData = fieldDataRequest['data']
+      console.log(`all poseidon data: [${paramKeyRaw}, ${fieldData[paramKeyRaw]['_metadata']['salt']}, ${contractPassword}]`)
+      paramKey = await poseidon([stringToBigInt(paramKeyRaw), stringToBigInt(fieldData[paramKeyRaw]['_metadata']['salt']), stringToBigInt(contractPassword)])
+
+      switch (paramToSync) {
+        case 'Data':
+          fetchedValue = await contract.methods.obfuscatedData(paramKey).call();
+          break;
+        case 'Data Request':
+          fetchedValue = await contract.methods.dataRequests(paramKey).call();
+          break;
+        case 'Update Request':
+          fetchedValue = await contract.methods.updateRequests(paramKey).call();
+          break;
+        case 'Response':
+          fetchedValue = await contract.methods.responses(paramKey).call();
+          break;
+        case 'Public User Information':
+          fetchedValue = await contract.methods.publicUserInformation(paramKey).call();
+          break;
+        case 'RSA Encryption Keys':
+          fetchedValue = await contract.methods.rsaEncryptionKeys(paramKey).call();
+          break;
+        case 'RSA Signing Keys':
+          fetchedValue = await contract.methods.rsaSigningKeys(paramKey).call();
+          break;
+        default:
+          console.error('Invalid parameter selected');
+          return;
+      }
+
+      setParameterValue(fetchedValue);
+      console.log('Fetched Value:', fetchedValue);
+    } catch (error) {
+      console.error('Error in fetching value:', error);
+    }
+  }
+
+  async function handleSubmit() {
+    await handleFetchValue();
+    // console.log(parameterValue, "submitted");
+    // console.log(paramKey, paramToSync);
+
+    // try {
+    //   let encodedData;
+    //   let dataTypeByte;
+    //   const contract = chainId == 43113 ? fujiCoreContract :
+    //                   chainId == 80001 ? mumbaiCoreContract : null;
+    //   const receiver = chainId == 43113 ? "mumbai" : "fuji";
+
+    //   if (!contract) {
+    //     console.error('No contract instance available for the current chain');
+    //     return;
+    //   }
+
+    //   // Encoding the data
+    //   switch (paramToSync) {
+    //     case 'Data':
+    //       encodedData = await contract.methods.encodeData(paramKey).call();
+    //       dataTypeByte = "0x03";
+    //       break;
+    //     case 'Data Request':
+    //       encodedData = await contract.methods.encodeDataRequest(paramKey).call();
+    //       dataTypeByte = "0x04";
+    //       break;
+    //     case 'Update Request':
+    //       encodedData = await contract.methods.encodeUpdateRequest(paramKey).call();
+    //       dataTypeByte = "0x05";
+    //       break;
+    //     case 'Response':
+    //       encodedData = await contract.methods.encodeResponse(paramKey).call();
+    //       dataTypeByte = "0x06";
+    //       break;
+    //     case 'Public User Information':
+    //       encodedData = await contract.methods.encodePublicUserInformation(paramKey).call();
+    //       dataTypeByte = "0x07";
+    //       break;
+    //     case 'RSA Encryption Keys':
+    //       encodedData = await contract.methods.encodeRSAEncryptionKey(paramKey).call();
+    //       dataTypeByte = "0x01";
+    //       break;
+    //     case 'RSA Signing Keys':
+    //       encodedData = await contract.methods.encodeRSASigningKey(paramKey).call();
+    //       dataTypeByte = "0x02";
+    //       break;
+    //     default:
+    //       console.error('Invalid parameter selected');
+    //       return;
+    //   }
+
+    //   let dataBytes = dataTypeByte + encodedData.slice(2); // Removing '0x' from encodedData
+    //   let data = contract.methods.sendMessage(receiver, dataBytes).encodeABI();
+
+    //   // 3000000 = gas limit for CCIP
+    //   let txObject = {
+    //     from: userAddress,
+    //     to: contract.options.address,
+    //     data: data,
+    //     gas: 3000000
+    //   };
+
+    //   let receipt = await web3.eth.sendTransaction(txObject);
+    //   console.log('Transaction Receipt:', receipt);
+
+    //   // CCIP message ID
+    //   let messageId; 
+    //   for (let log of receipt.logs) {
+    //     if (log.address.toLowerCase() == contract._address.toLowerCase()) {
+    //       messageId = log.data; 
+    //       break; 
+    //     }
+    //   }
+    //   console.log('Message ID:', messageId);
+
+    //   onClose();
+    // } catch (error) {
+    //   console.error('Error in transaction:', error);
+    // }
+
+  }
 
   return (
     <Transition.Root show={open} as={Fragment}>
@@ -116,9 +273,7 @@ export function NewCrossChainSyncModal({open, onClose}) {
 
                   <button
                       className="mt-2 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
-                      onClick={() => {
-                        //setParameterValue here after calling smart contract
-                      }}
+                      onClick={handleFetchValue}
                     >
                       Fetch Parameter Value
                   </button>
@@ -134,9 +289,8 @@ export function NewCrossChainSyncModal({open, onClose}) {
                       className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
                       rows={1}
                       readOnly
-                    >
-                      10 ZKP
-                    </textarea>
+                      defaultValue="10 ZKP"
+                    />
                   </div>
 
                   <div className="mt-6">
@@ -161,7 +315,7 @@ export function NewCrossChainSyncModal({open, onClose}) {
                   <button
                     type="button"
                     className="ml-3 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
-                    onClick={onClose}
+                    onClick={handleSubmit}
                   >
                     Call Smart Contract
                   </button> 

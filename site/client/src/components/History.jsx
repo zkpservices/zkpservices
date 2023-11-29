@@ -8,6 +8,9 @@ import { useGlobal } from '@/components/GlobalStorage';
 import { CompleteUpdateModal } from './CompleteUpdateModal';
 import { CompletedDataUpdateModal } from './CompletedDataUpdateModal';
 import { RequestedDataSentModal } from './RequestedDataSentModal';
+import { AwaitingDataModal } from './AwaitingDataModal';
+import { AwaitingUpdateCompletionModal } from './AwaitingUpdateCompletionModal';
+import { ReceivedUpdateResponseModal } from './ReceivedUpdateResponseModal';
 
 const tabs = [
   { name: 'Incoming' },
@@ -124,10 +127,24 @@ export function History({ tableData = {}, showRefresh = true , handleRefresh}) {
   }
 
   const completeUpdate = async () => {
+    const fieldComplete = {
+        [selectedRowData.field[0]]: {
+          ...selectedRowData.data[selectedRowData.field[0]],
+          _metadata: {
+            twoFA_provider: selectedRowData.twoFAProvider,
+            twoFA_requestID: selectedRowData.twoFARequestID,
+            twoFA_one_time_token: selectedRowData.twoFAOneTimeToken,
+            key: selectedRowData.key,
+            require2FA: selectedRowData.require2FA,
+            salt: selectedRowData.salt,
+            limit: selectedRowData.limit
+          }
+        }
+    }
 
     const updateData = {
       key: selectedRowData.field[0],
-      data: selectedRowData.data
+      data: fieldComplete,
     }
 
     const responseData = {
@@ -276,7 +293,6 @@ export function History({ tableData = {}, showRefresh = true , handleRefresh}) {
       {showCompletedUpdateModal && <CompletedDataUpdateModal 
       open={true} 
       onClose={closeCompletedUpdateModal}
-      onSubmit={completeUpdate}
       addressOfRequestingParty={selectedRowData.addressSender}
       fieldToUpdate={selectedRowData.field[0]}
       requestID={selectedRowData.requestID}
@@ -290,14 +306,71 @@ export function History({ tableData = {}, showRefresh = true , handleRefresh}) {
       twoFARequestID={selectedRowData.twoFARequestID}
       twoFAOneTimeToken={selectedRowData.twoFAOneTimeToken}
       />}
+      {showReceivedUpdateResponseModal && <ReceivedUpdateResponseModal 
+      open={true} 
+      onClose={closeReceivedUpdateResponseModal}
+      addressOfSendingParty={selectedRowData.addressSender}
+      fieldUpdate={selectedRowData.field[0]}
+      newDataSnapshot={JSON.stringify(selectedRowData.data, null, 2)}
+      oneTimeKey={selectedRowData.key}
+      oneTimeSalt={selectedRowData.salt}
+      timeLimit={selectedRowData.limit}
+      responseFee={selectedRowData.response_fee}
+      require2FA={selectedRowData.require2FA}
+      twoFAProvider={selectedRowData.twoFAProvider}
+      twoFARequestID={selectedRowData.twoFARequestID}
+      twoFAOneTimeToken={selectedRowData.twoFAOneTimeToken}
+      />}
+      {showReceivedDataResponseModal && <ReceivedDataResponseModal 
+      open={true} 
+      onClose={closeReceivedDataResponseModal}
+      addressOfSendingParty={selectedRowData.addressSender}
+      fieldRequested={selectedRowData.field[0]}
+      dataSnapshot={JSON.stringify(selectedRowData.data, null, 2)}
+      oneTimeKey={selectedRowData.key}
+      oneTimeSalt={selectedRowData.salt}
+      timeLimit={selectedRowData.limit}
+      responseFee={selectedRowData.response_fee}
+      require2FA={selectedRowData.require2FA}
+      twoFAProvider={selectedRowData.twoFAProvider}
+      twoFARequestID={selectedRowData.twoFARequestID}
+      twoFAOneTimeToken={selectedRowData.twoFAOneTimeToken}
+      />}
+      {showAwaitingDataModal && <AwaitingDataModal 
+      open={true} 
+      onClose={closeAwaitingDataModal}
+      addressOfSendingParty={selectedRowData.addressSender}
+      fieldRequested={selectedRowData.field[0]}
+      oneTimeKey={selectedRowData.key}
+      oneTimeSalt={selectedRowData.salt}
+      timeLimit={selectedRowData.limit}
+      responseFee={selectedRowData.response_fee}
+      require2FA={selectedRowData.require2FA}
+      twoFAProvider={selectedRowData.twoFAProvider}
+      twoFARequestID={selectedRowData.twoFARequestID}
+      twoFAOneTimeToken={selectedRowData.twoFAOneTimeToken}
+      />}
+      {showAwaitingUpdateModal && <AwaitingUpdateCompletionModal 
+      open={true} 
+      onClose={closeAwaitingUpdateModal}
+      addressOfSendingParty={selectedRowData.addressSender}
+      fieldToUpdate={selectedRowData.field[0]}
+      snapshotAfterUpdate={JSON.stringify(selectedRowData.data, null, 2)}
+      oneTimeKey={selectedRowData.key}
+      oneTimeSalt={selectedRowData.salt}
+      timeLimit={selectedRowData.limit}
+      responseFee={selectedRowData.response_fee}
+      require2FA={selectedRowData.require2FA}
+      twoFAProvider={selectedRowData.twoFAProvider}
+      twoFARequestID={selectedRowData.twoFARequestID}
+      twoFAOneTimeToken={selectedRowData.twoFAOneTimeToken}
+      />}
       {showRequestedDataSentModal && <RequestedDataSentModal 
       open={true} 
-      onClose={closeCompletedUpdateModal}
-      onSubmit={completeUpdate}
+      onClose={closeRequestedDataSentModal}
       addressOfRequestingParty={selectedRowData.addressSender}
-      fieldToUpdate={selectedRowData.field[0]}
-      requestID={selectedRowData.requestID}
-      snapshotDataAfterUpdate={JSON.stringify(selectedRowData.data, null, 2)}
+      fieldRequested={selectedRowData.field[0]}
+      snapshotData={JSON.stringify(selectedRowData.data, null, 2)}
       oneTimeKey={selectedRowData.key}
       oneTimeSalt={selectedRowData.salt}
       timeLimit={selectedRowData.limit}

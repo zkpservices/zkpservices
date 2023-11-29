@@ -2,7 +2,7 @@ import { Fragment, useState, useEffect } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { formToJSON } from 'axios';
-import { generateRandomAsciiString24, stringToBigInt, bigIntToString, flattenJsonAndComputeHash } from '@/components/HelperCalls';
+import { generateRandomAsciiString24, stringToBigInt, flattenJsonAndComputeHash } from '@/components/HelperCalls';
 import { poseidon } from '@/components/PoseidonHash';
 import { useGlobal } from '@/components/GlobalStorage';
 

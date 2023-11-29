@@ -135,10 +135,10 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
 
     //note: proper tokenomics not implemented, only token utility demonstrated
     uint256 private constant TOTAL_SUPPLY = 10000000000 * 10**18;
-    //99.9999% put into the vault, 0.0001% transferred to deploying wallet
-    uint256 private constant VAULT_AMOUNT = (TOTAL_SUPPLY * 999999) / 1000000;
+    //100% put into the vault
+    uint256 private constant VAULT_AMOUNT = TOTAL_SUPPLY;
 
-    // this contract helps expedite sign up to zkp.services via batched calls
+    // this contract helps expedite signing up to zkp.services via batched calls
     address public batchSignUpContractAddress;
 
     constructor(
@@ -419,6 +419,7 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
     mapping(string => uint256) public receiverCCIPFees;
     mapping(string => address) public receiverAddress;
     mapping(bytes32 => bool) public originPolicy;
+    event CCIPMessageID(bytes32 messageId);
 
     function setSender(address routerAddress, address linkAddress)
         public
@@ -598,6 +599,7 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
             evm2AnyMessage
         );
 
+        emit CCIPMessageID(messageId);
         return messageId;
     }
 
