@@ -20,7 +20,7 @@ export function RequestedDataSentModal({
 
   return (
     <Transition.Root show={open} as={Fragment}>
-      <Dialog as="div" className="fixed inset-0 overflow-y-auto z-10 dark:bg-opacity-75" onClose={onClose}>
+      <Dialog as="div" className="fixed inset-0 overflow-y-auto z-10 dark:bg-opacity-75" onClose={onClose} open={open}>
         <div className="min-h-screen flex items-center justify-center">
           <Transition.Child
             as={Fragment}
@@ -233,7 +233,7 @@ export function RequestedDataSentModal({
                   <button
                     type="button"
                     className="mt-3 ml-3 inline-flex w-full justify-center rounded-md bg-slate-100 dark:bg-slate-800 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-slate-200 dark:hover:bg-slate-900 sm:mt-0 sm:w-auto"
-                    onClick={onClose()}
+                    onClick={onClose}
                   >
                     Close
                   </button>

@@ -117,9 +117,9 @@ export function History({ tableData = {}, showRefresh = true , handleRefresh}) {
         limit: selectedRowData.limit,
         timestamp: Date.now().toString(),
         response_fee: selectedRowData.response_fee,
-        twoFA_provider: selectedRowData.twoFAProvider,
-        twoFA_requestID: selectedRowData.twoFARequestID,
-        twoFA_one_time_token: selectedRowData.twoFAOneTimeToken
+        twoFAProvider: selectedRowData.twoFAProvider,
+        twoFARequestID: selectedRowData.twoFARequestID,
+        twoFAOneTimeToken: selectedRowData.twoFAOneTimeToken
       }
     }
     const result = await addResponse(userAddress, userPassword, responseData, chainId)
@@ -131,9 +131,9 @@ export function History({ tableData = {}, showRefresh = true , handleRefresh}) {
         [selectedRowData.field[0]]: {
           ...selectedRowData.data[selectedRowData.field[0]],
           _metadata: {
-            twoFA_provider: selectedRowData.twoFAProvider,
-            twoFA_requestID: selectedRowData.twoFARequestID,
-            twoFA_one_time_token: selectedRowData.twoFAOneTimeToken,
+            twoFAProvider: selectedRowData.twoFAProvider,
+            twoFARequestID: selectedRowData.twoFARequestID,
+            twoFAOneTimeToken: selectedRowData.twoFAOneTimeToken,
             key: selectedRowData.key,
             require2FA: selectedRowData.require2FA,
             salt: selectedRowData.salt,
@@ -162,9 +162,9 @@ export function History({ tableData = {}, showRefresh = true , handleRefresh}) {
         limit: selectedRowData.limit,
         timestamp: Date.now().toString(),
         response_fee: selectedRowData.response_fee,
-        twoFA_provider: selectedRowData.twoFAProvider,
-        twoFA_requestID: selectedRowData.twoFARequestID,
-        twoFA_one_time_token: selectedRowData.twoFAOneTimeToken
+        twoFAProvider: selectedRowData.twoFAProvider,
+        twoFARequestID: selectedRowData.twoFARequestID,
+        twoFAOneTimeToken: selectedRowData.twoFAOneTimeToken
       }
     }
     const updateResult = await updateFieldData(userAddress, userPassword, updateData, chainId)
@@ -229,7 +229,13 @@ export function History({ tableData = {}, showRefresh = true , handleRefresh}) {
     setShowAwaitingUpdateModal(false)
   }
 
-  const openRequestedDataSentModal = (rowData) => {
+  const openRequestedDataSentModal = async (rowData) => {
+    const fieldData = await getFieldData(userAddress, userPassword, rowData.field[0], chainId)
+    const newRowData = {
+      ...rowData,
+      data: fieldData['data']
+    }
+    console.log(JSON.stringify(newRowData, null, 2))
     setSelectedRowData(rowData)
     setShowRequestedDataSentModal(true)
   }
