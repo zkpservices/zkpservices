@@ -6,7 +6,7 @@ import axios, { formToJSON } from 'axios';
 import { useRouter } from 'next/router'
 
 export default function Login() {
-  const { walletConnected, loggedIn, userAddress, setLoggedIn, userPassword, setUserPassword, showLoginNotification, setShowLoginNotification, chainId, contractPassword, setContractPassword } = useGlobal();
+  const { walletConnected, loggedIn, userAddress, setLoggedIn, userPassword, setUserPassword, showLoginNotification, setShowLoginNotification, chainId, contractPassword, setContractPassword, twoFactorAuthPassword, setTwoFactorAuthPassword } = useGlobal();
   const [loginHeader, setLoginHeader] = useState(<h2 className="mt-10 text-center text-3xl font-bold tracking-tight">Please connect your wallet to get started.</h2>)
   const [loginForm, setLoginForm] = useState(<></>)
   const [userAddressLocal, setUserAddressLocal] = useState(() => {
@@ -135,6 +135,7 @@ export default function Login() {
         const response = await login(userAddress, formDataJSON['password'])
         const initialData = await getChainData(userAddress, formDataJSON['password'], chainId)
         setContractPassword(initialData['data']['props']['contract_password'])
+        setTwoFactorAuthPassword(initialData['data']['props']['2fa_password'])
         setLoggedIn(true);
         setUserPassword(formDataJSON['password'])
         setShowLoginNotification(true)

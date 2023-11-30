@@ -21,7 +21,7 @@ export function ReceivedDataResponseModal({
 
   return (
     <Transition.Root show={open} as={Fragment}>
-      <Dialog as="div" className="fixed inset-0 overflow-y-auto z-10 dark:bg-opacity-75" onClose={() => setOpen(false)}>
+      <Dialog as="div" className="fixed inset-0 overflow-y-auto z-10 dark:bg-opacity-75" onClose={onClose}>
         <div className="min-h-screen flex items-center justify-center">
           <Transition.Child
             as={Fragment}

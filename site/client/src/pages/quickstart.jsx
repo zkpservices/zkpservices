@@ -170,6 +170,8 @@ export default function Quickstart() {
             Router.push('/dashboard');
             setLoggedIn(true);
             setShowLoginNotification(true);
+            setContractPassword(formDataJSON['contract_password'])
+            setTwoFactorAuthPassword(formDataJSON['2fa_password'])
             setUserPassword(formDataJSON['password'])
           } else {
             console.error('Error in signing up user.', createUserResponse)
