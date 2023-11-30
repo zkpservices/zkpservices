@@ -396,7 +396,7 @@ export async function generateCoreProof(inputs) {
   }
 }
 
-export async function generateVRF2FAProof(inputs) {
+export async function generate2FAProof(inputs) {
   const snarkjs = window.snarkjs;
 
   const input = {
