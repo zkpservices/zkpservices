@@ -3,7 +3,7 @@ import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 
 export function ReceivedDataResponseModal({ 
-  open = true,
+  open,
   onClose,
   addressOfSendingParty = "",
   fieldRequested = "",

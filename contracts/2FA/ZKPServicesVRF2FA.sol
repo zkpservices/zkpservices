@@ -58,9 +58,11 @@ contract ZKPServicesVRF2FA is Ownable, AutomationCompatibleInterface {
         )
     {
         uint256 currentWindow = block.number / WINDOW_SIZE;
-        upkeepNeeded =
-            !windowVRFRequested[currentWindow] &&
-            windowVRFRequestRequired[currentWindow];
+        uint256 priorWindow = currentWindow - 1;
+        upkeepNeeded = ((!windowVRFRequested[currentWindow] &&
+            windowVRFRequestRequired[currentWindow]) ||
+            (!windowVRFRequested[priorWindow] &&
+                windowVRFRequestRequired[priorWindow]));
     }
 
     function performUpkeep(

@@ -43,14 +43,14 @@ export function CompleteUpdateModal({
                     chainId == 1440002 ? rippleTwoFAContract: null;
 
   const handleSubmit = () => {
-    console.log("2FA _id", twoFARequestID);
-    console.log("2FA _oneTimeKey", twoFAOneTimeToken);
-    console.log("2FA two_factor_secret", "");
-    console.log("core requestId", requestID);
-    //dataLocation = poseidon(field + salt + user secret)
-    console.log("core dataLocation", dataLocation);
-    console.log("core saltHash", saltHash);
-    console.log("core user_secret", "");
+    // console.log("2FA _id", twoFARequestID);
+    // console.log("2FA _oneTimeKey", twoFAOneTimeToken);
+    // console.log("2FA two_factor_secret", "");
+    // console.log("core requestId", requestID);
+    // //dataLocation = poseidon(field + salt + user secret)
+    // console.log("core dataLocation", dataLocation);
+    // console.log("core saltHash", saltHash);
+    // console.log("core user_secret", "");
     //*3 smart contract calls
     //2FA steps:
     // 1*) requestRandomNumber(uint256 _id, string memory _oneTimeKey)

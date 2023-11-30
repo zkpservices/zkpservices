@@ -249,7 +249,7 @@ export function History({ tableData = {}, showRefresh = true , handleRefresh}) {
     <div className="xl:max-w-none">
       {showReceivedDataResponseModal && <ReceivedDataResponseModal 
       open={true} 
-      onClose={closeReceivedResponseModal}
+      onClose={closeReceivedDataResponseModal}
       addressOfSendingParty={selectedRowData.addressSender}
       fieldRequested={selectedRowData.field[0]}
       dataSnapshot={JSON.stringify(selectedRowData.data, null, 2)}
@@ -318,21 +318,6 @@ export function History({ tableData = {}, showRefresh = true , handleRefresh}) {
       addressOfSendingParty={selectedRowData.addressSender}
       fieldUpdate={selectedRowData.field[0]}
       newDataSnapshot={JSON.stringify(selectedRowData.data, null, 2)}
-      oneTimeKey={selectedRowData.key}
-      oneTimeSalt={selectedRowData.salt}
-      timeLimit={selectedRowData.limit}
-      responseFee={selectedRowData.response_fee}
-      require2FA={selectedRowData.require2FA}
-      twoFAProvider={selectedRowData.twoFAProvider}
-      twoFARequestID={selectedRowData.twoFARequestID}
-      twoFAOneTimeToken={selectedRowData.twoFAOneTimeToken}
-      />}
-      {showReceivedDataResponseModal && <ReceivedDataResponseModal 
-      open={true} 
-      onClose={closeReceivedDataResponseModal}
-      addressOfSendingParty={selectedRowData.addressSender}
-      fieldRequested={selectedRowData.field[0]}
-      dataSnapshot={JSON.stringify(selectedRowData.data, null, 2)}
       oneTimeKey={selectedRowData.key}
       oneTimeSalt={selectedRowData.salt}
       timeLimit={selectedRowData.limit}
