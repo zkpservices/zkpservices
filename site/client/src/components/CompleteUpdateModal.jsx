@@ -43,6 +43,55 @@ export function CompleteUpdateModal({
                     chainId == 1440002 ? rippleTwoFAContract: null;
 
   const handleSubmit = () => {
+    console.log("2FA _id", twoFARequestID);
+    console.log("2FA _oneTimeKey", twoFAOneTimeToken);
+    console.log("2FA two_factor_secret", "");
+    console.log("core requestId", requestID);
+    //dataLocation = poseidon(field + salt + user secret)
+    console.log("core dataLocation", dataLocation);
+    console.log("core saltHash", saltHash);
+    console.log("core user_secret", "");
+    //*3 smart contract calls
+    //2FA steps:
+    // 1*) requestRandomNumber(uint256 _id, string memory _oneTimeKey)
+    // 2) getRandomNumber(uint256 _id) (public view function)
+    // 3) get ZKP for next step by calling generate2FAProof
+    //      ZKP requirements:
+    //        random_number
+    //        two_factor_secret
+    //        secret_hash
+    // 4*) verifyProof(
+    //     uint256 _id,
+    //     uint256 _randomNumber,
+    //     uint256 _userSecretHash,
+    //     uint256[2] calldata _pA,
+    //     uint256[2][2] calldata _pB,
+    //     uint256[2] calldata _pC,
+    //     uint256[2] calldata _pubSignals
+    // )
+    //Response steps:
+    // 5) get ZKP for next step by calling generateCoreProof
+    //      ZKP requirements:
+    //        field_0
+    //        field_1
+    //        field_salt
+    //        one_time_key_0
+    //        one_time_key_1
+    //        user_secret_0
+    //        user_secret_1
+    //        provided_field_and_key_hash
+    //        provided_field_and_salt_and_user_secret_hash
+    //        provided_salt_hash
+    // 6*) function respond(
+    //     uint256 requestId,
+    //     uint256 dataLocation,
+    //     uint256 saltHash,
+    //     uint256[2] calldata _pA,
+    //     uint256[2][2] calldata _pB,
+    //     uint256[2] calldata _pC,
+    //     uint256[3] calldata _pubSignals,
+    //     bool isUpdate
+    // )
     onClose()
     onSubmit()
   }
