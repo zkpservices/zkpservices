@@ -135,10 +135,10 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
 
     //note: proper tokenomics not implemented, only token utility demonstrated
     uint256 private constant TOTAL_SUPPLY = 10000000000 * 10**18;
-    //99.9999% put into the vault, 0.0001% transferred to deploying wallet
-    uint256 private constant VAULT_AMOUNT = (TOTAL_SUPPLY * 999999) / 1000000;
+    //100% put into the vault
+    uint256 private constant VAULT_AMOUNT = TOTAL_SUPPLY;
 
-    // this contract helps expedite sign up to zkp.services via batched calls
+    // this contract helps expedite signing up to zkp.services via batched calls
     address public batchSignUpContractAddress;
 
     constructor(
@@ -320,20 +320,6 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
         usedRequestIds[requestId] = true;
     }
 
-    struct ProofParameters {
-        uint256 pA0;
-        uint256 pA1;
-        uint256 pB00;
-        uint256 pB01;
-        uint256 pB10;
-        uint256 pB11;
-        uint256 pC0;
-        uint256 pC1;
-        uint256 pubSignals0;
-        uint256 pubSignals1;
-        uint256 pubSignals2;
-    }
-
     // request ID = poseidon(field + key)
     // storage location = poseidon(field + salt + user secret)
     // salt hash = poseidon(salt)
@@ -341,7 +327,10 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
         uint256 requestId,
         uint256 dataLocation,
         uint256 saltHash,
-        ProofParameters calldata params,
+        uint256[2] calldata _pA,
+        uint256[2][2] calldata _pB,
+        uint256[2] calldata _pC,
+        uint256[3] calldata _pubSignals,
         bool isUpdate
     ) public {
         require(
@@ -360,7 +349,7 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
         uint256 requestTimeLimit = isUpdate
             ? updateRequests[requestId].timeLimit
             : dataRequests[requestId].timeLimit;
-        require(requestTimeLimit > block.timestamp, "Request has expired.");
+        require(requestTimeLimit >= block.timestamp, "Request has expired.");
 
         address _2FAProvider = isUpdate
             ? updateRequests[requestId]._2FAProvider
@@ -375,23 +364,11 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
             require(twoFactorData.success, "2FA failed.");
         }
 
-        uint256[2] memory pA = [params.pA0, params.pA1];
-        uint256[2][2] memory pB = [
-            [params.pB00, params.pB01],
-            [params.pB10, params.pB11]
-        ];
-        uint256[2] memory pC = [params.pC0, params.pC1];
-        uint256[3] memory pubSignals = [
-            params.pubSignals0,
-            params.pubSignals1,
-            params.pubSignals2
-        ];
-
         require(
-            pubSignals[0] == requestId &&
-                pubSignals[1] == dataLocation &&
-                pubSignals[2] == saltHash &&
-                responseVerifier.verifyProof(pA, pB, pC, pubSignals),
+            _pubSignals[0] == requestId &&
+                _pubSignals[1] == dataLocation &&
+                _pubSignals[2] == saltHash &&
+                responseVerifier.verifyProof(_pA, _pB, _pC, _pubSignals),
             "ZKP verification failed."
         );
 

@@ -406,61 +406,24 @@
 				"type": "uint256"
 			},
 			{
-				"components": [
-					{
-						"internalType": "uint256",
-						"name": "pA0",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "pA1",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "pB00",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "pB01",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "pB10",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "pB11",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "pC0",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "pC1",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "pubSignals0",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "pubSignals1",
-						"type": "uint256"
-					}
-				],
-				"internalType": "struct ZKPServicesVRF2FA.ProofParameters",
-				"name": "params",
-				"type": "tuple"
+				"internalType": "uint256[2]",
+				"name": "_pA",
+				"type": "uint256[2]"
+			},
+			{
+				"internalType": "uint256[2][2]",
+				"name": "_pB",
+				"type": "uint256[2][2]"
+			},
+			{
+				"internalType": "uint256[2]",
+				"name": "_pC",
+				"type": "uint256[2]"
+			},
+			{
+				"internalType": "uint256[2]",
+				"name": "_pubSignals",
+				"type": "uint256[2]"
 			}
 		],
 		"name": "verifyProof",

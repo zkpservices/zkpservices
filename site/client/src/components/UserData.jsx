@@ -7,6 +7,8 @@ import { Heading } from '@/components/Heading';
 import { DataIcon } from '@/components/icons/DataIcon';
 import { PlusIcon } from '@/components/icons/PlusIcon';
 import { ViewFieldModal } from './ViewFieldModal';
+import { poseidon } from './PoseidonHash';
+import { stringToBigInt, splitTo24, flattenJsonAndComputeHash } from './HelperCalls';
 import { NewDashboardDataModal } from './NewDashboardDataModal'; // Import your NewDashboardDataModal component
 
 const fieldDescriptions = 'Click to display data for this field.';
@@ -117,8 +119,12 @@ export function MyData({ mydata, onCardClick }) {
 
 export function UserData({ fieldNames = [], handleRemove, handleAdd}) {
   const [selectedFieldName, setSelectedFieldName] = useState(null);
+  const [selectedSalt, setSelectedSalt] = useState(null);
+  const [selectedLocation, setSelectedLocation] = useState(null);
+  const [selectedHash, setSelectedHash] = useState(null);
+  const [selectedSaltHash, setSelectedSaltHash] = useState(null);
   const [addDataModalOpen, setAddDataModalOpen] = useState(false);
-  let {userAddress, userPassword, fieldData, setFieldData, availableDashboard, setAvailableDashboard, dashboard, setDashboard, chainId} = useGlobal();
+  let {userAddress, userPassword, fieldData, setFieldData, availableDashboard, setAvailableDashboard, dashboard, setDashboard, chainId, contractPassword} = useGlobal();
 
   async function addServiceToDashboard(service) {
     setAddDataModalOpen(false);
@@ -134,8 +140,19 @@ export function UserData({ fieldNames = [], handleRemove, handleAdd}) {
 
   async function openFieldModal(fieldName) {
     let localFieldData = await getFieldData(userAddress, userPassword, fieldName.toLowerCase(), chainId)
-    setFieldData(JSON.stringify(localFieldData['data'], null, 2))
+    setFieldData(localFieldData['data'])
     setSelectedFieldName(fieldName);
+    const splitFieldName = splitTo24(fieldName)
+    const splitSalt = splitTo24(localFieldData['data'][fieldName]['_metadata']['salt'])
+    const splitUserSecret = splitTo24(contractPassword)
+    const dataLocation = await poseidon([stringToBigInt(splitFieldName[0]), stringToBigInt(splitFieldName[1]),stringToBigInt(splitSalt[0]), stringToBigInt(splitSalt[1]),stringToBigInt(splitUserSecret[0]), stringToBigInt(splitUserSecret[1])])
+    const saltHash = await poseidon([stringToBigInt(splitSalt[0]), stringToBigInt(splitSalt[1])])
+    const dataHash = await flattenJsonAndComputeHash(JSON.stringify(localFieldData['data'], null, 2))
+    setSelectedLocation(dataLocation)
+    setSelectedSaltHash(saltHash)
+    setSelectedHash(dataHash['rootHash'])
+    setSelectedSalt((localFieldData['data'][fieldName]['_metadata']['salt']))
+
   };
   
   const closeFieldModal = () => {
@@ -206,6 +223,11 @@ export function UserData({ fieldNames = [], handleRemove, handleAdd}) {
           onDelete={removeServiceFromDashboard}
           onClose={closeFieldModal}
           fieldData={fieldData}
+          fieldName={selectedFieldName}
+          dataLocation={selectedLocation}
+          dataHash={selectedHash}
+          obfuscationSalt={selectedSalt}
+          saltHash={selectedSaltHash}
         />
       )}
       {addDataModalOpen && (

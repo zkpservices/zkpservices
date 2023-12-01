@@ -7,6 +7,7 @@ export function ViewFieldModal({
   open,
   onClose,
   onDelete,
+  fieldName = "",
   fieldData = "",
   dataLocation = "Default data location",
   dataHash = "Default data hash",
@@ -17,6 +18,13 @@ export function ViewFieldModal({
   async function handleDelete() {
     onDelete(title.toLowerCase())
   }
+
+  const removeMetadata = (data) => {
+    const { _metadata, ...rest } = data;
+    return rest;
+  };
+
+  const modifiedFieldData = removeMetadata(fieldData[fieldName])
   
   return (
     <Transition.Root show={open} as={Fragment}>
@@ -77,7 +85,7 @@ export function ViewFieldModal({
                       <textarea
                         rows={8} 
                         className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
-                        defaultValue={fieldData}
+                        defaultValue={JSON.stringify(modifiedFieldData, null, 2)}
                         readOnly
                         spellCheck="false"
                       />

@@ -528,3 +528,10 @@ export function generateRandomAsciiString48() {
 
   return result;
 }
+
+export function splitTo24(str) {
+  const firstElement = str.substring(0, 24);
+  const secondElement = str.length > 24 ? str.substring(24, 48) : '';
+
+  return [firstElement, secondElement];
+}
