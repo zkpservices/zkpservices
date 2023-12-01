@@ -2,7 +2,7 @@ import { Fragment, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { useGlobal } from '@/components/GlobalStorage';
-import { stringToBigInt, bigIntToString, generateCoreProof, generate2FAProof } from '@/components/HelperCalls';
+import { stringToBigInt, bigIntToString, generateCoreProof, generate2FAProof, splitTo24 } from '@/components/HelperCalls';
 import { poseidon } from '@/components/PoseidonHash';
 
 export function CompleteUpdateModal({ 
@@ -53,6 +53,7 @@ export function CompleteUpdateModal({
 
     if (require2FA){
       if (chainId!=1440002){
+        //chainlink 2FA variants
         const _2FASmartContractRequestRandomNumberCallData = {
           _id: twoFARequestID,    //cast to big int once it's a string
           _oneTimeKey: twoFAOneTimeToken,
@@ -77,7 +78,7 @@ export function CompleteUpdateModal({
             console.log("Random number:", randomNumber);
             break; 
           } catch (error) {
-            if (attempt < 9) {
+            if (attempt < 30) {
               console.log("Random number not ready, retrying...");
               await new Promise(resolve => setTimeout(resolve, 2000)); 
             } else {
@@ -134,45 +135,173 @@ export function CompleteUpdateModal({
             gas: 5000000
         };
 
-        web3.eth.sendTransaction(txObject)
-            .then(receipt => {
-                console.log("Transaction receipt:", receipt);
-            })
-            .catch(error => {
-                console.error("Transaction error:", error);
-        });
+        receipt = await web3.eth.sendTransaction(txObject);
+        console.log("2FA verify proof receipt:", receipt);
+      }
+      else{
+        //non-chainlink 2FA variants
+        const _2FASmartContractRequestProofCallData = {
+          _id: twoFARequestID,    //cast to big int once it's a string
+          _oneTimeKey: twoFAOneTimeToken,
+        }
+
+        let data = _2FAContract.methods.requestProof(
+          _2FASmartContractRequestRandomNumberCallData._id,
+          _2FASmartContractRequestRandomNumberCallData._oneTimeKey).encodeABI();
+        let txObject = {
+          from: userAddress,
+          to: _2FAContract.options.address,
+          data: data,
+          gas: 500000
+        };
+        let receipt = await web3.eth.sendTransaction(txObject);
+        console.log("request proof receipt:", receipt);
+
+        console.log(String(stringToBigInt(twoFactorAuthPassword)));
+        console.log(String(await poseidon([stringToBigInt(twoFactorAuthPassword)])));
+
+        let _2FA_secret_hash = String(await poseidon([stringToBigInt(twoFactorAuthPassword)]));
+
+        const _2FAProof = await generate2FAProof({
+          "random_number": String(0),
+          "two_factor_secret": String(stringToBigInt(twoFactorAuthPassword)),
+          "secret_hash": _2FA_secret_hash,
+        })
+
+        console.log(_2FAProof);
+
+        const _2FASmartContractVerifyProofCallData = {
+            "_id": twoFARequestID,
+            "_userSecretHash": _2FA_secret_hash,
+            "params": {
+                "pA0": _2FAProof.proof.pi_a[0],
+                "pA1": _2FAProof.proof.pi_a[1],
+                "pB00": _2FAProof.proof.pi_b[0][0],
+                "pB01": _2FAProof.proof.pi_b[0][1],
+                "pB10": _2FAProof.proof.pi_b[1][0],
+                "pB11": _2FAProof.proof.pi_b[1][1],
+                "pC0": _2FAProof.proof.pi_c[0],
+                "pC1": _2FAProof.proof.pi_c[1],
+                "pubSignals0": _2FAProof.proof.pubSignals[0],
+                "pubSignals1": _2FAProof.proof.pubSignals[1]
+            }
+        };
+
+        console.log(_2FASmartContractVerifyProofCallData);
+
+        data = _2FAContract.methods.verifyProof(
+            _2FASmartContractVerifyProofCallData._id,
+            _2FASmartContractVerifyProofCallData._userSecretHash,
+            _2FASmartContractVerifyProofCallData.params
+        ).encodeABI();
+
+        txObject = {
+            from: userAddress,
+            to: _2FAContract.options.address,
+            data: data,
+            gas: 5000000
+        };
+
+        receipt = await web3.eth.sendTransaction(txObject);
+        console.log("2FA verify proof receipt:", receipt);
       }
     }
 
     const coreContract = chainId == 43113 ? fujiCoreContract :
                     chainId == 80001 ? mumbaiCoreContract :
                     chainId == 1440002 ? rippleCoreContract : null;
-    // //dataLocation = poseidon(field + salt + user secret)
-    //Response steps:
-    // 5) get ZKP for next step by calling generateCoreProof
-    //      ZKP requirements:
-    //        field_0
-    //        field_1
-    //        field_salt
-    //        one_time_key_0
-    //        one_time_key_1
-    //        user_secret_0
-    //        user_secret_1
-    //        provided_field_and_key_hash
-    //        provided_field_and_salt_and_user_secret_hash
-    //        provided_salt_hash
-    // 6*) function respond(
-    //     uint256 requestId,
-    //     uint256 dataLocation,
-    //     uint256 saltHash,
-    //     uint256[2] calldata _pA,
-    //     uint256[2][2] calldata _pB,
-    //     uint256[2] calldata _pC,
-    //     uint256[3] calldata _pubSignals,
-    //     bool isUpdate
-    // )
-    onClose()
-    onSubmit()
+
+    console.log("2FA _id", twoFARequestID);
+    console.log("2FA _oneTimeKey", twoFAOneTimeToken);
+    console.log("2FA two_factor_secret", twoFactorAuthPassword);
+    console.log("core requestId", requestID);
+    console.log("field", fieldToUpdate);
+    console.log("salt", oneTimeSalt);
+    console.log("contract password", contractPassword);
+    console.log("core one time key", oneTimeKey);
+
+    const field = splitTo24(fieldToUpdate);
+    console.log("field:", field);
+
+    const salt = oneTimeSalt;
+    console.log("salt:", oneTimeSalt);
+
+    const one_time_key = splitTo24(oneTimeKey);
+    console.log("one_time_key:", one_time_key);
+
+    const user_secret = splitTo24(contractPassword);
+    console.log("user_secret:", user_secret);
+
+    const provided_field_and_key_hash = await poseidon(([field[0], field[1], one_time_key[0], one_time_key[1]]).map((x)=>stringToBigInt(x)));
+    console.log("provided_field_and_key_hash:", provided_field_and_key_hash);
+
+    const provided_field_and_salt_and_user_secret_hash = await poseidon(([field[0], field[1], salt, user_secret[0], user_secret[1]]).map((x)=>stringToBigInt(x)));
+    console.log("provided_field_and_salt_and_user_secret_hash:", provided_field_and_salt_and_user_secret_hash);
+
+    const provided_salt_hash = await poseidon([stringToBigInt(oneTimeSalt)]);
+    console.log("provided_salt_hash:", provided_salt_hash);
+
+    const dataLocation = await poseidon(([field[0], field[1], salt, user_secret[0], user_secret[1]]).map((x)=>stringToBigInt(x)));
+    console.log("dataLocation:", dataLocation);
+
+    const coreProof = await generateCoreProof({
+      "field_0": stringToBigInt(field[0]),
+      "field_1": stringToBigInt(field[1]),
+      "field_salt": stringToBigInt(salt),
+      "one_time_key_0": stringToBigInt(one_time_key[0]),
+      "one_time_key_1": stringToBigInt(one_time_key[1]),
+      "user_secret_0": stringToBigInt(user_secret[0]),
+      "user_secret_1": stringToBigInt(user_secret[1]),
+      "provided_field_and_key_hash": provided_field_and_key_hash,
+      "provided_field_and_salt_and_user_secret_hash": provided_field_and_salt_and_user_secret_hash,
+      "provided_salt_hash": provided_salt_hash
+    })
+    console.log("coreProof:", coreProof);
+
+    console.log(coreProof);
+                                          
+    const respondCallData = {
+        "requestId": requestID,
+        "dataLocation": dataLocation,
+        "saltHash": provided_salt_hash,
+        "params": {
+            "pA0": coreProof.proof.pi_a[0],
+            "pA1": coreProof.proof.pi_a[1],
+            "pB00": coreProof.proof.pi_b[0][0],
+            "pB01": coreProof.proof.pi_b[0][1],
+            "pB10": coreProof.proof.pi_b[1][0],
+            "pB11": coreProof.proof.pi_b[1][1],
+            "pC0": coreProof.proof.pi_c[0],
+            "pC1": coreProof.proof.pi_c[1],
+            "pubSignals0": coreProof.proof.pubSignals[0],
+            "pubSignals1": coreProof.proof.pubSignals[1],
+            "pubSignals2": coreProof.proof.pubSignals[2]
+        },
+        "isUpdate": true,
+    };
+
+    console.log(respondCallData);
+
+    let data = coreContract.methods.respond(
+        respondCallData.requestId,
+        respondCallData.dataLocation,
+        respondCallData.saltHash,
+        respondCallData.params,
+        respondCallData.isUpdate
+    ).encodeABI();
+
+    let txObject = {
+        from: userAddress,
+        to: coreContract.options.address,
+        data: data,
+        gas: 5000000
+    };
+
+    let receipt = await web3.eth.sendTransaction(txObject);
+    console.log("core verify proof receipt:", receipt);
+
+    onClose();
+    onSubmit();
   }
 
   return (
