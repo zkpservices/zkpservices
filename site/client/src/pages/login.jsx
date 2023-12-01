@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { Logo } from "../components/Logo.jsx"
 import { useEffect, useState } from 'react'
 import { useGlobal } from "@/components/GlobalStorage.jsx";
@@ -27,9 +28,9 @@ export default function Login() {
         </h2>
         <p className="mt-2 text-center text-sm">
           Or{' '}
-          <a href="/quickstart" className="font-medium text-emerald-400 hover:text-emerald-600">
+          <Link href="/quickstart" className="font-medium text-emerald-400 hover:text-emerald-600">
             set up your account
-          </a>
+          </Link>
         </p>
       </>
       )

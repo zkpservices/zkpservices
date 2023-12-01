@@ -447,7 +447,7 @@ export default function Quickstart() {
               <div>
                 <h3 className="text-lg font-medium leading-6">Onboard to Smart Contract</h3>
                 <p className="mt-1 max-w-none text-sm">
-                  Please select to which chains you'd like to onboard immediately. You can onboard to other chains in the "onboard to new chains" section.
+                  Please select to which chains you&apos;d like to onboard immediately. You can onboard to other chains in the &quot;onboard to new chains&quot; section.
                 </p>
               </div>
               <div className="space-y-6 divide-y divide-gray-200 dark:divide-gray-700 sm:space-y-5">
