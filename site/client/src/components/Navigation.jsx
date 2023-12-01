@@ -355,7 +355,7 @@ export function Navigation(props) {
     setFujiBatchSignUpContract(fujiBatchSignUpContractInstance);
     setMumbaiBatchSignUpContract(mumbaiBatchSignUpContractInstance);
     setRippleBatchSignUpContract(rippleBatchSignUpContractInstance);
-  }
+  }  
 
   function updateWalletConnect() {
     if(walletConnected) {

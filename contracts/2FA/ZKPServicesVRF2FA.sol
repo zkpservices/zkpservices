@@ -134,20 +134,28 @@ contract ZKPServicesVRF2FA is Ownable, AutomationCompatibleInterface {
         return uint256(truncatedRandomNumber); // Convert back to uint256
     }
 
+    struct ProofParameters {
+        uint256 pA0;
+        uint256 pA1;
+        uint256 pB00;
+        uint256 pB01;
+        uint256 pB10;
+        uint256 pB11;
+        uint256 pC0;
+        uint256 pC1;
+        uint256 pubSignals0;
+        uint256 pubSignals1;
+    }
+
     function verifyProof(
         uint256 _id,
         uint256 _randomNumber,
         uint256 _userSecretHash,
-        uint256[2] calldata _pA,
-        uint256[2][2] calldata _pB,
-        uint256[2] calldata _pC,
-        uint256[2] calldata _pubSignals
+        ProofParameters memory params
     ) public {
         require(msg.sender == requesters[_id], "Unauthorized");
         require(userSecrets[msg.sender] != 0, "User secret has not been set");
-        require(_pubSignals.length == 2, "Invalid public signals length");
 
-        // Get the truncated random number from VRF
         uint256 randomNumber = getRandomNumber(_id);
         require(randomNumber == _randomNumber, "Invalid random number");
         require(
@@ -155,20 +163,20 @@ contract ZKPServicesVRF2FA is Ownable, AutomationCompatibleInterface {
             "Invalid user secret"
         );
         require(
-            _pubSignals[0] == _randomNumber,
+            params.pubSignals0 == _randomNumber,
             "Public signal for random number mismatch"
         );
         require(
-            _pubSignals[1] == _userSecretHash,
+            params.pubSignals1 == _userSecretHash,
             "Public signal for user secret hash mismatch"
         );
 
-        bool proofVerified = responseVerifier.verifyProof(
-            _pA,
-            _pB,
-            _pC,
-            _pubSignals
-        );
+        uint256[2] memory pA = [params.pA0, params.pA1];
+        uint256[2][2] memory pB = [[params.pB00, params.pB01], [params.pB10, params.pB11]];
+        uint256[2] memory pC = [params.pC0, params.pC1];
+        uint256[2] memory pubSignals = [params.pubSignals0, params.pubSignals1];
+
+        bool proofVerified = responseVerifier.verifyProof(pA, pB, pC, pubSignals);
         require(proofVerified, "Invalid proof");
 
         twoFactorData[_id].success = true;
