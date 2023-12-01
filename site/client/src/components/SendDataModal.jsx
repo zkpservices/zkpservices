@@ -4,6 +4,7 @@ import { XMarkIcon } from '@heroicons/react/24/outline';
 import { useGlobal } from '@/components/GlobalStorage';
 import { stringToBigInt, bigIntToString, generateCoreProof, generate2FAProof, splitTo24 } from '@/components/HelperCalls';
 import { poseidon } from '@/components/PoseidonHash';
+import { removeMetadata } from '@/components/HelperCalls';
 
 export function SendDataModal({ 
   open = true,

@@ -184,14 +184,14 @@ export function Services({handleRefresh}) {
     setSelectedService(serviceName);
   };
 
-  let {userAddress, userPassword, chainId, isOnboarding, setIsOnboarding} = useGlobal();
+  let {userAddress, userPassword, chainId, isOnboarding, setIsOnboarding, onboardedChain} = useGlobal();
 
   const pullChainData = async (userAddress, userPassword, chainId) => {
     const chainData = await getChainData(userAddress, userPassword, chainId)
     console.log(JSON.stringify(chainData, null, 2))
     let keysList = Object.keys(chainData['data']).filter(a => a !== "2fa_password")
     const filteredKeysList = Object.keys(chains).filter(item => !keysList.includes(item));
-    const usedChainsList = Object.keys(chains).filter(item => keysList.includes(item)).map(key => chains[key]);
+    const usedChainsList = Object.keys(chains).filter(item => keysList.includes(item) && item != chainId).map(key => chains[key]);
     setUsedChains(usedChainsList)
     const result = filteredKeysList.map(key => chains[key])
     const userSecretHashBigint = stringToBigInt(chainData['data']['props']['2fa_password']);
@@ -218,7 +218,7 @@ export function Services({handleRefresh}) {
   }
 
   useEffect(() => {
-    if(userAddress) {
+    if(userAddress && onboardedChain) {
       pullChainData(userAddress, userPassword, chainId)
     }
    

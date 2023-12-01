@@ -86,19 +86,19 @@ export function NewUpdateRequestModal({
     const formData = new FormData(event.target)
     const formDataJSON = formToJSON(formData);
 
-    const fieldEnd = stringToBigInt(formDataJSON['fieldToUpdate'].substring(24, 48)) ? stringToBigInt(formDataJSON['fieldToUpdate'].substring(24, 48)) : stringToBigInt("")
-    const oneTimeKeyEnd = stringToBigInt(formDataJSON['oneTimeKey'].substring(24, 48)) ? stringToBigInt(formDataJSON['oneTimeKey'].substring(24, 48)) : stringToBigInt("")
+    // const fieldEnd = stringToBigInt(formDataJSON['fieldToUpdate'].substring(24, 48)) ? stringToBigInt(formDataJSON['fieldToUpdate'].substring(24, 48)) : stringToBigInt("")
+    // const oneTimeKeyEnd = stringToBigInt(formDataJSON['oneTimeKey'].substring(24, 48)) ? stringToBigInt(formDataJSON['oneTimeKey'].substring(24, 48)) : stringToBigInt("")
     const requestID = await poseidon([
-                  stringToBigInt(formDataJSON['fieldToUpdate'].substring(0, 24)),
-                  fieldEnd,
-                  stringToBigInt(formDataJSON['oneTimeKey'].substring(0, 24)),
-                  oneTimeKeyEnd
-                ])
+              stringToBigInt(formDataJSON['fieldToUpdate'].substring(0, 24)),
+              stringToBigInt(formDataJSON['fieldToUpdate'].substring(24, 48)),
+              stringToBigInt(formDataJSON['oneTimeKey'].substring(0, 24)),
+              stringToBigInt(formDataJSON['oneTimeKey'].substring(24, 48))
+            ])
 
     const twoFARequestIDBigInt = stringToBigInt(formDataJSON['twoFARequestID']) ? stringToBigInt(formDataJSON['twoFARequestID']) : ""
     const request = {
       address_receiver: formDataJSON['receiverAddress'].toLowerCase(),
-      requestID: requestID,
+      requestID: requestID.toString(),
       operation: "update",
       field: formDataJSON['fieldToUpdate'],
       key: formDataJSON['oneTimeKey'],
@@ -149,7 +149,7 @@ export function NewUpdateRequestModal({
 
     try {
       const coreContractCallData = {
-        requestID: requestID,
+        requestID: requestID.toString(),
         encryptedRequest: "",
         encryptedKey: "",
         timeLimit: formDataJSON['timeLimit'],

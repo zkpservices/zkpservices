@@ -201,7 +201,7 @@ function SmallPrint() {
         &copy; Copyright {new Date().getFullYear()}. All rights reserved.
       </p>
       <div className="flex gap-4">
-        <SocialLink href="#" icon={TwitterIcon}>
+        <SocialLink href="https://twitter.com/zkpservices" target="_blank" icon={TwitterIcon}>
           Follow us on Twitter
         </SocialLink>
         <SocialLink href="#" icon={GitHubIcon}>
@@ -220,8 +220,8 @@ export function Footer() {
 
   return (
     <footer className="mx-auto max-w-2xl space-y-10 pb-16 lg:max-w-5xl">
-      <Feedback key={router.pathname} />
-      <PageNavigation />
+      {/* <Feedback key={router.pathname} /> */}
+      {/* <PageNavigation /> */}
       <SmallPrint />
     </footer>
   )

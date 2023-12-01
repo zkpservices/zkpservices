@@ -61,7 +61,7 @@ def login(item_id, password):
     password_auth_result = check_password(item_id, password)
     if not password_auth_result == True:
         return password_auth_result
-    else:
+    else: 
         return {
                 "statusCode": 200,
                 "body": json.dumps("User authenticated successfully.")
@@ -528,10 +528,16 @@ def get_dashboard(item_id, password, chain_id):
     password_auth_result = check_password(item_id, password)
     if not password_auth_result == True:
         return password_auth_result
+    
     try:
 
         # Query the DynamoDB table to fetch the "dashboard" attribute
         response = get_full_data(item_id)
+        if chain_id not in response.keys():
+            return {
+                "statusCode": 400,
+                "body": json.dumps("Chain not onboarded")
+            }
         item = response[chain_id]
 
         # Retrieve the "dashboard" list from the item

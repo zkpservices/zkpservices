@@ -4,7 +4,7 @@ import { UserData }  from '@/components/UserData';
 import { Services }  from '@/components/Services';
 import { History } from '@/components/History'
 import { useGlobal } from '@/components/GlobalStorage';
-import { getCCTX, getIncoming, getOutgoing, truncateAddress, getDashboard } from '@/components/APICalls';
+import { getCCTX, getIncoming, getOutgoing, truncateAddress, getDashboard, getChainData } from '@/components/APICalls';
 import coreContractABI from '../../public/contract_ABIs/ZKPServicesCore.json'; 
 import twoFAContractVRFABI from '../../public/contract_ABIs/ZKPServicesVRF2FA.json'; 
 import twoFAContractGenericABI from '../../public/contract_ABIs/ZKPServicesGeneric2FA.json'; 
@@ -12,12 +12,12 @@ import batchSignUpABI from '../../public/contract_ABIs/BatchSignUp.json'
 
 export function DashboardContext() {
   let { walletConnected, userAddress, showLoginNotification, setShowLoginNotification, loggedIn, 
-    userPassword, username, setUsername, dashboard, chainId, setDashboard, web3, setWeb3, 
-    setFujiCoreContract, setFujiTwoFAContract, setFujiBatchSignUpContract, setMumbaiCoreContract,
+    userPassword, username, setUsername, dashboard, chainId, setDashboard, web3, setWeb3, setContractPassword,
+    setTwoFactorAuthPassword, setFujiCoreContract, setFujiTwoFAContract, setFujiBatchSignUpContract, setMumbaiCoreContract,
     setMumbaiTwoFAContract, setMumbaiBatchSignUpContract, setRippleCoreContract, 
     setRippleTwoFAContract, setRippleBatchSignUpContract, fujiCoreContract, mumbaiCoreContract,
     rippleCoreContract, fujiTwoFAContract, mumbaiTwoFAContract, rippleTwoFAContract, fujiBatchSignUpContract,
-    mumbaiBatchSignUpContract, rippleBatchSignUpContract, isOnboarding } = useGlobal();  
+    mumbaiBatchSignUpContract, rippleBatchSignUpContract, isOnboarding, onboardedChain, setOnboardedChain } = useGlobal();  
   
   async function initializeWeb3(){
     //these are too large for local storage and need to be reinstantiated each time
@@ -112,7 +112,7 @@ export function DashboardContext() {
       return {
         operation: [operationText, `From: ${truncateAddress(item.address_sender)}`],
         field: [item.field, truncateAddress(item.address_sender)],
-        status: ['Show Response', 'button'],
+        status: ['Show Response', 'grey'],
         details: ['View Details', truncateAddress(item.responseID)],
         type: item.operation === 'update' ? 'incoming_response_update' : 'incoming_response_get',
         addressSender: item.address_sender,
@@ -132,7 +132,6 @@ export function DashboardContext() {
   }
   
   function formatOutgoingData(outgoingRequests, outgoingResponses, incomingResponses) {
-    console.log(outgoingResponses)
     const formattedRequests = outgoingRequests.map((item) => {
       const hasMatchingResponse = incomingResponses.some(
         (response) => response.responseID === item.requestID
@@ -187,6 +186,10 @@ export function DashboardContext() {
   async function loadAllHistory() {
     async function fetchHistoryData() {
       try {
+        const initialData = await getChainData(userAddress, userPassword, chainId)
+        setContractPassword(initialData['data']['props']['contract_password'])
+        setTwoFactorAuthPassword(initialData['data']['props']['2fa_password'])
+
         const cctxData = await getCCTX(userAddress, userPassword, chainId);
         const dataArray = cctxData['data']
   
@@ -241,16 +244,20 @@ export function DashboardContext() {
       const localdashboard = await getDashboard(userAddress, userPassword, chainId)
       setDashboard(localdashboard['data'])
       setUserDataFields(localdashboard['data']);
+      setOnboardedChain(true)
     } catch (error) {
       console.error('Error fetching user data fields:', error);
+      setOnboardedChain(false)
     }
   }
 
   useEffect(() => {
     if(loggedIn && userAddress && chainId && !isOnboarding) {
-      loadAllHistory()
-      fetchUserDataFields()
       initializeWeb3()
+      fetchUserDataFields()
+      if(onboardedChain) {
+        loadAllHistory()
+      }
     }
   }, [loggedIn, userAddress, chainId]);
 

@@ -535,3 +535,8 @@ export function splitTo24(str="") {
 
   return [firstElement, secondElement];
 }
+
+export const removeMetadata = (data) => {
+  const { _metadata, ...rest } = data;
+  return rest;
+};

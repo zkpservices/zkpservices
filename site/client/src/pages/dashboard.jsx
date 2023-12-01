@@ -6,6 +6,7 @@ import { ThreeJSComponent } from '@/components/ThreeJSComponent'
 import { Notification } from '@/components/Notification'
 import { DashboardContext } from '@/components/DashboardContext';
 import { useGlobal } from '@/components/GlobalStorage'
+import { getDashboard } from '@/components/APICalls';
    
 export function Dashboard() {
   const [tableData, setTableData] = useState({
@@ -16,7 +17,8 @@ export function Dashboard() {
 
 
   let { walletConnected, userAddress, showLoginNotification, 
-    setShowLoginNotification, loggedIn, userPassword, username, setUsername } = useGlobal();
+    setShowLoginNotification, loggedIn, userPassword, username, setUsername, 
+    onboardedChain, setOnboardedChain, chainId, isOnboarding} = useGlobal();
 
   // loggedIn = true;
   // walletConnected = true;
@@ -26,6 +28,18 @@ export function Dashboard() {
   const [loginNotification, setLoginNotification] = useState(<></>)
 
   const showDashboardConditional = () => {
+    if (walletConnected && loggedIn && !onboardedChain && !isOnboarding) {
+      return (
+        <div className="flex justify-center">
+          <h3 className="text-2xl tracking-tight text-center">
+            You are currently connected to a network (chain ID: {chainId}) that has not been onboarded to this account.
+            <br/>
+            <br/>
+            Please swap to an onboarded chain and follow the onboarding process for other required networks.
+          </h3>
+        </div>
+      );
+    }
     if (walletConnected && loggedIn) {
       return (
         <>
@@ -58,10 +72,24 @@ export function Dashboard() {
   // loggedIn = true;
   // walletConnected = true;
   
+  async function fetchUserDataFields() {  
+    try {
+      console.log("fuk yeww..")
+      const localdashboard = await getDashboard(userAddress, userPassword, chainId)
+      setOnboardedChain(true)
+    } catch (error) {
+      setOnboardedChain(false)
+      console.error(`Error establishing chain onboarded status: ${error}`)
+    }
+  }
+
   useEffect(() => {
+    if(loggedIn && walletConnected && !isOnboarding) {
+      fetchUserDataFields()
+    }
     setShowDashboard(showDashboardConditional())
     setUsernameText(usernameTextConditional())
-  }, [walletConnected, username])
+  }, [walletConnected, username, onboardedChain, chainId])
 
   useEffect(() => {
     setLoginNotification(loginNotificaitonConditional())

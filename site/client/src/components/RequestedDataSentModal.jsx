@@ -1,6 +1,7 @@
 import { Fragment, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
+import { removeMetadata } from './HelperCalls';
 
 export function RequestedDataSentModal({ 
   open,
@@ -17,7 +18,7 @@ export function RequestedDataSentModal({
   responseFee = "",
   require2FA = false,
 }) {
-
+  const modifiedFieldData = removeMetadata(JSON.parse(snapshotData)[fieldRequested])
   return (
     <Transition.Root show={open} as={Fragment}>
       <Dialog as="div" className="fixed inset-0 overflow-y-auto z-10 dark:bg-opacity-75" onClose={onClose}>
@@ -104,7 +105,7 @@ export function RequestedDataSentModal({
                       rows={8}
                       readOnly
                       spellCheck="false"
-                      value={snapshotData}
+                      value={JSON.stringify(modifiedFieldData, null, 2)}
                     />
                   </div>
 

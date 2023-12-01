@@ -93,11 +93,11 @@ export function NewDataRequestModal({
     
     const request = {
       address_receiver: formDataJSON['receiverAddress'].toLowerCase(),
-      requestID: requestID,
+      requestID: requestID.toString(),
       operation: "get",
       field: formDataJSON['fieldRequested'],
       key: formDataJSON['oneTimeKey'],
-      salt: formDataJSON['oneTimeSalt'],
+      salt: oneTimeSalt,
       limit: formDataJSON['timeLimit'],
       timestamp: Date.now().toString(),
       response_fee: formDataJSON['responseFee'],
@@ -139,7 +139,7 @@ export function NewDataRequestModal({
 
     try {
       const coreContractCallData = {
-        requestID: requestID,
+        requestID: requestID.toString(),
         encryptedRequest: "",
         encryptedKey: "",
         timeLimit: formDataJSON['timeLimit'],

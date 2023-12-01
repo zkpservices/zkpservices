@@ -5,6 +5,7 @@ import { motion, useScroll, useTransform } from 'framer-motion'
 import { useGlobal } from './GlobalStorage';
 import { Button } from '@/components/Button'
 import { Logo } from '@/components/Logo'
+import { getDashboard } from './APICalls';
 import { useMobileNavigationStore } from '@/components/MobileNavigation'
 import { ModeToggle } from '@/components/ModeToggle'
 import { MobileSearch, Search } from '@/components/Search'
@@ -39,13 +40,13 @@ export const Header = forwardRef(function Header({ className }, ref) {
   let bgOpacityLight = useTransform(scrollY, [0, 72], [0.5, 0.5])
   let bgOpacityDark = useTransform(scrollY, [0, 72], [0.2, 0.2])
   const [accountText, setAccountText] = useState('');
-  let {walletConnected, setWalletConnected, userAddress, setUserAddress, 
+  let {walletConnected, setWalletConnected, userAddress, userPassword, setUserAddress, 
         loggedIn, setLoggedIn, chainId, setChainId, setWeb3, web3, setFujiCoreContract,
         setFujiTwoFAContract, setFujiBatchSignUpContract, setMumbaiCoreContract, 
         setMumbaiTwoFAContract, setMumbaiBatchSignUpContract, setRippleCoreContract, 
         setRippleTwoFAContract, setRippleBatchSignUpContract, fujiCoreContract, mumbaiCoreContract,
         rippleCoreContract, fujiTwoFAContract, mumbaiTwoFAContract, rippleTwoFAContract, 
-        fujiBatchSignUpContract, mumbaiBatchSignUpContract, rippleBatchSignUpContract} = useGlobal();
+        fujiBatchSignUpContract, mumbaiBatchSignUpContract, rippleBatchSignUpContract, setOnboardedChain, onboardedChain, isOnboarding} = useGlobal();
   const [isHovered, setIsHovered] = useState(false);
   const [textOpacity, setTextOpacity] = useState(1); // Initialize opacity to 1
   const [loginButtonText, setLoginButtonText] = useState('Login');
@@ -96,12 +97,26 @@ export const Header = forwardRef(function Header({ className }, ref) {
     }
   }
 
+  async function fetchUserDataFields() {  
+    try {
+      const localdashboard = await getDashboard(userAddress, userPassword, chainId)
+      setOnboardedChain(true)
+    } catch (error) {
+      setOnboardedChain(false)
+      console.error(`Error establishing chain onboarded status: ${error}`)
+    }
+  }
+
+
   useEffect(() => {
     initializeWeb3();
     
     const handleChainChanged = (_chainId) => {
       console.log(_chainId)
       setChainId(_chainId)
+      if(loggedIn && walletConnected && !isOnboarding) {
+        fetchUserDataFields()
+      }
     };
   
     window.ethereum.on('chainChanged', handleChainChanged);

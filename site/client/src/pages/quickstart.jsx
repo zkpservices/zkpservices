@@ -240,10 +240,21 @@ export default function Quickstart() {
   }
 
   const showQuickstartConditional = () => {
-    return !walletConnected ?         
+    if(!walletConnected) { 
+      return (   
         <h2 className="mt-10 text-center text-3xl font-bold tracking-tight">
           Please connect your wallet to get started.
-        </h2> : <>
+        </h2>)
+    } else if (loggedIn){
+      return (   
+        <h2 className="mt-10 text-center text-2xl tracking-tight">
+          Account already exists for address ${userAddress}. 
+          <br/>
+          Please disconnect wallet and reconnect with a new wallet to create a new account.
+        </h2>)
+    }else {
+      return (
+       <>
         <Guide />
         <form className="space-y-8 divide-y divide-gray-200 dark:divide-gray-700" action="#" method="POST" onSubmit={handleSubmit}>
           <div className="space-y-8 divide-y divide-gray-200 dark:divide-gray-700 sm:space-y-5">
@@ -257,7 +268,7 @@ export default function Quickstart() {
 
               <div>
                 <h3 className="text-lg font-medium leading-6">Passwords</h3>
-                <p className="mt-1 max-w-2xl text-sm">Use a permanent address where you can receive mail.</p>
+                <p className="mt-1 max-w-2xl text-sm">Select a secure password for each of the following services.</p>
               </div>
 
               <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:border-t sm:border-gray-200 dark:border-gray-700 sm:pt-5">
@@ -309,7 +320,7 @@ export default function Quickstart() {
             <div className="space-y-6 pt-3 sm:space-y-5 sm:pt-5">
               <div>
                 <h3 className="text-lg font-medium leading-6">RSA Encryption Keys</h3>
-                <p className="mt-1 max-w-2xl text-sm">Use a permanent address where you can receive mail.</p>
+                <p className="mt-1 max-w-2xl text-sm">Generate new RSA Keys instantly, or provide your own.</p>
               </div>
 
               <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:border-t sm:border-gray-200 dark:border-gray-700 sm:pt-5">
@@ -325,7 +336,6 @@ export default function Quickstart() {
                     defaultValue={''}
                     spellCheck="false"
                   />
-                  <p className="mt-2 text-sm">Write a few sentences about yourself.</p>
                 </div>
               </div>
 
@@ -342,7 +352,6 @@ export default function Quickstart() {
                     defaultValue={''}
                     spellCheck="false"
                   />
-                  <p className="mt-2 text-sm">Write a few sentences about yourself.</p>
                 </div>
               </div>
 
@@ -362,7 +371,7 @@ export default function Quickstart() {
             <div className="space-y-6 pt-3 sm:space-y-5 sm:pt-5">
               <div>
                 <h3 className="text-lg font-medium leading-6">RSA Signing Keys</h3>
-                <p className="mt-1 max-w-2xl text-sm">Use a permanent address where you can receive mail.</p>
+                <p className="mt-1 max-w-2xl text-sm">Generate new RSA Keys instantly, or provide your own.</p>
               </div>
 
               <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:border-t sm:border-gray-200 dark:border-gray-700 sm:pt-5">
@@ -378,7 +387,6 @@ export default function Quickstart() {
                     defaultValue={''}
                     spellCheck="false"
                   />
-                  <p className="mt-2 text-sm">Write a few sentences about yourself.</p>
                 </div>
               </div>
 
@@ -395,7 +403,6 @@ export default function Quickstart() {
                     defaultValue={''}
                     spellCheck="false"
                   />
-                  <p className="mt-2 text-sm">Write a few sentences about yourself.</p>
                 </div>
               </div>
 
@@ -415,7 +422,7 @@ export default function Quickstart() {
             <div className="space-y-6 pt-3 sm:space-y-5 sm:pt-5">
               <div>
                 <h3 className="text-lg font-medium leading-6">(Optional) Public Information</h3>
-                <p className="mt-1 max-w-2xl text-sm">Use a permanent address where you can receive mail.</p>
+                <p className="mt-1 max-w-2xl text-sm">Enter some basic information to be publicly available for your account.</p>
               </div>
 
               <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:border-t sm:border-gray-200 dark:border-gray-700 sm:pt-5">
@@ -468,7 +475,7 @@ export default function Quickstart() {
                               <label htmlFor="comments" className="font-medium">
                                 Avalanche Fuji Testnet
                               </label>
-                              <p>Allows others to look up your public key through the smart contract.</p>
+                              <p>The Fuji Testnet serves as the official testnet for the Avalanche ecosystem.</p>
                             </div>
                           </div>
                           <div className="relative flex items-start">
@@ -485,7 +492,7 @@ export default function Quickstart() {
                               <label htmlFor="candidates" className="font-medium">
                                 Polygon Mumbai Testnet
                               </label>
-                              <p>Allows others to verify your signatures.</p>
+                              <p>The Mumbai testnet is the testnet of the Polygon network, which replicates the Polygon mainnet.</p>
                             </div>
                           </div>
                           <div className="relative flex items-start">
@@ -502,7 +509,7 @@ export default function Quickstart() {
                               <label htmlFor="offers" className="font-medium">
                                 Ripple EVM Sidechain
                               </label>
-                              <p>Allows others to look up public information associated with your account.</p>
+                              <p>The Ethereum Virtual Machine (EVM) compatible XRP Ledger sidechain is a fast and secure blockchain that brings web3 applications to the XRP Ledger community.</p>
                             </div>
                           </div>
                         </div>
@@ -525,8 +532,9 @@ export default function Quickstart() {
             </div>
           </div>
         </form>
-      </>
+      </>)
     }
+  }
 
   useEffect(() => {
     setShowQuickstart(showQuickstartConditional())

@@ -44,6 +44,7 @@ export function History({ tableData = {}, showRefresh = true , handleRefresh}) {
       if(rowData.status[0] === "Response Sent") {
         openRequestedDataSentModal(rowData)
       } else {
+
         openSendDataModal(rowData)
       }
     } else if (rowData.type === "incoming_request_update") {
@@ -94,7 +95,8 @@ export function History({ tableData = {}, showRefresh = true , handleRefresh}) {
     const fieldData = await getFieldData(userAddress, userPassword, rowData.field[0], chainId)
     const newRowData = {
       ...rowData,
-      data: fieldData['data']
+      data: fieldData['data'],
+      salt: fieldData['data'][rowData.field[0]]['_metadata']['salt']
     }
     console.log(newRowData)
     setSelectedRowData(newRowData)
@@ -233,10 +235,10 @@ export function History({ tableData = {}, showRefresh = true , handleRefresh}) {
     const fieldData = await getFieldData(userAddress, userPassword, rowData.field[0], chainId)
     const newRowData = {
       ...rowData,
-      data: fieldData['data']
+      data: fieldData['data'],
+      salt: fieldData['data'][rowData.field[0]]['_metadata']['salt']
     }
-    console.log(JSON.stringify(newRowData, null, 2))
-    setSelectedRowData(rowData)
+    setSelectedRowData(newRowData)
     setShowRequestedDataSentModal(true)
   }
 

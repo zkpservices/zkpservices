@@ -163,9 +163,11 @@ export function GlobalProvider({ children }) {
     return null;
   });
 
-  const [isOnboarding, setIsOnboarding] = useState(() => {
+  const [isOnboarding, setIsOnboarding] = useState(false);
+
+  const [onboardedChain, setOnboardedChain] = useState(() => {
     if (typeof window !== 'undefined') {
-      const localLoggedIn = localStorage.getItem('isOnboarding');
+      const localLoggedIn = localStorage.getItem('onboardedChain');
       return localLoggedIn === 'true' || false;
     }
     return false;
@@ -196,7 +198,7 @@ export function GlobalProvider({ children }) {
     localStorage.setItem('rippleCoreContract', rippleCoreContract);
     localStorage.setItem('rippleTwoFAContract', rippleTwoFAContract);
     localStorage.setItem('rippleBatchSignUpContract', rippleBatchSignUpContract);
-    localStorage.setItem('isOnboarding', isOnboarding);
+    localStorage.setItem('onboardedChain', onboardedChain);
   }, [
     userAddress,
     walletConnected,
@@ -220,7 +222,8 @@ export function GlobalProvider({ children }) {
     rippleCoreContract,
     rippleTwoFAContract,
     rippleBatchSignUpContract,
-    isOnboarding
+    isOnboarding,
+    onboardedChain
   ]);
 
   return (
@@ -233,7 +236,7 @@ export function GlobalProvider({ children }) {
       fujiBatchSignUpContract, setFujiBatchSignUpContract, mumbaiCoreContract, setMumbaiCoreContract, 
       mumbaiTwoFAContract, setMumbaiTwoFAContract, mumbaiBatchSignUpContract, setMumbaiBatchSignUpContract,
       rippleCoreContract, setRippleCoreContract, rippleTwoFAContract, setRippleTwoFAContract,
-      rippleBatchSignUpContract, setRippleBatchSignUpContract, isOnboarding, setIsOnboarding}}>
+      rippleBatchSignUpContract, setRippleBatchSignUpContract, isOnboarding, setIsOnboarding, onboardedChain, setOnboardedChain}}>
       {children}
     </GlobalContext.Provider>
   );

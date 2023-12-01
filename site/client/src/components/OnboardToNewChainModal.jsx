@@ -19,7 +19,7 @@ export function OnboardToNewChainModal({ open, onClose,
   }
 
   let { web3, fujiBatchSignUpContract, mumbaiBatchSignUpContract,
-    rippleBatchSignUpContract, userAddress, userPassword, chainId} = useGlobal();  
+    rippleBatchSignUpContract, userAddress, userPassword, chainId, onboardedChain, setOnboardedChain} = useGlobal();  
 
   const handleSubmit = async () => {
     const oldChainId = chainId
@@ -41,6 +41,7 @@ export function OnboardToNewChainModal({ open, onClose,
           method: 'wallet_switchEthereumChain',
           params: [{ chainId: chainIdHex }],
         });
+        setOnboardedChain(false)
       } catch (error) {
         console.error('Could not switch chains:', error);
       }
