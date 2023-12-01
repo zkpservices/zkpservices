@@ -144,8 +144,11 @@ export function UserData({ fieldNames = [], handleRemove, handleAdd}) {
     setSelectedFieldName(fieldName);
     const splitFieldName = splitTo24(fieldName)
     const splitUserSecret = splitTo24(contractPassword)
-    const dataLocation = await poseidon([stringToBigInt(splitFieldName[0]), stringToBigInt(splitFieldName[1]),stringToBigInt(saltHash),stringToBigInt(splitUserSecret[0]), stringToBigInt(splitUserSecret[1])])
     const saltHash = await poseidon([stringToBigInt(localFieldData['data'][fieldName]['_metadata']['salt'])])
+    const dataLocation = await poseidon([stringToBigInt(splitFieldName[0]), stringToBigInt(splitFieldName[1]),stringToBigInt(localFieldData['data'][fieldName]['_metadata']['salt']),stringToBigInt(splitUserSecret[0]), stringToBigInt(splitUserSecret[1])])
+    console.log(localFieldData['data'][fieldName]['_metadata']['salt'])
+    console.log(stringToBigInt(localFieldData['data'][fieldName]['_metadata']['salt']))
+    console.log(saltHash)
     const dataHash = await flattenJsonAndComputeHash(JSON.stringify(localFieldData['data'], null, 2))
     setSelectedLocation(dataLocation)
     setSelectedSaltHash(saltHash)
