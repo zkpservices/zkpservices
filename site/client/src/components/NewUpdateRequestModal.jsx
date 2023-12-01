@@ -124,24 +124,7 @@ export function NewUpdateRequestModal({
       _oneTimeKeyHash: web3.utils.keccak256(formDataJSON['twoFAOneTimeToken'])
     }
 
-    const coreContractCallData = {
-      requestID: requestID,
-      encryptedRequest: "",
-      encryptedKey: "",
-      timeLimit: formDataJSON['timeLimit'],
-      _2FAProvider: formDataJSON['twoFAProvider'] == "zkp.services" ?
-                    _2FAContract["_address"] : formDataJSON['twoFAProvider'],
-      _2FAID: String(twoFARequestIDBigInt),
-      responseFeeAmount: formDataJSON['responseFee'],
-      dataHash: rootHash,
-      saltHash: await poseidon([
-                  stringToBigInt(formDataJSON['oneTimeSalt'].substring(0, 24)),
-                  stringToBigInt(formDataJSON['oneTimeSalt'].substring(24, 48))
-                ])
-    }
-
     console.log(_2FASmartContractCallData);
-    console.log(coreContractCallData);
 
     try {
       const _2FASmartContractCallData = {
@@ -175,11 +158,10 @@ export function NewUpdateRequestModal({
         _2FAID: String(stringToBigInt(formDataJSON['twoFARequestID'])),
         responseFeeAmount: formDataJSON['responseFee'],
         dataHash: rootHash,
-        saltHash: await poseidon([
-                    stringToBigInt(formDataJSON['oneTimeSalt'].substring(0, 24)),
-                    stringToBigInt(formDataJSON['oneTimeSalt'].substring(24, 48))
-                  ])
+        saltHash: await poseidon([stringToBigInt(formDataJSON['oneTimeSalt'].substring(0, 24))])
       };
+
+      console.log(coreContractCallData);
 
       const data = coreContract.methods.requestUpdate(
         coreContractCallData.requestID,

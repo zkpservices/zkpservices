@@ -114,19 +114,7 @@ export function NewDataRequestModal({
       _oneTimeKeyHash: web3.utils.keccak256(formDataJSON['twoFAOneTimeToken'])
     }
 
-    const coreContractCallData = {
-      requestID: requestID,
-      encryptedRequest: "",
-      encryptedKey: "",
-      timeLimit: formDataJSON['timeLimit'],
-      _2FAProvider: formDataJSON['twoFAProvider'] == "zkp.services" ?
-                    _2FAContract["_address"] : formDataJSON['twoFAProvider'],
-      _2FAID: String(stringToBigInt(formDataJSON['twoFARequestID'])),
-      responseFeeAmount: formDataJSON['responseFee'],
-    }
-
     console.log(_2FASmartContractCallData);
-    console.log(coreContractCallData);
 
     try {
       const _2FASmartContractCallData = {
@@ -160,6 +148,8 @@ export function NewDataRequestModal({
         _2FAID: String(stringToBigInt(formDataJSON['twoFARequestID'])),
         responseFeeAmount: formDataJSON['responseFee'],
       };
+    
+      console.log(coreContractCallData);
 
       const data = coreContract.methods.requestData(
         coreContractCallData.requestID,
@@ -185,7 +175,6 @@ export function NewDataRequestModal({
     }
 
     console.log(request)
-
     const result = await onSubmit(request)
     onClose()
   }
@@ -289,7 +278,7 @@ export function NewDataRequestModal({
                     </button>
                   </div>
 
-                  <div className="mt-4">
+                  {/* <div className="mt-4">
                     <label htmlFor="oneTimeSalt" className="block text-sm font-medium leading-5 text-gray-900 dark:text-white">
                       One Time Salt:
                     </label>
@@ -308,7 +297,7 @@ export function NewDataRequestModal({
                     >
                       Generate Random Salt
                     </button>
-                  </div>
+                  </div> */}
 
                   <div className="mt-4">
                     <label htmlFor="timeLimit" className="block text-sm font-medium leading-5 text-gray-900 dark:text-white">

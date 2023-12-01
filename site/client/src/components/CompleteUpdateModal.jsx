@@ -297,6 +297,19 @@ export function CompleteUpdateModal({
         gas: 5000000
     };
 
+    if (require2FA){
+      if (chainId!=1440002){
+        let twoFASuccess;
+        for (let attempt = 0; attempt < 30; attempt++) {
+          twoFASuccess = await _2FAContract.methods.twoFactorData(twoFARequestID).call();
+          console.log("2FA Finality:", twoFASuccess.success);
+          if(twoFASuccess.success)
+            break; 
+          await new Promise(resolve => setTimeout(resolve, 2000)); 
+        }
+      }
+    }
+
     let receipt = await web3.eth.sendTransaction(txObject);
     console.log("core verify proof receipt:", receipt);
 

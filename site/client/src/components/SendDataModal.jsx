@@ -2,7 +2,7 @@ import { Fragment, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { useGlobal } from '@/components/GlobalStorage';
-import { stringToBigInt, bigIntToString, generateCoreProof, generate2FAProof } from '@/components/HelperCalls';
+import { stringToBigInt, bigIntToString, generateCoreProof, generate2FAProof, splitTo24 } from '@/components/HelperCalls';
 import { poseidon } from '@/components/PoseidonHash';
 
 export function SendDataModal({ 
@@ -31,10 +31,11 @@ export function SendDataModal({
     fujiTwoFAContract,
     mumbaiTwoFAContract,
     rippleTwoFAContract,
+    twoFactorAuthPassword,
+    contractPassword,
     web3,
     chainId
   } = useGlobal();
-
 
   const _2FAContract = chainId == 43113 ? fujiTwoFAContract:
                     chainId == 80001 ? mumbaiTwoFAContract:
@@ -54,7 +55,7 @@ export function SendDataModal({
       if (chainId!=1440002){
         //chainlink 2FA variants
         const _2FASmartContractRequestRandomNumberCallData = {
-          _id: twoFARequestID,    //cast to big int once it's a string
+          _id: stringToBigInt(twoFARequestID),    //cast to big int once it's a string
           _oneTimeKey: twoFAOneTimeToken,
         }
 
@@ -73,11 +74,11 @@ export function SendDataModal({
         let randomNumber;
         for (let attempt = 0; attempt < 30; attempt++) {
           try {
-            randomNumber = await _2FAContract.methods.getRandomNumber(twoFARequestID).call();
+            randomNumber = await _2FAContract.methods.getRandomNumber(stringToBigInt(twoFARequestID)).call();
             console.log("Random number:", randomNumber);
             break; 
           } catch (error) {
-            if (attempt < 9) {
+            if (attempt < 30) {
               console.log("Random number not ready, retrying...");
               await new Promise(resolve => setTimeout(resolve, 2000)); 
             } else {
@@ -101,7 +102,7 @@ export function SendDataModal({
         console.log(_2FAProof);
 
         const _2FASmartContractVerifyProofCallData = {
-            "_id": twoFARequestID,
+            "_id": stringToBigInt(twoFARequestID),
             "_randomNumber": randomNumber,
             "_userSecretHash": _2FA_secret_hash,
             "params": {
@@ -134,18 +135,13 @@ export function SendDataModal({
             gas: 5000000
         };
 
-        web3.eth.sendTransaction(txObject)
-            .then(receipt => {
-                console.log("Transaction receipt:", receipt);
-            })
-            .catch(error => {
-                console.error("Transaction error:", error);
-        });
+        receipt = await web3.eth.sendTransaction(txObject);
+        console.log("2FA verify proof receipt:", receipt);
       }
       else{
         //non-chainlink 2FA variants
         const _2FASmartContractRequestProofCallData = {
-          _id: twoFARequestID,    //cast to big int once it's a string
+          _id: stringToBigInt(twoFARequestID),    //cast to big int once it's a string
           _oneTimeKey: twoFAOneTimeToken,
         }
 
@@ -175,7 +171,7 @@ export function SendDataModal({
         console.log(_2FAProof);
 
         const _2FASmartContractVerifyProofCallData = {
-            "_id": twoFARequestID,
+            "_id": stringToBigInt(twoFARequestID),
             "_userSecretHash": _2FA_secret_hash,
             "params": {
                 "pA0": _2FAProof.proof.pi_a[0],
@@ -206,13 +202,8 @@ export function SendDataModal({
             gas: 5000000
         };
 
-        web3.eth.sendTransaction(txObject)
-            .then(receipt => {
-                console.log("Transaction receipt:", receipt);
-            })
-            .catch(error => {
-                console.error("Transaction error:", error);
-        });
+        receipt = await web3.eth.sendTransaction(txObject);
+        console.log("2FA verify proof receipt:", receipt);
       }
     }
 
@@ -230,18 +221,29 @@ export function SendDataModal({
     console.log("core one time key", oneTimeKey);
 
     const field = splitTo24(fieldRequested);
+    console.log("field:", field);
+
     const salt = oneTimeSalt;
+    console.log("salt:", oneTimeSalt);
+
     const one_time_key = splitTo24(oneTimeKey);
+    console.log("one_time_key:", one_time_key);
+
     const user_secret = splitTo24(contractPassword);
-    const provided_field_and_key_hash = await poseidon(([field[0], field[1], one_time_key[0], 
-                                                          one_time_key[1]]).map((x)=>stringToBigInt(x)));
-    const provided_field_and_salt_and_user_secret_hash = await poseidon(([field[0], field[1], 
-                                                                            salt, user_secret[0], 
-                                                                            user_secret[1]]).map((x)=>stringToBigInt(x)));
-    const provided_salt_hash = await poseidon([salt]);
-    const dataLocation = await poseidon(([field[0], field[1], salt, 
-                                            user_secret[0], user_secret[1]]).map((x)=>stringToBigInt(x)));
-                  
+    console.log("user_secret:", user_secret);
+
+    const provided_field_and_key_hash = await poseidon(([field[0], field[1], one_time_key[0], one_time_key[1]]).map((x)=>stringToBigInt(x)));
+    console.log("provided_field_and_key_hash:", provided_field_and_key_hash);
+
+    const provided_field_and_salt_and_user_secret_hash = await poseidon(([field[0], field[1], salt, user_secret[0], user_secret[1]]).map((x)=>stringToBigInt(x)));
+    console.log("provided_field_and_salt_and_user_secret_hash:", provided_field_and_salt_and_user_secret_hash);
+
+    const provided_salt_hash = await poseidon([stringToBigInt(oneTimeSalt)]);
+    console.log("provided_salt_hash:", provided_salt_hash);
+
+    const dataLocation = await poseidon(([field[0], field[1], salt, user_secret[0], user_secret[1]]).map((x)=>stringToBigInt(x)));
+    console.log("dataLocation:", dataLocation);
+
     const coreProof = await generateCoreProof({
       "field_0": stringToBigInt(field[0]),
       "field_1": stringToBigInt(field[1]),
@@ -254,6 +256,7 @@ export function SendDataModal({
       "provided_field_and_salt_and_user_secret_hash": provided_field_and_salt_and_user_secret_hash,
       "provided_salt_hash": provided_salt_hash
     })
+    console.log("coreProof:", coreProof);
 
     console.log(coreProof);
                                           
@@ -271,14 +274,15 @@ export function SendDataModal({
             "pC0": coreProof.proof.pi_c[0],
             "pC1": coreProof.proof.pi_c[1],
             "pubSignals0": coreProof.proof.pubSignals[0],
-            "pubSignals1": coreProof.proof.pubSignals[1]
+            "pubSignals1": coreProof.proof.pubSignals[1],
+            "pubSignals2": coreProof.proof.pubSignals[2]
         },
         "isUpdate": false,
     };
 
     console.log(respondCallData);
 
-    data = coreContract.methods.respond(
+    let data = coreContract.methods.respond(
         respondCallData.requestId,
         respondCallData.dataLocation,
         respondCallData.saltHash,
@@ -286,22 +290,31 @@ export function SendDataModal({
         respondCallData.isUpdate
     ).encodeABI();
 
-    txObject = {
+    let txObject = {
         from: userAddress,
         to: coreContract.options.address,
         data: data,
         gas: 5000000
     };
 
-    web3.eth.sendTransaction(txObject)
-        .then(receipt => {
-            console.log("Transaction receipt:", receipt);
-        })
-        .catch(error => {
-            console.error("Transaction error:", error);
-    });
-    onClose()
-    onSubmit()
+    if (require2FA){
+      if (chainId!=1440002){
+        let twoFASuccess;
+        for (let attempt = 0; attempt < 30; attempt++) {
+          twoFASuccess = await _2FAContract.methods.twoFactorData(stringToBigInt(twoFARequestID)).call();
+          console.log("2FA Finality:", twoFASuccess.success);
+          if(twoFASuccess.success)
+            break; 
+          await new Promise(resolve => setTimeout(resolve, 2000)); 
+        }
+      }
+    }
+
+    let receipt = await web3.eth.sendTransaction(txObject);
+    console.log("core verify proof receipt:", receipt);
+
+    onClose();
+    onSubmit();
   }
 
   return (

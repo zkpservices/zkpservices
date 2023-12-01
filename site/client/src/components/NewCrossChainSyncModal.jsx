@@ -63,7 +63,18 @@ export function NewCrossChainSyncModal({open, onClose, destinationChainOptions})
 
       switch (paramToSync) {
         case 'Data':
-          fetchedValue = await contract.methods.obfuscatedData(paramKey).call();
+          const fieldDataRequest = await getFieldData(userAddress, userPassword, paramKey, chainId)
+          console.log(fieldDataRequest)
+          const fieldData = fieldDataRequest['data']
+          const paramKeyRawEnd = stringToBigInt(paramKey.substring(24, 48)) ? stringToBigInt(paramKey.substring(24, 48)) : stringToBigInt("")
+          const contractPasswordEnd = stringToBigInt(contractPassword.substring(24, 48)) ? stringToBigInt(contractPassword.substring(24, 48)) : stringToBigInt("")
+          paramKey = await poseidon([stringToBigInt(paramKey), paramKeyRawEnd, stringToBigInt(fieldData[paramKey]['_metadata']['salt']), stringToBigInt(contractPassword), contractPasswordEnd])
+          const encryptedData = await contract.methods.obfuscatedData(paramKey).call();
+          fetchedValue = JSON.stringify(encryptedData, (key, value) =>
+            typeof value === 'bigint'
+                ? value.toString()
+                : value // return everything else unchanged
+          , 2);
           break;
         case 'Data Request':
           const encryptedDataRequest= await contract.methods.dataRequests(paramKey).call();
@@ -179,8 +190,8 @@ export function NewCrossChainSyncModal({open, onClose, destinationChainOptions})
       console.log('Message ID:', messageId);
       const type = paramToSyncDict[`${paramToSync}`]
       const targetChain = chainId == 43113 ? 80001 : 43113;
+      paramKey = document.getElementById('parameterKey').value;
       const result = await addCCTX(userAddress, userPassword, type, paramKey, chainId, `0x${targetChain.toString(16)}`, "1283748234")
-      console.log(result)
       onClose();
     } catch (error) {
       console.error('Error in transaction:', error);

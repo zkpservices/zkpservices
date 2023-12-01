@@ -677,6 +677,7 @@ def add_crosschain_transaction(id, tx_type, password, source_chain_id, target_ch
         if tx_type == "data":
             param_to_sync = source_chain_data['data'][param_key]
             target_chain_data['data'][param_key] = source_chain_data['data'][param_key]
+            target_chain_data['available_dashboard'].append(param_key)
         elif tx_type == "data_request" or tx_type == "update_request":
             source_requests_incoming = source_chain_data['requests_received']
             source_requests_outgoing = source_chain_data['requests_sent']
