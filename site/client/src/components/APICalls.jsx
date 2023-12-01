@@ -205,11 +205,12 @@ export const getChainData = async (userId, password, chainId) => {
   return makeAPICall('POST', data);
 };
 
-export const addNewChain = async (userId, password, chainId) => {
+export const addNewChain = async (userId, password, oldChainId, chainId) => {
   const data = {
     "id": userId,
     "password": password,
     "chain_id": chainId,
+    "old_chain_id": oldChainId,
     "action": "add_new_chain",
   }
   return makeAPICall('POST', data);

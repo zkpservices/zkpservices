@@ -163,6 +163,14 @@ export function GlobalProvider({ children }) {
     return null;
   });
 
+  const [isOnboarding, setIsOnboarding] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const localLoggedIn = localStorage.getItem('isOnboarding');
+      return localLoggedIn === 'true' || false;
+    }
+    return false;
+  });
+
 
   useEffect(() => {
     // Update localStorage when any relevant state variable changes
@@ -177,17 +185,18 @@ export function GlobalProvider({ children }) {
     localStorage.setItem('chainId', chainId);
     localStorage.setItem('fieldData', fieldData);
     localStorage.setItem('dashboard', dashboard);
-    localStorage.setItem('availableDashboard', dashboard);
-    localStorage.setItem('web3', dashboard);
-    localStorage.setItem('fujiCoreContract', dashboard);
-    localStorage.setItem('fujiTwoFAContract', dashboard);
-    localStorage.setItem('fujiBatchSignUpContract', dashboard);
-    localStorage.setItem('mumbaiCoreContract', dashboard);
-    localStorage.setItem('mumbaiTwoFAContract', dashboard);
-    localStorage.setItem('mumbaiBatchSignUpContract', dashboard);
-    localStorage.setItem('rippleCoreContract', dashboard);
-    localStorage.setItem('rippleTwoFAContract', dashboard);
-    localStorage.setItem('rippleBatchSignUpContract', dashboard);
+    localStorage.setItem('availableDashboard', availableDashboard);
+    localStorage.setItem('web3', web3);
+    localStorage.setItem('fujiCoreContract', fujiCoreContract);
+    localStorage.setItem('fujiTwoFAContract', fujiTwoFAContract);
+    localStorage.setItem('fujiBatchSignUpContract', fujiBatchSignUpContract);
+    localStorage.setItem('mumbaiCoreContract', mumbaiCoreContract);
+    localStorage.setItem('mumbaiTwoFAContract', mumbaiTwoFAContract);
+    localStorage.setItem('mumbaiBatchSignUpContract', mumbaiBatchSignUpContract);
+    localStorage.setItem('rippleCoreContract', rippleCoreContract);
+    localStorage.setItem('rippleTwoFAContract', rippleTwoFAContract);
+    localStorage.setItem('rippleBatchSignUpContract', rippleBatchSignUpContract);
+    localStorage.setItem('isOnboarding', isOnboarding);
   }, [
     userAddress,
     walletConnected,
@@ -210,7 +219,8 @@ export function GlobalProvider({ children }) {
     mumbaiBatchSignUpContract,
     rippleCoreContract,
     rippleTwoFAContract,
-    rippleBatchSignUpContract
+    rippleBatchSignUpContract,
+    isOnboarding
   ]);
 
   return (
@@ -223,7 +233,7 @@ export function GlobalProvider({ children }) {
       fujiBatchSignUpContract, setFujiBatchSignUpContract, mumbaiCoreContract, setMumbaiCoreContract, 
       mumbaiTwoFAContract, setMumbaiTwoFAContract, mumbaiBatchSignUpContract, setMumbaiBatchSignUpContract,
       rippleCoreContract, setRippleCoreContract, rippleTwoFAContract, setRippleTwoFAContract,
-      rippleBatchSignUpContract, setRippleBatchSignUpContract}}>
+      rippleBatchSignUpContract, setRippleBatchSignUpContract, isOnboarding, setIsOnboarding}}>
       {children}
     </GlobalContext.Provider>
   );

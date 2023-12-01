@@ -178,13 +178,17 @@ export function Services({handleRefresh}) {
   }
 
   const openModal = (serviceName) => {
+    if(serviceName === "Onboard To New Chain") {
+      setIsOnboarding(true)
+    }
     setSelectedService(serviceName);
   };
 
-  let {userAddress, userPassword, chainId} = useGlobal();
+  let {userAddress, userPassword, chainId, isOnboarding, setIsOnboarding} = useGlobal();
 
   const pullChainData = async (userAddress, userPassword, chainId) => {
     const chainData = await getChainData(userAddress, userPassword, chainId)
+    console.log(JSON.stringify(chainData, null, 2))
     let keysList = Object.keys(chainData['data']).filter(a => a !== "2fa_password")
     const filteredKeysList = Object.keys(chains).filter(item => !keysList.includes(item));
     const usedChainsList = Object.keys(chains).filter(item => keysList.includes(item)).map(key => chains[key]);
@@ -195,6 +199,9 @@ export function Services({handleRefresh}) {
     setAvailableChains(result)
     const propsLocal = chainData['data']['props']
     propsLocal['userSecretHash'] = userSecretHashLocal
+    propsLocal['rsa_enc_pub_key'] = chainData['data'][chainId]['rsa_enc_pub_key']
+    propsLocal['rsa_sign_pub_key'] = chainData['data'][chainId]['rsa_sign_pub_key']
+    propsLocal['public_info'] = chainData['data'][chainId]['public_info']
     setProps(propsLocal)
   }
 
@@ -259,6 +266,7 @@ export function Services({handleRefresh}) {
       }} />}
       {selectedService === 'Onboard To New Chain' && <OnboardToNewChainModal open={true} props={props} options={availableChains} onClose={() => {
         pullChainData(userAddress, userPassword, chainId)
+        setIsOnboarding(false)
         setSelectedService(null)}}
          />}
     </div>

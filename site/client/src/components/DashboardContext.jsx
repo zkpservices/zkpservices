@@ -17,7 +17,7 @@ export function DashboardContext() {
     setMumbaiTwoFAContract, setMumbaiBatchSignUpContract, setRippleCoreContract, 
     setRippleTwoFAContract, setRippleBatchSignUpContract, fujiCoreContract, mumbaiCoreContract,
     rippleCoreContract, fujiTwoFAContract, mumbaiTwoFAContract, rippleTwoFAContract, fujiBatchSignUpContract,
-    mumbaiBatchSignUpContract, rippleBatchSignUpContract } = useGlobal();  
+    mumbaiBatchSignUpContract, rippleBatchSignUpContract, isOnboarding } = useGlobal();  
   
   async function initializeWeb3(){
     //these are too large for local storage and need to be reinstantiated each time
@@ -247,7 +247,7 @@ export function DashboardContext() {
   }
 
   useEffect(() => {
-    if(loggedIn && userAddress && chainId) {
+    if(loggedIn && userAddress && chainId && !isOnboarding) {
       loadAllHistory()
       fetchUserDataFields()
       initializeWeb3()

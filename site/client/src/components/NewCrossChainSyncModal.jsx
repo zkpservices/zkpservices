@@ -44,7 +44,10 @@ export function NewCrossChainSyncModal({open, onClose, destinationChainOptions})
       const fieldDataRequest = await getFieldData(userAddress, userPassword, paramKeyRaw, chainId)
       const fieldData = fieldDataRequest['data']
       console.log(`all poseidon data: [${paramKeyRaw}, ${fieldData[paramKeyRaw]['_metadata']['salt']}, ${contractPassword}]`)
-      paramKey = await poseidon([stringToBigInt(paramKeyRaw), stringToBigInt(fieldData[paramKeyRaw]['_metadata']['salt']), stringToBigInt(contractPassword)])
+      const paramKeyRawEnd = stringToBigInt(paramKeyRaw.substring(24, 48)) ? stringToBigInt(paramKeyRaw.substring(24, 48)) : stringToBigInt("")
+      const saltEnd = stringToBigInt(fieldData[paramKeyRaw]['_metadata']['salt'].substring(24, 48)) ? stringToBigInt(fieldData[paramKeyRaw]['_metadata']['salt'].substring(24, 48)) : stringToBigInt("")
+      const contractPasswordEnd = stringToBigInt(contractPassword.substring(24, 48)) ? stringToBigInt(contractPassword.substring(24, 48)) : stringToBigInt("")
+      paramKey = await poseidon([stringToBigInt(paramKeyRaw), paramKeyRawEnd, stringToBigInt(fieldData[paramKeyRaw]['_metadata']['salt']), saltEnd, stringToBigInt(contractPassword)], contractPasswordEnd)
 
       switch (paramToSync) {
         case 'Data':

@@ -22,6 +22,7 @@ export function OnboardToNewChainModal({ open, onClose,
     rippleBatchSignUpContract, userAddress, userPassword, chainId} = useGlobal();  
 
   const handleSubmit = async () => {
+    const oldChainId = chainId
     const selectedValue = document.getElementById("chain").value;
     const targetChainId = chains[selectedValue];
 
@@ -61,7 +62,7 @@ export function OnboardToNewChainModal({ open, onClose,
 
     let receipt = await web3.eth.sendTransaction(txObject);
     console.log('Batch SignUp Transaction Receipt:', receipt);
-    addNewChain(userAddress, userPassword, `0x${targetChainId.toString(16)}`)
+    addNewChain(userAddress, userPassword, oldChainId, `0x${targetChainId.toString(16)}`)
     onClose();
   };
 

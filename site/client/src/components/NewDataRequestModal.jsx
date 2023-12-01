@@ -104,7 +104,7 @@ export function NewDataRequestModal({
       require2FA: isTwoFAEnabled,
       twoFAProvider: formDataJSON['twoFAProvider'] == "zkp.services" ?
                      _2FAContract["_address"] : formDataJSON['twoFAProvider'],
-      twoFARequestID: String(stringToBigInt(formDataJSON['twoFARequestID'])),
+      twoFARequestID: formDataJSON['twoFARequestID'],
       twoFAOneTimeToken: formDataJSON['twoFAOneTimeToken'],
       attach_token: formDataJSON['attachToken'] === 'on'
     }

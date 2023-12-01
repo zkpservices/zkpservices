@@ -86,8 +86,8 @@ export function NewUpdateRequestModal({
     const formData = new FormData(event.target)
     const formDataJSON = formToJSON(formData);
 
-    const fieldEnd = stringToBigInt(formDataJSON['fieldToUpdate'].substring(24, 48)) ? stringToBigInt(formDataJSON['fieldToUpdate'].substring(24, 48)) : ""
-    const oneTimeKeyEnd = stringToBigInt(formDataJSON['oneTimeKey'].substring(24, 48)) ? stringToBigInt(formDataJSON['oneTimeKey'].substring(24, 48)) : ""
+    const fieldEnd = stringToBigInt(formDataJSON['fieldToUpdate'].substring(24, 48)) ? stringToBigInt(formDataJSON['fieldToUpdate'].substring(24, 48)) : stringToBigInt("")
+    const oneTimeKeyEnd = stringToBigInt(formDataJSON['oneTimeKey'].substring(24, 48)) ? stringToBigInt(formDataJSON['oneTimeKey'].substring(24, 48)) : stringToBigInt("")
     const requestID = await poseidon([
                   stringToBigInt(formDataJSON['fieldToUpdate'].substring(0, 24)),
                   fieldEnd,
