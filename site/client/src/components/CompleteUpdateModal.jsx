@@ -37,9 +37,6 @@ export function CompleteUpdateModal({
     chainId
   } = useGlobal();
 
-  const coreContract = chainId == 43113 ? fujiCoreContract :
-                    chainId == 80001 ? mumbaiCoreContract :
-                    chainId == 1440002 ? rippleCoreContract : null;
   const _2FAContract = chainId == 43113 ? fujiTwoFAContract:
                     chainId == 80001 ? mumbaiTwoFAContract:
                     chainId == 1440002 ? rippleTwoFAContract: null;
@@ -146,28 +143,11 @@ export function CompleteUpdateModal({
         });
       }
     }
+
+    const coreContract = chainId == 43113 ? fujiCoreContract :
+                    chainId == 80001 ? mumbaiCoreContract :
+                    chainId == 1440002 ? rippleCoreContract : null;
     // //dataLocation = poseidon(field + salt + user secret)
-    // console.log("core dataLocation", dataLocation);
-    // console.log("core saltHash", saltHash);
-    // console.log("core user_secret", "");
-    //*3 smart contract calls
-    //2FA steps:
-    // 1*) requestRandomNumber(uint256 _id, string memory _oneTimeKey)
-    // 2) getRandomNumber(uint256 _id) (public view function)
-    // 3) get ZKP for next step by calling generate2FAProof
-    //      ZKP requirements:
-    //        random_number
-    //        two_factor_secret
-    //        secret_hash
-    // 4*) verifyProof(
-    //     uint256 _id,
-    //     uint256 _randomNumber,
-    //     uint256 _userSecretHash,
-    //     uint256[2] calldata _pA,
-    //     uint256[2][2] calldata _pB,
-    //     uint256[2] calldata _pC,
-    //     uint256[2] calldata _pubSignals
-    // )
     //Response steps:
     // 5) get ZKP for next step by calling generateCoreProof
     //      ZKP requirements:
