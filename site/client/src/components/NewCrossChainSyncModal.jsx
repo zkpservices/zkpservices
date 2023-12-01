@@ -3,7 +3,7 @@ import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { useGlobal } from '@/components/GlobalStorage';
 import { poseidon } from './PoseidonHash';
-import { getFieldData } from './APICalls';
+import { getFieldData, addCCTX } from './APICalls';
 import { stringToBigInt } from './HelperCalls';
 
 export function NewCrossChainSyncModal({open, onClose, destinationChainOptions}) {
@@ -21,6 +21,16 @@ export function NewCrossChainSyncModal({open, onClose, destinationChainOptions})
   const [parameterValue, setParameterValue] = useState('');
   let paramKey = useRef('');
   let paramToSync = useRef('');
+
+  const paramToSyncDict = {
+    "Data": "data",
+    "Data Request": "data_request",
+    "Update Request": "update_request",
+    "Response": "response",
+    "Public User Information": "public_info",
+    "RSA Encryption Keys": "rsa_enc_keys",
+    "RSA Signing Keys": "rsa_sign_keys"
+  }
   
   async function handleFetchValue() {
     try {
@@ -147,7 +157,7 @@ export function NewCrossChainSyncModal({open, onClose, destinationChainOptions})
       let dataBytes = dataTypeByte + encodedData.slice(2); // Removing '0x' from encodedData
       let data = contract.methods.sendMessage(receiver, dataBytes).encodeABI();
 
-      // 3000000 = gas limit for CCIP
+    //   // 3000000 = gas limit for CCIP
       let txObject = {
         from: userAddress,
         to: contract.options.address,
@@ -167,7 +177,10 @@ export function NewCrossChainSyncModal({open, onClose, destinationChainOptions})
         }
       }
       console.log('Message ID:', messageId);
-
+      const type = paramToSyncDict[`${paramToSync}`]
+      const targetChain = chainId == 43113 ? 80001 : 43113;
+      const result = await addCCTX(userAddress, userPassword, type, paramKey, chainId, `0x${targetChain.toString(16)}`, "1283748234")
+      console.log(result)
       onClose();
     } catch (error) {
       console.error('Error in transaction:', error);

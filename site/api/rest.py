@@ -210,14 +210,6 @@ def create_item(item_data):
             "password": item_data.get("password", ""),
             "2fa_password": item_data['2fa_password'],
             "contract_password": item_data['contract_password'],
-            "rsa_enc_pub_key": item_data['rsa_enc_pub_key'],
-            "rsa_enc_priv_key": item_data['rsa_enc_priv_key'],
-            "rsa_sign_pub_key": item_data['rsa_sign_pub_key'],
-            "rsa_sign_priv_key": item_data['rsa_sign_priv_key'],
-            "userdata_check": item_data['userdata_check'],
-            "rsa_enc_key_pub_check": item_data['rsa_enc_key_pub_check'],
-            "rsa_sign_key_pub_check": item_data['rsa_sign_key_pub_check'],
-            "public_info": item_data['public_info'],
         }
 
         # Create a "chain_data" dictionary to store chain-specific data
@@ -250,8 +242,11 @@ def create_item(item_data):
             # # If the user has crosschain_transactions, add them
             # if "crosschain_transactions" in item_data['chain_data'][chain_id]:
             #     chain_item['crosschain_transactions'] = item_data['chain_data'][chain_id]['crosschain_transactions']
-
+            chain_item.update(item_data['chain_data'][chain_id])
+            
             chain_data[chain_id] = chain_item
+            print('chain_data now:')
+            print(chain_data)
 
         # Add the "chain_data" dictionary to the user item
         user_item["chain_data"] = chain_data
@@ -656,7 +651,7 @@ def remove_from_dashboard(item_id, service, password, chain_id):
             "body": json.dumps(str(e))
         }
 
-def add_crosschain_transaction(id, crosschain_transaction, password, chain_id):
+def add_crosschain_transaction(id, tx_type, password, source_chain_id, target_chain_id, param_key, ccid):
     # Authenticate the user
     password_auth_result = check_password(id, password)
     if not password_auth_result == True:
@@ -671,16 +666,84 @@ def add_crosschain_transaction(id, crosschain_transaction, password, chain_id):
                 "statusCode": 404,
                 "body": json.dumps("User not found")
             }
+        
+        source_chain_data = user_data[source_chain_id]
+        target_chain_data = user_data[target_chain_id]
+
+        param_to_sync = {}
+
+        param_location = ""
+        
+        if tx_type == "data":
+            param_to_sync = source_chain_data['data'][param_key]
+            target_chain_data['data'][param_key] = source_chain_data['data'][param_key]
+        elif tx_type == "data_request" or tx_type == "update_request":
+            source_requests_incoming = source_chain_data['requests_received']
+            source_requests_outgoing = source_chain_data['requests_sent']
+            for request in source_requests_incoming:
+                if request['requestID'] == param_key:
+                    param_to_sync = request
+                    target_chain_data['requests_received'].append(param_to_sync)
+            for request in source_requests_outgoing:
+                if request['requestID'] == param_key:
+                    param_to_sync = request
+                    target_chain_data['requests_sent'].append(param_to_sync)
+
+        elif tx_type == "response":
+            source_responses_incoming = source_chain_data['responses_received']
+            source_responses_outgoing = source_chain_data['responses_sent']
+            for response in source_responses_incoming:
+                if response['responseID'] == param_key:
+                    param_to_sync = response
+                    target_chain_data['responses_received'].append(param_to_sync)
+            for response in source_responses_outgoing:
+                if response['responseID'] == param_key:
+                    param_to_sync = response
+                    target_chain_data['responses_sent'].append(param_to_sync)
+        elif tx_type == "public_info":
+            target_chain_data['public_info'] = source_chain_data['public_info']
+            param_to_sync = source_chain_data['public_info']
+        elif tx_type == "rsa_enc_keys":
+            target_chain_data["rsa_enc_pub_key"] = source_chain_data['rsa_enc_pub_key']
+            target_chain_data["rsa_enc_priv_key"] = source_chain_data['rsa_enc_priv_key']
+            param_to_sync = {
+                target_chain_data["rsa_enc_pub_key"]: source_chain_data['rsa_enc_pub_key'],
+                target_chain_data["rsa_enc_priv_key"]: source_chain_data['rsa_enc_priv_key']
+            }
+        elif tx_type == "rsa_sign_keys":
+            target_chain_data["rsa_sign_pub_key"] = source_chain_data['rsa_sign_pub_key']
+            target_chain_data["rsa_sign_priv_key"] = source_chain_data['rsa_sign_priv_key']
+            param_to_sync = {
+                target_chain_data["rsa_sign_pub_key"]: source_chain_data['rsa_sign_pub_key'],
+                target_chain_data["rsa_sign_priv_key"]: source_chain_data['rsa_sign_priv_key']
+            }
+        
+        crosschain_transaction = {
+            "source_chain": source_chain_id,
+            "target_chain": target_chain_id,
+            "parameter": tx_type,
+            "parameter_key": param_key,
+            "ccid": ccid,
+            "last_updated": str(int(time.time()))
+        }
+
 
         # Load the existing cctx data as a list
-        cctx = user_data[chain_id]['crosschain_transactions']
-        
-        # Update the new transaction with a "last_updated" timestamp
-        crosschain_transaction['last_updated'] = str(int(time.time()))
+        cctx_source = user_data[source_chain_id]['crosschain_transactions']
+
+        cctx_target = user_data[target_chain_id]['crosschain_transactions']
+    
         
         # Append the new transaction to the list
-        cctx.append(crosschain_transaction)
-        user_data[chain_id]['crosschain_transactions'] = cctx
+        cctx_source.append(crosschain_transaction)
+        source_chain_data['crosschain_transactions'] = cctx_source
+
+        # Append the new transaction to the list
+        cctx_target.append(crosschain_transaction)
+        target_chain_data['crosschain_transactions'] = cctx_target
+
+        user_data[source_chain_id] = source_chain_data
+        user_data[target_chain_id] = target_chain_data
 
         # Update cctx's in the database
         response = table.update_item(
@@ -823,13 +886,11 @@ def get_chain_data(id, password, chain_id):
 
             full_data['props'] = {
                 '2fa_password': item['2fa_password'],
-                'rsa_enc_pub_key': item['rsa_enc_pub_key'],
-                'rsa_sign_pub_key': item['rsa_sign_pub_key'],
-                'public_info': item['public_info']
+                'contract_password': item['contract_password'],
+            #     'rsa_enc_pub_key': item['rsa_enc_pub_key'],
+            #     'rsa_sign_pub_key': item['rsa_sign_pub_key'],
+            #     'public_info': item['public_info']
             }
-            print("abadz abadz")
-            print(full_data)
-            print(type(full_data))
             return full_data
 
     except Exception as e:
@@ -838,7 +899,7 @@ def get_chain_data(id, password, chain_id):
             "body": json.dumps(str(e))
         }
     
-def add_new_chain(id, password, new_chain_id):
+def add_new_chain(id, password, old_chain_id, new_chain_id):
     # Authenticate the user
     password_auth_result = check_password(id, password)
     if not password_auth_result == True:
@@ -862,6 +923,12 @@ def add_new_chain(id, password, new_chain_id):
                 "available_dashboard": [],
                 "crosschain_transactions": []
             }
+            old_chain_data = chain_data[old_chain_id]
+            chain_item['rsa_enc_priv_key'] = old_chain_data['rsa_enc_priv_key']
+            chain_item['rsa_enc_pub_key'] = old_chain_data['rsa_enc_pub_key']
+            chain_item['rsa_sign_priv_key'] = old_chain_data['rsa_sign_priv_key']
+            chain_item['rsa_sign_pub_key'] = old_chain_data['rsa_sign_pub_key']
+            chain_item['public_info'] = old_chain_data['public_info']
             chain_data[new_chain_id] = chain_item
             response = table.update_item(
                 Key={"id": id},
@@ -986,7 +1053,7 @@ def handler(event, context):
                         }
             elif body['action'] == 'add_crosschain_transaction':
                 if 'id' in body:
-                    return add_crosschain_transaction(body['id'], body['transaction'], body['password'], body['chain_id'])
+                    return add_crosschain_transaction(body['id'], body['type'], body['password'], body['source_chain_id'], body['target_chain_id'], body['param_key'], body['ccid'])
                 else:
                     return {
                         "statusCode": 400,
@@ -1026,7 +1093,7 @@ def handler(event, context):
                         }
             elif body['action'] == 'add_new_chain':
                 if 'id' in body:
-                    return add_new_chain(body['id'], body['password'], body['chain_id'])
+                    return add_new_chain(body['id'], body['password'], body['old_chain_id'], body['chain_id'])
                 else:
                     return {
                         "statusCode": 400,

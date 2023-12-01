@@ -1,4 +1,3 @@
-// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.7;
 
 import "../interfaces/IGroth16VerifierP2.sol";
@@ -25,7 +24,9 @@ contract ZKPServicesGeneric2FA is Ownable {
         address _passwordChangeVerifierAddress
     ) Ownable(msg.sender) {
         responseVerifier = IGroth16VerifierP2(_responseVerifierAddress);
-        passwordChangeVerifier = IGroth16VerifierP2(_passwordChangeVerifierAddress);
+        passwordChangeVerifier = IGroth16VerifierP2(
+            _passwordChangeVerifierAddress
+        );
     }
 
     function generate2FA(uint256 _id, bytes32 _oneTimeKeyHash) external {
@@ -42,40 +43,54 @@ contract ZKPServicesGeneric2FA is Ownable {
             oneTimeKeyHashes[_id] == keccak256(bytes(_oneTimeKey)),
             "Invalid one-time key"
         );
-        require(
-            requesters[_id] == address(0),
-            "Proof already requested"
-        );
+        require(requesters[_id] == address(0), "Proof already requested");
 
         requesters[_id] = msg.sender;
+    }
+
+    struct ProofParameters {
+        uint256 pA0;
+        uint256 pA1;
+        uint256 pB00;
+        uint256 pB01;
+        uint256 pB10;
+        uint256 pB11;
+        uint256 pC0;
+        uint256 pC1;
+        uint256 pubSignals0;
+        uint256 pubSignals1;
     }
 
     function verifyProof(
         uint256 _id,
         uint256 _userSecretHash,
-        uint256[2] calldata _pA,
-        uint256[2][2] calldata _pB,
-        uint256[2] calldata _pC,
-        uint256[2] calldata _pubSignals
+        ProofParameters memory params
     ) external {
         require(msg.sender == requesters[_id], "Unauthorized");
         require(userSecrets[msg.sender] != 0, "User secret has not been set");
-        require(_pubSignals.length == 2, "Invalid public signals length");
 
         require(
             userSecrets[msg.sender] == _userSecretHash,
             "Invalid user secret"
         );
         require(
-            _pubSignals[1] == _userSecretHash,
+            params.pubSignals1 == _userSecretHash,
             "Public signal for user secret hash mismatch"
         );
 
+        uint256[2] memory pA = [params.pA0, params.pA1];
+        uint256[2][2] memory pB = [
+            [params.pB00, params.pB01],
+            [params.pB10, params.pB11]
+        ];
+        uint256[2] memory pC = [params.pC0, params.pC1];
+        uint256[2] memory pubSignals = [params.pubSignals0, params.pubSignals1];
+
         bool proofVerified = responseVerifier.verifyProof(
-            _pA,
-            _pB,
-            _pC,
-            _pubSignals
+            pA,
+            pB,
+            pC,
+            pubSignals
         );
         require(proofVerified, "Invalid proof");
 

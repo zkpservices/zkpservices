@@ -215,3 +215,17 @@ export const addNewChain = async (userId, password, oldChainId, chainId) => {
   }
   return makeAPICall('POST', data);
 };
+
+export const addCCTX = async (userId, password, type, paramKey, sourceChain, targetChain, ccid) => {
+  const data = {
+    "id": userId,
+    "password": password,
+    "target_chain_id": targetChain,
+    "source_chain_id": sourceChain,
+    "action": "add_crosschain_transaction",
+    "param_key": paramKey,
+    "type": type,
+    "ccid": ccid
+  }
+  return makeAPICall('POST', data)
+}
