@@ -31,6 +31,8 @@ export function CompleteUpdateModal({
     fujiTwoFAContract,
     mumbaiTwoFAContract,
     rippleTwoFAContract,
+    twoFactorAuthPassword,
+    contractPassword,
     web3,
     chainId
   } = useGlobal();
@@ -42,11 +44,102 @@ export function CompleteUpdateModal({
                     chainId == 80001 ? mumbaiTwoFAContract:
                     chainId == 1440002 ? rippleTwoFAContract: null;
 
-  const handleSubmit = () => {
-    // console.log("2FA _id", twoFARequestID);
-    // console.log("2FA _oneTimeKey", twoFAOneTimeToken);
-    // console.log("2FA two_factor_secret", "");
-    // console.log("core requestId", requestID);
+  const handleSubmit = async () => {
+    console.log("2FA _id", twoFARequestID);
+    console.log("2FA _oneTimeKey", twoFAOneTimeToken);
+    console.log("2FA two_factor_secret", twoFactorAuthPassword);
+    console.log("core requestId", requestID);
+    console.log("field", fieldToUpdate);
+    console.log("salt", oneTimeSalt);
+    console.log("contract password", contractPassword);
+    console.log("core one time key", oneTimeKey);
+
+    if (require2FA){
+      if (chainId!=1440002){
+        const _2FASmartContractRequestRandomNumberCallData = {
+          _id: twoFARequestID,    //cast to big int once it's a string
+          _oneTimeKey: twoFAOneTimeToken,
+        }
+
+        let data = _2FAContract.methods.requestRandomNumber(
+          _2FASmartContractRequestRandomNumberCallData._id,
+          _2FASmartContractRequestRandomNumberCallData._oneTimeKey).encodeABI();
+        let txObject = {
+          from: userAddress,
+          to: _2FAContract.options.address,
+          data: data,
+          gas: 500000
+        };
+        let receipt = await web3.eth.sendTransaction(txObject);
+        console.log("request random number receipt:", receipt);
+
+        let randomNumber;
+        for (let attempt = 0; attempt < 25; attempt++) {
+          try {
+            randomNumber = await _2FAContract.methods.getRandomNumber(twoFARequestID).call();
+            console.log("Random number:", randomNumber);
+            break; 
+          } catch (error) {
+            if (attempt < 9) {
+              console.log("Random number not ready, retrying...");
+              await new Promise(resolve => setTimeout(resolve, 5000)); 
+            } else {
+              console.error("Failed to retrieve random number after 10 attempts.");
+            }
+          }
+        }
+
+        console.log(String(randomNumber));
+        console.log(String(stringToBigInt(twoFactorAuthPassword)));
+        console.log(String(await poseidon([stringToBigInt(twoFactorAuthPassword)])));
+
+        let _2FA_secret_hash = String(await poseidon([stringToBigInt(twoFactorAuthPassword)]));
+
+        const _2FAProof = await generate2FAProof({
+          "random_number": String(randomNumber),
+          "two_factor_secret": String(stringToBigInt(twoFactorAuthPassword)),
+          "secret_hash": _2FA_secret_hash,
+        })
+
+        console.log(_2FAProof);
+
+        const _2FASmartContractVerifyProofCallData = {
+          _id: twoFARequestID,    //cast to big int once it's a string
+          _randomNumber: randomNumber.toString(),
+          _userSecretHash: _2FA_secret_hash,
+          _pA: _2FAProof.proof.pi_a,
+          _pB: _2FAProof.proof.pi_b,
+          _pC: _2FAProof.proof.pi_c,
+          _pubSignals: _2FAProof.proof.pubSignals,
+        }
+
+        console.log(_2FASmartContractVerifyProofCallData);
+
+        // data = _2FAContract.methods.verifyProof(
+        //   _2FASmartContractVerifyProofCallData._id,
+        //   _2FASmartContractVerifyProofCallData._randomNumber,
+        //   _2FASmartContractVerifyProofCallData._userSecretHash,
+        //   [_2FASmartContractVerifyProofCallData._pA[0],
+        //   _2FASmartContractVerifyProofCallData._pA[1]],
+        //   [[_2FASmartContractVerifyProofCallData._pB[0][0],
+        //   _2FASmartContractVerifyProofCallData._pB[0][1]],
+        //   [_2FASmartContractVerifyProofCallData._pB[1][0],
+        //   _2FASmartContractVerifyProofCallData._pB[1][1]]],
+        //   [_2FASmartContractVerifyProofCallData._pC[0],
+        //   _2FASmartContractVerifyProofCallData._pC[1]],
+        //   [_2FASmartContractVerifyProofCallData._pubSignals[0],
+        //   _2FASmartContractVerifyProofCallData._pubSignals[1]]).encodeABI();
+        // txObject = {
+        //   from: userAddress,
+        //   to: _2FAContract.options.address,
+        //   data: data,
+        //   gas: 500000
+        // };
+        // receipt = await web3.eth.sendTransaction(txObject);
+        // console.log("verify 2FA proof contract call receipt:", receipt);
+      }
+
+    }
     // //dataLocation = poseidon(field + salt + user secret)
     // console.log("core dataLocation", dataLocation);
     // console.log("core saltHash", saltHash);
