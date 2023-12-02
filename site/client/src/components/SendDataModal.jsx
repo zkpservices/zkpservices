@@ -14,14 +14,14 @@ import { removeMetadata } from '@/components/HelperCalls'
 import { Notification } from './Notification'
 
 export function SendDataModal({
-  open = true,
+  open,
   onClose,
+  requestID,
   onSubmit,
   showNotif,
-  requestID,
   addressOfRequestingParty = '',
   fieldRequested = '',
-  data = '',
+  data = '{}',
   oneTimeKey = '',
   oneTimeSalt = '',
   timeLimit = '',
@@ -63,6 +63,8 @@ export function SendDataModal({
     setErrorTopText(topText)
     setErrorBottomText(bottomText)
   }
+
+  const modifiedFieldData = open ? removeMetadata(JSON.parse(data)[fieldRequested]) : {}
 
   const resetSubmitButton = () => {
     if (document.getElementById('submitButton')) {
@@ -528,6 +530,22 @@ export function SendDataModal({
                 <div className="mt-2 max-h-[40vh] min-w-[16rem] overflow-y-auto px-1 pb-1 md:min-w-[40rem] lg:max-h-[65vh] lg:min-w-[40rem]">
                   <div className="mt-4">
                     <label
+                      htmlFor="requestID"
+                      className="block text-sm font-medium leading-5 text-gray-900 dark:text-white"
+                    >
+                      Request ID:
+                    </label>
+                    <textarea
+                      id="requestID"
+                      className="relative mt-1 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 dark:focus:border-emerald-500 sm:text-sm"
+                      rows={1}
+                      readOnly
+                      spellCheck="false"
+                      value={requestID}
+                    />
+                  </div>
+                  <div className="mt-4">
+                    <label
                       htmlFor="addressOfRequestingParty"
                       className="block text-sm font-medium leading-5 text-gray-900 dark:text-white"
                     >
@@ -573,7 +591,7 @@ export function SendDataModal({
                       rows={8}
                       readOnly
                       spellCheck="false"
-                      value={data}
+                      value={JSON.stringify(modifiedFieldData, null, 2)}
                     />
                   </div>
 

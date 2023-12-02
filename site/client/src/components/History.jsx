@@ -365,6 +365,7 @@ export function History({ tableData = {}, showRefresh = true, handleRefresh }) {
       <ReceivedDataResponseModal
         open={showReceivedDataResponseModal}
         onClose={closeReceivedDataResponseModal}
+        requestID={selectedRowData.requestID}
         addressOfSendingParty={selectedRowData.addressSender}
         fieldRequested={selectedRowData.field[0]}
         dataSnapshot={JSON.stringify(selectedRowData.data, null, 2)}
@@ -442,6 +443,7 @@ export function History({ tableData = {}, showRefresh = true, handleRefresh }) {
       <ReceivedUpdateResponseModal
         open={showReceivedUpdateResponseModal}
         onClose={closeReceivedUpdateResponseModal}
+        requestID={selectedRowData.requestID}
         addressOfSendingParty={selectedRowData.addressSender}
         fieldUpdate={selectedRowData.field[0]}
         newDataSnapshot={JSON.stringify(selectedRowData.data, null, 2)}
@@ -457,6 +459,7 @@ export function History({ tableData = {}, showRefresh = true, handleRefresh }) {
       <AwaitingDataModal
         open={showAwaitingDataModal}
         onClose={closeAwaitingDataModal}
+        requestID={selectedRowData.requestID}
         addressOfSendingParty={selectedRowData.addressSender}
         fieldRequested={selectedRowData.field[0]}
         oneTimeKey={selectedRowData.key}
@@ -487,6 +490,7 @@ export function History({ tableData = {}, showRefresh = true, handleRefresh }) {
       <RequestedDataSentModal
         open={showRequestedDataSentModal}
         onClose={closeRequestedDataSentModal}
+        requestID={selectedRowData.requestID}
         addressOfRequestingParty={selectedRowData.addressSender}
         fieldRequested={selectedRowData.field[0]}
         snapshotData={JSON.stringify(selectedRowData.data, null, 2)}
