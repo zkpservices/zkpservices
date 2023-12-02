@@ -237,7 +237,8 @@ export function Services({handleRefresh}) {
           Services
         </Heading>
         <div className="not-prose mt-4 grid grid-cols-1 gap-8 border-t border-zinc-900/5 pt-10 dark:border-white/5 sm:grid-cols-2 xl:grid-cols-4">
-          {services.map((service) => (
+          {services.filter((service)=>!(service.name=="Cross-Chain Backups"&&chainId==1440002))
+          .map((service) => (
             <ServiceCard
               key={service.name}
               service={service}
@@ -256,10 +257,12 @@ export function Services({handleRefresh}) {
         setSelectedService(null)
         handleRefresh()
       }} onSubmit={addNewRequest}/>
+      {chainId!=1440002 && (
       <NewCrossChainSyncModal open={selectedService === 'Cross-Chain Backups'} destinationChainOptions={usedChains} onClose={() => {
         setSelectedService(null)
         handleRefresh()
       }} />
+      )}
       <ZKPFaucetModal open={selectedService === 'ZKP Tokens Faucet'} onClose={() => {
         setSelectedService(null)
         handleRefresh()
