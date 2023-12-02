@@ -88,7 +88,7 @@ export function ThreeJSComponent() {
           const animate = function () {
             requestAnimationFrame(animate);
 
-            if (isMouseMoving) {
+            if (isMouseMoving && window.innerWidth > 450) {
               const directionX = mouseX - (centroid.x / canvasWidth);
               rotationY += rotationSpeed * directionX;
               rotationY = Math.max(-maxRotationY, Math.min(maxRotationY, rotationY));
