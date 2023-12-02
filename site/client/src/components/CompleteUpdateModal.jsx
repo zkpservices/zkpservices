@@ -118,7 +118,7 @@ export function CompleteUpdateModal({
         } catch (error) {
           console.log(error)
           resetSubmitButton()
-          makeErrorNotif("Error requesting random number", error.data.message)
+          makeErrorNotif("Error requesting random number", error.toString())
           return
         }
 
@@ -216,7 +216,7 @@ export function CompleteUpdateModal({
         } catch (error) {
           console.error(error)
           resetSubmitButton()
-          makeErrorNotif("Error verifying random number", error.data.message)
+          makeErrorNotif("Error verifying random number", error.toString())
           return
         }
       } else {
@@ -248,7 +248,7 @@ export function CompleteUpdateModal({
         } catch (error) {
           console.error(error)
           resetSubmitButton()
-          makeErrorNotif("Error verifying random number", error.data.message)
+          makeErrorNotif("Error verifying random number", error.toString())
           return
         }
 
@@ -313,7 +313,7 @@ export function CompleteUpdateModal({
         } catch (error) {
           console.error(error)
           resetSubmitButton()
-          makeErrorNotif("Error verifying random number", error.data.message)
+          makeErrorNotif("Error verifying random number", error.toString())
           return
         }
       }
@@ -455,7 +455,7 @@ export function CompleteUpdateModal({
     } catch (error) {
       console.error(error)
       resetSubmitButton()
-      makeErrorNotif("Error submitting response transaction", error.data.message)
+      makeErrorNotif("Error submitting response transaction", error.toString())
       return
     }
     if (document.getElementById('submitButton')) {

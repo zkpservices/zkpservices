@@ -119,7 +119,7 @@ export function SendDataModal({
         } catch (error) {
           console.log(error)
           resetSubmitButton()
-          makeErrorNotif("Error requesting random number", error.data.message)
+          makeErrorNotif("Error requesting random number", error.toString())
           return
         }
         if (document.getElementById('submitButton')) {
@@ -216,7 +216,7 @@ export function SendDataModal({
         } catch (error) {
           console.error(error)
           resetSubmitButton()
-          makeErrorNotif("Error verifying 2FA proof", error.data.message)
+          makeErrorNotif("Error verifying 2FA proof", error.toString())
           return
         }
       } else {
@@ -248,7 +248,7 @@ export function SendDataModal({
         } catch (error) {
           console.error(error)
           resetSubmitButton()
-          makeErrorNotif("Error verifying request proof", error.data.message)
+          makeErrorNotif("Error verifying request proof", error.toString())
           return
         }
 
@@ -311,7 +311,7 @@ export function SendDataModal({
         } catch (error) {
           console.error(error)
           resetSubmitButton()
-          makeErrorNotif("Error verifying 2FA proof", error.data.message)
+          makeErrorNotif("Error verifying 2FA proof", error.toString())
           return
         }
         console.log('2FA verify proof receipt:', receipt)
@@ -454,7 +454,7 @@ export function SendDataModal({
     } catch {
       console.error(error)
       resetSubmitButton()
-      makeErrorNotif("Error submitting response transaction", error.data.message)
+      makeErrorNotif("Error submitting response transaction", error.toString())
       return
     }
     if (document.getElementById('submitButton')) {

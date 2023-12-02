@@ -1,4 +1,4 @@
-export function stringToBigInt(str) {
+export function stringToBigInt(str="") {
   if (str.length > 25) {
     throw new Error('String length must be 25 characters or less.')
   }
@@ -10,7 +10,7 @@ export function stringToBigInt(str) {
   return BigInt(numStr)
 }
 
-export function bigIntToString(bigInt) {
+export function bigIntToString(bigInt=0) {
   let str = bigInt.toString()
   // Add leading zeros if necessary to make the length a multiple of 3
   while (str.length % 3 !== 0) {

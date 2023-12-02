@@ -9,6 +9,7 @@ import {
 } from '@/components/HelperCalls'
 import { poseidon } from '@/components/PoseidonHash'
 import { useGlobal } from '@/components/GlobalStorage'
+import { Notification } from './Notification'
 
 const handleGenerateRandomKey = () => {
   try {
@@ -94,6 +95,26 @@ export function NewUpdateRequestModal({
 
   const [isTwoFAEnabled, setIsTwoFAEnabled] = useState(false)
   const [twoFAForm, setTwoFAForm] = useState(<></>)
+
+  const [showErrorNotif, setShowErrorNotif] = useState(false);
+  const [errorTopText, setErrorTopText] = useState('')
+  const [errorBottomText, setErrorBottomText] = useState('')
+
+  const makeErrorNotif = (topText, bottomText) => {
+    setShowErrorNotif(true)
+    setErrorTopText(topText)
+    setErrorBottomText(bottomText)
+  }
+
+  const resetSubmitButton = () => {
+    if (document.getElementById('submitButton')) {
+      document.getElementById('submitButton').textContent = 'Call Smart Contract'
+      document.getElementById('submitButton').className =
+        'ml-3 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2'
+      document.getElementById('submitButton').disabled = false
+    }
+  }
+
   useEffect(() => {
     setTwoFAForm(twoFAFormConditional())
   }, [isTwoFAEnabled])
@@ -284,17 +305,12 @@ export function NewUpdateRequestModal({
       console.log('2FA Contract Transaction Receipt:', receipt)
     } catch (error) {
       console.error('Error in 2FA Contract Call:', error)
-      if (document.getElementById('submitButton')) {
-        document.getElementById('submitButton').textContent =
-          'Call Smart Contract'
-        document.getElementById('submitButton').className =
-          'ml-3 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2'
-        document.getElementById('submitButton').disabled = false
-      }
+      resetSubmitButton()
+      makeErrorNotif("Error in 2FA Contract Call", error.toString())
+      return
     }
 
     try {
-      console.log(`TIME LIMIT!! TIME LIMIT: ${formDataJSON['timeLimit']}`)
       const coreContractCallData = {
         requestID: requestID.toString(),
         encryptedRequest: '',
@@ -342,19 +358,22 @@ export function NewUpdateRequestModal({
       console.log('Core Contract Transaction Receipt:', receipt)
     } catch (error) {
       console.error('Error in Core Contract Call:', error)
-      if (document.getElementById('submitButton')) {
-        document.getElementById('submitButton').textContent =
-          'Call Smart Contract'
-        document.getElementById('submitButton').className =
-          'ml-3 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2'
-        document.getElementById('submitButton').disabled = false
-      }
+      resetSubmitButton()
+      makeErrorNotif("Error in Core Contract Call", error.toString())
+      return
     }
 
     console.log(request)
     document.getElementById('submitButton').textContent =
       'Submitting request...'
-    const result = await onSubmit(request)
+    try {
+      const result = await onSubmit(request)
+    } catch (error) {
+      console.error('Error submitting request to API:', error)
+      resetSubmitButton()
+      makeErrorNotif("Error submitting request to API:", error.toString())
+      return    
+    }
     if (document.getElementById('submitButton')) {
       document.getElementById('submitButton').textContent =
         'Call Smart Contract'
@@ -362,7 +381,7 @@ export function NewUpdateRequestModal({
         'ml-3 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2'
       document.getElementById('submitButton').disabled = false
     }
-    showNotif(false, "New Data Request", "Request submitted successfully.")
+    showNotif(false, "New Update Request", "Request submitted successfully.")
     onClose()
   }
 
@@ -566,6 +585,13 @@ export function NewUpdateRequestModal({
                     {twoFAForm}
 
                     <div className="mt-4">
+                    <Notification
+                      open={showErrorNotif}
+                      error={true}
+                      showTopText={errorTopText}
+                      showBottomText={errorBottomText}
+                      onClose={() => setShowErrorNotif(false)}
+                    />
                       <label
                         htmlFor="responseFee"
                         className="block text-sm font-medium leading-5 text-gray-900 dark:text-white"
