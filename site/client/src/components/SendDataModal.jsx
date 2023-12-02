@@ -11,11 +11,13 @@ import {
 } from '@/components/HelperCalls'
 import { poseidon } from '@/components/PoseidonHash'
 import { removeMetadata } from '@/components/HelperCalls'
+import { Notification } from './Notification'
 
 export function SendDataModal({
   open = true,
   onClose,
   onSubmit,
+  showNotif,
   requestID,
   addressOfRequestingParty = '',
   fieldRequested = '',
@@ -51,6 +53,25 @@ export function SendDataModal({
         : chainId == 1440002
           ? rippleTwoFAContract
           : null
+
+  const [showErrorNotif, setShowErrorNotif] = useState(false);
+  const [errorTopText, setErrorTopText] = useState('')
+  const [errorBottomText, setErrorBottomText] = useState('')
+
+  const makeErrorNotif = (topText, bottomText) => {
+    setShowErrorNotif(true)
+    setErrorTopText(topText)
+    setErrorBottomText(bottomText)
+  }
+
+  const resetSubmitButton = () => {
+    if (document.getElementById('submitButton')) {
+      document.getElementById('submitButton').textContent = 'Send Data'
+      document.getElementById('submitButton').className =
+        'ml-3 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2'
+      document.getElementById('submitButton').disabled = false
+    }
+  }
 
   const handleSubmit = async () => {
     if (document.getElementById('submitButton')) {
@@ -92,8 +113,15 @@ export function SendDataModal({
           document.getElementById('submitButton').textContent =
             'Awaiting random number request...'
         }
-        let receipt = await web3.eth.sendTransaction(txObject)
-        console.log('request random number receipt:', receipt)
+        try {
+          let receipt = await web3.eth.sendTransaction(txObject)
+          console.log('request random number receipt:', receipt)
+        } catch (error) {
+          console.log(error)
+          resetSubmitButton()
+          makeErrorNotif("Error requesting random number", error.data.message)
+          return
+        }
         if (document.getElementById('submitButton')) {
           document.getElementById('submitButton').textContent =
             'Getting random number...'
@@ -107,11 +135,20 @@ export function SendDataModal({
             console.log('Random number:', randomNumber)
             break
           } catch (error) {
+            if (attempt === 3) {
+              if (document.getElementById('submitButton')) {
+                document.getElementById('submitButton').textContent =
+                  'Still getting random number...'
+              }
+            }
             if (attempt < 30) {
               console.log('Random number not ready, retrying...')
               await new Promise((resolve) => setTimeout(resolve, 2000))
             } else {
-              console.error('Failed to retrieve random number after 1 minute.')
+              console.error("Failed to retrieve random number after 1 minute.")
+              resetSubmitButton()
+              makeErrorNotif("Error requesting random number", "Failed to retrieve random number after 1 minute.")
+              return
             }
           }
         }
@@ -173,8 +210,15 @@ export function SendDataModal({
           document.getElementById('submitButton').textContent =
             'Awaiting 2FA acceptance...'
         }
-        receipt = await web3.eth.sendTransaction(txObject)
-        console.log('2FA verify proof receipt:', receipt)
+        try {
+          let receipt = await web3.eth.sendTransaction(txObject)
+          console.log('2FA verify proof receipt:', receipt)
+        } catch (error) {
+          console.error(error)
+          resetSubmitButton()
+          makeErrorNotif("Error verifying 2FA proof", error.data.message)
+          return
+        }
       } else {
         //non-chainlink 2FA variants
         const _2FASmartContractRequestProofCallData = {
@@ -198,8 +242,15 @@ export function SendDataModal({
           document.getElementById('submitButton').textContent =
             'Awaiting response acceptance...'
         }
-        let receipt = await web3.eth.sendTransaction(txObject)
-        console.log('request proof receipt:', receipt)
+        try {
+          let receipt = await web3.eth.sendTransaction(txObject)
+          console.log('request proof receipt:', receipt)
+        } catch (error) {
+          console.error(error)
+          resetSubmitButton()
+          makeErrorNotif("Error verifying request proof", error.data.message)
+          return
+        }
 
         console.log(String(stringToBigInt(twoFactorAuthPassword)))
         console.log(
@@ -255,7 +306,14 @@ export function SendDataModal({
           document.getElementById('submitButton').textContent =
             'Awaiting response acceptance...'
         }
-        receipt = await web3.eth.sendTransaction(txObject)
+        try {
+          let receipt = await web3.eth.sendTransaction(txObject)
+        } catch (error) {
+          console.error(error)
+          resetSubmitButton()
+          makeErrorNotif("Error verifying 2FA proof", error.data.message)
+          return
+        }
         console.log('2FA verify proof receipt:', receipt)
       }
     }
@@ -390,13 +448,28 @@ export function SendDataModal({
       document.getElementById('submitButton').textContent =
         'Awaiting final response acceptance...'
     }
-    let receipt = await web3.eth.sendTransaction(txObject)
-    console.log('core verify proof receipt:', receipt)
-    onSubmit()
+    try {
+      let receipt = await web3.eth.sendTransaction(txObject)
+      console.log('core verify proof receipt:', receipt)
+    } catch {
+      console.error(error)
+      resetSubmitButton()
+      makeErrorNotif("Error submitting response transaction", error.data.message)
+      return
+    }
     if (document.getElementById('submitButton')) {
       document.getElementById('submitButton').textContent =
         'Submitting response...'
     }
+    try {
+      onSubmit()
+    } catch (error) {
+      console.error(error)
+      resetSubmitButton()
+      makeErrorNotif("Error submitting response to API", error)
+      return
+    }
+    showNotif(false, "Data Response Sent", "Response sent successfully.") 
     onClose()
   }
 
@@ -628,6 +701,13 @@ export function SendDataModal({
                         twoFAProvider.includes(_2FAContract?._address)) && (
                         <>
                           <div className="mt-6">
+                            <Notification
+                              open={showErrorNotif}
+                              error={true}
+                              showTopText={errorTopText}
+                              showBottomText={errorBottomText}
+                              onClose={() => setShowErrorNotif(false)}
+                            />
                             <label
                               htmlFor="disclaimer"
                               className="block text-sm font-bold leading-5 text-gray-900 dark:text-white"

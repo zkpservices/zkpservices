@@ -10,11 +10,13 @@ import {
   splitTo24,
 } from '@/components/HelperCalls'
 import { poseidon } from '@/components/PoseidonHash'
+import { Notification } from './Notification'
 
 export function CompleteUpdateModal({
   open = true,
   onClose,
   onSubmit,
+  showNotif,
   requestID,
   addressOfRequestingParty = '',
   fieldToUpdate = '',
@@ -50,6 +52,25 @@ export function CompleteUpdateModal({
         : chainId == 1440002
           ? rippleTwoFAContract
           : null
+
+  const [showErrorNotif, setShowErrorNotif] = useState(false);
+  const [errorTopText, setErrorTopText] = useState('')
+  const [errorBottomText, setErrorBottomText] = useState('')
+
+  const makeErrorNotif = (topText, bottomText) => {
+    setShowErrorNotif(true)
+    setErrorTopText(topText)
+    setErrorBottomText(bottomText)
+  }
+
+  const resetSubmitButton = () => {
+    if (document.getElementById('submitButton')) {
+      document.getElementById('submitButton').textContent = 'Complete Update'
+      document.getElementById('submitButton').className =
+        'ml-3 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2'
+      document.getElementById('submitButton').disabled = false
+    }
+  }
 
   const handleSubmit = async () => {
     if (document.getElementById('submitButton')) {
@@ -91,8 +112,15 @@ export function CompleteUpdateModal({
           document.getElementById('submitButton').textContent =
             'Awaiting 2FA acceptance...'
         }
+        try {
         let receipt = await web3.eth.sendTransaction(txObject)
         console.log('request random number receipt:', receipt)
+        } catch (error) {
+          console.log(error)
+          resetSubmitButton()
+          makeErrorNotif("Error requesting random number", error.data.message)
+          return
+        }
 
         if (document.getElementById('submitButton')) {
           document.getElementById('submitButton').textContent =
@@ -107,11 +135,20 @@ export function CompleteUpdateModal({
             console.log('Random number:', randomNumber)
             break
           } catch (error) {
+            if(attempt == 3) {
+              if (document.getElementById('submitButton')) {
+                document.getElementById('submitButton').textContent =
+                  'Still getting random number...'
+              }
+            } 
             if (attempt < 30) {
               console.log('Random number not ready, retrying...')
               await new Promise((resolve) => setTimeout(resolve, 2000))
             } else {
               console.error('Failed to retrieve random number after 1 minute.')
+              resetSubmitButton()
+              makeErrorNotif("Error requesting random number", "Failed to retrieve random number after 1 minute.")
+              return
             }
           }
         }
@@ -171,10 +208,17 @@ export function CompleteUpdateModal({
         }
         if (document.getElementById('submitButton')) {
           document.getElementById('submitButton').textContent =
-            'Awaiting 2FA verification...'
+            'Awaiting random number verification...'
         }
-        receipt = await web3.eth.sendTransaction(txObject)
-        console.log('2FA verify proof receipt:', receipt)
+        try {
+          let receipt = await web3.eth.sendTransaction(txObject)
+          console.log('2FA verify proof receipt:', receipt)
+        } catch (error) {
+          console.error(error)
+          resetSubmitButton()
+          makeErrorNotif("Error verifying random number", error.data.message)
+          return
+        }
       } else {
         //non-chainlink 2FA variants
         const _2FASmartContractRequestProofCallData = {
@@ -198,8 +242,16 @@ export function CompleteUpdateModal({
           document.getElementById('submitButton').textContent =
             'Awaiting transaction acceptance...'
         }
-        let receipt = await web3.eth.sendTransaction(txObject)
-        console.log('request proof receipt:', receipt)
+        try {
+          let receipt = await web3.eth.sendTransaction(txObject)
+          console.log('request proof receipt:', receipt)
+        } catch (error) {
+          console.error(error)
+          resetSubmitButton()
+          makeErrorNotif("Error verifying random number", error.data.message)
+          return
+        }
+
 
         console.log(String(stringToBigInt(twoFactorAuthPassword)))
         console.log(
@@ -255,8 +307,15 @@ export function CompleteUpdateModal({
           document.getElementById('submitButton').textContent =
             'Awaiting 2FA acceptance...'
         }
-        receipt = await web3.eth.sendTransaction(txObject)
+        try {
+        let receipt = await web3.eth.sendTransaction(txObject)
         console.log('2FA verify proof receipt:', receipt)
+        } catch (error) {
+          console.error(error)
+          resetSubmitButton()
+          makeErrorNotif("Error verifying random number", error.data.message)
+          return
+        }
       }
     }
 
@@ -390,14 +449,29 @@ export function CompleteUpdateModal({
       document.getElementById('submitButton').textContent =
         'Awaiting response acceptance...'
     }
-    let receipt = await web3.eth.sendTransaction(txObject)
-    console.log('core verify proof receipt:', receipt)
+    try {
+      let receipt = await web3.eth.sendTransaction(txObject)
+      console.log('core verify proof receipt:', receipt)
+    } catch (error) {
+      console.error(error)
+      resetSubmitButton()
+      makeErrorNotif("Error submitting response transaction", error.data.message)
+      return
+    }
     if (document.getElementById('submitButton')) {
       document.getElementById('submitButton').textContent =
         'Submitting response...'
     }
-    onClose()
+    try {
     onSubmit()
+    } catch (error) {
+      console.error(error)
+      resetSubmitButton()
+      makeErrorNotif("Error submitting response to API", error.toString())
+      return
+    }
+    showNotif(false, "Update Response Sent", "Response sent successfully.")
+    onClose()
   }
 
   return (
@@ -430,6 +504,9 @@ export function CompleteUpdateModal({
             leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
           >
             <div>
+              <div>
+
+              </div>
               <div className="relative mx-auto mt-6 max-w-screen-2xl rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl dark:bg-gray-800 sm:my-20 sm:w-full sm:max-w-3xl sm:p-6">
                 <div className="absolute right-0 top-0 hidden pr-4 pt-4 sm:block">
                   <button
@@ -645,6 +722,13 @@ export function CompleteUpdateModal({
                       )}
 
                       <div className="mt-6">
+                        <Notification
+                          open={showErrorNotif}
+                          error={true}
+                          showTopText={errorTopText}
+                          showBottomText={errorBottomText}
+                          onClose={() => setShowErrorNotif(false)}
+                        />
                         <label
                           htmlFor="disclaimer"
                           className="block text-sm font-bold leading-5 text-gray-900 dark:text-white"

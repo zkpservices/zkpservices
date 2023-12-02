@@ -326,7 +326,8 @@ export function NewDataRequestModal({
       document.getElementById('submitDataRequestButton').disabled = false
     }
     const result = await onSubmit(request)
-    onClose(true, false, "New Data Request", "Request submitted successfully.")
+    showNotif(false, "New Data Request", "Request submitted successfully.")
+    onClose()
   }
 
   useEffect(() => {

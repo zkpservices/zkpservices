@@ -286,6 +286,7 @@ export function NewUpdateRequestModal({
     }
 
     try {
+      console.log(`TIME LIMIT!! TIME LIMIT: ${formDataJSON['timeLimit']}`)
       const coreContractCallData = {
         requestID: requestID.toString(),
         encryptedRequest: '',

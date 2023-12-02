@@ -319,7 +319,10 @@ export const Header = forwardRef(function Header({ className }, ref) {
       <div className="flex items-center gap-5 lg:hidden">
         <MobileNavigation />
         <Link href="/" aria-label="Home">
-          <Logo className="h-6" />
+          <div className="flex items-center mt-0.5"> 
+            <Logo className="h-6" />
+            <p className="ml-2 font-semibold text-lg text-black dark:text-white mb-1 mt-0.5">zkp.services</p> 
+          </div> 
         </Link>
       </div>
       <div className="ml-auto flex items-center gap-5">
@@ -334,7 +337,7 @@ export const Header = forwardRef(function Header({ className }, ref) {
         <div className="flex gap-4">
           <ModeToggle />
         </div>
-        <div className="flex hidden gap-4 min-[416px]:contents">
+        <div className="flex hidden gap-4 min-[500px]:contents">
           <Button
             href="#"
             id="connectWalletButtonNav"

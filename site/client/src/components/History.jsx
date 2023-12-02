@@ -15,6 +15,7 @@ import { RequestedDataSentModal } from './RequestedDataSentModal'
 import { AwaitingDataModal } from './AwaitingDataModal'
 import { AwaitingUpdateCompletionModal } from './AwaitingUpdateCompletionModal'
 import { ReceivedUpdateResponseModal } from './ReceivedUpdateResponseModal'
+import { Notification } from './Notification'
 
 const classNames = (...classes) => {
   return classes.filter(Boolean).join(' ')
@@ -33,6 +34,10 @@ export function History({ tableData = {}, showRefresh = true, handleRefresh }) {
   const [showAwaitingUpdateModal, setShowAwaitingUpdateModal] = useState(false)
   const [showRequestedDataSentModal, setShowRequestedDataSentModal] =
     useState(false)
+  const [showNotif, setShowNotif] = useState(false);
+  const [errorNotif, setErrorNotif] = useState(false);
+  const [notifTopText, setNotifTopText] = useState("");
+  const [notifBottomText, setNotifBottomText] = useState("");
   const [selectedRowData, setSelectedRowData] = useState({
     operation: ['', ''],
     field: ['', ''],
@@ -316,6 +321,12 @@ export function History({ tableData = {}, showRefresh = true, handleRefresh }) {
         open={showSendDataModal}
         onClose={closeSendDataModal}
         onSubmit={addResponseToRequest}
+        showNotif={(error, topText, bottomText) =>  {
+          setErrorNotif(error)
+          setNotifTopText(topText)
+          setNotifBottomText(bottomText)
+          setShowNotif(true)
+        }}
         addressOfRequestingParty={selectedRowData.addressSender}
         fieldRequested={selectedRowData.field[0]}
         requestID={selectedRowData.requestID}
@@ -333,6 +344,12 @@ export function History({ tableData = {}, showRefresh = true, handleRefresh }) {
         open={showCompleteUpdateModal}
         onClose={closeCompleteUpdateModal}
         onSubmit={completeUpdate}
+        showNotif={(error, topText, bottomText) =>  {
+          setErrorNotif(error)
+          setNotifTopText(topText)
+          setNotifBottomText(bottomText)
+          setShowNotif(true)
+        }}
         addressOfRequestingParty={selectedRowData.addressSender}
         fieldToUpdate={selectedRowData.field[0]}
         requestID={selectedRowData.requestID}
@@ -426,6 +443,13 @@ export function History({ tableData = {}, showRefresh = true, handleRefresh }) {
       </Heading>
       <div className="mt-4 border-t border-zinc-900/5 dark:border-white/5">
         <div className="mt-12 pb-8 xl:max-w-none">
+          <Notification
+            open={showNotif}
+            error={false}
+            showTopText={notifTopText}
+            showBottomText={notifBottomText}
+            onClose={() => setShowNotif(false)}
+          />
           <Tab.Group>
             <div className="mb-8">
               <div className="flex items-center justify-between">
