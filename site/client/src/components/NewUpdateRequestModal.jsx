@@ -96,7 +96,7 @@ export function NewUpdateRequestModal({
   const [isTwoFAEnabled, setIsTwoFAEnabled] = useState(false)
   const [twoFAForm, setTwoFAForm] = useState(<></>)
 
-  const [showErrorNotif, setShowErrorNotif] = useState(false);
+  const [showErrorNotif, setShowErrorNotif] = useState(false)
   const [errorTopText, setErrorTopText] = useState('')
   const [errorBottomText, setErrorBottomText] = useState('')
 
@@ -108,7 +108,8 @@ export function NewUpdateRequestModal({
 
   const resetSubmitButton = () => {
     if (document.getElementById('submitButton')) {
-      document.getElementById('submitButton').textContent = 'Call Smart Contract'
+      document.getElementById('submitButton').textContent =
+        'Call Smart Contract'
       document.getElementById('submitButton').className =
         'ml-3 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2'
       document.getElementById('submitButton').disabled = false
@@ -302,9 +303,9 @@ export function NewUpdateRequestModal({
       } catch (error) {
         console.error('Error in 2FA Contract Call:', error)
         resetSubmitButton()
-        makeErrorNotif("Error in 2FA Contract Call", error.toString())
+        makeErrorNotif('Error in 2FA Contract Call', error.toString())
         return
-      } 
+      }
     }
 
     try {
@@ -317,7 +318,7 @@ export function NewUpdateRequestModal({
           formDataJSON['twoFAProvider'] == 'zkp.services' && isTwoFAEnabled
             ? _2FAContract['_address']
             : !isTwoFAEnabled
-            ? "0x84713a3a001E2157d134B97C59D6bdAb351dd69d"
+            ? '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'
             : formDataJSON['twoFAProvider'],
         _2FAID: String(stringToBigInt(formDataJSON['twoFARequestID'])),
         responseFeeAmount: formDataJSON['responseFee'],
@@ -357,11 +358,9 @@ export function NewUpdateRequestModal({
       console.log('Core Contract Transaction Receipt:', receipt)
     } catch (error) {
       console.error('Error in Core Contract Call:', error)
-      if (document.getElementById('submitButton')) {
-        resetSubmitButton()
-        makeErrorNotif("Error in Core Contract Call", error.toString())
-        return  
-      }
+      resetSubmitButton()
+      makeErrorNotif("Error in Core Contract Call", error.toString())
+      return
     }
 
     console.log(request)
@@ -372,15 +371,8 @@ export function NewUpdateRequestModal({
     } catch (error) {
       console.error('Error submitting request to API:', error)
       resetSubmitButton()
-      makeErrorNotif("Error submitting request to API:", error.toString())
-      return    
-    }
-    if (document.getElementById('submitButton')) {
-      document.getElementById('submitButton').textContent =
-        'Call Smart Contract'
-      document.getElementById('submitButton').className =
-        'ml-3 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2'
-      document.getElementById('submitButton').disabled = false
+      makeErrorNotif('Error submitting request to API:', error.toString())
+      return
     }
     showNotif(false, 'New Update Request', 'Request submitted successfully.')
     onClose()
@@ -588,13 +580,13 @@ export function NewUpdateRequestModal({
                     {twoFAForm}
 
                     <div className="mt-4">
-                    <Notification
-                      open={showErrorNotif}
-                      error={true}
-                      showTopText={errorTopText}
-                      showBottomText={errorBottomText}
-                      onClose={() => setShowErrorNotif(false)}
-                    />
+                      <Notification
+                        open={showErrorNotif}
+                        error={true}
+                        showTopText={errorTopText}
+                        showBottomText={errorBottomText}
+                        onClose={() => setShowErrorNotif(false)}
+                      />
                       <label
                         htmlFor="responseFee"
                         className="block text-sm font-medium leading-5 text-gray-900 dark:text-white"

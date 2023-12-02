@@ -93,7 +93,7 @@ export function SendDataModal({
       if (chainId != 1440002) {
         //chainlink 2FA variants
         const _2FASmartContractRequestRandomNumberCallData = {
-          _id: stringToBigInt(twoFARequestID), //cast to big int once it's a string
+          _id: twoFARequestID, //cast to big int once it's a string
           _oneTimeKey: twoFAOneTimeToken,
         }
 
@@ -130,7 +130,7 @@ export function SendDataModal({
         for (let attempt = 0; attempt < 30; attempt++) {
           try {
             randomNumber = await _2FAContract.methods
-              .getRandomNumber(stringToBigInt(twoFARequestID))
+              .getRandomNumber(twoFARequestID)
               .call()
             console.log('Random number:', randomNumber)
             break
@@ -172,7 +172,7 @@ export function SendDataModal({
         console.log(_2FAProof)
 
         const _2FASmartContractVerifyProofCallData = {
-          _id: stringToBigInt(twoFARequestID),
+          _id: twoFARequestID,
           _randomNumber: randomNumber,
           _userSecretHash: _2FA_secret_hash,
           params: {
@@ -222,14 +222,16 @@ export function SendDataModal({
       } else {
         //non-chainlink 2FA variants
         const _2FASmartContractRequestProofCallData = {
-          _id: stringToBigInt(twoFARequestID), //cast to big int once it's a string
+          _id: twoFARequestID,
           _oneTimeKey: twoFAOneTimeToken,
         }
 
+        console.log(_2FASmartContractRequestProofCallData)
+
         let data = _2FAContract.methods
           .requestProof(
-            _2FASmartContractRequestRandomNumberCallData._id,
-            _2FASmartContractRequestRandomNumberCallData._oneTimeKey,
+            _2FASmartContractRequestProofCallData._id,
+            _2FASmartContractRequestProofCallData._oneTimeKey,
           )
           .encodeABI()
         let txObject = {
@@ -270,7 +272,7 @@ export function SendDataModal({
         console.log(_2FAProof)
 
         const _2FASmartContractVerifyProofCallData = {
-          _id: stringToBigInt(twoFARequestID),
+          _id: twoFARequestID,
           _userSecretHash: _2FA_secret_hash,
           params: {
             pA0: _2FAProof.proof.pi_a[0],
@@ -436,7 +438,7 @@ export function SendDataModal({
         let twoFASuccess
         for (let attempt = 0; attempt < 30; attempt++) {
           twoFASuccess = await _2FAContract.methods
-            .twoFactorData(stringToBigInt(twoFARequestID))
+            .twoFactorData(twoFARequestID)
             .call()
           console.log('2FA Finality:', twoFASuccess.success)
           if (twoFASuccess.success) break

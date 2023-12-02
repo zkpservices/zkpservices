@@ -78,23 +78,23 @@ export function NewDataRequestModal({
     chainId == 43113
       ? fujiCoreContract
       : chainId == 80001
-        ? mumbaiCoreContract
-        : chainId == 1440002
-          ? rippleCoreContract
-          : null
+      ? mumbaiCoreContract
+      : chainId == 1440002
+      ? rippleCoreContract
+      : null
   const _2FAContract =
     chainId == 43113
       ? fujiTwoFAContract
       : chainId == 80001
-        ? mumbaiTwoFAContract
-        : chainId == 1440002
-          ? rippleTwoFAContract
-          : null
+      ? mumbaiTwoFAContract
+      : chainId == 1440002
+      ? rippleTwoFAContract
+      : null
 
   const [isTwoFAEnabled, setIsTwoFAEnabled] = useState(false)
   const [twoFAForm, setTwoFAForm] = useState(<></>)
 
-  const [showErrorNotif, setShowErrorNotif] = useState(false);
+  const [showErrorNotif, setShowErrorNotif] = useState(false)
   const [errorTopText, setErrorTopText] = useState('')
   const [errorBottomText, setErrorBottomText] = useState('')
 
@@ -106,12 +106,17 @@ export function NewDataRequestModal({
 
   const resetSubmitButton = () => {
     if (document.getElementById('submitButton')) {
-      document.getElementById('submitButton').textContent = 'Call Smart Contract'
+      document.getElementById('submitButton').textContent =
+        'Call Smart Contract'
       document.getElementById('submitButton').className =
         'ml-3 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2'
       document.getElementById('submitButton').disabled = false
     }
   }
+
+  useEffect(() => {
+    setTwoFAForm(twoFAFormConditional())
+  }, [isTwoFAEnabled])
 
   const twoFAFormConditional = () => {
     if (isTwoFAEnabled) {
@@ -149,8 +154,9 @@ export function NewDataRequestModal({
               // onChange={(e) => setTwoFARequestID(e.target.value)}
               spellCheck="false"
               defaultValue={
-                document.getElementById("twoFARequestID") && document.getElementById("twoFARequestID").value != ""
-                  ? document.getElementById("twoFARequestID").value 
+                document.getElementById('twoFARequestID') &&
+                document.getElementById('twoFARequestID').value != ''
+                  ? document.getElementById('twoFARequestID').value
                   : generateRandomAsciiString24()
               }
             />
@@ -178,8 +184,9 @@ export function NewDataRequestModal({
               // onChange={(e) => setTwoFARequestID(e.target.value)}
               spellCheck="false"
               defaultValue={
-                document.getElementById("twoFAOneTimeToken") && document.getElementById("twoFAOneTimeToken").value != ""
-                  ? document.getElementById("twoFAOneTimeToken").value 
+                document.getElementById('twoFAOneTimeToken') &&
+                document.getElementById('twoFAOneTimeToken').value != ''
+                  ? document.getElementById('twoFAOneTimeToken').value
                   : generateRandomAsciiString24()
               }
             />
@@ -215,11 +222,12 @@ export function NewDataRequestModal({
   }
 
   const handleSubmit = async (event) => {
-    document.getElementById('submitDataRequestButton').textContent =
-      'Running...'
-    document.getElementById('submitDataRequestButton').className =
-      'ml-3 inline-flex justify-center rounded-md border border-transparent bg-gray-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2'
-    document.getElementById('submitDataRequestButton').disabled = true
+    if (document.getElementById('submitButton')) {
+      document.getElementById('submitButton').textContent = 'Running...'
+      document.getElementById('submitButton').className =
+        'ml-3 inline-flex justify-center rounded-md border border-transparent bg-gray-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2'
+      document.getElementById('submitButton').disabled = true
+    }
 
     event.preventDefault()
     const formData = new FormData(event.target)
@@ -232,6 +240,9 @@ export function NewDataRequestModal({
       stringToBigInt(formDataJSON['oneTimeKey'].substring(24, 48)),
     ])
 
+    const twoFARequestIDBigInt = stringToBigInt(formDataJSON['twoFARequestID'])
+      ? stringToBigInt(formDataJSON['twoFARequestID'])
+      : ''
     const request = {
       address_receiver: formDataJSON['receiverAddress'].toLowerCase(),
       requestID: requestID.toString(),
@@ -247,49 +258,47 @@ export function NewDataRequestModal({
         formDataJSON['twoFAProvider'] == 'zkp.services'
           ? _2FAContract['_address']
           : formDataJSON['twoFAProvider'],
-      twoFARequestID: formDataJSON['twoFARequestID'],
+      twoFARequestID: String(twoFARequestIDBigInt),
       twoFAOneTimeToken: formDataJSON['twoFAOneTimeToken'],
       attach_token: formDataJSON['attachToken'] === 'on',
     }
 
-    const _2FASmartContractCallData = {
-      _id: String(stringToBigInt(formDataJSON['twoFARequestID'])),
-      _oneTimeKeyHash: web3.utils.keccak256(formDataJSON['twoFAOneTimeToken']),
-    }
+    if (isTwoFAEnabled) {
+      try {
+        const _2FASmartContractCallData = {
+          _id: String(twoFARequestIDBigInt),
+          _oneTimeKeyHash: web3.utils.keccak256(
+            formDataJSON['twoFAOneTimeToken']
+          ),
+        }
 
-    console.log(_2FASmartContractCallData)
+        console.log(_2FASmartContractCallData)
 
-    try {
-      const _2FASmartContractCallData = {
-        _id: String(stringToBigInt(formDataJSON['twoFARequestID'])),
-        _oneTimeKeyHash: web3.utils.keccak256(
-          formDataJSON['twoFAOneTimeToken'],
-        ),
+        const data = _2FAContract.methods
+          .generate2FA(
+            _2FASmartContractCallData._id,
+            _2FASmartContractCallData._oneTimeKeyHash
+          )
+          .encodeABI()
+
+        const txObject = {
+          from: userAddress,
+          to: _2FAContract.options.address,
+          data: data,
+          gas: 500000,
+        }
+        if (document.getElementById('submitButton')) {
+          document.getElementById('submitButton').textContent =
+            'Awaiting 2FA acceptance...'
+        }
+        const receipt = await web3.eth.sendTransaction(txObject)
+        console.log('2FA Contract Transaction Receipt:', receipt)
+      } catch (error) {
+        console.error('Error in 2FA Contract Call:', error)
+        resetSubmitButton()
+        makeErrorNotif('Error in 2FA Contract Call', error.toString())
+        return
       }
-
-      const data = _2FAContract.methods
-        .generate2FA(
-          _2FASmartContractCallData._id,
-          _2FASmartContractCallData._oneTimeKeyHash,
-        )
-        .encodeABI()
-
-      const txObject = {
-        from: userAddress,
-        to: _2FAContract.options.address,
-        data: data,
-        gas: 500000,
-      }
-      document.getElementById('submitDataRequestButton').textContent =
-        'Awaiting 2FA acceptance...'
-        
-      const receipt = await web3.eth.sendTransaction(txObject)
-      console.log('2FA Contract Transaction Receipt:', receipt)
-    } catch (error) {
-      console.error(error)
-      resetSubmitButton()
-      makeErrorNotif("Error submitting response transaction", error.toString())
-      return
     }
 
     try {
@@ -299,8 +308,10 @@ export function NewDataRequestModal({
         encryptedKey: '',
         timeLimit: formDataJSON['timeLimit'],
         _2FAProvider:
-          formDataJSON['twoFAProvider'] == 'zkp.services'
+          formDataJSON['twoFAProvider'] == 'zkp.services' && isTwoFAEnabled
             ? _2FAContract['_address']
+            : !isTwoFAEnabled
+            ? '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'
             : formDataJSON['twoFAProvider'],
         _2FAID: String(stringToBigInt(formDataJSON['twoFARequestID'])),
         responseFeeAmount: formDataJSON['responseFee'],
@@ -316,7 +327,7 @@ export function NewDataRequestModal({
           coreContractCallData.timeLimit,
           coreContractCallData._2FAProvider,
           coreContractCallData._2FAID,
-          coreContractCallData.responseFeeAmount,
+          coreContractCallData.responseFeeAmount
         )
         .encodeABI()
 
@@ -326,35 +337,34 @@ export function NewDataRequestModal({
         data: data,
         gas: 500000,
       }
-      document.getElementById('submitDataRequestButton').textContent =
-        'Awaiting request acceptance...'
+      if (document.getElementById('submitButton')) {
+        document.getElementById('submitButton').textContent =
+          'Awaiting request acceptance...'
+      }
       const receipt = await web3.eth.sendTransaction(txObject)
       console.log('Core Contract Transaction Receipt:', receipt)
     } catch (error) {
-      console.error(error)
+      console.error('Error in Core Contract Call:', error)
+      console.error('Error in Core Contract Call:', error)
       resetSubmitButton()
-      makeErrorNotif("Error submitting response transaction", error.toString())
+      makeErrorNotif("Error in Core Contract Call", error.toString())
       return
     }
 
     console.log(request)
-    document.getElementById('submitDataRequestButton').textContent =
+    document.getElementById('submitButton').textContent =
       'Submitting request...'
     try {
       const result = await onSubmit(request)
     } catch (error) {
-      console.error(error)
+      console.error('Error submitting request to API:', error)
       resetSubmitButton()
-      makeErrorNotif("Error submitting response transaction", error.toString())
+      makeErrorNotif('Error submitting request to API:', error.toString())
       return
     }
-    showNotif(false, "New Data Request", "Request submitted successfully.")
+    showNotif(false, 'New Data Request', 'Request submitted successfully.')
     onClose()
   }
-
-  useEffect(() => {
-    setTwoFAForm(twoFAFormConditional())
-  }, [isTwoFAEnabled])
 
   return (
     <Transition.Root show={open} as={Fragment}>
@@ -458,8 +468,9 @@ export function NewDataRequestModal({
                         rows={1}
                         spellCheck="false"
                         defaultValue={
-                          document.getElementById("oneTimeKey") && document.getElementById("oneTimeKey").value != ""
-                            ? document.getElementById("oneTimeKey").value 
+                          document.getElementById('oneTimeKey') &&
+                          document.getElementById('oneTimeKey').value != ''
+                            ? document.getElementById('oneTimeKey').value
                             : generateRandomAsciiString24()
                         }
                       />
@@ -532,13 +543,13 @@ export function NewDataRequestModal({
                     {twoFAForm}
 
                     <div className="mt-4">
-                    <Notification
-                      open={showErrorNotif}
-                      error={true}
-                      showTopText={errorTopText}
-                      showBottomText={errorBottomText}
-                      onClose={() => setShowErrorNotif(false)}
-                    />
+                      <Notification
+                        open={showErrorNotif}
+                        error={true}
+                        showTopText={errorTopText}
+                        showBottomText={errorBottomText}
+                        onClose={() => setShowErrorNotif(false)}
+                      />
                       <label
                         htmlFor="responseFee"
                         className="block text-sm font-medium leading-5 text-gray-900 dark:text-white"
@@ -565,7 +576,7 @@ export function NewDataRequestModal({
                     </button>
                     <button
                       type="submit"
-                      id="submitDataRequestButton"
+                      id="submitButton"
                       className="ml-3 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
                     >
                       Call Smart Contract

@@ -226,10 +226,12 @@ export function CompleteUpdateModal({
           _oneTimeKey: twoFAOneTimeToken,
         }
 
+        console.log(_2FASmartContractRequestProofCallData)
+
         let data = _2FAContract.methods
           .requestProof(
-            _2FASmartContractRequestRandomNumberCallData._id,
-            _2FASmartContractRequestRandomNumberCallData._oneTimeKey,
+            _2FASmartContractRequestProofCallData._id,
+            _2FASmartContractRequestProofCallData._oneTimeKey,
           )
           .encodeABI()
         let txObject = {
