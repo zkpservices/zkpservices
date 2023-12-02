@@ -16,10 +16,8 @@ export function Notification({ open, showTopText, showBottomText, error = false,
   }
   useEffect(() => {
     const timer = setTimeout(() => {
-
       onClose()
     }, 5000);
-
     return () => {
       clearTimeout(timer);
     };
@@ -32,12 +30,9 @@ export function Notification({ open, showTopText, showBottomText, error = false,
   useEffect(() => {
     console.log(`open change detected, setting show to: ${open}`)
     setShow(open)
-
     const timer = setTimeout(() => {
-
       onClose()
     }, 5000);
-
     return () => {
       clearTimeout(timer);
     };
@@ -67,7 +62,7 @@ export function Notification({ open, showTopText, showBottomText, error = false,
                     {errorIcon}
                   </div>
                   <div className="ml-3 w-0 flex-1 pt-0.5 mt-4">
-                    <p className="text-sm font-medium text-gray-900 dark:text-gray-200">{showTopText}</p>
+                    <p className="text-sm font-bold text-gray-900 dark:text-gray-200">{showTopText}</p>
                     <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{showBottomText}</p>
                   </div>
                   <div className="ml-4 flex flex-shrink-0">
