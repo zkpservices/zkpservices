@@ -12,11 +12,6 @@ import { AwaitingDataModal } from './AwaitingDataModal';
 import { AwaitingUpdateCompletionModal } from './AwaitingUpdateCompletionModal';
 import { ReceivedUpdateResponseModal } from './ReceivedUpdateResponseModal';
 
-const tabs = [
-  { name: 'Incoming' },
-  { name: 'Outgoing' },
-  { name: 'Cross-Chain Sync' },
-];
 
 const classNames = (...classes) => {
   return classes.filter(Boolean).join(' ');
@@ -55,6 +50,12 @@ export function History({ tableData = {}, showRefresh = true , handleRefresh}) {
     handleRefresh();
   };
 
+  const tabs = [
+    { name: 'Incoming' },
+    { name: 'Outgoing' },
+    { name: 'Cross-Chain Sync' },
+  ];
+  
   const openModal = (rowData) => {
     console.log(`openModal rowData: ${JSON.stringify(rowData, null, 2)}`)
     if(rowData.type === "incoming_request_get") {
@@ -399,7 +400,8 @@ export function History({ tableData = {}, showRefresh = true , handleRefresh}) {
             <div className="mb-8">
               <div className="flex items-center justify-between">
                 <Tab.List className="flex">
-                  {tabs.map((tab) => (
+                  {tabs.filter((tab)=>!(tab.name=="Cross-Chain Sync"&&chainId==1440002))
+                    .map((tab) => (
                     <Tab
                       key={tab.name}
                       as="button"
