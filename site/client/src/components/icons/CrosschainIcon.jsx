@@ -16,5 +16,5 @@ export function CrosschainIcon(props) {
         strokeWidth="25"
       />
     </svg>
-  );
+  )
 }

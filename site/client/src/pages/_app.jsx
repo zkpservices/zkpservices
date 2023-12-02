@@ -27,14 +27,8 @@ export default function App({ Component, pageProps }) {
         <title>zkp.services</title>
         <meta name="description" content={pageProps.description} />
       </Head>
-      <Script 
-        src="/snarkjs.min.js" 
-        strategy="beforeInteractive"
-      />
-      <Script 
-        src="/poseidon/wasm_exec.js"
-        strategy="beforeInteractive"
-      />
+      <Script src="/snarkjs.min.js" strategy="beforeInteractive" />
+      <Script src="/poseidon/wasm_exec.js" strategy="beforeInteractive" />
       <GlobalProvider>
         <MDXProvider components={mdxComponents}>
           <Layout {...pageProps}>

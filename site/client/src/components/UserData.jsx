@@ -1,18 +1,27 @@
-import { useState } from 'react';
-import { GridPattern } from '@/components/GridPattern';
-import { motion, useMotionTemplate, useMotionValue } from 'framer-motion';
+import { useState } from 'react'
+import { GridPattern } from '@/components/GridPattern'
+import { motion, useMotionTemplate, useMotionValue } from 'framer-motion'
 import { useGlobal } from '@/components/GlobalStorage'
-import { getFieldData, getAvailableDashboard, addToDashboard, removeFromDashboard } from '@/components/APICalls';
-import { Heading } from '@/components/Heading';
-import { DataIcon } from '@/components/icons/DataIcon';
-import { PlusIcon } from '@/components/icons/PlusIcon';
-import { ViewFieldModal } from './ViewFieldModal';
-import { poseidon } from './PoseidonHash';
-import { stringToBigInt, splitTo24, flattenJsonAndComputeHash } from './HelperCalls';
-import { NewDashboardDataModal } from './NewDashboardDataModal'; // Import your NewDashboardDataModal component
+import {
+  getFieldData,
+  getAvailableDashboard,
+  addToDashboard,
+  removeFromDashboard,
+} from '@/components/APICalls'
+import { Heading } from '@/components/Heading'
+import { DataIcon } from '@/components/icons/DataIcon'
+import { PlusIcon } from '@/components/icons/PlusIcon'
+import { ViewFieldModal } from './ViewFieldModal'
+import { poseidon } from './PoseidonHash'
+import {
+  stringToBigInt,
+  splitTo24,
+  flattenJsonAndComputeHash,
+} from './HelperCalls'
+import { NewDashboardDataModal } from './NewDashboardDataModal' // Import your NewDashboardDataModal component
 
-const fieldDescriptions = 'Click to display data for this field.';
-const fieldIcon = DataIcon; // Assuming DataIcon is the desired icon
+const fieldDescriptions = 'Click to display data for this field.'
+const fieldIcon = DataIcon // Assuming DataIcon is the desired icon
 const fieldPatterns = [
   {
     y: 16,
@@ -39,14 +48,14 @@ const fieldPatterns = [
     y: 22,
     squares: [[0, 1]],
   },
-];
+]
 
 function MyDataIcon({ icon: Icon }) {
   return (
     <div className="flex h-7 w-7 items-center justify-center rounded-full bg-zinc-900/5 ring-1 ring-zinc-900/25 backdrop-blur-[2px] transition duration-300 group-hover:bg-white/50 group-hover:ring-zinc-900/25 dark:bg-white/7.5 dark:ring-white/15 dark:group-hover:bg-sky-300/10 dark:group-hover:ring-sky-400">
       <Icon className="h-5 w-5 fill-zinc-700/10 stroke-zinc-700 transition-colors duration-300 group-hover:stroke-zinc-900 dark:fill-white/10 dark:stroke-zinc-400 dark:group-hover:fill-sky-300/10 dark:group-hover:stroke-sky-400" />
     </div>
-  );
+  )
 }
 
 function MyDataPattern({ mouseX, mouseY, ...gridProps }) {
@@ -85,13 +94,13 @@ function MyDataPattern({ mouseX, mouseY, ...gridProps }) {
 }
 
 export function MyData({ mydata, onCardClick }) {
-  let mouseX = useMotionValue(0);
-  let mouseY = useMotionValue(0);
+  let mouseX = useMotionValue(0)
+  let mouseY = useMotionValue(0)
 
   function onMouseMove({ currentTarget, clientX, clientY }) {
-    let { left, top } = currentTarget.getBoundingClientRect();
-    mouseX.set(clientX - left);
-    mouseY.set(clientY - top);
+    let { left, top } = currentTarget.getBoundingClientRect()
+    mouseX.set(clientX - left)
+    mouseY.set(clientY - top)
   }
 
   return (
@@ -99,13 +108,16 @@ export function MyData({ mydata, onCardClick }) {
       key={mydata.name}
       onMouseMove={onMouseMove}
       onClick={() => onCardClick(mydata.name)}
-      className="group relative flex rounded-2xl bg-zinc-50 transition-shadow hover:shadow-md hover:shadow-zinc-900/5 dark:bg-white/2.5 dark:hover:shadow-black/5 h-60"
+      className="group relative flex h-60 rounded-2xl bg-zinc-50 transition-shadow hover:shadow-md hover:shadow-zinc-900/5 dark:bg-white/2.5 dark:hover:shadow-black/5"
     >
       <MyDataPattern {...mydata.pattern} mouseX={mouseX} mouseY={mouseY} />
       <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-zinc-900/7.5 group-hover:ring-zinc-900/10 dark:ring-white/10 dark:group-hover:ring-white/20" />
-      <div className="relative rounded-2xl px-4 pt-16 pb-4">
+      <div className="relative rounded-2xl px-4 pb-4 pt-16">
         <MyDataIcon icon={mydata.icon} />
-        <h3 className="mt-4 text-sm font-semibold leading-7 text-zinc-900 dark:text-white" style={{textTransform: 'capitalize'}}>
+        <h3
+          className="mt-4 text-sm font-semibold leading-7 text-zinc-900 dark:text-white"
+          style={{ textTransform: 'capitalize' }}
+        >
           <span className="absolute inset-0 rounded-2xl" />
           {mydata.name}
         </h3>
@@ -114,72 +126,113 @@ export function MyData({ mydata, onCardClick }) {
         </p>
       </div>
     </div>
-  );
+  )
 }
 
-export function UserData({ fieldNames = [], handleRemove, handleAdd}) {
-  const [selectedFieldName, setSelectedFieldName] = useState(null);
-  const [selectedSalt, setSelectedSalt] = useState(null);
-  const [selectedLocation, setSelectedLocation] = useState(null);
-  const [selectedHash, setSelectedHash] = useState(null);
-  const [selectedSaltHash, setSelectedSaltHash] = useState(null);
-  const [addDataModalOpen, setAddDataModalOpen] = useState(false);
+export function UserData({ fieldNames = [], handleRemove, handleAdd }) {
+  const [selectedFieldName, setSelectedFieldName] = useState(null)
+  const [selectedSalt, setSelectedSalt] = useState(null)
+  const [selectedLocation, setSelectedLocation] = useState(null)
+  const [selectedHash, setSelectedHash] = useState(null)
+  const [selectedSaltHash, setSelectedSaltHash] = useState(null)
+  const [addDataModalOpen, setAddDataModalOpen] = useState(false)
   const [availableDashboard, setAvailableDashboard] = useState([])
-  let {userAddress, userPassword, fieldData, setFieldData, dashboard, setDashboard, chainId, contractPassword} = useGlobal();
+  let {
+    userAddress,
+    userPassword,
+    fieldData,
+    setFieldData,
+    dashboard,
+    setDashboard,
+    chainId,
+    contractPassword,
+  } = useGlobal()
 
   async function addServiceToDashboard(service) {
-    setAddDataModalOpen(false);
+    setAddDataModalOpen(false)
     handleAdd(service)
-    const addToDashboardResult = await addToDashboard(userAddress, userPassword, service, chainId)
+    const addToDashboardResult = await addToDashboard(
+      userAddress,
+      userPassword,
+      service,
+      chainId,
+    )
   }
 
   async function removeServiceFromDashboard(service) {
-    setSelectedFieldName(null);
+    setSelectedFieldName(null)
     handleRemove(service)
-    const removeServiceFromDashboardResult = await removeFromDashboard(userAddress, userPassword, service, chainId)
+    const removeServiceFromDashboardResult = await removeFromDashboard(
+      userAddress,
+      userPassword,
+      service,
+      chainId,
+    )
   }
 
   async function openFieldModal(fieldName) {
-    let localFieldData = await getFieldData(userAddress, userPassword, fieldName.toLowerCase(), chainId)
+    let localFieldData = await getFieldData(
+      userAddress,
+      userPassword,
+      fieldName.toLowerCase(),
+      chainId,
+    )
     setFieldData(localFieldData['data'])
-    setSelectedFieldName(fieldName);
+    setSelectedFieldName(fieldName)
     const splitFieldName = splitTo24(fieldName)
     const splitUserSecret = splitTo24(contractPassword)
-    const saltHash = await poseidon([stringToBigInt(localFieldData['data'][fieldName]['_metadata']['salt'])])
-    const dataLocation = await poseidon([stringToBigInt(splitFieldName[0]), stringToBigInt(splitFieldName[1]),stringToBigInt(localFieldData['data'][fieldName]['_metadata']['salt']),stringToBigInt(splitUserSecret[0]), stringToBigInt(splitUserSecret[1])])
+    const saltHash = await poseidon([
+      stringToBigInt(localFieldData['data'][fieldName]['_metadata']['salt']),
+    ])
+    const dataLocation = await poseidon([
+      stringToBigInt(splitFieldName[0]),
+      stringToBigInt(splitFieldName[1]),
+      stringToBigInt(localFieldData['data'][fieldName]['_metadata']['salt']),
+      stringToBigInt(splitUserSecret[0]),
+      stringToBigInt(splitUserSecret[1]),
+    ])
     console.log(localFieldData['data'][fieldName]['_metadata']['salt'])
-    console.log(stringToBigInt(localFieldData['data'][fieldName]['_metadata']['salt']))
+    console.log(
+      stringToBigInt(localFieldData['data'][fieldName]['_metadata']['salt']),
+    )
     console.log(saltHash)
-    const dataHash = await flattenJsonAndComputeHash(JSON.stringify(localFieldData['data'], null, 2))
+    const dataHash = await flattenJsonAndComputeHash(
+      JSON.stringify(localFieldData['data'], null, 2),
+    )
     setSelectedLocation(dataLocation)
     setSelectedSaltHash(saltHash)
     setSelectedHash(dataHash['rootHash'])
-    setSelectedSalt((localFieldData['data'][fieldName]['_metadata']['salt']))
+    setSelectedSalt(localFieldData['data'][fieldName]['_metadata']['salt'])
+  }
 
-  };
-  
   const closeFieldModal = () => {
-    setSelectedFieldName(null);
-  };
+    setSelectedFieldName(null)
+  }
 
   function findUniqueElements(list1, list2) {
-    const uniqueInList1 = list1.filter((item) => !list2.includes(item));
-    const uniqueInList2 = list2.filter((item) => !list1.includes(item));
-    return [...uniqueInList1, ...uniqueInList2];
+    const uniqueInList1 = list1.filter((item) => !list2.includes(item))
+    const uniqueInList2 = list2.filter((item) => !list1.includes(item))
+    return [...uniqueInList1, ...uniqueInList2]
   }
 
   async function openAddDataModal() {
-    const localAvailableDashboard = await getAvailableDashboard(userAddress, userPassword, chainId)
-    const differenceDashboard = findUniqueElements(localAvailableDashboard['data'], fieldNames)
-    
+    const localAvailableDashboard = await getAvailableDashboard(
+      userAddress,
+      userPassword,
+      chainId,
+    )
+    const differenceDashboard = findUniqueElements(
+      localAvailableDashboard['data'],
+      fieldNames,
+    )
+
     setAvailableDashboard(differenceDashboard)
-    setAddDataModalOpen(true);
-  };
-  
+    setAddDataModalOpen(true)
+  }
 
   const closeAddDataModal = () => {
-    setAddDataModalOpen(false);
-  };
+    setAddDataModalOpen(false)
+  }
 
   return (
     <div className="my-16 xl:max-w-none">
@@ -202,8 +255,9 @@ export function UserData({ fieldNames = [], handleRemove, handleAdd}) {
         <MyData
           key="Add Data"
           mydata={{
-            name: "Add Data",
-            description: "Enter a field to add to your dashboard for easy access.",
+            name: 'Add Data',
+            description:
+              'Enter a field to add to your dashboard for easy access.',
             icon: PlusIcon,
             pattern: {
               y: 16,
@@ -216,25 +270,25 @@ export function UserData({ fieldNames = [], handleRemove, handleAdd}) {
           onCardClick={openAddDataModal}
         />
       </div>
-      
-        <ViewFieldModal
-          title={selectedFieldName}
-          open={selectedFieldName !== null}
-          onDelete={removeServiceFromDashboard}
-          onClose={closeFieldModal}
-          fieldData={fieldData}
-          fieldName={selectedFieldName}
-          dataLocation={selectedLocation}
-          dataHash={selectedHash}
-          obfuscationSalt={selectedSalt}
-          saltHash={selectedSaltHash}
-        />
-        <NewDashboardDataModal
-          open={addDataModalOpen}
-          onSubmit={addServiceToDashboard}
-          onClose={closeAddDataModal}
-          options={availableDashboard}
-        />
-  </div>
-);
+
+      <ViewFieldModal
+        title={selectedFieldName}
+        open={selectedFieldName !== null}
+        onDelete={removeServiceFromDashboard}
+        onClose={closeFieldModal}
+        fieldData={fieldData}
+        fieldName={selectedFieldName}
+        dataLocation={selectedLocation}
+        dataHash={selectedHash}
+        obfuscationSalt={selectedSalt}
+        saltHash={selectedSaltHash}
+      />
+      <NewDashboardDataModal
+        open={addDataModalOpen}
+        onSubmit={addServiceToDashboard}
+        onClose={closeAddDataModal}
+        options={availableDashboard}
+      />
+    </div>
+  )
 }

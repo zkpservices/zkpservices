@@ -5,33 +5,28 @@ const guides = [
   {
     href: '/zkp.edited',
     name: 'Overview',
-    description:
-      'An overview of zkp.services.',
+    description: 'An overview of zkp.services.',
   },
   {
     href: '/guides',
     name: 'dApp Guide',
-    description:
-      'A guide on how to use our dApp.',
+    description: 'A guide on how to use our dApp.',
   },
   {
     href: '/youdata',
     name: 'Your Data',
-    description:
-      'Learn how we handle your data.',
+    description: 'Learn how we handle your data.',
   },
   {
     href: '/2FA',
     name: '2FA',
-    description:
-      'Learn how we implement our own native 2FA solution.',
+    description: 'Learn how we implement our own native 2FA solution.',
   },
   {
     href: '/api_docs',
     name: 'API Guide',
-    description:
-      'Learn how to to use our API for user data.',
-  }
+    description: 'Learn how to to use our API for user data.',
+  },
 ]
 
 export function Guides() {

@@ -37,5 +37,5 @@ export function DataIcon(props) {
         strokeWidth="16"
       />
     </svg>
-  );
+  )
 }

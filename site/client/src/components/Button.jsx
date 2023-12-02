@@ -38,7 +38,7 @@ export function Button({
   className = clsx(
     'inline-flex gap-0.5 justify-center overflow-hidden text-sm font-medium transition',
     variantStyles[variant],
-    className
+    className,
   )
 
   let arrowIcon = (
@@ -47,7 +47,7 @@ export function Button({
         'mt-0.5 h-5 w-5',
         variant === 'text' && 'relative top-px',
         arrow === 'left' && '-ml-1 rotate-180',
-        arrow === 'right' && '-mr-1'
+        arrow === 'right' && '-mr-1',
       )}
     />
   )

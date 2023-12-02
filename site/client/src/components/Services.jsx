@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { GridPattern } from '@/components/GridPattern';
 import { motion, useMotionTemplate, useMotionValue } from 'framer-motion';
 import { Heading } from '@/components/Heading';
-import { addRequest, getChainData } from '@/components/APICalls';
+import { addRequest, getChainData, getDashboard } from '@/components/APICalls';
 import { QuestionMarkIcon } from '@/components/icons/QuestionMarkIcon';
 import { UpdateIcon } from '@/components/icons/UpdateIcon';
 import { PlusIcon } from '@/components/icons/PlusIcon';
@@ -63,8 +63,7 @@ const services = [
   {
     href: '/dashboard',
     name: 'ZKP Tokens Faucet',
-    description:
-      'Get some test tokens for our ERC20 contract',
+    description: 'Get some test tokens for our ERC20 contract',
     icon: TokenIcon,
     pattern: {
       y: 22,
@@ -85,19 +84,19 @@ const services = [
       ],
     },
   },
-];
+]
 
 function ServiceIcon({ icon: Icon }) {
   return (
     <div className="flex h-7 w-7 items-center justify-center rounded-full bg-zinc-900/5 ring-1 ring-zinc-900/25 backdrop-blur-[2px] transition duration-300 group-hover:bg-white/50 group-hover:ring-zinc-900/25 dark:bg-white/7.5 dark:ring-white/15 dark:group-hover:bg-emerald-300/10 dark:group-hover:ring-emerald-400">
       <Icon className="h-5 w-5 fill-zinc-700/10 stroke-zinc-700 transition-colors duration-300 group-hover:stroke-zinc-900 dark:fill-white/10 dark:stroke-zinc-400 dark:group-hover:fill-emerald-300/10 dark:group-hover:stroke-emerald-400" />
     </div>
-  );
+  )
 }
 
 function ServicePattern({ mouseX, mouseY, ...gridProps }) {
-  let maskImage = useMotionTemplate`radial-gradient(180px at ${mouseX}px ${mouseY}px, white, transparent)`;
-  let style = { maskImage, WebkitMaskImage: maskImage };
+  let maskImage = useMotionTemplate`radial-gradient(180px at ${mouseX}px ${mouseY}px, white, transparent)`
+  let style = { maskImage, WebkitMaskImage: maskImage }
 
   return (
     <div className="pointer-events-none">
@@ -127,17 +126,17 @@ function ServicePattern({ mouseX, mouseY, ...gridProps }) {
         />
       </motion.div>
     </div>
-  );
+  )
 }
 
 function ServiceCard({ service, onCardClick, openModal, isSelected }) {
-  let mouseX = useMotionValue(0);
-  let mouseY = useMotionValue(0);
+  let mouseX = useMotionValue(0)
+  let mouseY = useMotionValue(0)
 
   function onMouseMove({ currentTarget, clientX, clientY }) {
-    let { left, top } = currentTarget.getBoundingClientRect();
-    mouseX.set(clientX - left);
-    mouseY.set(clientY - top);
+    let { left, top } = currentTarget.getBoundingClientRect()
+    mouseX.set(clientX - left)
+    mouseY.set(clientY - top)
   }
 
   return (
@@ -145,67 +144,101 @@ function ServiceCard({ service, onCardClick, openModal, isSelected }) {
       key={service.name}
       onMouseMove={onMouseMove}
       onClick={() => {
-        onCardClick(service.name);
-        openModal(service.name); // Pass the service name to openModal
+        onCardClick(service.name)
+        openModal(service.name) // Pass the service name to openModal
       }}
-      className={`group relative flex rounded-2xl bg-zinc-50 transition-shadow hover:shadow-md hover:shadow-zinc-900/5 dark:bg-white/2.5 dark:hover:shadow-black/5 ${isSelected ? 'bg-zinc-900' : ''}`}
+      className={`group relative flex rounded-2xl bg-zinc-50 transition-shadow hover:shadow-md hover:shadow-zinc-900/5 dark:bg-white/2.5 dark:hover:shadow-black/5 ${
+        isSelected ? 'bg-zinc-900' : ''
+      }`}
     >
       <ServicePattern {...service.pattern} mouseX={mouseX} mouseY={mouseY} />
       <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-zinc-900/7.5 group-hover:ring-zinc-900/10 dark:ring-white/10 dark:group-hover:ring-white/20" />
-      <div className="relative rounded-2xl px-4 pt-16 pb-4">
+      <div className="relative rounded-2xl px-4 pb-4 pt-16">
         <ServiceIcon icon={service.icon} />
-        <h3 className={`mt-4 text-sm font-semibold leading-7 text-${isSelected ? 'white' : 'zinc-900'} dark:text-white`}>
+        <h3
+          className={`mt-4 text-sm font-semibold leading-7 text-${
+            isSelected ? 'white' : 'zinc-900'
+          } dark:text-white`}
+        >
           <span className="absolute inset-0 rounded-2xl" />
           {service.name}
         </h3>
-        <p className={`mt-1 text-sm text-${isSelected ? 'white' : 'zinc-600'} dark:text-zinc-400`}>
+        <p
+          className={`mt-1 text-sm text-${
+            isSelected ? 'white' : 'zinc-600'
+          } dark:text-zinc-400`}
+        >
           {service.description}
         </p>
       </div>
     </div>
-  );
+  )
 }
 
-export function Services({handleRefresh}) {
-  const [selectedService, setSelectedService] = useState(null);
-  const [availableChains, setAvailableChains] = useState(["Avalanche Fuji", "Polygon Mumbai", "Ripple EVM Devnet"])
+export function Services({ handleRefresh }) {
+  const [selectedService, setSelectedService] = useState(null)
+  const [availableChains, setAvailableChains] = useState([
+    'Avalanche Fuji',
+    'Polygon Mumbai',
+    'Ripple EVM Devnet',
+  ])
   const [usedChains, setUsedChains] = useState([])
-  const [props, setProps] = useState({});
+  const [props, setProps] = useState({})
 
   const chains = {
-    "0xa869": "Avalanche Fuji", 
-    "0x13881": "Polygon Mumbai", 
-    "0x15f902": "Ripple EVM Devnet"
+    '0xa869': 'Avalanche Fuji',
+    '0x13881': 'Polygon Mumbai',
+    '0x15f902': 'Ripple EVM Devnet',
   }
 
   const openModal = (serviceName) => {
-    if(serviceName === "Onboard To New Chain") {
+    if (serviceName === 'Onboard To New Chain') {
       setIsOnboarding(true)
     }
-    setSelectedService(serviceName);
-  };
+    setSelectedService(serviceName)
+  }
 
-  let {userAddress, userPassword, chainId, isOnboarding, setIsOnboarding, onboardedChain} = useGlobal();
+  let {
+    userAddress,
+    userPassword,
+    chainId,
+    isOnboarding,
+    setIsOnboarding,
+    onboardedChain,
+  } = useGlobal()
 
   const [showNotif, setShowNotif] = useState(false);
+  const [errorNotif, setErrorNotif] = useState(false);
   const [notifTopText, setNotifTopText] = useState("");
   const [notifBottomText, setNotifBottomText] = useState("");
 
   const pullChainData = async (userAddress, userPassword, chainId) => {
     const chainData = await getChainData(userAddress, userPassword, chainId)
     console.log(JSON.stringify(chainData, null, 2))
-    let keysList = Object.keys(chainData['data']).filter(a => a !== "2fa_password")
-    const filteredKeysList = Object.keys(chains).filter(item => !keysList.includes(item));
-    const usedChainsList = Object.keys(chains).filter(item => keysList.includes(item) && item != chainId).map(key => chains[key]);
+    let keysList = Object.keys(chainData['data']).filter(
+      (a) => a !== '2fa_password',
+    )
+    const filteredKeysList = Object.keys(chains).filter(
+      (item) => !keysList.includes(item),
+    )
+    const usedChainsList = Object.keys(chains)
+      .filter((item) => keysList.includes(item) && item != chainId)
+      .map((key) => chains[key])
     setUsedChains(usedChainsList)
-    const result = filteredKeysList.map(key => chains[key])
-    const userSecretHashBigint = stringToBigInt(chainData['data']['props']['2fa_password']);
-    const userSecretHashLocal = await poseidon([userSecretHashBigint.toString()]);
+    const result = filteredKeysList.map((key) => chains[key])
+    const userSecretHashBigint = stringToBigInt(
+      chainData['data']['props']['2fa_password'],
+    )
+    const userSecretHashLocal = await poseidon([
+      userSecretHashBigint.toString(),
+    ])
     setAvailableChains(result)
     const propsLocal = chainData['data']['props']
     propsLocal['userSecretHash'] = userSecretHashLocal
-    propsLocal['rsa_enc_pub_key'] = chainData['data'][chainId]['rsa_enc_pub_key']
-    propsLocal['rsa_sign_pub_key'] = chainData['data'][chainId]['rsa_sign_pub_key']
+    propsLocal['rsa_enc_pub_key'] =
+      chainData['data'][chainId]['rsa_enc_pub_key']
+    propsLocal['rsa_sign_pub_key'] =
+      chainData['data'][chainId]['rsa_sign_pub_key']
     propsLocal['public_info'] = chainData['data'][chainId]['public_info']
     setProps(propsLocal)
   }
@@ -217,70 +250,137 @@ export function Services({handleRefresh}) {
       chainID: chainId,
     }
     const finalRequestData = {
-      request: compiledRequestData
+      request: compiledRequestData,
     }
-    const addRequestResult = await addRequest(userAddress, userPassword, finalRequestData, chainId)
+    const addRequestResult = await addRequest(
+      userAddress,
+      userPassword,
+      finalRequestData,
+      chainId,
+    )
   }
 
   useEffect(() => {
-    if(userAddress && onboardedChain) {
+    if (userAddress && onboardedChain) {
       pullChainData(userAddress, userPassword, chainId)
     }
-   
   }, [userAddress])
 
   useEffect(() => {
-    if(selectedService) {
+    if (selectedService) {
       handleRefresh()
     }
   }, [selectedService])
 
   return (
     <div className="xl:max-w-none mt-16">
-    <Notification
-      open={showNotif}
-      showTopText={notifTopText}
-      showBottomText={notifBottomText}
-      error={false}
-      onClose={() => setShowNotif(false)}
-    />
       <div className="my-16 xl:max-w-none">
         <Heading level={2} id="services">
           Services
         </Heading>
         <div className="not-prose mt-4 grid grid-cols-1 gap-8 border-t border-zinc-900/5 pt-10 dark:border-white/5 sm:grid-cols-2 xl:grid-cols-4">
-          {services.map((service) => (
-            <ServiceCard
-              key={service.name}
-              service={service}
-              onCardClick={openModal}
-              openModal={openModal} // Just pass openModal function
-              isSelected={selectedService === service.name}
+          {services
+            .filter(
+              (service) =>
+                !(service.name == 'Cross-Chain Backups' && chainId == 1440002),
+            )
+            .map((service) => (
+              <ServiceCard
+                key={service.name}
+                service={service}
+                onCardClick={openModal}
+                openModal={openModal} // Just pass openModal function
+                isSelected={selectedService === service.name}
+              />
+            ))}
+            <div>
+            <Notification
+              open={showNotif}
+              showTopText={notifTopText}
+              showBottomText={notifBottomText}
+              error={false}
+              onClose={() => setShowNotif(false)}
             />
-          ))}
+
+            </div>
         </div>
       </div>
-      <NewDataRequestModal open={selectedService === 'Request Data'} onClose={() => {
-        setSelectedService(null)
-        handleRefresh()
-      }} onSubmit={addNewRequest} />
-      <NewUpdateRequestModal open={selectedService === 'Request Update'} onClose={() => {
-        setSelectedService(null)
-        handleRefresh()
-      }} onSubmit={addNewRequest}/>
-      <NewCrossChainSyncModal open={selectedService === 'Cross-Chain Backups'} destinationChainOptions={usedChains} onClose={() => {
-        setSelectedService(null)
-        handleRefresh()
-      }} />
-      <ZKPFaucetModal open={selectedService === 'ZKP Tokens Faucet'} onClose={() => {
-        setSelectedService(null)
-        handleRefresh()
-      }} />
-       <OnboardToNewChainModal open={selectedService === 'Onboard To New Chain'} props={props} options={availableChains} onClose={() => {
-        pullChainData(userAddress, userPassword, chainId)
-        setIsOnboarding(false)
-        setSelectedService(null)}}
-         />
+      <NewDataRequestModal
+        open={selectedService === 'Request Data'}
+        onClose={() => {
+          setSelectedService(null)
+          handleRefresh()
+        }}
+        onSubmit={addNewRequest}
+        showNotif={(error, topText, bottomText) =>  {
+          setErrorNotif(error)
+          setNotifTopText(topText)
+          setNotifBottomText(bottomText)
+          setShowNotif(true)
+        }
+        }
+      />
+      <NewUpdateRequestModal
+        open={selectedService === 'Request Update'}
+        onClose={(notif, error, topText, bottomText) => {
+          setSelectedService(null)
+          handleRefresh()
+        }}
+        onSubmit={addNewRequest}
+        showNotif={(error, topText, bottomText) =>  {
+          setErrorNotif(error)
+          setNotifTopText(topText)
+          setNotifBottomText(bottomText)
+          setShowNotif(true)
+        }
+      }
+      />
+      {chainId != 1440002 && (
+        <NewCrossChainSyncModal
+          open={selectedService === 'Cross-Chain Backups'}
+          destinationChainOptions={usedChains}
+          onClose={(error, topText, bottomText) => {
+            setSelectedService(null)
+            handleRefresh()
+          }
+        }
+          showNotif={(error, topText, bottomText) =>  {
+            setErrorNotif(error)
+            setNotifTopText(topText)
+            setNotifBottomText(bottomText)
+            setShowNotif(true)
+          }
+        }        
+        />
+      )}
+      <ZKPFaucetModal
+        open={selectedService === 'ZKP Tokens Faucet'}
+        showNotif={(error, topText, bottomText) =>  {
+          setErrorNotif(error)
+          setNotifTopText(topText)
+          setNotifBottomText(bottomText)
+          setShowNotif(true)
+        }}
+        onClose={(error, topText, bottomText) => {
+          setSelectedService(null)
+          handleRefresh()
+        }}
+      />
+      <OnboardToNewChainModal
+        open={selectedService === 'Onboard To New Chain'}
+        props={props}
+        options={availableChains}
+        showNotif={(error, topText, bottomText) =>  {
+          setErrorNotif(error)
+          setNotifTopText(topText)
+          setNotifBottomText(bottomText)
+          setShowNotif(true)
+        }}
+        onClose={(error, topText, bottomText) => {
+          setSelectedService(null)
+          handleRefresh()
+        }}
+      />
     </div>
-  );
+  )
 }

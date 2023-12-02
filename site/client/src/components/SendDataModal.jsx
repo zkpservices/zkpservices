@@ -1,29 +1,34 @@
-import { Fragment, useState } from 'react';
-import { Dialog, Transition } from '@headlessui/react';
-import { XMarkIcon } from '@heroicons/react/24/outline';
-import { useGlobal } from '@/components/GlobalStorage';
-import { stringToBigInt, bigIntToString, generateCoreProof, generate2FAProof, splitTo24 } from '@/components/HelperCalls';
-import { poseidon } from '@/components/PoseidonHash';
-import { removeMetadata } from '@/components/HelperCalls';
+import { Fragment, useState } from 'react'
+import { Dialog, Transition } from '@headlessui/react'
+import { XMarkIcon } from '@heroicons/react/24/outline'
+import { useGlobal } from '@/components/GlobalStorage'
+import {
+  stringToBigInt,
+  bigIntToString,
+  generateCoreProof,
+  generate2FAProof,
+  splitTo24,
+} from '@/components/HelperCalls'
+import { poseidon } from '@/components/PoseidonHash'
+import { removeMetadata } from '@/components/HelperCalls'
 
-export function SendDataModal({ 
+export function SendDataModal({
   open = true,
   onClose,
   onSubmit,
   requestID,
-  addressOfRequestingParty = "",
-  fieldRequested = "",
-  data = "",
-  oneTimeKey = "",
-  oneTimeSalt = "",
-  timeLimit = "",
-  twoFAProvider = "",
-  twoFARequestID = "",
-  twoFAOneTimeToken = "",
-  responseFee = "",
-  require2FA = false
+  addressOfRequestingParty = '',
+  fieldRequested = '',
+  data = '',
+  oneTimeKey = '',
+  oneTimeSalt = '',
+  timeLimit = '',
+  twoFAProvider = '',
+  twoFARequestID = '',
+  twoFAOneTimeToken = '',
+  responseFee = '',
+  require2FA = false,
 }) {
-
   let {
     userAddress,
     fujiCoreContract,
@@ -35,314 +40,374 @@ export function SendDataModal({
     twoFactorAuthPassword,
     contractPassword,
     web3,
-    chainId
-  } = useGlobal();
+    chainId,
+  } = useGlobal()
 
-  const _2FAContract = chainId == 43113 ? fujiTwoFAContract:
-                    chainId == 80001 ? mumbaiTwoFAContract:
-                    chainId == 1440002 ? rippleTwoFAContract: null;
+  const _2FAContract =
+    chainId == 43113
+      ? fujiTwoFAContract
+      : chainId == 80001
+        ? mumbaiTwoFAContract
+        : chainId == 1440002
+          ? rippleTwoFAContract
+          : null
 
   const handleSubmit = async () => {
-    if(document.getElementById("submitButton")) {
-      document.getElementById("submitButton").textContent = "Running..."
-      document.getElementById("submitButton").className = "ml-3 inline-flex justify-center rounded-md border border-transparent bg-gray-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
-      document.getElementById("submitButton").disabled = true;
+    if (document.getElementById('submitButton')) {
+      document.getElementById('submitButton').textContent = 'Running...'
+      document.getElementById('submitButton').className =
+        'ml-3 inline-flex justify-center rounded-md border border-transparent bg-gray-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2'
+      document.getElementById('submitButton').disabled = true
     }
-    console.log("2FA _id", twoFARequestID);
-    console.log("2FA _oneTimeKey", twoFAOneTimeToken);
-    console.log("2FA two_factor_secret", twoFactorAuthPassword);
-    console.log("core requestId", requestID);
-    console.log("field", fieldRequested);
-    console.log("salt", oneTimeSalt);
-    console.log("contract password", contractPassword);
-    console.log("core one time key", oneTimeKey);
+    console.log('2FA _id', twoFARequestID)
+    console.log('2FA _oneTimeKey', twoFAOneTimeToken)
+    console.log('2FA two_factor_secret', twoFactorAuthPassword)
+    console.log('core requestId', requestID)
+    console.log('field', fieldRequested)
+    console.log('salt', oneTimeSalt)
+    console.log('contract password', contractPassword)
+    console.log('core one time key', oneTimeKey)
 
-    if (require2FA){
-      if (chainId!=1440002){
+    if (require2FA) {
+      if (chainId != 1440002) {
         //chainlink 2FA variants
         const _2FASmartContractRequestRandomNumberCallData = {
-          _id: stringToBigInt(twoFARequestID),    //cast to big int once it's a string
+          _id: stringToBigInt(twoFARequestID), //cast to big int once it's a string
           _oneTimeKey: twoFAOneTimeToken,
         }
 
-        let data = _2FAContract.methods.requestRandomNumber(
-          _2FASmartContractRequestRandomNumberCallData._id,
-          _2FASmartContractRequestRandomNumberCallData._oneTimeKey).encodeABI();
+        let data = _2FAContract.methods
+          .requestRandomNumber(
+            _2FASmartContractRequestRandomNumberCallData._id,
+            _2FASmartContractRequestRandomNumberCallData._oneTimeKey,
+          )
+          .encodeABI()
         let txObject = {
           from: userAddress,
           to: _2FAContract.options.address,
           data: data,
-          gas: 500000
-        };
-        if(document.getElementById("submitButton")) {
-          document.getElementById("submitButton").textContent = "Awaiting random number request..."
+          gas: 500000,
         }
-        let receipt = await web3.eth.sendTransaction(txObject);
-        console.log("request random number receipt:", receipt);
-        if(document.getElementById("submitButton")) {
-          document.getElementById("submitButton").textContent = "Getting random number..."
+        if (document.getElementById('submitButton')) {
+          document.getElementById('submitButton').textContent =
+            'Awaiting random number request...'
         }
-        let randomNumber;
+        let receipt = await web3.eth.sendTransaction(txObject)
+        console.log('request random number receipt:', receipt)
+        if (document.getElementById('submitButton')) {
+          document.getElementById('submitButton').textContent =
+            'Getting random number...'
+        }
+        let randomNumber
         for (let attempt = 0; attempt < 30; attempt++) {
           try {
-            randomNumber = await _2FAContract.methods.getRandomNumber(stringToBigInt(twoFARequestID)).call();
-            console.log("Random number:", randomNumber);
-            break; 
+            randomNumber = await _2FAContract.methods
+              .getRandomNumber(stringToBigInt(twoFARequestID))
+              .call()
+            console.log('Random number:', randomNumber)
+            break
           } catch (error) {
             if (attempt < 30) {
-              console.log("Random number not ready, retrying...");
-              await new Promise(resolve => setTimeout(resolve, 2000)); 
+              console.log('Random number not ready, retrying...')
+              await new Promise((resolve) => setTimeout(resolve, 2000))
             } else {
-              console.error("Failed to retrieve random number after 1 minute.");
+              console.error('Failed to retrieve random number after 1 minute.')
             }
           }
         }
 
-        console.log(String(randomNumber));
-        console.log(String(stringToBigInt(twoFactorAuthPassword)));
-        console.log(String(await poseidon([stringToBigInt(twoFactorAuthPassword)])));
+        console.log(String(randomNumber))
+        console.log(String(stringToBigInt(twoFactorAuthPassword)))
+        console.log(
+          String(await poseidon([stringToBigInt(twoFactorAuthPassword)])),
+        )
 
-        let _2FA_secret_hash = String(await poseidon([stringToBigInt(twoFactorAuthPassword)]));
+        let _2FA_secret_hash = String(
+          await poseidon([stringToBigInt(twoFactorAuthPassword)]),
+        )
 
         const _2FAProof = await generate2FAProof({
-          "random_number": String(randomNumber),
-          "two_factor_secret": String(stringToBigInt(twoFactorAuthPassword)),
-          "secret_hash": _2FA_secret_hash,
+          random_number: String(randomNumber),
+          two_factor_secret: String(stringToBigInt(twoFactorAuthPassword)),
+          secret_hash: _2FA_secret_hash,
         })
 
-        console.log(_2FAProof);
+        console.log(_2FAProof)
 
         const _2FASmartContractVerifyProofCallData = {
-            "_id": stringToBigInt(twoFARequestID),
-            "_randomNumber": randomNumber,
-            "_userSecretHash": _2FA_secret_hash,
-            "params": {
-                "pA0": _2FAProof.proof.pi_a[0],
-                "pA1": _2FAProof.proof.pi_a[1],
-                "pB00": _2FAProof.proof.pi_b[0][0],
-                "pB01": _2FAProof.proof.pi_b[0][1],
-                "pB10": _2FAProof.proof.pi_b[1][0],
-                "pB11": _2FAProof.proof.pi_b[1][1],
-                "pC0": _2FAProof.proof.pi_c[0],
-                "pC1": _2FAProof.proof.pi_c[1],
-                "pubSignals0": _2FAProof.proof.pubSignals[0],
-                "pubSignals1": _2FAProof.proof.pubSignals[1]
-            }
-        };
+          _id: stringToBigInt(twoFARequestID),
+          _randomNumber: randomNumber,
+          _userSecretHash: _2FA_secret_hash,
+          params: {
+            pA0: _2FAProof.proof.pi_a[0],
+            pA1: _2FAProof.proof.pi_a[1],
+            pB00: _2FAProof.proof.pi_b[0][0],
+            pB01: _2FAProof.proof.pi_b[0][1],
+            pB10: _2FAProof.proof.pi_b[1][0],
+            pB11: _2FAProof.proof.pi_b[1][1],
+            pC0: _2FAProof.proof.pi_c[0],
+            pC1: _2FAProof.proof.pi_c[1],
+            pubSignals0: _2FAProof.proof.pubSignals[0],
+            pubSignals1: _2FAProof.proof.pubSignals[1],
+          },
+        }
 
-        console.log(_2FASmartContractVerifyProofCallData);
+        console.log(_2FASmartContractVerifyProofCallData)
 
-        data = _2FAContract.methods.verifyProof(
+        data = _2FAContract.methods
+          .verifyProof(
             _2FASmartContractVerifyProofCallData._id,
             _2FASmartContractVerifyProofCallData._randomNumber,
             _2FASmartContractVerifyProofCallData._userSecretHash,
-            _2FASmartContractVerifyProofCallData.params
-        ).encodeABI();
+            _2FASmartContractVerifyProofCallData.params,
+          )
+          .encodeABI()
 
         txObject = {
-            from: userAddress,
-            to: _2FAContract.options.address,
-            data: data,
-            gas: 5000000
-        };
-        if(document.getElementById("submitButton")) {
-          document.getElementById("submitButton").textContent = "Awaiting 2FA acceptance..."
+          from: userAddress,
+          to: _2FAContract.options.address,
+          data: data,
+          gas: 5000000,
         }
-        receipt = await web3.eth.sendTransaction(txObject);
-        console.log("2FA verify proof receipt:", receipt);
-      }
-      else{
+        if (document.getElementById('submitButton')) {
+          document.getElementById('submitButton').textContent =
+            'Awaiting 2FA acceptance...'
+        }
+        receipt = await web3.eth.sendTransaction(txObject)
+        console.log('2FA verify proof receipt:', receipt)
+      } else {
         //non-chainlink 2FA variants
         const _2FASmartContractRequestProofCallData = {
-          _id: stringToBigInt(twoFARequestID),    //cast to big int once it's a string
+          _id: stringToBigInt(twoFARequestID), //cast to big int once it's a string
           _oneTimeKey: twoFAOneTimeToken,
         }
 
-        let data = _2FAContract.methods.requestProof(
-          _2FASmartContractRequestRandomNumberCallData._id,
-          _2FASmartContractRequestRandomNumberCallData._oneTimeKey).encodeABI();
+        let data = _2FAContract.methods
+          .requestProof(
+            _2FASmartContractRequestRandomNumberCallData._id,
+            _2FASmartContractRequestRandomNumberCallData._oneTimeKey,
+          )
+          .encodeABI()
         let txObject = {
           from: userAddress,
           to: _2FAContract.options.address,
           data: data,
-          gas: 500000
-        };
-        if(document.getElementById("submitButton")) {
-          document.getElementById("submitButton").textContent = "Awaiting response acceptance..."
+          gas: 500000,
         }
-        let receipt = await web3.eth.sendTransaction(txObject);
-        console.log("request proof receipt:", receipt);
+        if (document.getElementById('submitButton')) {
+          document.getElementById('submitButton').textContent =
+            'Awaiting response acceptance...'
+        }
+        let receipt = await web3.eth.sendTransaction(txObject)
+        console.log('request proof receipt:', receipt)
 
-        console.log(String(stringToBigInt(twoFactorAuthPassword)));
-        console.log(String(await poseidon([stringToBigInt(twoFactorAuthPassword)])));
+        console.log(String(stringToBigInt(twoFactorAuthPassword)))
+        console.log(
+          String(await poseidon([stringToBigInt(twoFactorAuthPassword)])),
+        )
 
-        let _2FA_secret_hash = String(await poseidon([stringToBigInt(twoFactorAuthPassword)]));
+        let _2FA_secret_hash = String(
+          await poseidon([stringToBigInt(twoFactorAuthPassword)]),
+        )
 
         const _2FAProof = await generate2FAProof({
-          "random_number": String(0),
-          "two_factor_secret": String(stringToBigInt(twoFactorAuthPassword)),
-          "secret_hash": _2FA_secret_hash,
+          random_number: String(0),
+          two_factor_secret: String(stringToBigInt(twoFactorAuthPassword)),
+          secret_hash: _2FA_secret_hash,
         })
 
-        console.log(_2FAProof);
+        console.log(_2FAProof)
 
         const _2FASmartContractVerifyProofCallData = {
-            "_id": stringToBigInt(twoFARequestID),
-            "_userSecretHash": _2FA_secret_hash,
-            "params": {
-                "pA0": _2FAProof.proof.pi_a[0],
-                "pA1": _2FAProof.proof.pi_a[1],
-                "pB00": _2FAProof.proof.pi_b[0][0],
-                "pB01": _2FAProof.proof.pi_b[0][1],
-                "pB10": _2FAProof.proof.pi_b[1][0],
-                "pB11": _2FAProof.proof.pi_b[1][1],
-                "pC0": _2FAProof.proof.pi_c[0],
-                "pC1": _2FAProof.proof.pi_c[1],
-                "pubSignals0": _2FAProof.proof.pubSignals[0],
-                "pubSignals1": _2FAProof.proof.pubSignals[1]
-            }
-        };
+          _id: stringToBigInt(twoFARequestID),
+          _userSecretHash: _2FA_secret_hash,
+          params: {
+            pA0: _2FAProof.proof.pi_a[0],
+            pA1: _2FAProof.proof.pi_a[1],
+            pB00: _2FAProof.proof.pi_b[0][0],
+            pB01: _2FAProof.proof.pi_b[0][1],
+            pB10: _2FAProof.proof.pi_b[1][0],
+            pB11: _2FAProof.proof.pi_b[1][1],
+            pC0: _2FAProof.proof.pi_c[0],
+            pC1: _2FAProof.proof.pi_c[1],
+            pubSignals0: _2FAProof.proof.pubSignals[0],
+            pubSignals1: _2FAProof.proof.pubSignals[1],
+          },
+        }
 
-        console.log(_2FASmartContractVerifyProofCallData);
+        console.log(_2FASmartContractVerifyProofCallData)
 
-        data = _2FAContract.methods.verifyProof(
+        data = _2FAContract.methods
+          .verifyProof(
             _2FASmartContractVerifyProofCallData._id,
             _2FASmartContractVerifyProofCallData._userSecretHash,
-            _2FASmartContractVerifyProofCallData.params
-        ).encodeABI();
+            _2FASmartContractVerifyProofCallData.params,
+          )
+          .encodeABI()
 
         txObject = {
-            from: userAddress,
-            to: _2FAContract.options.address,
-            data: data,
-            gas: 5000000
-        };
-        if(document.getElementById("submitButton")) {
-          document.getElementById("submitButton").textContent = "Awaiting response acceptance..."
+          from: userAddress,
+          to: _2FAContract.options.address,
+          data: data,
+          gas: 5000000,
         }
-        receipt = await web3.eth.sendTransaction(txObject);
-        console.log("2FA verify proof receipt:", receipt);
+        if (document.getElementById('submitButton')) {
+          document.getElementById('submitButton').textContent =
+            'Awaiting response acceptance...'
+        }
+        receipt = await web3.eth.sendTransaction(txObject)
+        console.log('2FA verify proof receipt:', receipt)
       }
     }
 
-    const coreContract = chainId == 43113 ? fujiCoreContract :
-                    chainId == 80001 ? mumbaiCoreContract :
-                    chainId == 1440002 ? rippleCoreContract : null;
+    const coreContract =
+      chainId == 43113
+        ? fujiCoreContract
+        : chainId == 80001
+          ? mumbaiCoreContract
+          : chainId == 1440002
+            ? rippleCoreContract
+            : null
 
-    console.log("2FA _id", twoFARequestID);
-    console.log("2FA _oneTimeKey", twoFAOneTimeToken);
-    console.log("2FA two_factor_secret", twoFactorAuthPassword);
-    console.log("core requestId", requestID);
-    console.log("field", fieldRequested);
-    console.log("salt", oneTimeSalt);
-    console.log("contract password", contractPassword);
-    console.log("core one time key", oneTimeKey);
+    console.log('2FA _id', twoFARequestID)
+    console.log('2FA _oneTimeKey', twoFAOneTimeToken)
+    console.log('2FA two_factor_secret', twoFactorAuthPassword)
+    console.log('core requestId', requestID)
+    console.log('field', fieldRequested)
+    console.log('salt', oneTimeSalt)
+    console.log('contract password', contractPassword)
+    console.log('core one time key', oneTimeKey)
 
-    const field = splitTo24(fieldRequested);
-    console.log("field:", field);
+    const field = splitTo24(fieldRequested)
+    console.log('field:', field)
 
-    const salt = oneTimeSalt;
-    console.log("salt:", oneTimeSalt);
+    const salt = oneTimeSalt
+    console.log('salt:', oneTimeSalt)
 
-    const one_time_key = splitTo24(oneTimeKey);
-    console.log("one_time_key:", one_time_key);
+    const one_time_key = splitTo24(oneTimeKey)
+    console.log('one_time_key:', one_time_key)
 
-    const user_secret = splitTo24(contractPassword);
-    console.log("user_secret:", user_secret);
+    const user_secret = splitTo24(contractPassword)
+    console.log('user_secret:', user_secret)
 
-    const provided_field_and_key_hash = await poseidon(([field[0], field[1], one_time_key[0], one_time_key[1]]).map((x)=>stringToBigInt(x)));
-    console.log("provided_field_and_key_hash:", provided_field_and_key_hash);
+    const provided_field_and_key_hash = await poseidon(
+      [field[0], field[1], one_time_key[0], one_time_key[1]].map((x) =>
+        stringToBigInt(x),
+      ),
+    )
+    console.log('provided_field_and_key_hash:', provided_field_and_key_hash)
 
-    const provided_field_and_salt_and_user_secret_hash = await poseidon(([field[0], field[1], salt, user_secret[0], user_secret[1]]).map((x)=>stringToBigInt(x)));
-    console.log("provided_field_and_salt_and_user_secret_hash:", provided_field_and_salt_and_user_secret_hash);
+    const provided_field_and_salt_and_user_secret_hash = await poseidon(
+      [field[0], field[1], salt, user_secret[0], user_secret[1]].map((x) =>
+        stringToBigInt(x),
+      ),
+    )
+    console.log(
+      'provided_field_and_salt_and_user_secret_hash:',
+      provided_field_and_salt_and_user_secret_hash,
+    )
 
-    const provided_salt_hash = await poseidon([stringToBigInt(oneTimeSalt)]);
-    console.log("provided_salt_hash:", provided_salt_hash);
+    const provided_salt_hash = await poseidon([stringToBigInt(oneTimeSalt)])
+    console.log('provided_salt_hash:', provided_salt_hash)
 
-    const dataLocation = await poseidon(([field[0], field[1], salt, user_secret[0], user_secret[1]]).map((x)=>stringToBigInt(x)));
-    console.log("dataLocation:", dataLocation);
+    const dataLocation = await poseidon(
+      [field[0], field[1], salt, user_secret[0], user_secret[1]].map((x) =>
+        stringToBigInt(x),
+      ),
+    )
+    console.log('dataLocation:', dataLocation)
 
     const coreProof = await generateCoreProof({
-      "field_0": stringToBigInt(field[0]),
-      "field_1": stringToBigInt(field[1]),
-      "field_salt": stringToBigInt(salt),
-      "one_time_key_0": stringToBigInt(one_time_key[0]),
-      "one_time_key_1": stringToBigInt(one_time_key[1]),
-      "user_secret_0": stringToBigInt(user_secret[0]),
-      "user_secret_1": stringToBigInt(user_secret[1]),
-      "provided_field_and_key_hash": provided_field_and_key_hash,
-      "provided_field_and_salt_and_user_secret_hash": provided_field_and_salt_and_user_secret_hash,
-      "provided_salt_hash": provided_salt_hash
+      field_0: stringToBigInt(field[0]),
+      field_1: stringToBigInt(field[1]),
+      field_salt: stringToBigInt(salt),
+      one_time_key_0: stringToBigInt(one_time_key[0]),
+      one_time_key_1: stringToBigInt(one_time_key[1]),
+      user_secret_0: stringToBigInt(user_secret[0]),
+      user_secret_1: stringToBigInt(user_secret[1]),
+      provided_field_and_key_hash: provided_field_and_key_hash,
+      provided_field_and_salt_and_user_secret_hash:
+        provided_field_and_salt_and_user_secret_hash,
+      provided_salt_hash: provided_salt_hash,
     })
-    console.log("coreProof:", coreProof);
+    console.log('coreProof:', coreProof)
 
-    console.log(coreProof);
-                                          
+    console.log(coreProof)
+
     const respondCallData = {
-        "requestId": requestID,
-        "dataLocation": dataLocation,
-        "saltHash": provided_salt_hash,
-        "params": {
-            "pA0": coreProof.proof.pi_a[0],
-            "pA1": coreProof.proof.pi_a[1],
-            "pB00": coreProof.proof.pi_b[0][0],
-            "pB01": coreProof.proof.pi_b[0][1],
-            "pB10": coreProof.proof.pi_b[1][0],
-            "pB11": coreProof.proof.pi_b[1][1],
-            "pC0": coreProof.proof.pi_c[0],
-            "pC1": coreProof.proof.pi_c[1],
-            "pubSignals0": coreProof.proof.pubSignals[0],
-            "pubSignals1": coreProof.proof.pubSignals[1],
-            "pubSignals2": coreProof.proof.pubSignals[2]
-        },
-        "isUpdate": false,
-    };
+      requestId: requestID,
+      dataLocation: dataLocation,
+      saltHash: provided_salt_hash,
+      params: {
+        pA0: coreProof.proof.pi_a[0],
+        pA1: coreProof.proof.pi_a[1],
+        pB00: coreProof.proof.pi_b[0][0],
+        pB01: coreProof.proof.pi_b[0][1],
+        pB10: coreProof.proof.pi_b[1][0],
+        pB11: coreProof.proof.pi_b[1][1],
+        pC0: coreProof.proof.pi_c[0],
+        pC1: coreProof.proof.pi_c[1],
+        pubSignals0: coreProof.proof.pubSignals[0],
+        pubSignals1: coreProof.proof.pubSignals[1],
+        pubSignals2: coreProof.proof.pubSignals[2],
+      },
+      isUpdate: false,
+    }
 
-    console.log(respondCallData);
+    console.log(respondCallData)
 
-    let data = coreContract.methods.respond(
+    let data = coreContract.methods
+      .respond(
         respondCallData.requestId,
         respondCallData.dataLocation,
         respondCallData.saltHash,
         respondCallData.params,
-        respondCallData.isUpdate
-    ).encodeABI();
+        respondCallData.isUpdate,
+      )
+      .encodeABI()
 
     let txObject = {
-        from: userAddress,
-        to: coreContract.options.address,
-        data: data,
-        gas: 5000000
-    };
+      from: userAddress,
+      to: coreContract.options.address,
+      data: data,
+      gas: 5000000,
+    }
 
-    if (require2FA){
-      if (chainId!=1440002){
-        let twoFASuccess;
+    if (require2FA) {
+      if (chainId != 1440002) {
+        let twoFASuccess
         for (let attempt = 0; attempt < 30; attempt++) {
-          twoFASuccess = await _2FAContract.methods.twoFactorData(stringToBigInt(twoFARequestID)).call();
-          console.log("2FA Finality:", twoFASuccess.success);
-          if(twoFASuccess.success)
-            break; 
-          await new Promise(resolve => setTimeout(resolve, 2000)); 
+          twoFASuccess = await _2FAContract.methods
+            .twoFactorData(stringToBigInt(twoFARequestID))
+            .call()
+          console.log('2FA Finality:', twoFASuccess.success)
+          if (twoFASuccess.success) break
+          await new Promise((resolve) => setTimeout(resolve, 2000))
         }
       }
     }
-    if(document.getElementById("submitButton")) {
-      document.getElementById("submitButton").textContent = "Awaiting final response acceptance..."
+    if (document.getElementById('submitButton')) {
+      document.getElementById('submitButton').textContent =
+        'Awaiting final response acceptance...'
     }
-    let receipt = await web3.eth.sendTransaction(txObject);
-    console.log("core verify proof receipt:", receipt);
-    onSubmit();
-    if(document.getElementById("submitButton")) {
-      document.getElementById("submitButton").textContent = "Submitting response..."
+    let receipt = await web3.eth.sendTransaction(txObject)
+    console.log('core verify proof receipt:', receipt)
+    onSubmit()
+    if (document.getElementById('submitButton')) {
+      document.getElementById('submitButton').textContent =
+        'Submitting response...'
     }
-    onClose();
+    onClose()
   }
 
   return (
     <Transition.Root show={open} as={Fragment}>
-      <Dialog as="div" className="fixed inset-0 overflow-y-auto z-10 dark:bg-opacity-75 shadow-emerald-600" onClose={onClose}>
-        <div className="min-h-screen flex items-center justify-center">
+      <Dialog
+        as="div"
+        className="fixed inset-0 z-10 overflow-y-auto shadow-emerald-600 dark:bg-opacity-75"
+        onClose={onClose}
+      >
+        <div className="flex min-h-screen items-center justify-center">
           <Transition.Child
             as={Fragment}
             enter="ease-out duration-300"
@@ -365,16 +430,16 @@ export function SendDataModal({
             leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
           >
             <div>
-              <div className="relative bg-white rounded-lg max-w-screen-2xl mx-auto mt-6 px-4 pt-5 pb-4 text-left shadow-xl dark:bg-gray-800 sm:my-20 sm:w-full sm:max-w-3xl sm:p-6">
+              <div className="relative mx-auto mt-6 max-w-screen-2xl rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl dark:bg-gray-800 sm:my-20 sm:w-full sm:max-w-3xl sm:p-6">
                 <div className="absolute right-0 top-0 hidden pr-4 pt-4 sm:block">
                   <button
                     type="button"
-                    className="rounded-md bg-white dark:bg-gray-800 text-gray-400 dark:text-gray-600 hover:text-gray-500 dark:hover-text-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                    className="dark:hover-text-gray-400 rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 dark:bg-gray-800 dark:text-gray-600"
                     onClick={onClose}
                   >
                     <span className="sr-only">Close</span>
                     <XMarkIcon
-                      className="h-6 w-6 text-emerald-500 dark:text-emerald-300 hover:text-emerald-600 dark:hover:text-emerald-400"
+                      className="h-6 w-6 text-emerald-500 hover:text-emerald-600 dark:text-emerald-300 dark:hover:text-emerald-400"
                       aria-hidden="true"
                     />
                   </button>
@@ -385,15 +450,17 @@ export function SendDataModal({
                 >
                   Send Requested Data
                 </Dialog.Title>
-                <div className="mt-2 px-1 pb-1 lg:max-h-[65vh] max-h-[40vh] overflow-y-auto min-w-[16rem] md:min-w-[40rem] lg:min-w-[40rem]">
-
+                <div className="mt-2 max-h-[40vh] min-w-[16rem] overflow-y-auto px-1 pb-1 md:min-w-[40rem] lg:max-h-[65vh] lg:min-w-[40rem]">
                   <div className="mt-4">
-                    <label htmlFor="addressOfRequestingParty" className="block text-sm font-medium leading-5 text-gray-900 dark:text-white">
+                    <label
+                      htmlFor="addressOfRequestingParty"
+                      className="block text-sm font-medium leading-5 text-gray-900 dark:text-white"
+                    >
                       Address of Requesting Party:
                     </label>
                     <textarea
                       id="addressOfRequestingParty"
-                      className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
+                      className="relative mt-1 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 dark:focus:border-emerald-500 sm:text-sm"
                       rows={1}
                       readOnly
                       spellCheck="false"
@@ -402,12 +469,15 @@ export function SendDataModal({
                   </div>
 
                   <div className="mt-4">
-                    <label htmlFor="fieldRequested" className="block text-sm font-medium leading-5 text-gray-900 dark:text-white">
+                    <label
+                      htmlFor="fieldRequested"
+                      className="block text-sm font-medium leading-5 text-gray-900 dark:text-white"
+                    >
                       Field Requested:
                     </label>
                     <textarea
                       id="fieldRequested"
-                      className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
+                      className="relative mt-1 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 dark:focus:border-emerald-500 sm:text-sm"
                       rows={1}
                       readOnly
                       spellCheck="false"
@@ -416,12 +486,15 @@ export function SendDataModal({
                   </div>
 
                   <div className="mt-4">
-                    <label htmlFor="data" className="block text-sm font-medium leading-5 text-gray-900 dark:text-white">
+                    <label
+                      htmlFor="data"
+                      className="block text-sm font-medium leading-5 text-gray-900 dark:text-white"
+                    >
                       Data:
                     </label>
                     <textarea
                       id="data"
-                      className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
+                      className="relative mt-1 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 dark:focus:border-emerald-500 sm:text-sm"
                       rows={8}
                       readOnly
                       spellCheck="false"
@@ -432,12 +505,15 @@ export function SendDataModal({
                   <hr className="my-4 border-gray-300 dark:border-gray-700" />
 
                   <div className="mt-4">
-                    <label htmlFor="oneTimeKey" className="block text-sm font-medium leading-5 text-gray-900 dark:text-white">
+                    <label
+                      htmlFor="oneTimeKey"
+                      className="block text-sm font-medium leading-5 text-gray-900 dark:text-white"
+                    >
                       One Time Key:
                     </label>
                     <textarea
                       id="oneTimeKey"
-                      className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
+                      className="relative mt-1 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 dark:focus:border-emerald-500 sm:text-sm"
                       rows={1}
                       readOnly
                       spellCheck="false"
@@ -446,12 +522,15 @@ export function SendDataModal({
                   </div>
 
                   <div className="mt-4">
-                    <label htmlFor="oneTimeSalt" className="block text-sm font-medium leading-5 text-gray-900 dark:text-white">
+                    <label
+                      htmlFor="oneTimeSalt"
+                      className="block text-sm font-medium leading-5 text-gray-900 dark:text-white"
+                    >
                       One Time Salt:
                     </label>
                     <textarea
                       id="oneTimeSalt"
-                      className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
+                      className="relative mt-1 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 dark:focus:border-emerald-500 sm:text-sm"
                       rows={1}
                       readOnly
                       spellCheck="false"
@@ -460,12 +539,15 @@ export function SendDataModal({
                   </div>
 
                   <div className="mt-4">
-                    <label htmlFor="timeLimit" className="block text-sm font-medium leading-5 text-gray-900 dark:text-white">
+                    <label
+                      htmlFor="timeLimit"
+                      className="block text-sm font-medium leading-5 text-gray-900 dark:text-white"
+                    >
                       Time Limit of Request (in seconds):
                     </label>
                     <textarea
                       id="timeLimit"
-                      className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
+                      className="relative mt-1 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 dark:focus:border-emerald-500 sm:text-sm"
                       rows={1}
                       readOnly
                       spellCheck="false"
@@ -474,13 +556,16 @@ export function SendDataModal({
                   </div>
 
                   <div className="mt-4">
-                    <label htmlFor="require2FA" className="block text-sm font-medium leading-5 text-gray-900 dark:text-white">
+                    <label
+                      htmlFor="require2FA"
+                      className="block text-sm font-medium leading-5 text-gray-900 dark:text-white"
+                    >
                       2FA Required?
                     </label>
                     <input
                       type="checkbox"
                       id="require2FA"
-                      className="mt-2 ml-1 h-4 w-4 rounded border border-gray-300 dark:border-gray-700 text-emerald-600 focus:ring-emerald-500"
+                      className="ml-1 mt-2 h-4 w-4 rounded border border-gray-300 text-emerald-600 focus:ring-emerald-500 dark:border-gray-700"
                       disabled
                       checked={require2FA}
                     />
@@ -489,12 +574,15 @@ export function SendDataModal({
                   {require2FA && (
                     <>
                       <div className="mt-4">
-                        <label htmlFor="twoFAProvider" className="block text-sm font-medium leading-5 text-gray-900 dark:text-white">
+                        <label
+                          htmlFor="twoFAProvider"
+                          className="block text-sm font-medium leading-5 text-gray-900 dark:text-white"
+                        >
                           2FA Provider (address/name):
                         </label>
                         <textarea
                           id="twoFAProvider"
-                          className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
+                          className="relative mt-1 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 dark:focus:border-emerald-500 sm:text-sm"
                           rows={1}
                           readOnly
                           spellCheck="false"
@@ -503,12 +591,15 @@ export function SendDataModal({
                       </div>
 
                       <div className="mt-4">
-                        <label htmlFor="twoFARequestID" className="block text-sm font-medium leading-5 text-gray-900 dark:text-white">
+                        <label
+                          htmlFor="twoFARequestID"
+                          className="block text-sm font-medium leading-5 text-gray-900 dark:text-white"
+                        >
                           2FA Request ID:
                         </label>
                         <textarea
                           id="twoFARequestID"
-                          className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
+                          className="relative mt-1 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 dark:focus:border-emerald-500 sm:text-sm"
                           rows={1}
                           readOnly
                           spellCheck="false"
@@ -517,39 +608,54 @@ export function SendDataModal({
                       </div>
 
                       <div className="mt-4">
-                        <label htmlFor="twoFAOneTimeToken" className="block text-sm font-medium leading-5 text-gray-900 dark:text-white">
+                        <label
+                          htmlFor="twoFAOneTimeToken"
+                          className="block text-sm font-medium leading-5 text-gray-900 dark:text-white"
+                        >
                           2FA One Time Token:
                         </label>
                         <textarea
                           id="twoFAOneTimeToken"
-                          className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
+                          className="relative mt-1 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 dark:focus:border-emerald-500 sm:text-sm"
                           rows={1}
                           readOnly
                           spellCheck="false"
                           value={twoFAOneTimeToken}
                         />
                       </div>
-                      
-                      {(twoFAProvider.includes("zkp.services") || twoFAProvider.includes(_2FAContract?._address)) && (
+
+                      {(twoFAProvider.includes('zkp.services') ||
+                        twoFAProvider.includes(_2FAContract?._address)) && (
                         <>
                           <div className="mt-6">
-                            <label htmlFor="disclaimer" className="block text-sm font-bold leading-5 text-gray-900 dark:text-white">
+                            <label
+                              htmlFor="disclaimer"
+                              className="block text-sm font-bold leading-5 text-gray-900 dark:text-white"
+                            >
                               Additional Contract Calls:
                             </label>
-                            <p className="text-gray-500 dark:text-gray-300 mt-2 whitespace-normal">
-                              Since the 2FA provider is zkp.services, a few smart contract calls may precede the core update smart 
-                              contract call if 2FA has not already been completed.
+                            <p className="mt-2 whitespace-normal text-gray-500 dark:text-gray-300">
+                              Since the 2FA provider is zkp.services, a few
+                              smart contract calls may precede the core update
+                              smart contract call if 2FA has not already been
+                              completed.
                             </p>
                           </div>
                         </>
                       )}
 
                       <div className="mt-6">
-                        <label htmlFor="disclaimer" className="block text-sm font-bold leading-5 text-gray-900 dark:text-white">
+                        <label
+                          htmlFor="disclaimer"
+                          className="block text-sm font-bold leading-5 text-gray-900 dark:text-white"
+                        >
                           Disclaimer:
                         </label>
-                        <p className="text-gray-500 dark:text-gray-300 mt-2 whitespace-normal">
-                          2FA can only be completed via this dApp if a zkp.services 2FA provider has been chosen and the one time token was attached. For other providers, please use the dApp/frontend/etc. to complete 2FA.
+                        <p className="mt-2 whitespace-normal text-gray-500 dark:text-gray-300">
+                          2FA can only be completed via this dApp if a
+                          zkp.services 2FA provider has been chosen and the one
+                          time token was attached. For other providers, please
+                          use the dApp/frontend/etc. to complete 2FA.
                         </p>
                       </div>
                     </>
@@ -558,25 +664,27 @@ export function SendDataModal({
                   <hr className="my-4 border-gray-300 dark:border-gray-700" />
 
                   <div className="mt-4">
-                    <label htmlFor="responseFee" className="block text-sm font-medium leading-5 text-gray-900 dark:text-white">
+                    <label
+                      htmlFor="responseFee"
+                      className="block text-sm font-medium leading-5 text-gray-900 dark:text-white"
+                    >
                       Response Fee:
                     </label>
                     <textarea
                       id="responseFee"
-                      className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
+                      className="relative mt-1 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 dark:focus:border-emerald-500 sm:text-sm"
                       rows={1}
                       readOnly
                       spellCheck="false"
                       value={responseFee}
                     />
                   </div>
-
                 </div>
 
                 <div className="mt-6 flex justify-end">
                   <button
                     type="button"
-                    className="mt-3 ml-3 inline-flex w-full justify-center rounded-md bg-slate-100 dark:bg-slate-800 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-slate-200 dark:hover:bg-slate-900 sm:mt-0 sm:w-auto"
+                    className="ml-3 mt-3 inline-flex w-full justify-center rounded-md bg-slate-100 px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-slate-200 dark:bg-slate-800 dark:text-white dark:ring-gray-600 dark:hover:bg-slate-900 sm:mt-0 sm:w-auto"
                     onClick={onClose}
                   >
                     Cancel
@@ -584,11 +692,11 @@ export function SendDataModal({
                   <button
                     type="button"
                     id="submitButton"
-                    className="ml-3 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                    className="ml-3 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
                     onClick={handleSubmit}
                   >
                     Send Data
-                  </button> 
+                  </button>
                 </div>
               </div>
             </div>
@@ -596,5 +704,5 @@ export function SendDataModal({
         </div>
       </Dialog>
     </Transition.Root>
-  );
+  )
 }

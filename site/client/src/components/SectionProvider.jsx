@@ -17,7 +17,7 @@ function createSectionStore(sections) {
       set((state) =>
         state.visibleSections.join() === visibleSections.join()
           ? {}
-          : { visibleSections }
+          : { visibleSections },
       ),
     registerHeading: ({ id, ref, offsetRem }) =>
       set((state) => {

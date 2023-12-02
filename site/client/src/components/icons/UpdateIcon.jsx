@@ -9,5 +9,5 @@ export function UpdateIcon(props) {
         strokeWidth="25"
       />
     </svg>
-  );
+  )
 }
