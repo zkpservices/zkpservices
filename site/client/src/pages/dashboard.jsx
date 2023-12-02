@@ -28,6 +28,9 @@ export function Dashboard() {
     chainId,
     isOnboarding,
     metamaskAvailable,
+    setApiErrorNotif,
+    setApiErrorTopText,
+    setApiErrorBottomText
   } = useGlobal()
 
   // loggedIn = true;
@@ -118,6 +121,9 @@ export function Dashboard() {
       setOnboardedChain(true)
     } catch (error) {
       setOnboardedChain(false)
+      setApiErrorNotif(true)
+      setApiErrorTopText("Error establishing chain onboarded status:")
+      setApiErrorBottomText(error.toString())
       console.error(`Error establishing chain onboarded status: ${error}`)
     }
   }

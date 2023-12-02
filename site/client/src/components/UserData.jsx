@@ -146,31 +146,49 @@ export function UserData({ fieldNames = [], handleRemove, handleAdd }) {
     setDashboard,
     chainId,
     contractPassword,
+    apiErrorNotif,
+    setApiErrorNotif,
+    setApiErrorTopText,
+    setApiErrorBottomText
   } = useGlobal()
 
   async function addServiceToDashboard(service) {
     setAddDataModalOpen(false)
     handleAdd(service)
-    const addToDashboardResult = await addToDashboard(
-      userAddress,
-      userPassword,
-      service,
-      chainId,
-    )
+    try {
+      const addToDashboardResult = await addToDashboard(
+        userAddress,
+        userPassword,
+        service,
+        chainId,
+      )
+    } catch (error) {
+      console.error("Error adding to dashboard.")
+      setApiErrorTopText("Error adding to dashboard.")
+      setApiErrorBottomText(error.toString())
+      setApiErrorNotif(true)
+    }
   }
 
   async function removeServiceFromDashboard(service) {
     setSelectedFieldName(null)
     handleRemove(service)
+    try {
     const removeServiceFromDashboardResult = await removeFromDashboard(
       userAddress,
       userPassword,
       service,
       chainId,
     )
+    } catch (error) {
+      setApiErrorNotif(true)
+      setApiErrorTopText("Error removing field from dashboard")
+      setApiErrorBottomText(error.toString())
+    }
   }
 
   async function openFieldModal(fieldName) {
+    try {
     let localFieldData = await getFieldData(
       userAddress,
       userPassword,
@@ -203,6 +221,11 @@ export function UserData({ fieldNames = [], handleRemove, handleAdd }) {
     setSelectedSaltHash(saltHash)
     setSelectedHash(dataHash['rootHash'])
     setSelectedSalt(localFieldData['data'][fieldName]['_metadata']['salt'])
+  } catch (error) {
+    setApiErrorNotif(true)
+    setApiErrorTopText("Error fetching field data")
+    setApiErrorBottomText(error.toString())
+  }
   }
 
   const closeFieldModal = () => {
@@ -216,18 +239,24 @@ export function UserData({ fieldNames = [], handleRemove, handleAdd }) {
   }
 
   async function openAddDataModal() {
-    const localAvailableDashboard = await getAvailableDashboard(
-      userAddress,
-      userPassword,
-      chainId,
-    )
-    const differenceDashboard = findUniqueElements(
-      localAvailableDashboard['data'],
-      fieldNames,
-    )
+    try {
+      const localAvailableDashboard = await getAvailableDashboard(
+        userAddress,
+        userPassword,
+        chainId,
+      )
+      const differenceDashboard = findUniqueElements(
+        localAvailableDashboard['data'],
+        fieldNames,
+      )
 
-    setAvailableDashboard(differenceDashboard)
-    setAddDataModalOpen(true)
+      setAvailableDashboard(differenceDashboard)
+      setAddDataModalOpen(true)
+    } catch (error) {
+      setApiErrorNotif(true)
+      setApiErrorTopText("Error getting available dashboard elements")
+      setApiErrorBottomText(error.toString())
+    }
   }
 
   const closeAddDataModal = () => {

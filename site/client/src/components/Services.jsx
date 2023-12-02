@@ -205,6 +205,9 @@ export function Services({ handleRefresh }) {
     isOnboarding,
     setIsOnboarding,
     onboardedChain,
+    setApiErrorNotif,
+    setApiErrorTopText,
+    setApiErrorBottomText
   } = useGlobal()
 
   const [showNotif, setShowNotif] = useState(false);
@@ -213,34 +216,40 @@ export function Services({ handleRefresh }) {
   const [notifBottomText, setNotifBottomText] = useState("");
 
   const pullChainData = async (userAddress, userPassword, chainId) => {
-    const chainData = await getChainData(userAddress, userPassword, chainId)
-    console.log(JSON.stringify(chainData, null, 2))
-    let keysList = Object.keys(chainData['data']).filter(
-      (a) => a !== '2fa_password',
-    )
-    const filteredKeysList = Object.keys(chains).filter(
-      (item) => !keysList.includes(item),
-    )
-    const usedChainsList = Object.keys(chains)
-      .filter((item) => keysList.includes(item) && item != chainId)
-      .map((key) => chains[key])
-    setUsedChains(usedChainsList)
-    const result = filteredKeysList.map((key) => chains[key])
-    const userSecretHashBigint = stringToBigInt(
-      chainData['data']['props']['2fa_password'],
-    )
-    const userSecretHashLocal = await poseidon([
-      userSecretHashBigint.toString(),
-    ])
-    setAvailableChains(result)
-    const propsLocal = chainData['data']['props']
-    propsLocal['userSecretHash'] = userSecretHashLocal
-    propsLocal['rsa_enc_pub_key'] =
-      chainData['data'][chainId]['rsa_enc_pub_key']
-    propsLocal['rsa_sign_pub_key'] =
-      chainData['data'][chainId]['rsa_sign_pub_key']
-    propsLocal['public_info'] = chainData['data'][chainId]['public_info']
-    setProps(propsLocal)
+    try {
+      const chainData = await getChainData(userAddress, userPassword, chainId)
+      console.log(JSON.stringify(chainData, null, 2))
+      let keysList = Object.keys(chainData['data']).filter(
+        (a) => a !== '2fa_password',
+      )
+      const filteredKeysList = Object.keys(chains).filter(
+        (item) => !keysList.includes(item),
+      )
+      const usedChainsList = Object.keys(chains)
+        .filter((item) => keysList.includes(item) && item != chainId)
+        .map((key) => chains[key])
+      setUsedChains(usedChainsList)
+      const result = filteredKeysList.map((key) => chains[key])
+      const userSecretHashBigint = stringToBigInt(
+        chainData['data']['props']['2fa_password'],
+      )
+      const userSecretHashLocal = await poseidon([
+        userSecretHashBigint.toString(),
+      ])
+      setAvailableChains(result)
+      const propsLocal = chainData['data']['props']
+      propsLocal['userSecretHash'] = userSecretHashLocal
+      propsLocal['rsa_enc_pub_key'] =
+        chainData['data'][chainId]['rsa_enc_pub_key']
+      propsLocal['rsa_sign_pub_key'] =
+        chainData['data'][chainId]['rsa_sign_pub_key']
+      propsLocal['public_info'] = chainData['data'][chainId]['public_info']
+      setProps(propsLocal)
+    } catch (error) {
+      setApiErrorNotif(true)
+      setApiErrorTopText("Error fetching chain data")
+      setApiErrorBottomText(error.toString())
+    }
   }
 
   async function addNewRequest(requestData) {
@@ -252,12 +261,18 @@ export function Services({ handleRefresh }) {
     const finalRequestData = {
       request: compiledRequestData,
     }
+    try {
     const addRequestResult = await addRequest(
       userAddress,
       userPassword,
       finalRequestData,
       chainId,
     )
+    } catch (error) {
+      setApiErrorNotif(true)
+      setApiErrorTopText("Error adding request")
+      setApiErrorBottomText(error.toString())
+    }
   }
 
   useEffect(() => {

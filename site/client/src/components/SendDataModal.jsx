@@ -453,7 +453,7 @@ export function SendDataModal({
     try {
       let receipt = await web3.eth.sendTransaction(txObject)
       console.log('core verify proof receipt:', receipt)
-    } catch {
+    } catch (error) {
       console.error(error)
       resetSubmitButton()
       makeErrorNotif("Error submitting response transaction", error.toString())
@@ -703,13 +703,6 @@ export function SendDataModal({
                         twoFAProvider.includes(_2FAContract?._address)) && (
                         <>
                           <div className="mt-6">
-                            <Notification
-                              open={showErrorNotif}
-                              error={true}
-                              showTopText={errorTopText}
-                              showBottomText={errorBottomText}
-                              onClose={() => setShowErrorNotif(false)}
-                            />
                             <label
                               htmlFor="disclaimer"
                               className="block text-sm font-bold leading-5 text-gray-900 dark:text-white"
@@ -727,6 +720,13 @@ export function SendDataModal({
                       )}
 
                       <div className="mt-6">
+                        <Notification
+                          open={showErrorNotif}
+                          error={true}
+                          showTopText={errorTopText}
+                          showBottomText={errorBottomText}
+                          onClose={() => setShowErrorNotif(false)}
+                          />
                         <label
                           htmlFor="disclaimer"
                           className="block text-sm font-bold leading-5 text-gray-900 dark:text-white"

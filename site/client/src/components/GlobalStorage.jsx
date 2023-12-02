@@ -182,6 +182,33 @@ export function GlobalProvider({ children }) {
     return false
   })
 
+  const [apiErrorNotif, setApiErrorNotif] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const localShowLoginNotification =
+        localStorage.getItem('apiErrorNotif')
+      return localShowLoginNotification === 'true' || false
+    }
+    return false
+  })
+
+  const [apiErrorTopText, setApiErrorTopText] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const localShowLoginNotification =
+        localStorage.getItem('apiErrorTopText')
+      return localShowLoginNotification === 'true' || false
+    }
+    return false
+  })
+
+  const [apiErrorBottomText, setApiErrorBottomText] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const localShowLoginNotification =
+        localStorage.getItem('apiErrorBottomText')
+      return localShowLoginNotification === 'true' || false
+    }
+    return false
+  })
+
   useEffect(() => {
     // Update localStorage when any relevant state variable changes
     localStorage.setItem('walletConnected', walletConnected)
@@ -207,6 +234,9 @@ export function GlobalProvider({ children }) {
     localStorage.setItem('rippleBatchSignUpContract', rippleBatchSignUpContract)
     localStorage.setItem('onboardedChain', onboardedChain)
     localStorage.setItem('metamaskAvailable', metamaskAvailable)
+    localStorage.setItem('apiErrorNotif', apiErrorNotif),
+    localStorage.setItem('apiErrorTopText', apiErrorTopText),
+    localStorage.setItem('apiErrorBottomText', apiErrorBottomText)
   }, [
     userAddress,
     walletConnected,
@@ -232,6 +262,9 @@ export function GlobalProvider({ children }) {
     isOnboarding,
     onboardedChain,
     metamaskAvailable,
+    apiErrorNotif,
+    apiErrorTopText,
+    apiErrorBottomText
   ])
 
   return (
@@ -285,6 +318,12 @@ export function GlobalProvider({ children }) {
         setOnboardedChain,
         metamaskAvailable,
         setMetamaskAvailable,
+        apiErrorNotif,
+        setApiErrorNotif,
+        apiErrorTopText,
+        setApiErrorTopText,
+        apiErrorBottomText,
+        setApiErrorBottomText
       }}
     >
       {children}

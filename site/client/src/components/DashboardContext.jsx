@@ -57,6 +57,10 @@ export function DashboardContext() {
     setOnboardedChain,
     metamaskAvailable,
     setMetamaskAvailable,
+    apiErrorNotif,
+    setApiErrorNotif,
+    setApiErrorTopText,
+    setApiErrorBottomText
   } = useGlobal()
 
   async function initializeWeb3() {
@@ -301,6 +305,16 @@ export function DashboardContext() {
     return [...formattedRequests, ...formattedResponses]
   }
 
+  const paramToSyncDict = {
+    'data': 'Data',
+    'data_request': 'Data Request',
+    'update_request': 'Update Request',
+    'response': 'Response',
+    'public_info': 'Public User Information',
+    'rsa_enc_keys': 'RSA Encryption Keys',
+    'rsa_sign_keys': 'RSA Signing Keys'
+  }
+
   async function loadAllHistory() {
     async function fetchHistoryData() {
       try {
@@ -311,23 +325,30 @@ export function DashboardContext() {
         )
         setContractPassword(initialData['data']['props']['contract_password'])
         setTwoFactorAuthPassword(initialData['data']['props']['2fa_password'])
-
-        const cctxData = await getCCTX(userAddress, userPassword, chainId)
-        const dataArray = cctxData['data']
-
         try {
+          const cctxData = await getCCTX(userAddress, userPassword, chainId)
+          
+          const dataArray = cctxData['data']
+
+        
           // Attempt to parse the string into an array
           // Check if dataArray is an array
           if (Array.isArray(dataArray)) {
             // The parsed data is an array
+            console.log(`CCTX item: ${JSON.stringify(dataArray, null, 2)}`)
             const transformedData = dataArray.map((item) => ({
               operation: ['Sync Data'],
               field: [
-                item.field,
-                `From: ${item.source_chain} to ${item.destination_chain}`,
+                item.parameter_key,
+                `From: ${item.source_chain} to ${item.target_chain}`,
               ],
-              status: ['Sync Completed', 'button'],
-              details: ['View Details', `${truncateAddress(item.ccid_id)}`],
+              status: ['Sync Completed', 'grey'],
+              details: ['View Details', `${truncateAddress(item.ccid)}`],
+              type: 'cctx',
+              paramType: paramToSyncDict[item.parameter],
+              sourceChain: item.source_chain,
+              destinationChain: item.target_chain,
+              ccid: item.ccid
             }))
             setTableData((prevTableData) => ({
               ...prevTableData,
@@ -339,7 +360,10 @@ export function DashboardContext() {
           }
         } catch (error) {
           // JSON parsing error
-          console.error('Error parsing JSON data:', error)
+          setApiErrorNotif(true)
+          setApiErrorTopText("Error fetching CCTX")
+          setApiErrorBottomText(error.toString())
+          console.error('Error fetching CCTX', error)
         }
 
         // Fetch incoming and outgoing data
@@ -366,7 +390,11 @@ export function DashboardContext() {
           Outgoing: outgoingFinal,
         }))
       } catch (error) {
-        console.error('Error fetching user data A:', error)
+        setApiErrorNotif(true)
+        setApiErrorTopText("Error fetching user data")
+        setApiErrorBottomText(error.toString())
+        console.error('Error fetching user data:', error)
+        
       }
     }
     fetchHistoryData()
@@ -383,7 +411,11 @@ export function DashboardContext() {
       setUserDataFields(localdashboard['data'])
       setOnboardedChain(true)
     } catch (error) {
-      console.error('Error fetching user data fields:', error)
+      
+      setApiErrorNotif(true)
+      setApiErrorTopText('Error getting dashboard data')
+      setApiErrorBottomText(error.toString())
+      console.error('Error getting dashboard data:', error)
       setOnboardedChain(false)
     }
   }

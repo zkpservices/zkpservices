@@ -5,6 +5,7 @@ import { useGlobal } from '@/components/GlobalStorage'
 import { poseidon } from './PoseidonHash'
 import { getFieldData, addCCTX } from './APICalls'
 import { stringToBigInt } from './HelperCalls'
+import { Notification } from './Notification'
 
 export function NewCrossChainSyncModal({
   open,
@@ -28,13 +29,32 @@ export function NewCrossChainSyncModal({
   let paramToSync = useRef('')
 
   const paramToSyncDict = {
-    Data: 'data',
+    'Data': 'data',
     'Data Request': 'data_request',
     'Update Request': 'update_request',
-    Response: 'response',
+    'Response': 'response',
     'Public User Information': 'public_info',
     'RSA Encryption Keys': 'rsa_enc_keys',
     'RSA Signing Keys': 'rsa_sign_keys',
+  }
+
+  const [showErrorNotif, setShowErrorNotif] = useState(false);
+  const [errorTopText, setErrorTopText] = useState('')
+  const [errorBottomText, setErrorBottomText] = useState('')
+
+  const makeErrorNotif = (topText, bottomText) => {
+    setShowErrorNotif(true)
+    setErrorTopText(topText)
+    setErrorBottomText(bottomText)
+  }
+
+  const resetSubmitButton = () => {
+    if (document.getElementById('submitButton')) {
+      document.getElementById('submitButton').textContent = 'Onboard'
+      document.getElementById('submitButton').className =
+        'ml-3 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2'
+      document.getElementById('submitButton').disabled = false
+    }
   }
 
   async function handleFetchValue() {
@@ -72,6 +92,7 @@ export function NewCrossChainSyncModal({
 
       switch (paramToSync) {
         case 'Data':
+          try {
           const fieldDataRequest = await getFieldData(
             userAddress,
             userPassword,
@@ -104,6 +125,11 @@ export function NewCrossChainSyncModal({
               typeof value === 'bigint' ? value.toString() : value, // return everything else unchanged
             2,
           )
+        } catch (error) {
+          setApiErrorNotif(true)
+          setApiErrorTopText("Error fetching field data")
+          setApiErrorBottomText(error.toString())
+        }
           break
         case 'Data Request':
           const encryptedDataRequest = await contract.methods
@@ -151,6 +177,8 @@ export function NewCrossChainSyncModal({
       console.log('Fetched Value:', fetchedValue)
     } catch (error) {
       console.error('Error in fetching value:', error)
+      makeErrorNotif("Error in fetching value:", error.toString())
+      return
     }
   }
 
@@ -251,6 +279,9 @@ export function NewCrossChainSyncModal({
           break
         }
       }
+
+      const transactionId = receipt.logs[receipt.logs.length - 1].data
+
       console.log('Message ID:', messageId)
       const type = paramToSyncDict[`${paramToSync}`]
       const targetChain = chainId == 43113 ? 80001 : 43113
@@ -266,19 +297,15 @@ export function NewCrossChainSyncModal({
         paramKey,
         chainId,
         `0x${targetChain.toString(16)}`,
-        '1283748234',
+        transactionId,
       )
       showNotif(false, "Cross-Chain Sync Submitted", "Transaction submitted successfully, awaiting Chainlink to complete sync.")
       onClose()
     } catch (error) {
       console.error('Error in transaction:', error)
-      if (document.getElementById('submitButton')) {
-        document.getElementById('submitButton').textContent =
-          'Call Smart Contract'
-        document.getElementById('submitButton').className =
-          'ml-3 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2'
-        document.getElementById('submitButton').disabled = false
-      }
+      resetSubmitButton()
+      makeErrorNotif("Error in transaction:", error.toString())
+      return
     }
   }
 
@@ -431,6 +458,13 @@ export function NewCrossChainSyncModal({
                   </div>
 
                   <div className="mt-6">
+                    <Notification
+                        open={showErrorNotif}
+                        error={true}
+                        showTopText={errorTopText}
+                        showBottomText={errorBottomText}
+                        onClose={() => setShowErrorNotif(false)}
+                    />
                     <label
                       htmlFor="disclaimer"
                       className="block text-sm font-bold leading-5 text-gray-900 dark:text-white"

@@ -15,6 +15,7 @@ import coreContractABI from '../../public/contract_ABIs/ZKPServicesCore.json'
 import twoFAContractVRFABI from '../../public/contract_ABIs/ZKPServicesVRF2FA.json'
 import twoFAContractGenericABI from '../../public/contract_ABIs/ZKPServicesGeneric2FA.json'
 import batchSignUpABI from '../../public/contract_ABIs/BatchSignUp.json'
+import { Notification } from '@/components/Notification'
 
 const chains = {
   fuji: 43113,
@@ -62,11 +63,38 @@ export default function Quickstart() {
     metamaskAvailable,
     setMetamaskAvailable,
   } = useGlobal()
+  const [showErrorNotif, setShowErrorNotif] = useState(false);
+  const [errorTopText, setErrorTopText] = useState('')
+  const [errorBottomText, setErrorBottomText] = useState('')
   const [showQuickstart, setShowQuickstart] = useState(
-    <h2 className="mt-10 text-center text-3xl font-bold tracking-tight">
-      Please connect your wallet to get started.
-    </h2>,
+    <div>
+      <Notification
+        open={showErrorNotif}
+        error={true}
+        showTopText={errorTopText}
+        showBottomText={errorBottomText}
+        onClose={() => setShowErrorNotif(false)}
+      />
+      <h2 className="mt-10 text-center text-3xl font-bold tracking-tight">
+        Please connect your wallet to get started.
+      </h2>
+    </div>
   )
+
+  const makeErrorNotif = (topText, bottomText) => {
+    setShowErrorNotif(true)
+    setErrorTopText(topText)
+    setErrorBottomText(bottomText)
+  }
+
+  const resetSubmitButton = () => {
+    if (document.getElementById('submitButton')) {
+      document.getElementById('submitButton').textContent = 'Onboard'
+      document.getElementById('submitButton').className =
+        'ml-3 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2'
+      document.getElementById('submitButton').disabled = false
+    }
+  }
 
   const handleGenerateRSAKeys = async () => {
     try {
@@ -136,8 +164,14 @@ export default function Quickstart() {
     if (document.getElementById('submitButton')) {
       document.getElementById('submitButton').textContent = 'Awaiting sign-up acceptance...'
     }
-    let receipt = await web3.eth.sendTransaction(txObject)
-    console.log('Batch SignUp Transaction Receipt:', receipt)
+    try {
+      let receipt = await web3.eth.sendTransaction(txObject)
+      console.log('Batch SignUp Transaction Receipt:', receipt)
+    } catch (error) {
+      console.error('Batch SignUp Transaction error:', error)
+      resetSubmitButton()
+      makeErrorNotif('Batch SignUp Transaction error:', error.toString())
+    }
   }
 
   const switchChain = async (targetChainId) => {
@@ -148,14 +182,9 @@ export default function Quickstart() {
         params: [{ chainId: chainIdHex }],
       })
     } catch (error) {
-      if (document.getElementById('submitButton')) {
-        document.getElementById('submitButton').textContent = 'Submitting...'
-        document.getElementById('submitButton').className =
-          'ml-3 inline-flex justify-center rounded-md border border-transparent bg-gray-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2'
-        document.getElementById('submitButton').disabled = true
-      }
-      // Log the error
-      console.error('Could not switch chains:', error)
+      console.error('Error switching chains:', error)
+      resetSubmitButton()
+      makeErrorNotif("Error switching chains:", error.toString())
     }
   }
 
@@ -229,15 +258,11 @@ export default function Quickstart() {
           method: 'wallet_switchEthereumChain',
           params: [{ chainId: chainId }],
         })
-      } catch {
-        if (document.getElementById('submitButton')) {
-          document.getElementById('submitButton').textContent = 'Submitting...'
-          document.getElementById('submitButton').className =
-            'ml-3 inline-flex justify-center rounded-md border border-transparent bg-gray-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2'
-          document.getElementById('submitButton').disabled = true
-        }
-        // Log the error
-        console.log('User Rejected Switching to Original Chain')
+      } catch (error) {
+        console.error('User Rejected Switching to Original Chain', error)
+        resetSubmitButton()
+        makeErrorNotif("User Rejected Switching to Original Chain", error.toString())
+        return
       }
 
       async function callCreateUser() {
@@ -256,15 +281,16 @@ export default function Quickstart() {
             setUserPassword(formDataJSON['password'])
           } else {
             console.error('Error in signing up user.', createUserResponse)
+            setShowErrorNotif(true)
+            setErrorTopText('Error in signing up user.')
+            setErrorBottomText(createUserResponse['data'])
           }
         } catch (error) {
-          if (document.getElementById('submitButton')) {
-            document.getElementById('submitButton').textContent = 'Submitting...'
-            document.getElementById('submitButton').className =
-              'ml-3 inline-flex justify-center rounded-md border border-transparent bg-gray-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2'
-            document.getElementById('submitButton').disabled = true
-          }
-          console.error('Error fetching user data C:', error)
+          resetSubmitButton()
+          setShowErrorNotif(true)
+          setErrorTopText('Error in signing up user.')
+          setErrorBottomText(createUserResponse['data'])
+          return
         }
       }
       if (document.getElementById('submitButton')) {
@@ -272,13 +298,11 @@ export default function Quickstart() {
       }
       callCreateUser()
     } catch (error) {
-      if (document.getElementById('submitButton')) {
-        document.getElementById('submitButton').textContent = 'Submitting...'
-        document.getElementById('submitButton').className =
-          'ml-3 inline-flex justify-center rounded-md border border-transparent bg-gray-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2'
-        document.getElementById('submitButton').disabled = true
-      }
-      console.error('Authentication failed', error)
+      resetSubmitButton()
+      setShowErrorNotif(true)
+      setErrorTopText('Error in signing up user.')
+      setErrorBottomText(createUserResponse['data'])
+      return
     }
   }
 
@@ -766,5 +790,7 @@ export default function Quickstart() {
     initializeWeb3()
   }, [])
 
-  return <div className="max-w-none">{showQuickstart}</div>
+  return <div className="max-w-none">
+    {showQuickstart}
+    </div>
 }

@@ -26,8 +26,7 @@ export const makeAPICall = async (method, data) => {
   }
 }
 
-// You can create more specific functions for different API endpoints
-export const login = async (userId, password) => {
+export const login = async (userId, password) => { //error notifs handled
   console.log(`logging in with the following data, userId: ${userId}`)
   const data = {
     id: userId,
@@ -37,7 +36,7 @@ export const login = async (userId, password) => {
   return await makeAPICall('POST', data)
 }
 
-export const createUser = async (userId, quickstart_JSON) => {
+export const createUser = async (userId, quickstart_JSON) => { //error notifs handled
   const data = {
     id: userId,
     action: 'create_item',
@@ -60,7 +59,7 @@ export const createUser = async (userId, quickstart_JSON) => {
 //   return makeAPICall('POST', data);
 // };
 
-export const getCCTX = async (userId, password, chainId) => {
+export const getCCTX = async (userId, password, chainId) => { //error notifs handled
   const data = {
     id: userId,
     password: password,
@@ -70,7 +69,7 @@ export const getCCTX = async (userId, password, chainId) => {
   return makeAPICall('POST', data)
 }
 
-export const getIncoming = async (userId, password, chainId) => {
+export const getIncoming = async (userId, password, chainId) => { //error notifs handled
   const data = {
     id: userId,
     password: password,
@@ -80,7 +79,7 @@ export const getIncoming = async (userId, password, chainId) => {
   return makeAPICall('POST', data)
 }
 
-export const getOutgoing = async (userId, password, chainId) => {
+export const getOutgoing = async (userId, password, chainId) => { //error notifs handled
   const data = {
     id: userId,
     password: password,
@@ -97,7 +96,7 @@ export const truncateAddress = (address) => {
   return `${start}...${end}`
 }
 
-export const getFieldData = async (userId, password, key, chainId) => {
+export const getFieldData = async (userId, password, key, chainId) => { //error notifs handled
   console.log(`getFieldData params: ${userId}, ${password}, ${key}, ${chainId}`)
   const data = {
     id: userId,
@@ -109,7 +108,7 @@ export const getFieldData = async (userId, password, key, chainId) => {
   return makeAPICall('POST', data)
 }
 
-export const getDashboard = async (userId, password, chainId) => {
+export const getDashboard = async (userId, password, chainId) => { //error notifs handled
   const data = {
     id: userId,
     password: password,
@@ -119,7 +118,7 @@ export const getDashboard = async (userId, password, chainId) => {
   return makeAPICall('POST', data)
 }
 
-export const getAvailableDashboard = async (userId, password, chainId) => {
+export const getAvailableDashboard = async (userId, password, chainId) => { //error notifs handled
   const data = {
     id: userId,
     password: password,
@@ -129,7 +128,7 @@ export const getAvailableDashboard = async (userId, password, chainId) => {
   return makeAPICall('POST', data)
 }
 
-export const addToDashboard = async (userId, password, service, chainId) => {
+export const addToDashboard = async (userId, password, service, chainId) => { //error notifs handled
   const data = {
     id: userId,
     password: password,
@@ -140,7 +139,7 @@ export const addToDashboard = async (userId, password, service, chainId) => {
   return makeAPICall('POST', data)
 }
 
-export const removeFromDashboard = async (
+export const removeFromDashboard = async ( //error notifs handled
   userId,
   password,
   service,
@@ -156,7 +155,7 @@ export const removeFromDashboard = async (
   return makeAPICall('DELETE', data)
 }
 
-export const addRequest = async (userId, password, requestData, chainId) => {
+export const addRequest = async (userId, password, requestData, chainId) => { //error notifs handled
   const data = {
     id: userId,
     password: password,
@@ -173,7 +172,7 @@ export const addRequest = async (userId, password, requestData, chainId) => {
   return makeAPICall('POST', mergedData)
 }
 
-export const addResponse = async (userId, password, responseData, chainId) => {
+export const addResponse = async (userId, password, responseData, chainId) => { //error notifs handled
   const data = {
     id: userId,
     password: password,
@@ -188,7 +187,7 @@ export const addResponse = async (userId, password, responseData, chainId) => {
   return makeAPICall('POST', mergedData)
 }
 
-export const updateFieldData = async (
+export const updateFieldData = async ( //error notifs handled
   userId,
   password,
   updatedData,
@@ -208,7 +207,7 @@ export const updateFieldData = async (
   return makeAPICall('PUT', mergedData)
 }
 
-export const getChainData = async (userId, password, chainId) => {
+export const getChainData = async (userId, password, chainId) => { //error notifs handled
   const data = {
     id: userId,
     password: password,
@@ -218,7 +217,7 @@ export const getChainData = async (userId, password, chainId) => {
   return makeAPICall('POST', data)
 }
 
-export const addNewChain = async (userId, password, oldChainId, chainId) => {
+export const addNewChain = async (userId, password, oldChainId, chainId) => { //error notifs handled
   const data = {
     id: userId,
     password: password,
@@ -229,7 +228,7 @@ export const addNewChain = async (userId, password, oldChainId, chainId) => {
   return makeAPICall('POST', data)
 }
 
-export const addCCTX = async (
+export const addCCTX = async ( //error notifs handled
   userId,
   password,
   type,

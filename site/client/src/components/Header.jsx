@@ -13,6 +13,7 @@ import coreContractABI from '../../public/contract_ABIs/ZKPServicesCore.json'
 import twoFAContractVRFABI from '../../public/contract_ABIs/ZKPServicesVRF2FA.json'
 import twoFAContractGenericABI from '../../public/contract_ABIs/ZKPServicesGeneric2FA.json'
 import batchSignUpABI from '../../public/contract_ABIs/BatchSignUp.json'
+import { Notification } from './Notification'
 import {
   MobileNavigation,
   useIsInsideMobileNavigation,
@@ -39,6 +40,15 @@ export const Header = forwardRef(function Header({ className }, ref) {
   let bgOpacityLight = useTransform(scrollY, [0, 72], [0.5, 0.5])
   let bgOpacityDark = useTransform(scrollY, [0, 72], [0.2, 0.2])
   const [accountText, setAccountText] = useState('')
+  const [showErrorNotif, setShowErrorNotif] = useState(false);
+  const [errorTopText, setErrorTopText] = useState('')
+  const [errorBottomText, setErrorBottomText] = useState('')
+
+  const makeErrorNotif = (topText, bottomText) => {
+    setShowErrorNotif(true)
+    setErrorTopText(topText)
+    setErrorBottomText(bottomText)
+  }
   let {
     walletConnected,
     setWalletConnected,
@@ -74,6 +84,12 @@ export const Header = forwardRef(function Header({ className }, ref) {
     isOnboarding,
     metamaskAvailable,
     setMetamaskAvailable,
+    apiErrorNotif,
+    setApiErrorNotif,
+    setApiErrorTopText,
+    setApiErrorBottomText,
+    apiErrorTopText,
+    apiErrorBottomText
   } = useGlobal()
   const [isHovered, setIsHovered] = useState(false)
   const [textOpacity, setTextOpacity] = useState(1) // Initialize opacity to 1
@@ -92,6 +108,10 @@ export const Header = forwardRef(function Header({ className }, ref) {
       connectToMetaMask()
     }
   }, [])
+
+  useEffect(() => {
+    setShowErrorNotif(apiErrorNotif)
+  }, [apiErrorNotif])
 
   useEffect(() => {
     if (userAddress) {
@@ -138,6 +158,9 @@ export const Header = forwardRef(function Header({ className }, ref) {
       )
       setOnboardedChain(true)
     } catch (error) {
+      setApiErrorNotif(true)
+      setApiErrorTopText("Error establishing chain onboarded status")
+      setApiErrorBottomText(error.toString())
       setOnboardedChain(false)
       console.error(`Error establishing chain onboarded status: ${error}`)
     }
@@ -358,6 +381,13 @@ export const Header = forwardRef(function Header({ className }, ref) {
           >
             {loginButtonText}
           </Button>
+          <Notification
+                        open={showErrorNotif}
+                        error={true}
+                        showTopText={apiErrorTopText}
+                        showBottomText={apiErrorBottomText}
+                        onClose={() => setApiErrorNotif(false)}
+          />
         </div>
       </div>
     </motion.div>

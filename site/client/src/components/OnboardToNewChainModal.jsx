@@ -1,8 +1,9 @@
-import { Fragment } from 'react'
+import { Fragment, useState } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import { ExclamationTriangleIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { useGlobal } from '@/components/GlobalStorage'
 import { addNewChain } from '@/components/APICalls'
+import { Notification } from './Notification'
 
 export function OnboardToNewChainModal({
   open,
@@ -32,7 +33,29 @@ export function OnboardToNewChainModal({
     chainId,
     onboardedChain,
     setOnboardedChain,
+    setApiErrorNotif,
+    setApiErrorTopText,
+    setApiErrorBottomText
   } = useGlobal()
+
+  const [showErrorNotif, setShowErrorNotif] = useState(false);
+  const [errorTopText, setErrorTopText] = useState('')
+  const [errorBottomText, setErrorBottomText] = useState('')
+
+  const makeErrorNotif = (topText, bottomText) => {
+    setShowErrorNotif(true)
+    setErrorTopText(topText)
+    setErrorBottomText(bottomText)
+  }
+
+  const resetSubmitButton = () => {
+    if (document.getElementById('submitButton')) {
+      document.getElementById('submitButton').textContent = 'Onboard'
+      document.getElementById('submitButton').className =
+        'ml-3 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2'
+      document.getElementById('submitButton').disabled = false
+    }
+  }
 
   const handleSubmit = async () => {
     if (document.getElementById('submitButton')) {
@@ -68,13 +91,10 @@ export function OnboardToNewChainModal({
         })
         setOnboardedChain(false)
       } catch (error) {
-        if (document.getElementById('submitButton')) {
-          document.getElementById('submitButton').textContent = 'Onboard'
-          document.getElementById('submitButton').className =
-            'ml-3 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2'
-          document.getElementById('submitButton').disabled = false
-        }
-        console.error('Could not switch chains:', error)
+        console.log(error)
+        resetSubmitButton()
+        makeErrorNotif("Error switching chains", error.toString())
+        return
       }
     }
 
@@ -97,18 +117,30 @@ export function OnboardToNewChainModal({
       document.getElementById('submitButton').textContent =
         'Awaiting transaction acceptance...'
     }
-    let receipt = await web3.eth.sendTransaction(txObject)
-    console.log('Batch SignUp Transaction Receipt:', receipt)
+    try {
+      let receipt = await web3.eth.sendTransaction(txObject)
+      console.log('Batch SignUp Transaction Receipt:', receipt)
+    } catch (error) {
+      setApiErrorNotif(true)
+      setApiErrorTopText("Error completing chain onboarding")
+      setApiErrorBottomText(error.toString())
+    }
     if (document.getElementById('submitButton')) {
       document.getElementById('submitButton').textContent =
         'Submitting transaction...'
     }
-    addNewChain(
-      userAddress,
-      userPassword,
-      oldChainId,
-      `0x${targetChainId.toString(16)}`,
-    )
+    try {
+      addNewChain(
+        userAddress,
+        userPassword,
+        oldChainId,
+        `0x${targetChainId.toString(16)}`,
+      )
+    } catch (error) {
+      setApiErrorNotif(true)
+      setApiErrorTopText("Error completing chain onboarding")
+      setApiErrorBottomText(error.toString())
+    }
     showNotif(false, "Chain Onboarded", "Onboarded to new chain successfully.")
     onClose()
 
@@ -196,6 +228,13 @@ export function OnboardToNewChainModal({
                   </div>
                 </div>
                 <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+                <Notification
+                              open={showErrorNotif}
+                              error={true}
+                              showTopText={errorTopText}
+                              showBottomText={errorBottomText}
+                              onClose={() => setShowErrorNotif(false)}
+                />
                   <button
                     type="submit"
                     id="submitButton"

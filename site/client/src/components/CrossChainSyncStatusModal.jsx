@@ -1,24 +1,33 @@
-import { Fragment, useState } from 'react'
+import { Fragment, useState, useEffect } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline' // Import the XMarkIcon
+import { truncateAddress } from './APICalls'
+import { removeMetadata } from './HelperCalls'
 
 export function CrossChainSyncStatusModal({
+  open,
+  onClose,
   sourceChain = '',
   destinationChain = '',
   parameterSynced = '',
   parameterKey = '',
-  parameterValue = '',
+  parameterValue,
   ccipRequestID = '',
 }) {
-  const [open, setOpen] = useState(true)
+  const [isOpen, setIsOpen] = useState(open)
   const [status, setStatus] = useState('Incomplete')
+  const modifiedFieldData = isOpen ? removeMetadata(parameterValue[parameterKey]) : {}
+
+  useEffect(() => {
+    setIsOpen(open)
+  }, [open])
 
   return (
-    <Transition.Root show={open} as={Fragment}>
+    <Transition.Root show={isOpen} as={Fragment}>
       <Dialog
         as="div"
         className="fixed inset-0 z-10 overflow-y-auto dark:bg-opacity-75"
-        onClose={() => setOpen(false)}
+        onClose={onClose}
       >
         <div className="flex min-h-screen items-center justify-center">
           <Transition.Child
@@ -48,7 +57,7 @@ export function CrossChainSyncStatusModal({
                   <button
                     type="button"
                     className="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 dark:bg-gray-800 dark:text-gray-600 dark:hover:text-gray-400"
-                    onClick={() => setOpen(false)}
+                    onClick={onClose}
                   >
                     <span className="sr-only">Close</span>
                     <XMarkIcon
@@ -146,7 +155,7 @@ export function CrossChainSyncStatusModal({
                       rows={8}
                       readOnly
                       spellCheck="false"
-                      value={parameterValue}
+                      value={JSON.stringify(modifiedFieldData, null, 2)}
                     />
                   </div>
 
@@ -200,7 +209,7 @@ export function CrossChainSyncStatusModal({
                         rel="noopener noreferrer"
                         className="text-emerald-600 underline"
                       >
-                        {`https://ccip.chain.link/msg/${ccipRequestID}`}
+                        {`https://ccip.chain.link/msg/${truncateAddress(ccipRequestID)}`}
                       </a>
                     </div>
                   </div>
@@ -226,7 +235,7 @@ export function CrossChainSyncStatusModal({
                   <button
                     type="button"
                     className="mt-3 inline-flex w-full justify-center rounded-md bg-slate-100 px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-slate-200 dark:bg-slate-800 dark:text-white dark:ring-gray-600 dark:hover:bg-slate-900 sm:mt-0 sm:w-auto"
-                    onClick={() => setOpen(false)}
+                    onClick={onClose}
                   >
                     Close
                   </button>

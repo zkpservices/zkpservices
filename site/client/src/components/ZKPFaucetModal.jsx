@@ -2,6 +2,7 @@ import { Fragment, useState, useEffect } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import { ExclamationTriangleIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { useGlobal } from '@/components/GlobalStorage'
+import { Notification } from './Notification'
 
 export function ZKPFaucetModal({ open, showNotif, onClose }) {
   let {
@@ -13,6 +14,25 @@ export function ZKPFaucetModal({ open, showNotif, onClose }) {
     chainId,
   } = useGlobal()
   const [balance, setBalance] = useState(null)
+
+  const [showErrorNotif, setShowErrorNotif] = useState(false);
+  const [errorTopText, setErrorTopText] = useState('')
+  const [errorBottomText, setErrorBottomText] = useState('')
+
+  const makeErrorNotif = (topText, bottomText) => {
+    setShowErrorNotif(true)
+    setErrorTopText(topText)
+    setErrorBottomText(bottomText)
+  }
+
+  const resetSubmitButton = () => {
+    if (document.getElementById('submitButton')) {
+      document.getElementById('submitButton').textContent = 'Onboard'
+      document.getElementById('submitButton').className =
+        'ml-3 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2'
+      document.getElementById('submitButton').disabled = false
+    }
+  }
 
   useEffect(() => {
     const contract =
@@ -95,13 +115,16 @@ export function ZKPFaucetModal({ open, showNotif, onClose }) {
             await new Promise((resolve) => setTimeout(resolve, 2000))
           }
         }
-        
+
         waitForConfirmation(receipt.transactionHash)
         showNotif(false, "Tokens received", "200 ZKP tokens added to balance.")
         onClose()
       }
     } catch (error) {
       console.error('Error requesting Vault Tokens:', error)
+      resetSubmitButton()
+      makeErrorNotif("Error requesting Vault Tokens:", error.toString())
+      return
     }
   }
 
@@ -170,6 +193,13 @@ export function ZKPFaucetModal({ open, showNotif, onClose }) {
                       Your ZKP Balance:
                     </label>
                     <div className="mt-2">
+                    <Notification
+                        open={showErrorNotif}
+                        error={true}
+                        showTopText={errorTopText}
+                        showBottomText={errorBottomText}
+                        onClose={() => setShowErrorNotif(false)}
+                      />
                       <textarea
                         rows={1}
                         name="comment"

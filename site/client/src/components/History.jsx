@@ -15,6 +15,7 @@ import { RequestedDataSentModal } from './RequestedDataSentModal'
 import { AwaitingDataModal } from './AwaitingDataModal'
 import { AwaitingUpdateCompletionModal } from './AwaitingUpdateCompletionModal'
 import { ReceivedUpdateResponseModal } from './ReceivedUpdateResponseModal'
+import { CrossChainSyncStatusModal } from './CrossChainSyncStatusModal'
 import { Notification } from './Notification'
 
 const classNames = (...classes) => {
@@ -34,6 +35,7 @@ export function History({ tableData = {}, showRefresh = true, handleRefresh }) {
   const [showAwaitingUpdateModal, setShowAwaitingUpdateModal] = useState(false)
   const [showRequestedDataSentModal, setShowRequestedDataSentModal] =
     useState(false)
+  const [showCrossChainSyncModal, setShowCrossChainSyncModal] = useState(false)
   const [showNotif, setShowNotif] = useState(false);
   const [errorNotif, setErrorNotif] = useState(false);
   const [notifTopText, setNotifTopText] = useState("");
@@ -57,7 +59,7 @@ export function History({ tableData = {}, showRefresh = true, handleRefresh }) {
     twoFARequestID: '',
     twoFAOneTimeToken: '',
   })
-  let { userAddress, userPassword, chainId } = useGlobal()
+  let { userAddress, userPassword, chainId, setApiErrorNotif, setApiErrorTopText, setApiErrorBottomText } = useGlobal()
   const handleRefreshAll = () => {
     // Call the loadAllHistory function from DashboardContext
     handleRefresh()
@@ -103,6 +105,9 @@ export function History({ tableData = {}, showRefresh = true, handleRefresh }) {
       openRequestedDataSentModal(rowData)
     } else if (rowData.type === 'outgoing_response_update') {
       openCompletedUpdateModal(rowData)
+    } else if (rowData.type === 'cctx') {
+
+      openCrossChainSyncModal(rowData)
     }
   }
 
@@ -121,20 +126,51 @@ export function History({ tableData = {}, showRefresh = true, handleRefresh }) {
   }
 
   const openSendDataModal = async (rowData) => {
-    const fieldData = await getFieldData(
-      userAddress,
-      userPassword,
-      rowData.field[0],
-      chainId,
-    )
-    const newRowData = {
-      ...rowData,
-      data: fieldData['data'],
-      salt: fieldData['data'][rowData.field[0]]['_metadata']['salt'],
+    try {
+      const fieldData = await getFieldData(
+        userAddress,
+        userPassword,
+        rowData.field[0],
+        chainId,
+      )
+      const newRowData = {
+        ...rowData,
+        data: fieldData['data'],
+        salt: fieldData['data'][rowData.field[0]]['_metadata']['salt'],
+      }
+      console.log(newRowData)
+      setSelectedRowData(newRowData)
+      setShowSendDataModal(true)
+    } catch (error) {
+      setApiErrorNotif(true)
+      setApiErrorTopText("Error fetching field data")
+      setApiErrorBottomText(error.toString())
     }
-    console.log(newRowData)
-    setSelectedRowData(newRowData)
-    setShowSendDataModal(true)
+  }
+
+  const openCrossChainSyncModal = async (rowData) => {
+    try {
+      const fieldData = await getFieldData(
+        userAddress,
+        userPassword,
+        rowData.field[0],
+        chainId,
+      )
+      const newRowData = {
+        ...rowData,
+        data: fieldData['data'],
+      }
+      setSelectedRowData(newRowData)
+      setShowCrossChainSyncModal(true)
+    } catch (error) {
+        setApiErrorNotif(true)
+        setApiErrorTopText("Error fetching field data")
+        setApiErrorBottomText(error.toString())
+    }
+  }
+
+  const closeCrossChainSyncModal = () => {
+    setShowCrossChainSyncModal(false)
   }
 
   const addResponseToRequest = async () => {
@@ -158,12 +194,18 @@ export function History({ tableData = {}, showRefresh = true, handleRefresh }) {
         twoFAOneTimeToken: selectedRowData.twoFAOneTimeToken,
       },
     }
-    const result = await addResponse(
-      userAddress,
-      userPassword,
-      responseData,
-      chainId,
-    )
+    try {
+      const result = await addResponse(
+        userAddress,
+        userPassword,
+        responseData,
+        chainId,
+      )
+    } catch (error) {
+      setApiErrorNotif(true)
+      setApiErrorTopText("Error adding response")
+      setApiErrorBottomText(error.toString())
+    }
     handleRefresh()
   }
 
@@ -208,18 +250,30 @@ export function History({ tableData = {}, showRefresh = true, handleRefresh }) {
         twoFAOneTimeToken: selectedRowData.twoFAOneTimeToken,
       },
     }
+    try {
     const updateResult = await updateFieldData(
       userAddress,
       userPassword,
       updateData,
       chainId,
     )
+    } catch (error) {
+      setApiErrorNotif(true)
+      setApiErrorTopText("Error updating field")
+      setApiErrorBottomText(error.toString())
+    }
+    try {
     const responseResult = await addResponse(
       userAddress,
       userPassword,
       responseData,
       chainId,
     )
+    } catch (error) {
+    setApiErrorNotif(true)
+    setApiErrorTopText("Error adding response to update request")
+    setApiErrorBottomText(error.toString())
+    }
     closeCompleteUpdateModal()
     handleRefresh()
   }
@@ -281,19 +335,25 @@ export function History({ tableData = {}, showRefresh = true, handleRefresh }) {
   }
 
   const openRequestedDataSentModal = async (rowData) => {
-    const fieldData = await getFieldData(
-      userAddress,
-      userPassword,
-      rowData.field[0],
-      chainId,
-    )
-    const newRowData = {
-      ...rowData,
-      data: fieldData['data'],
-      salt: fieldData['data'][rowData.field[0]]['_metadata']['salt'],
+    try {
+      const fieldData = await getFieldData(
+        userAddress,
+        userPassword,
+        rowData.field[0],
+        chainId,
+      )
+      const newRowData = {
+        ...rowData,
+        data: fieldData['data'],
+        salt: fieldData['data'][rowData.field[0]]['_metadata']['salt'],
+      }
+      setSelectedRowData(newRowData)
+      setShowRequestedDataSentModal(true)
+    } catch (error) {
+      setApiErrorNotif(true)
+      setApiErrorTopText("Error fetching field data")
+      setApiErrorBottomText(error.toString())
     }
-    setSelectedRowData(newRowData)
-    setShowRequestedDataSentModal(true)
   }
 
   const closeRequestedDataSentModal = (rowData) => {
@@ -437,6 +497,16 @@ export function History({ tableData = {}, showRefresh = true, handleRefresh }) {
         twoFAProvider={selectedRowData.twoFAProvider}
         twoFARequestID={selectedRowData.twoFARequestID}
         twoFAOneTimeToken={selectedRowData.twoFAOneTimeToken}
+      />
+      <CrossChainSyncStatusModal
+        open={showCrossChainSyncModal}
+        onClose={closeCrossChainSyncModal}
+        parameterValue={selectedRowData.data}
+        ccipRequestID={selectedRowData.ccid}
+        parameterSynced={selectedRowData.paramType}
+        parameterKey={selectedRowData.field[0]}
+        sourceChain={selectedRowData.sourceChain}
+        destinationChain={selectedRowData.destinationChain}
       />
       <Heading level={2} id="history" className="mt-0">
         Recent Activity

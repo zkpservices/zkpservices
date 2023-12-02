@@ -192,14 +192,16 @@ export default function Login() {
         setShowLoginNotification(true)
         router.push('/dashboard')
       } catch (error) {
-        if (error.response.status == 401) {
-          setBadLogin(true)
-          setNotifTopText("Login Failed")
-          setNotifBottomText("Incorrect password.")
-        } else if (error.response.status == 404) {
-          setBadLogin(true)
-          setNotifTopText("Login Failed")
-          setNotifBottomText("User not found with current address.")
+        if(error.response) {
+          if (error.response.status == 401) {
+            setBadLogin(true)
+            setNotifTopText("Login Failed")
+            setNotifBottomText("Incorrect password.")
+          } else if (error.response.status == 404) {
+            setBadLogin(true)
+            setNotifTopText("Login Failed")
+            setNotifBottomText("User not found with current address.")
+          }
         }
         document.getElementById('submitButton').disabled = false
         document.getElementById('submitButton').textContent = 'Sign in'
