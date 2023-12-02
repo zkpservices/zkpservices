@@ -1,4 +1,4 @@
-import { Fragment, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { formToJSON } from 'axios';
 import { XMarkIcon } from '@heroicons/react/24/outline';
@@ -14,6 +14,7 @@ const handleGenerateRandomKey = () => {
     console.error('Error generating random key:', error);
   }
 };
+
 
 const handleGenerateRandomToken = () => {
   try {
@@ -78,8 +79,87 @@ export function NewDataRequestModal({
                     chainId == 1440002 ? rippleTwoFAContract: null;
 
   const [isTwoFAEnabled, setIsTwoFAEnabled] = useState(false);
+  const [twoFAForm, setTwoFAForm] = useState(<></>)
+
+  const twoFAFormConditional = () => {
+    if(isTwoFAEnabled) {
+      return (                    <>
+        <div className="mt-4">
+          <label htmlFor="twoFAProvider" className="block text-sm font-medium leading-5 text-gray-900 dark:text-white">
+            2FA Provider (address/name):
+          </label>
+          <textarea
+            id="twoFAProvider"
+            name="twoFAProvider"
+            className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
+            rows={1}
+            defaultValue={twoFAProvider}
+            spellCheck="false"
+          />
+        </div>
+  
+        <div className="mt-4">
+          <label htmlFor="twoFARequestID" className="block text-sm font-medium leading-5 text-gray-900 dark:text-white">
+            2FA Request ID:
+          </label>
+          <textarea
+            id="twoFARequestID"
+            name="twoFARequestID"
+            className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
+            rows={1}
+            // onChange={(e) => setTwoFARequestID(e.target.value)}
+            spellCheck="false"
+            defaultValue={twoFARequestID}
+          />
+          <button
+            className="mt-2 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+            type="button"
+            onClick={handleGenerateRandomID}
+          >
+            Generate Random ID
+          </button>
+        </div>
+  
+        <div className="mt-4">
+          <label htmlFor="twoFAOneTimeToken" className="block text-sm font-medium leading-5 text-gray-900 dark:text-white">
+            2FA One Time Token:
+          </label>
+          <textarea
+            id="twoFAOneTimeToken"
+            name="twoFAOneTimeToken"
+            className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
+            rows={1}
+            // onChange={(e) => setTwoFARequestID(e.target.value)}
+            spellCheck="false"
+            defaultValue={twoFAOneTimeToken}
+          />
+          <button
+            className="mt-2 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+            type="button"
+            onClick={handleGenerateRandomToken}
+          >
+            Generate Random Token
+          </button>
+        </div>
+  
+        <div className="mt-4">
+          <label htmlFor="attachToken" className="block text-sm font-medium leading-5 text-gray-900 dark:text-white">
+            Attach One Time Token to Request (optional)?
+          </label>
+          <input type="checkbox" name="attachToken" id="attachToken" defaultChecked className="mt-2 ml-1 h-4 w-4 rounded border-gray-300 dark:border-gray-700 text-emerald-600 focus:ring-emerald-500" />
+        </div>
+      </>
+      )} else {
+        return (<></>)
+      }
+    }
 
   const handleSubmit = async (event) => {
+
+    document.getElementById("submitDataRequestButton").textContent = "Running..."
+    document.getElementById("submitDataRequestButton").className = "ml-3 inline-flex justify-center rounded-md border border-transparent bg-gray-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+    document.getElementById("submitDataRequestButton").disabled = true;
+
     event.preventDefault();
     const formData = new FormData(event.target)
     const formDataJSON = formToJSON(formData);
@@ -130,7 +210,7 @@ export function NewDataRequestModal({
         data: data,
         gas: 500000
       };
-
+      document.getElementById("submitDataRequestButton").textContent = "Awaiting 2FA acceptance..."
       const receipt = await web3.eth.sendTransaction(txObject);
       console.log('2FA Contract Transaction Receipt:', receipt);
     } catch (error) {
@@ -167,7 +247,7 @@ export function NewDataRequestModal({
         data: data,
         gas: 500000
       };
-
+      document.getElementById("submitDataRequestButton").textContent = "Awaiting request acceptance..."
       const receipt = await web3.eth.sendTransaction(txObject);
       console.log('Core Contract Transaction Receipt:', receipt);
     } catch (error) {
@@ -175,9 +255,14 @@ export function NewDataRequestModal({
     }
 
     console.log(request)
+    document.getElementById("submitDataRequestButton").textContent = "Submitting request..."
     const result = await onSubmit(request)
     onClose()
   }
+
+  useEffect(() => {
+    setTwoFAForm(twoFAFormConditional())
+  }, [isTwoFAEnabled])
 
   return (
     <Transition.Root show={open} as={Fragment}>
@@ -329,74 +414,7 @@ export function NewDataRequestModal({
                     />
                   </div>
 
-                  {isTwoFAEnabled && (
-                    <>
-                      <div className="mt-4">
-                        <label htmlFor="twoFAProvider" className="block text-sm font-medium leading-5 text-gray-900 dark:text-white">
-                          2FA Provider (address/name):
-                        </label>
-                        <textarea
-                          id="twoFAProvider"
-                          name="twoFAProvider"
-                          className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
-                          rows={1}
-                          defaultValue={twoFAProvider}
-                          spellCheck="false"
-                        />
-                      </div>
-
-                      <div className="mt-4">
-                        <label htmlFor="twoFARequestID" className="block text-sm font-medium leading-5 text-gray-900 dark:text-white">
-                          2FA Request ID:
-                        </label>
-                        <textarea
-                          id="twoFARequestID"
-                          name="twoFARequestID"
-                          className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
-                          rows={1}
-                          // onChange={(e) => setTwoFARequestID(e.target.value)}
-                          spellCheck="false"
-                          defaultValue={twoFARequestID}
-                        />
-                        <button
-                          className="mt-2 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
-                          type="button"
-                          onClick={handleGenerateRandomID}
-                        >
-                          Generate Random ID
-                        </button>
-                      </div>
-
-                      <div className="mt-4">
-                        <label htmlFor="twoFAOneTimeToken" className="block text-sm font-medium leading-5 text-gray-900 dark:text-white">
-                          2FA One Time Token:
-                        </label>
-                        <textarea
-                          id="twoFAOneTimeToken"
-                          name="twoFAOneTimeToken"
-                          className="relative block w-full mt-1 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus:border-emerald-500 dark:focus:border-emerald-500 focus:outline-none bg-slate-100 dark:bg-slate-700 focus:ring-emerald-500 sm:text-sm"
-                          rows={1}
-                          // onChange={(e) => setTwoFARequestID(e.target.value)}
-                          spellCheck="false"
-                          defaultValue={twoFAOneTimeToken}
-                        />
-                        <button
-                          className="mt-2 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
-                          type="button"
-                          onClick={handleGenerateRandomToken}
-                        >
-                          Generate Random Token
-                        </button>
-                      </div>
-
-                      <div className="mt-4">
-                        <label htmlFor="attachToken" className="block text-sm font-medium leading-5 text-gray-900 dark:text-white">
-                          Attach One Time Token to Request (optional)?
-                        </label>
-                        <input type="checkbox" name="attachToken" id="attachToken" defaultChecked className="mt-2 ml-1 h-4 w-4 rounded border-gray-300 dark:border-gray-700 text-emerald-600 focus:ring-emerald-500" />
-                      </div>
-                    </>
-                  )}
+                  {twoFAForm}
 
                   <div className="mt-4">
                     <label htmlFor="responseFee" className="block text-sm font-medium leading-5 text-gray-900 dark:text-white">
@@ -423,6 +441,7 @@ export function NewDataRequestModal({
                   </button>
                   <button
                     type="submit"
+                    id="submitDataRequestButton"
                     className="ml-3 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
                   >
                     Call Smart Contract
