@@ -248,7 +248,7 @@ export default function Quickstart() {
     } else if (loggedIn){
       return (   
         <h2 className="mt-10 text-center text-2xl tracking-tight">
-          Account already exists for address ${userAddress}. 
+          Account already exists for address {userAddress}. 
           <br/>
           Please disconnect wallet and reconnect with a new wallet to create a new account.
         </h2>)

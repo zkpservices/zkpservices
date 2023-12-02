@@ -62,7 +62,7 @@ export function Dashboard() {
   }
 
   const loginNotificaitonConditional = () => {
-    return (loggedIn ?<Notification
+    return (loggedIn && showLoginNotification?<Notification
             showTopText="Logged in successfully"
             showBottomText={`Logged in as ${userAddress}`}
           /> : <></>)
@@ -74,7 +74,6 @@ export function Dashboard() {
   
   async function fetchUserDataFields() {  
     try {
-      console.log("fuk yeww..")
       const localdashboard = await getDashboard(userAddress, userPassword, chainId)
       setOnboardedChain(true)
     } catch (error) {
@@ -96,11 +95,11 @@ export function Dashboard() {
   }, [loggedIn])
 
   useEffect(() => {
-
     // After 5000 milliseconds (5 seconds), hide the notification
     const notificationTimeout = setTimeout(() => {
       setShowLoginNotification(false);
-    }, 5000);
+      setLoginNotification(loginNotificaitonConditional())
+    }, 3000);
 
     // Clear the notification timeout when the component unmounts
     return () => {
@@ -117,7 +116,12 @@ export function Dashboard() {
       </div>
   
       <div>
-        {/* {loginNotification} */}
+      <Notification
+            error={false}
+            open={showLoginNotification}
+            onClose={() => setShowLoginNotification(false)}
+            showTopText="Logged in successfully"
+            showBottomText={`Logged in as ${userAddress}`}/>
       </div>
     </>
   );

@@ -5,6 +5,7 @@ import { useGlobal } from "@/components/GlobalStorage.jsx";
 import { login, getChainData, getDashboard } from '@/components/APICalls.jsx';
 import axios, { formToJSON } from 'axios';
 import { useRouter } from 'next/router'
+import { Notification } from '@/components/Notification'
 
 export default function Login() {
   const { walletConnected, loggedIn, userAddress, setLoggedIn, userPassword, setUserPassword, 
@@ -12,6 +13,7 @@ export default function Login() {
     twoFactorAuthPassword, setTwoFactorAuthPassword, onboardedChain, setOnboardedChain } = useGlobal();
   const [loginHeader, setLoginHeader] = useState(<h2 className="mt-10 text-center text-3xl font-bold tracking-tight">Please connect your wallet to get started.</h2>)
   const [loginForm, setLoginForm] = useState(<></>)
+  const [badLogin, setBadLogin] = useState(false);
   const [userAddressLocal, setUserAddressLocal] = useState(() => {
     if (typeof window !== 'undefined') {
       return localStorage.getItem('userAddress') || '';
@@ -101,14 +103,16 @@ export default function Login() {
                 </div>
               </div>
               <div>
-                <button
-                  type="submit"
-                  className="relative flex w-full justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
-                >
-                  <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-                  </span>
-                  Sign in
-                </button>
+              <button
+                type="submit"
+                id="submitButton"
+                disabled={false}
+                className="relative flex w-full justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+              >
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3">
+                </span>
+                Sign in
+              </button>
               </div>
             </form>
       </>
@@ -125,11 +129,12 @@ export default function Login() {
     setLoginForm(showLoginForm(walletConnected))
     setUserAddressLocal(userAddress)
   }, [walletConnected, userAddress])
-
-
+  const badLoginNotifClose = () => setBadLogin(false);
   const handleSubmit = async (event) => {
-     event.preventDefault();
-
+    document.getElementById('submitButton').disabled = true;
+    document.getElementById('submitButton').textContent = "Signing in...";
+    document.getElementById('submitButton').className = "relative flex w-full justify-center rounded-md border border-transparent bg-gray-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+    event.preventDefault();
     // Extract form data here
     const formData = new FormData(event.target);
 
@@ -142,12 +147,26 @@ export default function Login() {
         setShowLoginNotification(true)
         router.push('/dashboard')
       } catch (error) {
-        // Handle errors, e.g., show an error message
+        if(error.response.status == 401) {
+          setBadLogin(true)
+        }
+        document.getElementById('submitButton').disabled = false;
+        document.getElementById('submitButton').textContent = "Sign in";
+        document.getElementById('submitButton').className = "relative flex w-full justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
         console.error('Authentication failed', error);
       }
+      
     }
   };
   return (
+    <div>
+    <Notification
+      open={badLogin}
+      showTopText="Login failed"
+      showBottomText={`Incorrect password.`}
+      error={true}
+      onClose={badLoginNotifClose}
+    />
     <div className="max-w-none">
       <div className="flex min-h-full items-center justify-center pt-6 pb-32 sm:px-6 lg:px-8">
         <div className="w-full max-w-md space-y-8">
@@ -158,6 +177,7 @@ export default function Login() {
           {loginForm}
         </div>
       </div>
+    </div>
     </div>
   );
 };  
