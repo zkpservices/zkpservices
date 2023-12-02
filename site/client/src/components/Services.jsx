@@ -16,6 +16,7 @@ import { useGlobal } from '@/components/GlobalStorage';
 import { OnboardToNewChainModal } from './OnboardToNewChainModal';
 import { poseidon } from '@/components/PoseidonHash';
 import { stringToBigInt } from '@/components/HelperCalls';
+import { Notification } from './Notification';
 const services = [
   {
     href: '/dashboard',
@@ -186,6 +187,10 @@ export function Services({handleRefresh}) {
 
   let {userAddress, userPassword, chainId, isOnboarding, setIsOnboarding, onboardedChain} = useGlobal();
 
+  const [showNotif, setShowNotif] = useState(false);
+  const [notifTopText, setNotifTopText] = useState("");
+  const [notifBottomText, setNotifBottomText] = useState("");
+
   const pullChainData = async (userAddress, userPassword, chainId) => {
     const chainData = await getChainData(userAddress, userPassword, chainId)
     console.log(JSON.stringify(chainData, null, 2))
@@ -232,13 +237,19 @@ export function Services({handleRefresh}) {
 
   return (
     <div className="xl:max-w-none mt-16">
+    <Notification
+      open={showNotif}
+      showTopText={notifTopText}
+      showBottomText={notifBottomText}
+      error={false}
+      onClose={() => setShowNotif(false)}
+    />
       <div className="my-16 xl:max-w-none">
         <Heading level={2} id="services">
           Services
         </Heading>
         <div className="not-prose mt-4 grid grid-cols-1 gap-8 border-t border-zinc-900/5 pt-10 dark:border-white/5 sm:grid-cols-2 xl:grid-cols-4">
-          {services.filter((service)=>!(service.name=="Cross-Chain Backups"&&chainId==1440002))
-          .map((service) => (
+          {services.map((service) => (
             <ServiceCard
               key={service.name}
               service={service}
@@ -257,12 +268,10 @@ export function Services({handleRefresh}) {
         setSelectedService(null)
         handleRefresh()
       }} onSubmit={addNewRequest}/>
-      {chainId!=1440002 && (
       <NewCrossChainSyncModal open={selectedService === 'Cross-Chain Backups'} destinationChainOptions={usedChains} onClose={() => {
         setSelectedService(null)
         handleRefresh()
       }} />
-      )}
       <ZKPFaucetModal open={selectedService === 'ZKP Tokens Faucet'} onClose={() => {
         setSelectedService(null)
         handleRefresh()

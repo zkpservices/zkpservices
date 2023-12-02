@@ -2,6 +2,7 @@ import Link from 'next/link'
 import axios from 'axios';
 import { useEffect, useRef, useState } from 'react';
 import { useG } from "@/components/GlobalStorage.jsx";
+import { ThreeJSComponent } from '@/components/ThreeJSComponent'
 import { Notification } from '@/components/Notification'
 import { DashboardContext } from '@/components/DashboardContext';
 import { useGlobal } from '@/components/GlobalStorage'
