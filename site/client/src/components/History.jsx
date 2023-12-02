@@ -471,6 +471,7 @@ export function History({ tableData = {}, showRefresh = true, handleRefresh }) {
       <AwaitingUpdateCompletionModal
         open={showAwaitingUpdateModal}
         onClose={closeAwaitingUpdateModal}
+        requestID={selectedRowData.requestID}
         addressOfSendingParty={selectedRowData.addressSender}
         fieldToUpdate={selectedRowData.field[0]}
         snapshotAfterUpdate={JSON.stringify(selectedRowData.data, null, 2)}
