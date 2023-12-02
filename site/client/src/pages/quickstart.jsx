@@ -68,16 +68,16 @@ export default function Quickstart() {
   const [errorBottomText, setErrorBottomText] = useState('')
   const [showQuickstart, setShowQuickstart] = useState(
     <div>
-      <Notification
+      {/* <Notification
         open={showErrorNotif}
         error={true}
         showTopText={errorTopText}
         showBottomText={errorBottomText}
         onClose={() => setShowErrorNotif(false)}
-      />
-      <h2 className="mt-10 text-center text-3xl font-bold tracking-tight">
+      /> */}
+      {/* <h2 className="mt-10 text-center text-3xl font-bold tracking-tight">
         Please connect your wallet to get started.
-      </h2>
+      </h2> */}
     </div>
   )
 
@@ -409,9 +409,18 @@ export default function Quickstart() {
       )
     } else if (!walletConnected) {
       return (
+        <>
+        <Notification
+          open={showErrorNotif}
+          error={true}
+          showTopText={errorTopText}
+          showBottomText={errorBottomText}
+          onClose={() => setShowErrorNotif(false)}
+        />
         <h2 className="mt-10 text-center text-3xl font-bold tracking-tight">
           Please connect your wallet to get started.
         </h2>
+        </>
       )
     } else if (loggedIn) {
       return (
@@ -779,16 +788,22 @@ export default function Quickstart() {
     }
   }
 
-  useEffect(() => {
-    setShowQuickstart(showQuickstartConditional())
-    initializeWeb3()
-  }, [walletConnected, userAddress])
+  // useEffect(() => {
+  //   setShowQuickstart(showQuickstartConditional())
+  //   initializeWeb3()
+  // }, [walletConnected, userAddress])
+
+  // useEffect(() => {
+  //   // Call the initialization function when the component mounts
+  //   console.log('useEffect initializeWeb3 called')
+  //   initializeWeb3()
+  // }, [])
 
   useEffect(() => {
-    // Call the initialization function when the component mounts
-    console.log('useEffect initializeWeb3 called')
-    initializeWeb3()
-  }, [])
+    initializeWeb3().then(() => {
+      setShowQuickstart(showQuickstartConditional());
+    });
+  }, [walletConnected, userAddress, metamaskAvailable, loggedIn]);
 
   return <div className="max-w-none">
     {showQuickstart}
