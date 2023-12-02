@@ -116,7 +116,6 @@ export function MyData({ mydata, onCardClick }) {
         <MyDataIcon icon={mydata.icon} />
         <h3
           className="mt-4 text-sm font-semibold leading-7 text-zinc-900 dark:text-white"
-          style={{ textTransform: 'capitalize' }}
         >
           <span className="absolute inset-0 rounded-2xl" />
           {mydata.name}

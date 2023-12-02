@@ -215,7 +215,6 @@ export function OnboardToNewChainModal({
                         <select
                           id="chain"
                           name="chain"
-                          style={{ textTransform: 'capitalize' }}
                           className="focus-border-emerald-500 focus:box-shadow-none relative mt-2 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-transparent focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 sm:text-sm sm:leading-6"
                           defaultValue="Medical Records"
                         >

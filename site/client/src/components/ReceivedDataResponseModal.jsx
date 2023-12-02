@@ -112,7 +112,6 @@ export function ReceivedDataResponseModal({
                       Field Requested:
                     </label>
                     <textarea
-                      style={{ textTransform: 'capitalize' }}
                       id="fieldRequested"
                       className="relative mt-1 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 dark:focus:border-emerald-500 sm:text-sm"
                       rows={1}
