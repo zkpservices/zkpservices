@@ -7,9 +7,9 @@ import {
   stringToBigInt,
   flattenJsonAndComputeHash,
 } from '@/components/HelperCalls'
+import { Notification } from '@/components/Notification'
 import { poseidon } from '@/components/PoseidonHash'
 import { useGlobal } from '@/components/GlobalStorage'
-import { Notification } from './Notification'
 
 const handleGenerateRandomKey = () => {
   try {
@@ -80,18 +80,18 @@ export function NewUpdateRequestModal({
     chainId == 43113
       ? fujiCoreContract
       : chainId == 80001
-        ? mumbaiCoreContract
-        : chainId == 1440002
-          ? rippleCoreContract
-          : null
+      ? mumbaiCoreContract
+      : chainId == 1440002
+      ? rippleCoreContract
+      : null
   const _2FAContract =
     chainId == 43113
       ? fujiTwoFAContract
       : chainId == 80001
-        ? mumbaiTwoFAContract
-        : chainId == 1440002
-          ? rippleTwoFAContract
-          : null
+      ? mumbaiTwoFAContract
+      : chainId == 1440002
+      ? rippleTwoFAContract
+      : null
 
   const [isTwoFAEnabled, setIsTwoFAEnabled] = useState(false)
   const [twoFAForm, setTwoFAForm] = useState(<></>)
@@ -155,8 +155,9 @@ export function NewUpdateRequestModal({
               // onChange={(e) => setTwoFARequestID(e.target.value)}
               spellCheck="false"
               defaultValue={
-                document.getElementById("twoFARequestID") && document.getElementById("twoFARequestID").value != ""
-                  ? document.getElementById("twoFARequestID").value 
+                document.getElementById('twoFARequestID') &&
+                document.getElementById('twoFARequestID').value != ''
+                  ? document.getElementById('twoFARequestID').value
                   : generateRandomAsciiString24()
               }
             />
@@ -184,8 +185,9 @@ export function NewUpdateRequestModal({
               // onChange={(e) => setTwoFARequestID(e.target.value)}
               spellCheck="false"
               defaultValue={
-                document.getElementById("twoFAOneTimeToken") && document.getElementById("twoFAOneTimeToken").value != ""
-                  ? document.getElementById("twoFAOneTimeToken").value 
+                document.getElementById('twoFAOneTimeToken') &&
+                document.getElementById('twoFAOneTimeToken').value != ''
+                  ? document.getElementById('twoFAOneTimeToken').value
                   : generateRandomAsciiString24()
               }
             />
@@ -232,8 +234,6 @@ export function NewUpdateRequestModal({
     const formData = new FormData(event.target)
     const formDataJSON = formToJSON(formData)
 
-    // const fieldEnd = stringToBigInt(formDataJSON['fieldToUpdate'].substring(24, 48)) ? stringToBigInt(formDataJSON['fieldToUpdate'].substring(24, 48)) : stringToBigInt("")
-    // const oneTimeKeyEnd = stringToBigInt(formDataJSON['oneTimeKey'].substring(24, 48)) ? stringToBigInt(formDataJSON['oneTimeKey'].substring(24, 48)) : stringToBigInt("")
     const requestID = await poseidon([
       stringToBigInt(formDataJSON['fieldToUpdate'].substring(0, 24)),
       stringToBigInt(formDataJSON['fieldToUpdate'].substring(24, 48)),
@@ -269,45 +269,42 @@ export function NewUpdateRequestModal({
     let rootHash = dataHashes['rootHash']
     console.log('rootHash', rootHash)
 
-    const _2FASmartContractCallData = {
-      _id: String(twoFARequestIDBigInt),
-      _oneTimeKeyHash: web3.utils.keccak256(formDataJSON['twoFAOneTimeToken']),
-    }
+    if (isTwoFAEnabled) {
+      try {
+        const _2FASmartContractCallData = {
+          _id: String(twoFARequestIDBigInt),
+          _oneTimeKeyHash: web3.utils.keccak256(
+            formDataJSON['twoFAOneTimeToken']
+          ),
+        }
 
-    console.log(_2FASmartContractCallData)
+        console.log(_2FASmartContractCallData)
 
-    try {
-      const _2FASmartContractCallData = {
-        _id: String(twoFARequestIDBigInt),
-        _oneTimeKeyHash: web3.utils.keccak256(
-          formDataJSON['twoFAOneTimeToken'],
-        ),
-      }
+        const data = _2FAContract.methods
+          .generate2FA(
+            _2FASmartContractCallData._id,
+            _2FASmartContractCallData._oneTimeKeyHash
+          )
+          .encodeABI()
 
-      const data = _2FAContract.methods
-        .generate2FA(
-          _2FASmartContractCallData._id,
-          _2FASmartContractCallData._oneTimeKeyHash,
-        )
-        .encodeABI()
-
-      const txObject = {
-        from: userAddress,
-        to: _2FAContract.options.address,
-        data: data,
-        gas: 500000,
-      }
-      if (document.getElementById('submitButton')) {
-        document.getElementById('submitButton').textContent =
-          'Awaiting 2FA acceptance...'
-      }
-      const receipt = await web3.eth.sendTransaction(txObject)
-      console.log('2FA Contract Transaction Receipt:', receipt)
-    } catch (error) {
-      console.error('Error in 2FA Contract Call:', error)
-      resetSubmitButton()
-      makeErrorNotif("Error in 2FA Contract Call", error.toString())
-      return
+        const txObject = {
+          from: userAddress,
+          to: _2FAContract.options.address,
+          data: data,
+          gas: 500000,
+        }
+        if (document.getElementById('submitButton')) {
+          document.getElementById('submitButton').textContent =
+            'Awaiting 2FA acceptance...'
+        }
+        const receipt = await web3.eth.sendTransaction(txObject)
+        console.log('2FA Contract Transaction Receipt:', receipt)
+      } catch (error) {
+        console.error('Error in 2FA Contract Call:', error)
+        resetSubmitButton()
+        makeErrorNotif("Error in 2FA Contract Call", error.toString())
+        return
+      } 
     }
 
     try {
@@ -317,8 +314,10 @@ export function NewUpdateRequestModal({
         encryptedKey: '',
         timeLimit: formDataJSON['timeLimit'],
         _2FAProvider:
-          formDataJSON['twoFAProvider'] == 'zkp.services'
+          formDataJSON['twoFAProvider'] == 'zkp.services' && isTwoFAEnabled
             ? _2FAContract['_address']
+            : !isTwoFAEnabled
+            ? "0x84713a3a001E2157d134B97C59D6bdAb351dd69d"
             : formDataJSON['twoFAProvider'],
         _2FAID: String(stringToBigInt(formDataJSON['twoFARequestID'])),
         responseFeeAmount: formDataJSON['responseFee'],
@@ -340,7 +339,7 @@ export function NewUpdateRequestModal({
           coreContractCallData._2FAID,
           coreContractCallData.responseFeeAmount,
           coreContractCallData.dataHash,
-          coreContractCallData.saltHash,
+          coreContractCallData.saltHash
         )
         .encodeABI()
 
@@ -358,9 +357,11 @@ export function NewUpdateRequestModal({
       console.log('Core Contract Transaction Receipt:', receipt)
     } catch (error) {
       console.error('Error in Core Contract Call:', error)
-      resetSubmitButton()
-      makeErrorNotif("Error in Core Contract Call", error.toString())
-      return
+      if (document.getElementById('submitButton')) {
+        resetSubmitButton()
+        makeErrorNotif("Error in Core Contract Call", error.toString())
+        return  
+      }
     }
 
     console.log(request)
@@ -381,7 +382,7 @@ export function NewUpdateRequestModal({
         'ml-3 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2'
       document.getElementById('submitButton').disabled = false
     }
-    showNotif(false, "New Update Request", "Request submitted successfully.")
+    showNotif(false, 'New Update Request', 'Request submitted successfully.')
     onClose()
   }
 
@@ -503,8 +504,9 @@ export function NewUpdateRequestModal({
                         rows={1}
                         spellCheck="false"
                         defaultValue={
-                          document.getElementById("oneTimeKey") && document.getElementById("oneTimeKey").value != ""
-                            ? document.getElementById("oneTimeKey").value 
+                          document.getElementById('oneTimeKey') &&
+                          document.getElementById('oneTimeKey').value != ''
+                            ? document.getElementById('oneTimeKey').value
                             : generateRandomAsciiString24()
                         }
                       />
@@ -531,8 +533,9 @@ export function NewUpdateRequestModal({
                         rows={1}
                         spellCheck="false"
                         defaultValue={
-                          document.getElementById("oneTimeSalt") && document.getElementById("oneTimeSalt").value != ""
-                            ? document.getElementById("oneTimeSalt").value 
+                          document.getElementById('oneTimeSalt') &&
+                          document.getElementById('oneTimeSalt').value != ''
+                            ? document.getElementById('oneTimeSalt').value
                             : generateRandomAsciiString24()
                         }
                       />
