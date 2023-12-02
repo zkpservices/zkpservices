@@ -9,7 +9,7 @@ export function Modal() {
     <Transition.Root show={open} as={Fragment}>
       <Dialog
         as="div"
-        className="fixed inset-0 z-10 overflow-y-auto"
+        className="fixed inset-0 z-50 overflow-y-auto"
         onClose={setOpen}
       >
         <div className="flex min-h-screen items-center justify-center">
