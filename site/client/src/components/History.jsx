@@ -31,7 +31,24 @@ export function History({ tableData = {}, showRefresh = true , handleRefresh}) {
   const [showAwaitingDataModal, setShowAwaitingDataModal] = useState(false);
   const [showAwaitingUpdateModal, setShowAwaitingUpdateModal] = useState(false);
   const [showRequestedDataSentModal, setShowRequestedDataSentModal] = useState(false);
-  const [selectedRowData, setSelectedRowData] = useState({});
+  const [selectedRowData, setSelectedRowData] = useState({        
+  operation: ['', ''],
+  field: ['', ''],
+  status: ['', 'grey'],
+  details: ['', ''],
+  type: '',
+  requestID: '',
+  addressSender: '',
+  data: {},
+  addressSender: '',
+  salt: '',
+  limit: '',
+  key: '',
+  response_fee: '',
+  require2FA: '',
+  twoFAProvider: '',
+  twoFARequestID: '',
+  twoFAOneTimeToken: ''});
   let {userAddress, userPassword, chainId} = useGlobal();
   const handleRefreshAll = () => {
     // Call the loadAllHistory function from DashboardContext
@@ -249,8 +266,8 @@ export function History({ tableData = {}, showRefresh = true , handleRefresh}) {
 
   return (
     <div className="xl:max-w-none">
-      {showReceivedDataResponseModal && <ReceivedDataResponseModal 
-      open={true} 
+      <ReceivedDataResponseModal 
+      open={showReceivedDataResponseModal} 
       onClose={closeReceivedDataResponseModal}
       addressOfSendingParty={selectedRowData.addressSender}
       fieldRequested={selectedRowData.field[0]}
@@ -263,9 +280,9 @@ export function History({ tableData = {}, showRefresh = true , handleRefresh}) {
       twoFAProvider={selectedRowData.twoFAProvider}
       twoFARequestID={selectedRowData.twoFARequestID}
       twoFAOneTimeToken={selectedRowData.twoFAOneTimeToken}
-      />}
-      {showSendDataModal && <SendDataModal 
-      open={true} 
+      />
+      <SendDataModal 
+      open={showSendDataModal} 
       onClose={closeSendDataModal}
       onSubmit={addResponseToRequest}
       addressOfRequestingParty={selectedRowData.addressSender}
@@ -280,9 +297,9 @@ export function History({ tableData = {}, showRefresh = true , handleRefresh}) {
       twoFAProvider={selectedRowData.twoFAProvider}
       twoFARequestID={selectedRowData.twoFARequestID}
       twoFAOneTimeToken={selectedRowData.twoFAOneTimeToken}
-      />}
-      {showCompleteUpdateModal && <CompleteUpdateModal 
-      open={true} 
+      />
+      <CompleteUpdateModal 
+      open={showCompleteUpdateModal} 
       onClose={closeCompleteUpdateModal}
       onSubmit={completeUpdate}
       addressOfRequestingParty={selectedRowData.addressSender}
@@ -297,9 +314,9 @@ export function History({ tableData = {}, showRefresh = true , handleRefresh}) {
       twoFAProvider={selectedRowData.twoFAProvider}
       twoFARequestID={selectedRowData.twoFARequestID}
       twoFAOneTimeToken={selectedRowData.twoFAOneTimeToken}
-      />}
-      {showCompletedUpdateModal && <CompletedDataUpdateModal 
-      open={true} 
+      />
+      <CompletedDataUpdateModal 
+      open={showCompletedUpdateModal} 
       onClose={closeCompletedUpdateModal}
       addressOfRequestingParty={selectedRowData.addressSender}
       fieldToUpdate={selectedRowData.field[0]}
@@ -313,9 +330,9 @@ export function History({ tableData = {}, showRefresh = true , handleRefresh}) {
       twoFAProvider={selectedRowData.twoFAProvider}
       twoFARequestID={selectedRowData.twoFARequestID}
       twoFAOneTimeToken={selectedRowData.twoFAOneTimeToken}
-      />}
-      {showReceivedUpdateResponseModal && <ReceivedUpdateResponseModal 
-      open={true} 
+      />
+      <ReceivedUpdateResponseModal 
+      open={showReceivedUpdateResponseModal} 
       onClose={closeReceivedUpdateResponseModal}
       addressOfSendingParty={selectedRowData.addressSender}
       fieldUpdate={selectedRowData.field[0]}
@@ -328,9 +345,9 @@ export function History({ tableData = {}, showRefresh = true , handleRefresh}) {
       twoFAProvider={selectedRowData.twoFAProvider}
       twoFARequestID={selectedRowData.twoFARequestID}
       twoFAOneTimeToken={selectedRowData.twoFAOneTimeToken}
-      />}
-      {showAwaitingDataModal && <AwaitingDataModal 
-      open={true} 
+      />
+      <AwaitingDataModal 
+      open={showAwaitingDataModal} 
       onClose={closeAwaitingDataModal}
       addressOfSendingParty={selectedRowData.addressSender}
       fieldRequested={selectedRowData.field[0]}
@@ -342,9 +359,9 @@ export function History({ tableData = {}, showRefresh = true , handleRefresh}) {
       twoFAProvider={selectedRowData.twoFAProvider}
       twoFARequestID={selectedRowData.twoFARequestID}
       twoFAOneTimeToken={selectedRowData.twoFAOneTimeToken}
-      />}
-      {showAwaitingUpdateModal && <AwaitingUpdateCompletionModal 
-      open={true} 
+      />
+      <AwaitingUpdateCompletionModal 
+      open={showAwaitingUpdateModal} 
       onClose={closeAwaitingUpdateModal}
       addressOfSendingParty={selectedRowData.addressSender}
       fieldToUpdate={selectedRowData.field[0]}
@@ -357,9 +374,9 @@ export function History({ tableData = {}, showRefresh = true , handleRefresh}) {
       twoFAProvider={selectedRowData.twoFAProvider}
       twoFARequestID={selectedRowData.twoFARequestID}
       twoFAOneTimeToken={selectedRowData.twoFAOneTimeToken}
-      />}
-      {showRequestedDataSentModal && <RequestedDataSentModal 
-      open={true} 
+      />
+      <RequestedDataSentModal 
+      open={showRequestedDataSentModal} 
       onClose={closeRequestedDataSentModal}
       addressOfRequestingParty={selectedRowData.addressSender}
       fieldRequested={selectedRowData.field[0]}
@@ -372,7 +389,7 @@ export function History({ tableData = {}, showRefresh = true , handleRefresh}) {
       twoFAProvider={selectedRowData.twoFAProvider}
       twoFARequestID={selectedRowData.twoFARequestID}
       twoFAOneTimeToken={selectedRowData.twoFAOneTimeToken}
-      />}
+      />
       <Heading level={2} id="history" className="mt-0">
         Recent Activity
       </Heading>

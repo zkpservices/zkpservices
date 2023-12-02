@@ -18,7 +18,7 @@ export function RequestedDataSentModal({
   responseFee = "",
   require2FA = false,
 }) {
-  const modifiedFieldData = removeMetadata(JSON.parse(snapshotData)[fieldRequested])
+  const modifiedFieldData = open ? removeMetadata(JSON.parse(snapshotData)[fieldRequested]) : {}
   return (
     <Transition.Root show={open} as={Fragment}>
       <Dialog as="div" className="fixed inset-0 overflow-y-auto z-10 dark:bg-opacity-75" onClose={onClose}>
