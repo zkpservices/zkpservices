@@ -67,7 +67,7 @@ export default function Quickstart() {
   const [errorTopText, setErrorTopText] = useState('')
   const [errorBottomText, setErrorBottomText] = useState('')
   const [showQuickstart, setShowQuickstart] = useState(
-    <div>
+    <div class="min-h-screen">
       {/* <Notification
         open={showErrorNotif}
         error={true}

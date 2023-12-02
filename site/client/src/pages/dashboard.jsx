@@ -37,11 +37,12 @@ export function Dashboard() {
   // walletConnected = true;
 
   const [showDashboard, setShowDashboard] = useState(
-    <div className="flex justify-center">
-      <h2 className="text-center text-3xl font-bold tracking-tight">
-        Please connect your wallet and log in to get started
-      </h2>
-    </div>,
+    <div class="min-h-screen"></div>
+    // <div className="flex justify-center">
+    //   <h2 className="text-center text-3xl font-bold tracking-tight">
+    //     Please connect your wallet and log in to get started
+    //   </h2>
+    // </div>,
   )
   const [usernameText, setUsernameText] = useState('')
   const [loginNotification, setLoginNotification] = useState(<></>)
