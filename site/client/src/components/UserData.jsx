@@ -169,11 +169,8 @@ export function UserData({ fieldNames = [], handleRemove, handleAdd}) {
 
   async function openAddDataModal() {
     const localAvailableDashboard = await getAvailableDashboard(userAddress, userPassword, chainId)
-    console.log(fieldNames)
-    console.log(localAvailableDashboard['data'])
     const differenceDashboard = findUniqueElements(localAvailableDashboard['data'], fieldNames)
     
-    console.log(differenceDashboard)
     setAvailableDashboard(differenceDashboard)
     setAddDataModalOpen(true);
   };
@@ -218,7 +215,7 @@ export function UserData({ fieldNames = [], handleRemove, handleAdd}) {
           onCardClick={openAddDataModal}
         />
       </div>
-      {selectedFieldName && (
+      
         <ViewFieldModal
           title={selectedFieldName}
           open={selectedFieldName !== null}
@@ -231,15 +228,12 @@ export function UserData({ fieldNames = [], handleRemove, handleAdd}) {
           obfuscationSalt={selectedSalt}
           saltHash={selectedSaltHash}
         />
-      )}
-      {addDataModalOpen && (
         <NewDashboardDataModal
           open={addDataModalOpen}
           onSubmit={addServiceToDashboard}
           onClose={closeAddDataModal}
           options={availableDashboard}
         />
-      )}
   </div>
 );
 }

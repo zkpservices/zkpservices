@@ -24,7 +24,7 @@ export function ViewFieldModal({
     return rest;
   };
 
-  const modifiedFieldData = removeMetadata(fieldData[fieldName])
+  const modifiedFieldData = open ? removeMetadata(fieldData[fieldName]): {}
   
   return (
     <Transition.Root show={open} as={Fragment}>

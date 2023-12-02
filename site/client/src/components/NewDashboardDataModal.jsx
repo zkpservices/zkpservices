@@ -1,4 +1,4 @@
-import { Fragment } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { ExclamationTriangleIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { formToJSON } from 'axios';
@@ -10,6 +10,16 @@ export function NewDashboardDataModal({ open, onClose, onSubmit, options = ["Med
     const formDataJSON = formToJSON(formData);
     const result = await onSubmit(formDataJSON['field'])
   }
+  const [optionsList, setOptionsList] = useState(["Medical Records", "Public Transport Card", "Insurance Card"])
+  const optionsMapConditional = (options) => {
+    return options.map((option) => (
+      <option key={option}>{option}</option>
+    ))
+  }
+
+  useEffect(() => {
+    setOptionsList(optionsMapConditional(options))
+  }, [options])
 
   return (
     <Transition.Root show={open} as={Fragment}>
@@ -78,9 +88,7 @@ export function NewDashboardDataModal({ open, onClose, onSubmit, options = ["Med
                           className="relative block w-full mt-2 appearance-none rounded-md border border-gray-300 dark:border-gray-600 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:z-10 focus-border-emerald-500 focus:outline-none focus:border-transparent focus:ring-emerald-500 focus:box-shadow-none bg-slate-100 dark:bg-slate-700 sm:text-sm sm:leading-6"
                           defaultValue="Medical Records"
                         >
-                          {options.map((option) => (
-                            <option key={option}>{option}</option>
-                          ))}
+                          {optionsList}
                         </select>
                       </div>
                     </div>
