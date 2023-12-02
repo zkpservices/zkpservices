@@ -10,7 +10,7 @@ import { Notification } from '@/components/Notification'
 export default function Login() {
   const { walletConnected, loggedIn, userAddress, setLoggedIn, userPassword, setUserPassword, 
     showLoginNotification, setShowLoginNotification, chainId, contractPassword, setContractPassword, 
-    twoFactorAuthPassword, setTwoFactorAuthPassword, onboardedChain, setOnboardedChain } = useGlobal();
+    twoFactorAuthPassword, setTwoFactorAuthPassword, onboardedChain, setOnboardedChain, metamaskAvailable } = useGlobal();
   const [loginHeader, setLoginHeader] = useState(<h2 className="mt-10 text-center text-3xl font-bold tracking-tight">Please connect your wallet to get started.</h2>)
   const [loginForm, setLoginForm] = useState(<></>)
   const [badLogin, setBadLogin] = useState(false);
@@ -22,7 +22,14 @@ export default function Login() {
   });
   const router = useRouter()
   const showLoginHeader = () => {
-    if(walletConnected) {
+    if (!metamaskAvailable){
+      return (   
+        <h2 className="mt-10 text-center text-2xl tracking-tight">
+          Web3 is not available on this device.
+          <br/>
+          Our guide is available on all devices, but please connect somewhere with Metamask available to use our dApp.
+        </h2>)
+    } else if(walletConnected) {
       return (
         <>
         <h2 className="mt-10 text-center text-3xl font-bold tracking-tight">

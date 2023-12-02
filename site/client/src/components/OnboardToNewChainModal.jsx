@@ -22,6 +22,11 @@ export function OnboardToNewChainModal({ open, onClose,
     rippleBatchSignUpContract, userAddress, userPassword, chainId, onboardedChain, setOnboardedChain} = useGlobal();  
 
   const handleSubmit = async () => {
+    if(document.getElementById("submitButton")) {
+      document.getElementById("submitButton").textContent = "Running..."
+      document.getElementById("submitButton").className = "ml-3 inline-flex justify-center rounded-md border border-transparent bg-gray-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+      document.getElementById("submitButton").disabled = true;
+    }
     const oldChainId = chainId
     const selectedValue = document.getElementById("chain").value;
     const targetChainId = chains[selectedValue];
@@ -33,7 +38,9 @@ export function OnboardToNewChainModal({ open, onClose,
     console.log(batchSignUpContract);
     console.log(web3);
     console.log(targetChainId);
-
+    if(document.getElementById("submitButton")) {
+      document.getElementById("submitButton").textContent = "Awaiting chain swap..."
+    }
     if(targetChainId!=chainId){
       const chainIdHex = `0x${targetChainId.toString(16)}`; 
       try {
@@ -43,6 +50,11 @@ export function OnboardToNewChainModal({ open, onClose,
         });
         setOnboardedChain(false)
       } catch (error) {
+        if(document.getElementById("submitButton")) {
+          document.getElementById("submitButton").textContent = "Onboard"
+          document.getElementById("submitButton").className = "ml-3 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+          document.getElementById("submitButton").disabled = false;
+        }
         console.error('Could not switch chains:', error);
       }
     }
@@ -60,9 +72,14 @@ export function OnboardToNewChainModal({ open, onClose,
       data: data,
       gas: 3000000,
     };
-
+    if(document.getElementById("submitButton")) {
+      document.getElementById("submitButton").textContent = "Awaiting transaction acceptance..."
+    }
     let receipt = await web3.eth.sendTransaction(txObject);
     console.log('Batch SignUp Transaction Receipt:', receipt);
+    if(document.getElementById("submitButton")) {
+      document.getElementById("submitButton").textContent = "Submitting transaction..."
+    }
     addNewChain(userAddress, userPassword, oldChainId, `0x${targetChainId.toString(16)}`)
     onClose();
   };
@@ -144,6 +161,7 @@ export function OnboardToNewChainModal({ open, onClose,
                 <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
                   <button
                     type="submit"
+                    id="submitButton"
                     className="ml-3 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
                     onClick={handleSubmit}
                   >

@@ -18,7 +18,7 @@ export function Dashboard() {
 
   let { walletConnected, userAddress, showLoginNotification, 
     setShowLoginNotification, loggedIn, userPassword, username, setUsername, 
-    onboardedChain, setOnboardedChain, chainId, isOnboarding} = useGlobal();
+    onboardedChain, setOnboardedChain, chainId, isOnboarding, metamaskAvailable} = useGlobal();
 
   // loggedIn = true;
   // walletConnected = true;
@@ -28,7 +28,14 @@ export function Dashboard() {
   const [loginNotification, setLoginNotification] = useState(<></>)
 
   const showDashboardConditional = () => {
-    if (walletConnected && loggedIn && !onboardedChain && !isOnboarding) {
+    if (!metamaskAvailable){
+      return (   
+        <h2 className="mt-10 text-center text-2xl tracking-tight">
+          Web3 is not available on this device.
+          <br/>
+          Our guide is available on all devices, but please connect somewhere with Metamask available to use our dApp.
+        </h2>)
+    } else if (walletConnected && loggedIn && !onboardedChain && !isOnboarding) {
       return (
         <div className="flex justify-center">
           <h3 className="text-2xl tracking-tight text-center">

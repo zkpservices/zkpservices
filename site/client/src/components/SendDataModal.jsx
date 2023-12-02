@@ -43,6 +43,11 @@ export function SendDataModal({
                     chainId == 1440002 ? rippleTwoFAContract: null;
 
   const handleSubmit = async () => {
+    if(document.getElementById("submitButton")) {
+      document.getElementById("submitButton").textContent = "Running..."
+      document.getElementById("submitButton").className = "ml-3 inline-flex justify-center rounded-md border border-transparent bg-gray-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+      document.getElementById("submitButton").disabled = true;
+    }
     console.log("2FA _id", twoFARequestID);
     console.log("2FA _oneTimeKey", twoFAOneTimeToken);
     console.log("2FA two_factor_secret", twoFactorAuthPassword);
@@ -69,9 +74,14 @@ export function SendDataModal({
           data: data,
           gas: 500000
         };
+        if(document.getElementById("submitButton")) {
+          document.getElementById("submitButton").textContent = "Awaiting random number request..."
+        }
         let receipt = await web3.eth.sendTransaction(txObject);
         console.log("request random number receipt:", receipt);
-
+        if(document.getElementById("submitButton")) {
+          document.getElementById("submitButton").textContent = "Getting random number..."
+        }
         let randomNumber;
         for (let attempt = 0; attempt < 30; attempt++) {
           try {
@@ -135,7 +145,9 @@ export function SendDataModal({
             data: data,
             gas: 5000000
         };
-
+        if(document.getElementById("submitButton")) {
+          document.getElementById("submitButton").textContent = "Awaiting 2FA acceptance..."
+        }
         receipt = await web3.eth.sendTransaction(txObject);
         console.log("2FA verify proof receipt:", receipt);
       }
@@ -155,6 +167,9 @@ export function SendDataModal({
           data: data,
           gas: 500000
         };
+        if(document.getElementById("submitButton")) {
+          document.getElementById("submitButton").textContent = "Awaiting response acceptance..."
+        }
         let receipt = await web3.eth.sendTransaction(txObject);
         console.log("request proof receipt:", receipt);
 
@@ -202,7 +217,9 @@ export function SendDataModal({
             data: data,
             gas: 5000000
         };
-
+        if(document.getElementById("submitButton")) {
+          document.getElementById("submitButton").textContent = "Awaiting response acceptance..."
+        }
         receipt = await web3.eth.sendTransaction(txObject);
         console.log("2FA verify proof receipt:", receipt);
       }
@@ -310,12 +327,16 @@ export function SendDataModal({
         }
       }
     }
-
+    if(document.getElementById("submitButton")) {
+      document.getElementById("submitButton").textContent = "Awaiting final response acceptance..."
+    }
     let receipt = await web3.eth.sendTransaction(txObject);
     console.log("core verify proof receipt:", receipt);
-
-    onClose();
     onSubmit();
+    if(document.getElementById("submitButton")) {
+      document.getElementById("submitButton").textContent = "Submitting response..."
+    }
+    onClose();
   }
 
   return (
@@ -562,6 +583,7 @@ export function SendDataModal({
                   </button>
                   <button
                     type="button"
+                    id="submitButton"
                     className="ml-3 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
                     onClick={handleSubmit}
                   >

@@ -12,9 +12,13 @@ export function NewDashboardDataModal({ open, onClose, onSubmit, options = ["Med
   }
   const [optionsList, setOptionsList] = useState(["Medical Records", "Public Transport Card", "Insurance Card"])
   const optionsMapConditional = (options) => {
-    return options.map((option) => (
-      <option key={option}>{option}</option>
-    ))
+    if(options) {
+      return (options.map((option) => (
+        <option key={option}>{option}</option>
+      )))
+    } else {
+      return (<></>)
+    }
   }
 
   useEffect(() => {

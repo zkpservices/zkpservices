@@ -77,12 +77,6 @@ export function GlobalProvider({ children }) {
     }
     return '';
   });
-  const [availableDashboard, setAvailableDashboard] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('availableDashboard') || '';
-    }
-    return '';
-  });
   const [web3, setWeb3] = useState(() => {
     if (typeof window !== 'undefined') {
       const localWeb3 = localStorage.getItem('web3');
@@ -173,6 +167,14 @@ export function GlobalProvider({ children }) {
     return false;
   });
 
+  const [metamaskAvailable, setMetamaskAvailable] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const localShowLoginNotification = localStorage.getItem('metamaskAvailable');
+      return localShowLoginNotification === 'true' || false;
+    }
+    return false;
+  });
+
 
   useEffect(() => {
     // Update localStorage when any relevant state variable changes
@@ -187,7 +189,6 @@ export function GlobalProvider({ children }) {
     localStorage.setItem('chainId', chainId);
     localStorage.setItem('fieldData', fieldData);
     localStorage.setItem('dashboard', dashboard);
-    localStorage.setItem('availableDashboard', availableDashboard);
     localStorage.setItem('web3', web3);
     localStorage.setItem('fujiCoreContract', fujiCoreContract);
     localStorage.setItem('fujiTwoFAContract', fujiTwoFAContract);
@@ -199,6 +200,7 @@ export function GlobalProvider({ children }) {
     localStorage.setItem('rippleTwoFAContract', rippleTwoFAContract);
     localStorage.setItem('rippleBatchSignUpContract', rippleBatchSignUpContract);
     localStorage.setItem('onboardedChain', onboardedChain);
+    localStorage.setItem('metamaskAvailable', metamaskAvailable);
   }, [
     userAddress,
     walletConnected,
@@ -211,7 +213,6 @@ export function GlobalProvider({ children }) {
     chainId,
     fieldData,
     dashboard,
-    availableDashboard,
     web3,
     fujiCoreContract,
     fujiTwoFAContract,
@@ -223,7 +224,8 @@ export function GlobalProvider({ children }) {
     rippleTwoFAContract,
     rippleBatchSignUpContract,
     isOnboarding,
-    onboardedChain
+    onboardedChain,
+    metamaskAvailable
   ]);
 
   return (
@@ -231,12 +233,13 @@ export function GlobalProvider({ children }) {
       userAddress, setUserAddress,  showLoginNotification, setShowLoginNotification, userPassword, 
       setUserPassword, username, setUsername, twoFactorAuthPassword, setTwoFactorAuthPassword, 
       contractPassword, setContractPassword, chainId, setChainId, fieldData, setFieldData, 
-      dashboard, setDashboard, availableDashboard, setAvailableDashboard, web3, setWeb3,
+      dashboard, setDashboard, web3, setWeb3,
       fujiCoreContract, setFujiCoreContract, fujiTwoFAContract, setFujiTwoFAContract,
       fujiBatchSignUpContract, setFujiBatchSignUpContract, mumbaiCoreContract, setMumbaiCoreContract, 
       mumbaiTwoFAContract, setMumbaiTwoFAContract, mumbaiBatchSignUpContract, setMumbaiBatchSignUpContract,
       rippleCoreContract, setRippleCoreContract, rippleTwoFAContract, setRippleTwoFAContract,
-      rippleBatchSignUpContract, setRippleBatchSignUpContract, isOnboarding, setIsOnboarding, onboardedChain, setOnboardedChain}}>
+      rippleBatchSignUpContract, setRippleBatchSignUpContract, isOnboarding, setIsOnboarding, onboardedChain, setOnboardedChain,
+      metamaskAvailable, setMetamaskAvailable}}>
       {children}
     </GlobalContext.Provider>
   );

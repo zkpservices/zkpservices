@@ -46,7 +46,8 @@ export const Header = forwardRef(function Header({ className }, ref) {
         setMumbaiTwoFAContract, setMumbaiBatchSignUpContract, setRippleCoreContract, 
         setRippleTwoFAContract, setRippleBatchSignUpContract, fujiCoreContract, mumbaiCoreContract,
         rippleCoreContract, fujiTwoFAContract, mumbaiTwoFAContract, rippleTwoFAContract, 
-        fujiBatchSignUpContract, mumbaiBatchSignUpContract, rippleBatchSignUpContract, setOnboardedChain, onboardedChain, isOnboarding} = useGlobal();
+        fujiBatchSignUpContract, mumbaiBatchSignUpContract, rippleBatchSignUpContract, setOnboardedChain, 
+        onboardedChain, isOnboarding, metamaskAvailable, setMetamaskAvailable} = useGlobal();
   const [isHovered, setIsHovered] = useState(false);
   const [textOpacity, setTextOpacity] = useState(1); // Initialize opacity to 1
   const [loginButtonText, setLoginButtonText] = useState('Login');
@@ -118,6 +119,8 @@ export const Header = forwardRef(function Header({ className }, ref) {
         fetchUserDataFields()
       }
     };
+
+    if(metamaskAvailable) {
   
     window.ethereum.on('chainChanged', handleChainChanged);
   
@@ -125,6 +128,7 @@ export const Header = forwardRef(function Header({ className }, ref) {
       // Clean up the event listener when the component is unmounted
       window.ethereum.removeListener('chainChanged', handleChainChanged);
     };
+  }
   }, []);
 
   const truncateAddress = (address) => {
@@ -148,7 +152,9 @@ export const Header = forwardRef(function Header({ className }, ref) {
     }
   }
 
-  async function initializeWeb3(){
+  async function initializeWeb3() {
+    if(window.ethereum) {
+    setMetamaskAvailable(true);
     //these are too large for local storage and need to be reinstantiated each time
     const web3Instance = new Web3(window.ethereum);
     web3 = web3Instance;
@@ -196,13 +202,18 @@ export const Header = forwardRef(function Header({ className }, ref) {
     setFujiBatchSignUpContract(fujiBatchSignUpContractInstance);
     setMumbaiBatchSignUpContract(mumbaiBatchSignUpContractInstance);
     setRippleBatchSignUpContract(rippleBatchSignUpContractInstance);
+  } else {
+    setMetamaskAvailable(false);
   }
+}
 
   function updateWalletConnect() {
-    if(walletConnected) {
-      disconnectWallet()
-    } else {
-      connectToMetaMask()
+    if(metamaskAvailable) {
+      if(walletConnected) {
+        disconnectWallet()
+      } else {
+        connectToMetaMask()
+      }
     }
   }
 

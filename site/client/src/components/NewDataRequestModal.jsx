@@ -215,6 +215,9 @@ export function NewDataRequestModal({
       console.log('2FA Contract Transaction Receipt:', receipt);
     } catch (error) {
       console.error('Error in 2FA Contract Call:', error);
+      document.getElementById("submitDataRequestButton").textContent = "Call Smart Contract"
+      document.getElementById("submitDataRequestButton").className = "ml-3 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+      document.getElementById("submitDataRequestButton").disabled = false;
     }
 
     try {
@@ -252,10 +255,21 @@ export function NewDataRequestModal({
       console.log('Core Contract Transaction Receipt:', receipt);
     } catch (error) {
       console.error('Error in Core Contract Call:', error);
+      document.getElementById("submitDataRequestButton").textContent = "Call Smart Contract"
+      document.getElementById("submitDataRequestButton").className = "ml-3 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+      document.getElementById("submitDataRequestButton").disabled = false;
     }
 
     console.log(request)
     document.getElementById("submitDataRequestButton").textContent = "Submitting request..."
+    try{
+      const result = await onSubmit(request)
+    } catch(error) {
+      console.error(error)
+      document.getElementById("submitDataRequestButton").textContent = "Call Smart Contract"
+      document.getElementById("submitDataRequestButton").className = "ml-3 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+      document.getElementById("submitDataRequestButton").disabled = false;
+    }
     const result = await onSubmit(request)
     onClose()
   }
@@ -266,7 +280,7 @@ export function NewDataRequestModal({
 
   return (
     <Transition.Root show={open} as={Fragment}>
-      <Dialog as="div" className="fixed inset-0 overflow-y-auto z-10 dark:bg-opacity-75" onClose={onClose}>
+      <Dialog as="div" className="fixed inset-0 overflow-y-auto z-10 dark:bg-opacity-75" onClose={() => {}}>
         <div className="min-h-screen flex items-center justify-center">
           <Transition.Child
             as={Fragment}

@@ -124,7 +124,8 @@ export function UserData({ fieldNames = [], handleRemove, handleAdd}) {
   const [selectedHash, setSelectedHash] = useState(null);
   const [selectedSaltHash, setSelectedSaltHash] = useState(null);
   const [addDataModalOpen, setAddDataModalOpen] = useState(false);
-  let {userAddress, userPassword, fieldData, setFieldData, availableDashboard, setAvailableDashboard, dashboard, setDashboard, chainId, contractPassword} = useGlobal();
+  const [availableDashboard, setAvailableDashboard] = useState([])
+  let {userAddress, userPassword, fieldData, setFieldData, dashboard, setDashboard, chainId, contractPassword} = useGlobal();
 
   async function addServiceToDashboard(service) {
     setAddDataModalOpen(false);

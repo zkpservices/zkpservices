@@ -114,6 +114,11 @@ export function NewCrossChainSyncModal({open, onClose, destinationChainOptions})
   }
 
   async function handleSubmit() {
+    if(document.getElementById("submitButton")) {
+      document.getElementById("submitButton").textContent = "Running..."
+      document.getElementById("submitButton").className = "ml-3 inline-flex justify-center rounded-md border border-transparent bg-gray-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+      document.getElementById("submitButton").disabled = true;
+    }
     await handleFetchValue();
     console.log(parameterValue, "submitted");
     console.log(paramKey, paramToSync);
@@ -175,7 +180,9 @@ export function NewCrossChainSyncModal({open, onClose, destinationChainOptions})
         data: data,
         gas: 3000000
       };
-
+      if(document.getElementById("submitButton")) {
+        document.getElementById("submitButton").textContent = "Awaiting transaction acceptance..."
+      }
       let receipt = await web3.eth.sendTransaction(txObject);
       console.log('Transaction Receipt:', receipt);
 
@@ -191,10 +198,18 @@ export function NewCrossChainSyncModal({open, onClose, destinationChainOptions})
       const type = paramToSyncDict[`${paramToSync}`]
       const targetChain = chainId == 43113 ? 80001 : 43113;
       paramKey = document.getElementById('parameterKey').value;
+      if(document.getElementById("submitButton")) {
+        document.getElementById("submitButton").textContent = "Submitting transaction..."
+      }
       const result = await addCCTX(userAddress, userPassword, type, paramKey, chainId, `0x${targetChain.toString(16)}`, "1283748234")
       onClose();
     } catch (error) {
       console.error('Error in transaction:', error);
+      if(document.getElementById("submitButton")) {
+        document.getElementById("submitButton").textContent = "Call Smart Contract"
+        document.getElementById("submitButton").className = "ml-3 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+        document.getElementById("submitButton").disabled = false;
+      }
     }
 
   }
@@ -350,6 +365,7 @@ export function NewCrossChainSyncModal({open, onClose, destinationChainOptions})
                   </button>
                   <button
                     type="button"
+                    id="submitButton"
                     className="ml-3 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
                     onClick={handleSubmit}
                   >

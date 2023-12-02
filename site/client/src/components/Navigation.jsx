@@ -219,7 +219,7 @@ export function Navigation(props) {
         setMumbaiTwoFAContract, setMumbaiBatchSignUpContract, setRippleCoreContract, 
         setRippleTwoFAContract, setRippleBatchSignUpContract, fujiCoreContract, mumbaiCoreContract,
         rippleCoreContract, fujiTwoFAContract, mumbaiTwoFAContract, rippleTwoFAContract, 
-        fujiBatchSignUpContract, mumbaiBatchSignUpContract, rippleBatchSignUpContract} = useGlobal();
+        fujiBatchSignUpContract, mumbaiBatchSignUpContract, rippleBatchSignUpContract, metamaskAvailable, setMetamaskAvailable} = useGlobal();
   const [isHovered, setIsHovered] = useState(false);
   const [textOpacity, setTextOpacity] = useState(1); // Initialize opacity to 1
   const [loginButtonText, setLoginButtonText] = useState('Login');
@@ -277,13 +277,16 @@ export function Navigation(props) {
       console.log(_chainId)
       setChainId(_chainId)
     };
+
+    if(metamaskAvailable) {
   
-    window.ethereum.on('chainChanged', handleChainChanged);
-  
-    return () => {
-      // Clean up the event listener when the component is unmounted
-      window.ethereum.removeListener('chainChanged', handleChainChanged);
-    };
+      window.ethereum.on('chainChanged', handleChainChanged);
+    
+      return () => {
+        // Clean up the event listener when the component is unmounted
+        window.ethereum.removeListener('chainChanged', handleChainChanged);
+      };
+    }
   }, []);
 
   const truncateAddress = (address) => {
@@ -308,53 +311,58 @@ export function Navigation(props) {
   }
 
   async function initializeWeb3(){
-    //these are too large for local storage and need to be reinstantiated each time
-    const web3Instance = new Web3(window.ethereum);
-    web3 = web3Instance;
-    setWeb3(web3Instance);
+    if(window.ethereum) {
+      setMetamaskAvailable(true);
+      //these are too large for local storage and need to be reinstantiated each time
+      const web3Instance = new Web3(window.ethereum);
+      web3 = web3Instance;
+      setWeb3(web3Instance);
 
-    const coreContractAbi = coreContractABI; 
-    const fujiCoreContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'; 
-    const mumbaiCoreContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'; 
-    const rippleCoreContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'; 
-    const fujiCoreContractInstance = new web3Instance.eth.Contract(coreContractAbi, fujiCoreContractAddress);
-    const mumbaiCoreContractInstance = new web3Instance.eth.Contract(coreContractAbi, mumbaiCoreContractAddress);
-    const rippleCoreContractInstance = new web3Instance.eth.Contract(coreContractAbi, rippleCoreContractAddress);
-    fujiCoreContract = fujiCoreContractInstance;
-    mumbaiCoreContract = mumbaiCoreContractInstance;
-    rippleCoreContract = rippleCoreContractInstance;
-    setFujiCoreContract(fujiCoreContractInstance);
-    setMumbaiCoreContract(mumbaiCoreContractInstance);
-    setRippleCoreContract(rippleCoreContractInstance);
+      const coreContractAbi = coreContractABI; 
+      const fujiCoreContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'; 
+      const mumbaiCoreContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'; 
+      const rippleCoreContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'; 
+      const fujiCoreContractInstance = new web3Instance.eth.Contract(coreContractAbi, fujiCoreContractAddress);
+      const mumbaiCoreContractInstance = new web3Instance.eth.Contract(coreContractAbi, mumbaiCoreContractAddress);
+      const rippleCoreContractInstance = new web3Instance.eth.Contract(coreContractAbi, rippleCoreContractAddress);
+      fujiCoreContract = fujiCoreContractInstance;
+      mumbaiCoreContract = mumbaiCoreContractInstance;
+      rippleCoreContract = rippleCoreContractInstance;
+      setFujiCoreContract(fujiCoreContractInstance);
+      setMumbaiCoreContract(mumbaiCoreContractInstance);
+      setRippleCoreContract(rippleCoreContractInstance);
 
-    const twoFAContractVRFAbi = twoFAContractVRFABI;
-    const twoFAContractGenericAbi = twoFAContractGenericABI;
-    const fujiTwoFAContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'; 
-    const mumbaiTwoFAContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'; 
-    const rippleTwoFAContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'; 
-    const fujiTwoFAContractInstance = new web3Instance.eth.Contract(twoFAContractVRFAbi, fujiTwoFAContractAddress);
-    const mumbaiTwoFAContractInstance = new web3Instance.eth.Contract(twoFAContractVRFAbi, mumbaiTwoFAContractAddress);
-    const rippleTwoFAContractInstance = new web3Instance.eth.Contract(twoFAContractGenericAbi, rippleTwoFAContractAddress);
-    fujiTwoFAContract = fujiTwoFAContractInstance;
-    mumbaiTwoFAContract = mumbaiTwoFAContractInstance;
-    rippleTwoFAContract = rippleTwoFAContractInstance;
-    setFujiTwoFAContract(fujiTwoFAContractInstance);
-    setMumbaiTwoFAContract(mumbaiTwoFAContractInstance);
-    setRippleTwoFAContract(rippleTwoFAContractInstance);
+      const twoFAContractVRFAbi = twoFAContractVRFABI;
+      const twoFAContractGenericAbi = twoFAContractGenericABI;
+      const fujiTwoFAContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'; 
+      const mumbaiTwoFAContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'; 
+      const rippleTwoFAContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'; 
+      const fujiTwoFAContractInstance = new web3Instance.eth.Contract(twoFAContractVRFAbi, fujiTwoFAContractAddress);
+      const mumbaiTwoFAContractInstance = new web3Instance.eth.Contract(twoFAContractVRFAbi, mumbaiTwoFAContractAddress);
+      const rippleTwoFAContractInstance = new web3Instance.eth.Contract(twoFAContractGenericAbi, rippleTwoFAContractAddress);
+      fujiTwoFAContract = fujiTwoFAContractInstance;
+      mumbaiTwoFAContract = mumbaiTwoFAContractInstance;
+      rippleTwoFAContract = rippleTwoFAContractInstance;
+      setFujiTwoFAContract(fujiTwoFAContractInstance);
+      setMumbaiTwoFAContract(mumbaiTwoFAContractInstance);
+      setRippleTwoFAContract(rippleTwoFAContractInstance);
 
-    const batchSignUpContractAbi = batchSignUpABI;
-    const fujiBatchSignUpContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d';
-    const mumbaiBatchSignUpContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d';
-    const rippleBatchSignUpContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d';
-    const fujiBatchSignUpContractInstance = new web3Instance.eth.Contract(batchSignUpContractAbi, fujiBatchSignUpContractAddress);
-    const mumbaiBatchSignUpContractInstance = new web3Instance.eth.Contract(batchSignUpContractAbi, mumbaiBatchSignUpContractAddress);
-    const rippleBatchSignUpContractInstance = new web3Instance.eth.Contract(batchSignUpContractAbi, rippleBatchSignUpContractAddress);
-    fujiBatchSignUpContract = fujiBatchSignUpContractInstance;
-    mumbaiBatchSignUpContract = mumbaiBatchSignUpContractInstance;
-    rippleBatchSignUpContract = rippleBatchSignUpContractInstance;
-    setFujiBatchSignUpContract(fujiBatchSignUpContractInstance);
-    setMumbaiBatchSignUpContract(mumbaiBatchSignUpContractInstance);
-    setRippleBatchSignUpContract(rippleBatchSignUpContractInstance);
+      const batchSignUpContractAbi = batchSignUpABI;
+      const fujiBatchSignUpContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d';
+      const mumbaiBatchSignUpContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d';
+      const rippleBatchSignUpContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d';
+      const fujiBatchSignUpContractInstance = new web3Instance.eth.Contract(batchSignUpContractAbi, fujiBatchSignUpContractAddress);
+      const mumbaiBatchSignUpContractInstance = new web3Instance.eth.Contract(batchSignUpContractAbi, mumbaiBatchSignUpContractAddress);
+      const rippleBatchSignUpContractInstance = new web3Instance.eth.Contract(batchSignUpContractAbi, rippleBatchSignUpContractAddress);
+      fujiBatchSignUpContract = fujiBatchSignUpContractInstance;
+      mumbaiBatchSignUpContract = mumbaiBatchSignUpContractInstance;
+      rippleBatchSignUpContract = rippleBatchSignUpContractInstance;
+      setFujiBatchSignUpContract(fujiBatchSignUpContractInstance);
+      setMumbaiBatchSignUpContract(mumbaiBatchSignUpContractInstance);
+      setRippleBatchSignUpContract(rippleBatchSignUpContractInstance);
+    } else {
+      setMetamaskAvailable(false);
+    }
   }  
 
   function updateWalletConnect() {
