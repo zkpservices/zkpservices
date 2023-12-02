@@ -133,7 +133,11 @@ export function NewUpdateRequestModal({
               rows={1}
               // onChange={(e) => setTwoFARequestID(e.target.value)}
               spellCheck="false"
-              defaultValue={twoFARequestID}
+              defaultValue={
+                document.getElementById("twoFARequestID") && document.getElementById("twoFARequestID").value != ""
+                  ? document.getElementById("twoFARequestID").value 
+                  : generateRandomAsciiString24()
+              }
             />
             <button
               className="mt-2 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
@@ -158,7 +162,11 @@ export function NewUpdateRequestModal({
               rows={1}
               // onChange={(e) => setTwoFARequestID(e.target.value)}
               spellCheck="false"
-              defaultValue={twoFAOneTimeToken}
+              defaultValue={
+                document.getElementById("twoFAOneTimeToken") && document.getElementById("twoFAOneTimeToken").value != ""
+                  ? document.getElementById("twoFAOneTimeToken").value 
+                  : generateRandomAsciiString24()
+              }
             />
             <button
               className="mt-2 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
@@ -475,7 +483,11 @@ export function NewUpdateRequestModal({
                         className="relative mt-1 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 dark:focus:border-emerald-500 sm:text-sm"
                         rows={1}
                         spellCheck="false"
-                        defaultValue={oneTimeKey}
+                        defaultValue={
+                          document.getElementById("oneTimeKey") && document.getElementById("oneTimeKey").value != ""
+                            ? document.getElementById("oneTimeKey").value 
+                            : generateRandomAsciiString24()
+                        }
                       />
                       <button
                         className="mt-2 inline-flex justify-center rounded-md border border-transparent bg-emerald-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
@@ -499,7 +511,11 @@ export function NewUpdateRequestModal({
                         className="relative mt-1 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 dark:focus:border-emerald-500 sm:text-sm"
                         rows={1}
                         spellCheck="false"
-                        defaultValue={oneTimeSalt}
+                        defaultValue={
+                          document.getElementById("oneTimeSalt") && document.getElementById("oneTimeSalt").value != ""
+                            ? document.getElementById("oneTimeSalt").value 
+                            : generateRandomAsciiString24()
+                        }
                       />
                       <button
                         type="button"
