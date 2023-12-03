@@ -224,7 +224,7 @@ export default function Login() {
     }
   }
   return (
-    <div>
+    <div className="max-w-none">
       <Notification
         open={badLogin}
         showTopText={notifTopText}
