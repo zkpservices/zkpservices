@@ -95,7 +95,7 @@ export default function Login() {
               >
                 Data Provider:
               </label>
-              <div className="mt-2">
+              <div className="mt-2 font-mono">
                 <input
                   id="provider"
                   name="provider"

@@ -40,7 +40,7 @@ export const Header = forwardRef(function Header({ className }, ref) {
   let bgOpacityLight = useTransform(scrollY, [0, 72], [0.5, 0.5])
   let bgOpacityDark = useTransform(scrollY, [0, 72], [0.2, 0.2])
   const [accountText, setAccountText] = useState('')
-  const [showErrorNotif, setShowErrorNotif] = useState(false);
+  const [showErrorNotif, setShowErrorNotif] = useState(false)
   const [errorTopText, setErrorTopText] = useState('')
   const [errorBottomText, setErrorBottomText] = useState('')
 
@@ -89,7 +89,7 @@ export const Header = forwardRef(function Header({ className }, ref) {
     setApiErrorTopText,
     setApiErrorBottomText,
     apiErrorTopText,
-    apiErrorBottomText
+    apiErrorBottomText,
   } = useGlobal()
   const [isHovered, setIsHovered] = useState(false)
   const [textOpacity, setTextOpacity] = useState(1) // Initialize opacity to 1
@@ -154,12 +154,12 @@ export const Header = forwardRef(function Header({ className }, ref) {
       const localdashboard = await getDashboard(
         userAddress,
         userPassword,
-        chainId,
+        chainId
       )
       setOnboardedChain(true)
     } catch (error) {
       setApiErrorNotif(true)
-      setApiErrorTopText("Error establishing chain onboarded status")
+      setApiErrorTopText('Error establishing chain onboarded status')
       setApiErrorBottomText(error.toString())
       setOnboardedChain(false)
       console.error(`Error establishing chain onboarded status: ${error}`)
@@ -225,15 +225,15 @@ export const Header = forwardRef(function Header({ className }, ref) {
         '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'
       const fujiCoreContractInstance = new web3Instance.eth.Contract(
         coreContractAbi,
-        fujiCoreContractAddress,
+        fujiCoreContractAddress
       )
       const mumbaiCoreContractInstance = new web3Instance.eth.Contract(
         coreContractAbi,
-        mumbaiCoreContractAddress,
+        mumbaiCoreContractAddress
       )
       const rippleCoreContractInstance = new web3Instance.eth.Contract(
         coreContractAbi,
-        rippleCoreContractAddress,
+        rippleCoreContractAddress
       )
       fujiCoreContract = fujiCoreContractInstance
       mumbaiCoreContract = mumbaiCoreContractInstance
@@ -252,15 +252,15 @@ export const Header = forwardRef(function Header({ className }, ref) {
         '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'
       const fujiTwoFAContractInstance = new web3Instance.eth.Contract(
         twoFAContractVRFAbi,
-        fujiTwoFAContractAddress,
+        fujiTwoFAContractAddress
       )
       const mumbaiTwoFAContractInstance = new web3Instance.eth.Contract(
         twoFAContractVRFAbi,
-        mumbaiTwoFAContractAddress,
+        mumbaiTwoFAContractAddress
       )
       const rippleTwoFAContractInstance = new web3Instance.eth.Contract(
         twoFAContractGenericAbi,
-        rippleTwoFAContractAddress,
+        rippleTwoFAContractAddress
       )
       fujiTwoFAContract = fujiTwoFAContractInstance
       mumbaiTwoFAContract = mumbaiTwoFAContractInstance
@@ -278,15 +278,15 @@ export const Header = forwardRef(function Header({ className }, ref) {
         '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'
       const fujiBatchSignUpContractInstance = new web3Instance.eth.Contract(
         batchSignUpContractAbi,
-        fujiBatchSignUpContractAddress,
+        fujiBatchSignUpContractAddress
       )
       const mumbaiBatchSignUpContractInstance = new web3Instance.eth.Contract(
         batchSignUpContractAbi,
-        mumbaiBatchSignUpContractAddress,
+        mumbaiBatchSignUpContractAddress
       )
       const rippleBatchSignUpContractInstance = new web3Instance.eth.Contract(
         batchSignUpContractAbi,
-        rippleBatchSignUpContractAddress,
+        rippleBatchSignUpContractAddress
       )
       fujiBatchSignUpContract = fujiBatchSignUpContractInstance
       mumbaiBatchSignUpContract = mumbaiBatchSignUpContractInstance
@@ -325,7 +325,7 @@ export const Header = forwardRef(function Header({ className }, ref) {
           'backdrop-blur-sm dark:backdrop-blur lg:left-72 xl:left-80',
         isInsideMobileNavigation
           ? 'bg-white dark:bg-zinc-900'
-          : 'bg-white/[var(--bg-opacity-light)] dark:bg-zinc-900/[var(--bg-opacity-dark)]',
+          : 'bg-white/[var(--bg-opacity-light)] dark:bg-zinc-900/[var(--bg-opacity-dark)]'
       )}
       style={{
         '--bg-opacity-light': bgOpacityLight,
@@ -336,16 +336,18 @@ export const Header = forwardRef(function Header({ className }, ref) {
         className={clsx(
           'absolute inset-x-0 top-full h-px transition',
           (isInsideMobileNavigation || !mobileNavIsOpen) &&
-            'bg-zinc-900/7.5 dark:bg-white/7.5',
+            'bg-zinc-900/7.5 dark:bg-white/7.5'
         )}
       />
       <div className="flex items-center gap-5 lg:hidden">
         <MobileNavigation />
         <Link href="/" aria-label="Home">
-          <div className="flex items-center mt-0.5"> 
+          <div className="mt-0.5 flex items-center">
             <Logo className="h-6" />
-            <p className="ml-2 font-semibold text-lg text-black dark:text-white mb-1 mt-0.5">zkp.services</p> 
-          </div> 
+            <p className="mb-1 ml-2 mt-0.5 text-lg font-semibold text-black dark:text-white">
+              zkp.services
+            </p>
+          </div>
         </Link>
       </div>
       <div className="ml-auto flex items-center gap-5">
@@ -370,7 +372,13 @@ export const Header = forwardRef(function Header({ className }, ref) {
               updateWalletConnect()
             }}
           >
-            {isHovered && walletConnected ? 'Disconnect' : accountText}
+            {isHovered && walletConnected ? (
+              'Disconnect'
+            ) : accountText == 'Connect Wallet' ? (
+              'Connect Wallet'
+            ) : (
+              <div class="font-mono">{accountText}</div>
+            )}
           </Button>
           <Button
             href="/login"
@@ -382,11 +390,11 @@ export const Header = forwardRef(function Header({ className }, ref) {
             {loginButtonText}
           </Button>
           <Notification
-                        open={showErrorNotif}
-                        error={true}
-                        showTopText={apiErrorTopText}
-                        showBottomText={apiErrorBottomText}
-                        onClose={() => setApiErrorNotif(false)}
+            open={showErrorNotif}
+            error={true}
+            showTopText={apiErrorTopText}
+            showBottomText={apiErrorBottomText}
+            onClose={() => setApiErrorNotif(false)}
           />
         </div>
       </div>

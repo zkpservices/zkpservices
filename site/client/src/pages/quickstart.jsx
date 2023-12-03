@@ -400,7 +400,7 @@ export default function Quickstart() {
   const showQuickstartConditional = () => {
     if (!metamaskAvailable) {
       return (
-        <h2 className="mt-10 text-center text-2xl tracking-tight">
+        <h2 className="my-48 text-center text-2xl tracking-tight">
           Web3 is not available on this device.
           <br />
           Our guide is available on all devices, but please connect somewhere
@@ -417,14 +417,14 @@ export default function Quickstart() {
           showBottomText={errorBottomText}
           onClose={() => setShowErrorNotif(false)}
         />
-        <h2 className="mt-10 text-center text-3xl font-bold tracking-tight">
+        <h2 className="my-48 text-center text-3xl font-bold tracking-tight">
           Please connect your wallet to get started.
         </h2>
         </>
       )
     } else if (loggedIn) {
       return (
-        <h2 className="mt-10 text-center text-2xl tracking-tight">
+        <h2 className="my-48 text-center text-2xl tracking-tight">
           Account already exists for address {userAddress}.
           <br />
           Please disconnect wallet and reconnect with a new wallet to create a
@@ -529,7 +529,7 @@ export default function Quickstart() {
                   >
                     RSA Encryption Key - Public Key
                   </label>
-                  <div className="mt-1 sm:col-span-2 sm:mt-0">
+                  <div className="mt-1 sm:col-span-2 sm:mt-0 font-mono">
                     <textarea
                       id="rsa_enc_pub_key"
                       name="rsa_enc_pub_key"
@@ -548,7 +548,7 @@ export default function Quickstart() {
                   >
                     RSA Encryption Key - Private Key
                   </label>
-                  <div className="mt-1 sm:col-span-2 sm:mt-0">
+                  <div className="mt-1 sm:col-span-2 sm:mt-0 font-mono">
                     <textarea
                       id="rsa_enc_priv_key"
                       name="rsa_enc_priv_key"
@@ -590,7 +590,7 @@ export default function Quickstart() {
                   >
                     RSA Signing Key - Public Key
                   </label>
-                  <div className="mt-1 sm:col-span-2 sm:mt-0">
+                  <div className="mt-1 sm:col-span-2 sm:mt-0 font-mono">
                     <textarea
                       id="rsa_sign_pub_key"
                       name="rsa_sign_pub_key"
@@ -609,7 +609,7 @@ export default function Quickstart() {
                   >
                     RSA Signing Key - Private Key
                   </label>
-                  <div className="mt-1 sm:col-span-2 sm:mt-0">
+                  <div className="mt-1 sm:col-span-2 sm:mt-0 font-mono">
                     <textarea
                       id="rsa_sign_priv_key"
                       name="rsa_sign_priv_key"
