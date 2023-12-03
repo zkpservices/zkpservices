@@ -37,7 +37,7 @@ export function Dashboard() {
   // walletConnected = true;
 
   const [showDashboard, setShowDashboard] = useState(
-    <div class="min-h-screen"></div>
+    <div className="min-h-screen"></div>
     // <div className="flex justify-center">
     //   <h2 className="text-center text-3xl font-bold tracking-tight">
     //     Please connect your wallet and log in to get started

@@ -1,4 +1,4 @@
-import { Fragment, useState, useEffect } from 'react'
+import { Fragment, useState, useEffect, useRef, useLayoutEffect } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import { formToJSON } from 'axios'
@@ -10,6 +10,40 @@ import {
 import { Notification } from '@/components/Notification'
 import { poseidon } from '@/components/PoseidonHash'
 import { useGlobal } from '@/components/GlobalStorage'
+import {
+  autocompletion,
+  closeBrackets,
+  closeBracketsKeymap,
+  completionKeymap,
+} from '@codemirror/autocomplete'
+import { defaultKeymap, history, historyKeymap } from '@codemirror/commands'
+import {
+  bracketMatching,
+  defaultHighlightStyle,
+  foldGutter,
+  foldKeymap,
+  indentOnInput,
+  syntaxHighlighting,
+} from '@codemirror/language'
+import { lintKeymap } from '@codemirror/lint'
+import { highlightSelectionMatches, searchKeymap } from '@codemirror/search'
+import { EditorState } from '@codemirror/state'
+import {
+  EditorView,
+  crosshairCursor,
+  drawSelection,
+  dropCursor,
+  highlightActiveLine,
+  highlightActiveLineGutter,
+  highlightSpecialChars,
+  keymap,
+  lineNumbers,
+  rectangularSelection,
+} from '@codemirror/view'
+import { json } from '@codemirror/lang-json'
+import { abcdef } from '@uiw/codemirror-theme-abcdef'
+import { tokyoNight } from '@uiw/codemirror-theme-tokyo-night'
+import { tokyoNightDay } from '@uiw/codemirror-theme-tokyo-night-day'
 
 const handleGenerateRandomKey = () => {
   try {
@@ -73,8 +107,97 @@ export function NewUpdateRequestModal({
     rippleTwoFAContract,
     web3,
     chainId,
-  } = useGlobal()
-  console.log(web3)
+  } = useGlobal();
+  console.log(web3);
+
+  const editorContainerRef = useRef(null);
+  const [editorView, setEditorView] = useState(null);
+  const [isEditorReady, setIsEditorReady] = useState(false);
+
+  const borderTheme = EditorView.theme({
+    '.cm-editor': { 'border-radius': '0.375rem' },
+    '&': { 'border-radius': '0.375rem' },
+    '.cm-scroller': { 'border-radius': '0.375rem' },
+    '.cm-content': { 'border-radius': '0.375rem' },
+    '.cm-focused': { 'border-radius': '0.375rem' },
+  });
+
+  const currentTheme = document.documentElement.classList.contains('dark') ? tokyoNight : tokyoNightDay;
+
+  useEffect(() => {
+    if (open && !editorView && isEditorReady) {
+      const newState = EditorState.create({
+        doc: `{
+  "<field_name>": {
+    "<first_key>": "value1",
+    "<second_key>": 2,
+    "<third_key>": {
+      "<third_key_first>": "value3"
+    }
+  }
+}`,
+        extensions: [
+          lineNumbers(),
+          highlightActiveLineGutter(),
+          highlightSpecialChars(),
+          history(),
+          foldGutter(),
+          drawSelection(),
+          dropCursor(),
+          EditorState.allowMultipleSelections.of(true),
+          indentOnInput(),
+          syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
+          bracketMatching(),
+          closeBrackets(),
+          rectangularSelection(),
+          crosshairCursor(),
+          highlightActiveLine(),
+          highlightSelectionMatches(),
+          keymap.of([
+            ...closeBracketsKeymap,
+            ...defaultKeymap,
+            ...searchKeymap,
+            ...historyKeymap,
+            ...foldKeymap,
+            ...completionKeymap,
+            ...lintKeymap,
+          ]),
+          json(),
+          currentTheme,
+          borderTheme,
+        ],
+      });
+
+      const view = new EditorView({
+        state: newState,
+        parent: editorContainerRef.current,
+      });
+
+      console.log(view.state.doc.toString());
+      console.log(JSON.parse(view.state.doc.toString()));
+
+      setEditorView(view);
+    }
+
+    return () => {
+      if (editorView) {
+        editorView.destroy();
+      }
+    };
+  }, [open, isEditorReady]);
+
+  useEffect(() => {
+    if (open) {
+      const timer = setTimeout(() => setIsEditorReady(true), 50);
+      return () => clearTimeout(timer);
+    } else {
+      if(editorView){
+        editorView.destroy();
+      }
+      setIsEditorReady(false);
+      setEditorView(null);
+    }
+  }, [open]);
 
   const coreContract =
     chainId == 43113
@@ -134,7 +257,7 @@ export function NewUpdateRequestModal({
             <textarea
               id="twoFAProvider"
               name="twoFAProvider"
-              className="font-mono relative mt-1 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 dark:focus:border-emerald-500 sm:text-sm"
+              className="relative mt-1 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 font-mono text-gray-900 placeholder-gray-500 focus:z-10 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 dark:focus:border-emerald-500 sm:text-sm"
               rows={1}
               defaultValue={twoFAProvider}
               spellCheck="false"
@@ -151,7 +274,7 @@ export function NewUpdateRequestModal({
             <textarea
               id="twoFARequestID"
               name="twoFARequestID"
-              className="font-mono relative mt-1 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 dark:focus:border-emerald-500 sm:text-sm"
+              className="relative mt-1 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 font-mono text-gray-900 placeholder-gray-500 focus:z-10 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 dark:focus:border-emerald-500 sm:text-sm"
               rows={1}
               // onChange={(e) => setTwoFARequestID(e.target.value)}
               spellCheck="false"
@@ -181,7 +304,7 @@ export function NewUpdateRequestModal({
             <textarea
               id="twoFAOneTimeToken"
               name="twoFAOneTimeToken"
-              className="font-mono relative mt-1 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 dark:focus:border-emerald-500 sm:text-sm"
+              className="relative mt-1 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 font-mono text-gray-900 placeholder-gray-500 focus:z-10 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 dark:focus:border-emerald-500 sm:text-sm"
               rows={1}
               // onChange={(e) => setTwoFARequestID(e.target.value)}
               spellCheck="false"
@@ -253,7 +376,7 @@ export function NewUpdateRequestModal({
       key: formDataJSON['oneTimeKey'],
       limit: formDataJSON['timeLimit'],
       timestamp: Date.now().toString(),
-      updated_data: JSON.parse(formDataJSON['newData']),
+      updated_data: JSON.parse(editorView.state.doc.toString()),
       salt: formDataJSON['oneTimeSalt'],
       response_fee: formDataJSON['responseFee'],
       require2FA: isTwoFAEnabled,
@@ -266,7 +389,7 @@ export function NewUpdateRequestModal({
       attach_token: formDataJSON['attachToken'] === 'on',
     }
 
-    let dataHashes = await flattenJsonAndComputeHash(formDataJSON['newData'])
+    let dataHashes = await flattenJsonAndComputeHash(editorView.state.doc.toString())
     let rootHash = dataHashes['rootHash']
     console.log('rootHash', rootHash)
 
@@ -359,7 +482,7 @@ export function NewUpdateRequestModal({
     } catch (error) {
       console.error('Error in Core Contract Call:', error)
       resetSubmitButton()
-      makeErrorNotif("Error in Core Contract Call", error.toString())
+      makeErrorNotif('Error in Core Contract Call', error.toString())
       return
     }
 
@@ -439,7 +562,7 @@ export function NewUpdateRequestModal({
                       <textarea
                         id="receiverAddress"
                         name="receiverAddress"
-                        className="font-mono relative mt-1 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 dark:focus:border-emerald-500 sm:text-sm"
+                        className="relative mt-1 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 font-mono text-gray-900 placeholder-gray-500 focus:z-10 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 dark:focus:border-emerald-500 sm:text-sm"
                         rows={1}
                         spellCheck="false"
                         defaultValue={receiverAddress}
@@ -456,7 +579,7 @@ export function NewUpdateRequestModal({
                       <textarea
                         id="fieldToUpdate"
                         name="fieldToUpdate"
-                        className="font-mono relative mt-1 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 dark:focus:border-emerald-500 sm:text-sm"
+                        className="relative mt-1 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 font-mono text-gray-900 placeholder-gray-500 focus:z-10 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 dark:focus:border-emerald-500 sm:text-sm"
                         rows={1}
                         spellCheck="false"
                         defaultValue={fieldToUpdate}
@@ -470,29 +593,44 @@ export function NewUpdateRequestModal({
                       >
                         Enter New Data for Field:
                       </label>
+                      <div className="mt-1 rounded-md border border-gray-300 focus-within:z-10 focus-within:border-emerald-500 focus-within:outline-none focus-within:ring focus-within:ring-[1.25px] focus-within:ring-emerald-500 dark:border-gray-600 dark:focus-within:ring-[1.75px]">
+                        <div
+                          ref={editorContainerRef}
+                          className="block w-full font-mono"
+                        ></div>
+                      </div>
+                    </div>
+
+                    {/* <div className="mt-4">
+                      <label
+                        htmlFor="newData"
+                        className="block text-sm font-medium leading-5 text-gray-900 dark:text-white"
+                      >
+                        Enter New Data for Field:
+                      </label>
                       <textarea
                         id="newData"
                         name="newData"
-                        className="font-mono relative mt-1 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 dark:focus:border-emerald-500 sm:text-sm"
+                        className="relative mt-1 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 font-mono text-gray-900 placeholder-gray-500 focus:z-10 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 dark:focus:border-emerald-500 sm:text-sm"
                         rows={8}
                         spellCheck="false"
                         defaultValue={newData}
                       />
-                    </div>
+                    </div> */}
 
-                  <div className="mt-6">
-                    <label
-                      htmlFor="disclaimer"
-                      className="block text-sm font-bold leading-5 text-gray-900 dark:text-white"
-                    >
-                      Disclaimer:
-                    </label>
-                    <p className="mt-2 whitespace-normal text-gray-500 dark:text-gray-300">
-                      Please enter data in the form of a valid JSON payload matching the 
-                      example structure above. We are working on supporting all kinds of data types
-                      very soon.
-                    </p>
-                  </div>
+                    <div className="mt-6">
+                      <label
+                        htmlFor="disclaimer"
+                        className="block text-sm font-bold leading-5 text-gray-900 dark:text-white"
+                      >
+                        Disclaimer:
+                      </label>
+                      <p className="mt-2 whitespace-normal text-gray-500 dark:text-gray-300">
+                        Please enter data in the form of a valid JSON payload
+                        matching the example structure above. We are working on
+                        supporting all kinds of data types very soon.
+                      </p>
+                    </div>
 
                     <hr className="my-4 border-gray-300 dark:border-gray-700" />
 
@@ -506,7 +644,7 @@ export function NewUpdateRequestModal({
                       <textarea
                         id="oneTimeKey"
                         name="oneTimeKey"
-                        className="font-mono relative mt-1 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 dark:focus:border-emerald-500 sm:text-sm"
+                        className="relative mt-1 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 font-mono text-gray-900 placeholder-gray-500 focus:z-10 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 dark:focus:border-emerald-500 sm:text-sm"
                         rows={1}
                         spellCheck="false"
                         defaultValue={
@@ -535,7 +673,7 @@ export function NewUpdateRequestModal({
                       <textarea
                         id="oneTimeSalt"
                         name="oneTimeSalt"
-                        className="font-mono relative mt-1 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 dark:focus:border-emerald-500 sm:text-sm"
+                        className="relative mt-1 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 font-mono text-gray-900 placeholder-gray-500 focus:z-10 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 dark:focus:border-emerald-500 sm:text-sm"
                         rows={1}
                         spellCheck="false"
                         defaultValue={
@@ -564,7 +702,7 @@ export function NewUpdateRequestModal({
                       <textarea
                         id="timeLimit"
                         name="timeLimit"
-                        className="font-mono relative mt-1 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 dark:focus:border-emerald-500 sm:text-sm"
+                        className="relative mt-1 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 font-mono text-gray-900 placeholder-gray-500 focus:z-10 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 dark:focus:border-emerald-500 sm:text-sm"
                         rows={1}
                         spellCheck="false"
                         defaultValue={timeLimit}
@@ -610,7 +748,7 @@ export function NewUpdateRequestModal({
                       <textarea
                         id="responseFee"
                         name="responseFee"
-                        className="font-mono relative mt-1 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 dark:focus:border-emerald-500 sm:text-sm"
+                        className="relative mt-1 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 font-mono text-gray-900 placeholder-gray-500 focus:z-10 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 dark:focus:border-emerald-500 sm:text-sm"
                         rows={1}
                         defaultValue={responseFee}
                         spellCheck="false"

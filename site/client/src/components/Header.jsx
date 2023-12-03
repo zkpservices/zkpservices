@@ -377,7 +377,7 @@ export const Header = forwardRef(function Header({ className }, ref) {
             ) : accountText == 'Connect Wallet' ? (
               'Connect Wallet'
             ) : (
-              <div class="font-mono">{accountText}</div>
+              <div className="font-mono">{accountText}</div>
             )}
           </Button>
           <Button
