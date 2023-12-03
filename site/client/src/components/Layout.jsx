@@ -20,7 +20,7 @@ export function Layout({ children, sections = [] }) {
             <Link href="/" aria-label="Home">
               <div className="flex items-center mt-0.5"> 
                 <Logo className="h-6" />
-                <p className="ml-2 font-bold text-lg text-black dark:text-white mb-1 mt-0.5">zkp.services</p> 
+                <p className="ml-2 font-semibold text-lg text-black dark:text-white mb-1 mt-0.5">zkp.services</p> 
               </div>
             </Link>
           </div>
