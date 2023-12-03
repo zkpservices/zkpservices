@@ -195,7 +195,7 @@ export const navigation = [
     links: [
       { title: 'Introduction', href: '/' },
       { title: 'Overview', href: '/docs' },
-      { title: 'Your Data', href: '/your_data' },
+      { title: 'Protocol Blueprint', href: '/blueprint' },
       { title: 'Multi-Factor Authentication', href: '/mfa' },
       { title: 'API Documentation', href: '/api_docs' },
       { title: 'dApp Guide', href: '/guides' },

@@ -8,9 +8,9 @@ const guides = [
     description: 'Learn how zkp.services works',
   },
   {
-    href: '/your_data',
-    name: 'Your Data',
-    description: 'Learn how zkp.services handles and transforms your dataat each step with this in-depth\
+    href: '/blueprint',
+    name: 'Protocol Blueprint',
+    description: 'Learn how zkp.services handles and transforms your data at each step with this in-depth\
                   explanation.',
   },
   {
