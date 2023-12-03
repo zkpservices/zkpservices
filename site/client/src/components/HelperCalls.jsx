@@ -580,3 +580,25 @@ export const removeMetadata = (data) => {
     return {}
   }
 }
+
+export const convertFloatToString = (obj) => {
+  if (typeof obj === 'number') {
+    // If it's a float or decimal, convert to string
+    return obj.toString();
+  } else if (Array.isArray(obj)) {
+    // If it's an array, map over its elements and recursively convert
+    return obj.map((item) => convertFloatToString(item));
+  } else if (typeof obj === 'object') {
+    // If it's an object, iterate over its properties and recursively convert
+    const newObj = {};
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        newObj[key] = convertFloatToString(obj[key]);
+      }
+    }
+    return newObj;
+  } else {
+    // If it's neither a number nor an object, return the original value
+    return obj;
+  }
+};

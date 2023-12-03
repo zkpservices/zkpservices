@@ -21,6 +21,7 @@ export function GlobalProvider({ children }) {
     return false
   })
   const [userAddress, setUserAddress] = useState(() => {
+    console.log("NIGHTMARE NIGHTMARE NIGHTMARE")
     if (typeof window !== 'undefined') {
       return localStorage.getItem('userAddress') || ''
     }
@@ -32,15 +33,7 @@ export function GlobalProvider({ children }) {
     }
     return ''
   })
-  const [showLoginNotification, setShowLoginNotification] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const localShowLoginNotification = localStorage.getItem(
-        'showLoginNotification',
-      )
-      return localShowLoginNotification === 'true' || false
-    }
-    return false
-  })
+  const [showLoginNotification, setShowLoginNotification] = useState(false)
   const [username, setUsername] = useState(() => {
     if (typeof window !== 'undefined') {
       return localStorage.getItem('username') || ''
@@ -215,7 +208,6 @@ export function GlobalProvider({ children }) {
     localStorage.setItem('userAddress', userAddress)
     localStorage.setItem('loggedIn', loggedIn)
     localStorage.setItem('userPassword', userPassword)
-    localStorage.setItem('showLoginNotification', showLoginNotification)
     localStorage.setItem('username', username)
     localStorage.setItem('twoFactorAuthPassword', twoFactorAuthPassword)
     localStorage.setItem('contractPassword', contractPassword)

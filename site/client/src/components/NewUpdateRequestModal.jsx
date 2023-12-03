@@ -44,6 +44,7 @@ import { json } from '@codemirror/lang-json'
 import { abcdef } from '@uiw/codemirror-theme-abcdef'
 import { tokyoNight } from '@uiw/codemirror-theme-tokyo-night'
 import { tokyoNightDay } from '@uiw/codemirror-theme-tokyo-night-day'
+import { convertFloatToString } from '@/components/HelperCalls'
 
 const handleGenerateRandomKey = () => {
   try {
@@ -376,7 +377,7 @@ export function NewUpdateRequestModal({
       key: formDataJSON['oneTimeKey'],
       limit: formDataJSON['timeLimit'],
       timestamp: Date.now().toString(),
-      updated_data: JSON.parse(editorView.state.doc.toString()),
+      updated_data: convertFloatToString(JSON.parse(editorView.state.doc.toString())),
       salt: formDataJSON['oneTimeSalt'],
       response_fee: formDataJSON['responseFee'],
       require2FA: isTwoFAEnabled,
@@ -388,6 +389,7 @@ export function NewUpdateRequestModal({
       twoFAOneTimeToken: formDataJSON['twoFAOneTimeToken'],
       attach_token: formDataJSON['attachToken'] === 'on',
     }
+    console.log(request)
 
     let dataHashes = await flattenJsonAndComputeHash(editorView.state.doc.toString())
     let rootHash = dataHashes['rootHash']
