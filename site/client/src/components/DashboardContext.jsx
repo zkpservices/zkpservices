@@ -222,7 +222,7 @@ export function DashboardContext() {
             : 'incoming_response_get',
         addressSender: item.address_sender,
         requestID: item.responseID,
-        data: item.data,
+        data: item.operation === 'update' ? item.updated_data : item.data,
         salt: item.salt,
         limit: item.limit,
         key: item.key,
