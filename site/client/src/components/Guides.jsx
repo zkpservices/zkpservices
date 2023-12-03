@@ -3,29 +3,32 @@ import { Heading } from '@/components/Heading'
 
 const guides = [
   {
-    href: '/zkp.edited',
+    href: '/docs',
     name: 'Overview',
-    description: 'An overview of zkp.services.',
+    description: 'Learn how zkp.services works',
   },
   {
-    href: '/guides',
-    name: 'dApp Guide',
-    description: 'A guide on how to use our dApp.',
+    href: '/blueprint',
+    name: 'Protocol Blueprint',
+    description: 'Learn how zkp.services handles and transforms your data at each step with this in-depth\
+                  explanation.',
   },
   {
-    href: '/youdata',
-    name: 'Your Data',
-    description: 'Learn how we handle your data.',
-  },
-  {
-    href: '/2FA',
-    name: '2FA',
-    description: 'Learn how we implement our own native 2FA solution.',
+    href: '/mfa',
+    name: 'Multi-Factor Authentication',
+    description: 'Read about how customizable multi-factor authentication can be enabled and discover\
+                  zkp.services\' own trustless, entirely on-chain MFA provider.',
   },
   {
     href: '/api_docs',
     name: 'API Guide',
-    description: 'Learn how to to use our API for user data.',
+    description: 'Learn about our API for data providers of user data and how to select a custom\
+                  data source.',
+  },
+  {
+    href: '/dapp_guide',
+    name: 'dApp Guide',
+    description: 'Learn how to use our dApp with this easy to follow tutorial.',
   },
 ]
 
