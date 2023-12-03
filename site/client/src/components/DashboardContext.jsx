@@ -215,7 +215,7 @@ export function DashboardContext() {
         ],
         field: [item.field, truncateAddress(item.address_sender)],
         status: ['Show Response', 'grey'],
-        details: ['View Details', truncateAddress(item.responseID)],
+        details: ['View Details', `ID: ${truncateAddress(item.responseID)}`],
         type:
           item.operation === 'update'
             ? 'incoming_response_update'
@@ -251,7 +251,7 @@ export function DashboardContext() {
       return {
         operation: [
           operationText,
-          `To: ${truncateAddress(item.address_sender)}`,
+          'By you'
         ],
         field: [item.field, truncateAddress(item.address_receiver)],
         status: hasMatchingResponse
