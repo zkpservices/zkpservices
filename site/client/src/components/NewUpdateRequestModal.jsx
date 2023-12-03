@@ -131,7 +131,7 @@ export function NewUpdateRequestModal({
         doc: `{
   "<field_name>": {
     "<first_key>": "value1",
-    "<second_key>": 2,
+    "<second_key>": "2",
     "<third_key>": {
       "<third_key_first>": "value3"
     }

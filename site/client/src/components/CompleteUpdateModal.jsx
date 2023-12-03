@@ -1,4 +1,4 @@
-import { Fragment, useState } from 'react'
+import { Fragment, useState, useRef, useEffect } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import { useGlobal } from '@/components/GlobalStorage'
@@ -11,6 +11,40 @@ import {
 } from '@/components/HelperCalls'
 import { poseidon } from '@/components/PoseidonHash'
 import { Notification } from './Notification'
+import {
+  autocompletion,
+  closeBrackets,
+  closeBracketsKeymap,
+  completionKeymap,
+} from '@codemirror/autocomplete'
+import { defaultKeymap, history, historyKeymap } from '@codemirror/commands'
+import {
+  bracketMatching,
+  defaultHighlightStyle,
+  foldGutter,
+  foldKeymap,
+  indentOnInput,
+  syntaxHighlighting,
+} from '@codemirror/language'
+import { lintKeymap } from '@codemirror/lint'
+import { highlightSelectionMatches, searchKeymap } from '@codemirror/search'
+import { EditorState } from '@codemirror/state'
+import {
+  EditorView,
+  crosshairCursor,
+  drawSelection,
+  dropCursor,
+  highlightActiveLine,
+  highlightActiveLineGutter,
+  highlightSpecialChars,
+  keymap,
+  lineNumbers,
+  rectangularSelection,
+} from '@codemirror/view'
+import { json } from '@codemirror/lang-json'
+import { abcdef } from '@uiw/codemirror-theme-abcdef'
+import { tokyoNight } from '@uiw/codemirror-theme-tokyo-night'
+import { tokyoNightDay } from '@uiw/codemirror-theme-tokyo-night-day'
 
 export function CompleteUpdateModal({
   open = true,
@@ -30,6 +64,93 @@ export function CompleteUpdateModal({
   responseFee = '',
   require2FA = false,
 }) {
+
+  const editorContainerRef = useRef(null);
+  const [editorView, setEditorView] = useState(null);
+  const [isEditorReady, setIsEditorReady] = useState(false);
+
+  const borderTheme = EditorView.theme({
+    '.cm-editor': { 'border-radius': '0.375rem' },
+    '&': { 'border-radius': '0.375rem' },
+    '.cm-scroller': { 'border-radius': '0.375rem' },
+    '.cm-content': { 'border-radius': '0.375rem' },
+    '.cm-focused': { 'border-radius': '0.375rem' },
+  });
+
+  const currentTheme = document.documentElement.classList.contains('dark') ? tokyoNight : tokyoNightDay;
+
+  useEffect(() => {
+    if (open && !editorView && isEditorReady) {
+      const newState = EditorState.create({
+        doc: JSON.stringify(
+                          JSON.parse(newDataAfterUpdate),
+                          null,
+                          2,
+                        ),
+        extensions: [
+          lineNumbers(),
+          highlightActiveLineGutter(),
+          highlightSpecialChars(),
+          history(),
+          foldGutter(),
+          drawSelection(),
+          dropCursor(),
+          EditorState.allowMultipleSelections.of(true),
+          indentOnInput(),
+          syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
+          bracketMatching(),
+          closeBrackets(),
+          rectangularSelection(),
+          crosshairCursor(),
+          highlightActiveLine(),
+          highlightSelectionMatches(),
+          keymap.of([
+            ...closeBracketsKeymap,
+            ...defaultKeymap,
+            ...searchKeymap,
+            ...historyKeymap,
+            ...foldKeymap,
+            ...completionKeymap,
+            ...lintKeymap,
+          ]),
+          json(),
+          currentTheme,
+          borderTheme,
+          EditorState.readOnly.of(true)
+        ],
+      });
+
+      const view = new EditorView({
+        state: newState,
+        parent: editorContainerRef.current,
+      });
+
+      console.log(view.state.doc.toString());
+      console.log(JSON.parse(view.state.doc.toString()));
+
+      setEditorView(view);
+    }
+
+    return () => {
+      if (editorView) {
+        editorView.destroy();
+      }
+    };
+  }, [open, isEditorReady]);
+
+  useEffect(() => {
+    if (open) {
+      const timer = setTimeout(() => setIsEditorReady(true), 50);
+      return () => clearTimeout(timer);
+    } else {
+      if(editorView){
+        editorView.destroy();
+      }
+      setIsEditorReady(false);
+      setEditorView(null);
+    }
+  }, [open]); 
+
   let {
     userAddress,
     fujiCoreContract,
@@ -589,14 +710,20 @@ export function CompleteUpdateModal({
                     >
                       New Data After Update:
                     </label>
-                    <textarea
+                    <div className="mt-1 rounded-md border border-gray-300 focus-within:z-10 focus-within:border-emerald-500 focus-within:outline-none focus-within:ring focus-within:ring-[1.25px] focus-within:ring-emerald-500 dark:border-gray-600 dark:focus-within:ring-[1.75px]">
+                      <div
+                        ref={editorContainerRef}
+                        className="block w-full font-mono"
+                      ></div>
+                    </div>
+                    {/* <textarea
                       id="newDataAfterUpdate"
                       className="font-mono relative mt-1 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 dark:focus:border-emerald-500 sm:text-sm"
                       rows={8}
                       readOnly
                       spellCheck="false"
                       value={newDataAfterUpdate}
-                    />
+                    /> */}
                   </div>
 
                   <hr className="my-4 border-gray-300 dark:border-gray-700" />

@@ -69,6 +69,7 @@ export function ReceivedUpdateResponseModal({
 
   useEffect(() => {
     if (open && !editorView && isEditorReady) {
+      console.log(newDataSnapshot)
       const newState = EditorState.create({
         doc: JSON.stringify(
                           JSON.parse(newDataSnapshot),
