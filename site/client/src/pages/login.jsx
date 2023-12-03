@@ -6,6 +6,7 @@ import { login, getChainData, getDashboard } from '@/components/APICalls.jsx'
 import axios, { formToJSON } from 'axios'
 import { useRouter } from 'next/router'
 import { Notification } from '@/components/Notification'
+import { Note } from '@/components/mdx'
 
 export default function Login() {
   const {
@@ -27,9 +28,11 @@ export default function Login() {
     metamaskAvailable,
   } = useGlobal()
   const [loginHeader, setLoginHeader] = useState(
-    <h2 className="mt-10 text-center text-3xl font-bold tracking-tight">
-      Please connect your wallet to get started.
-    </h2>,
+    <div className="mt-32 mb-20 font-semibold">
+      <Note>
+        Please connect your wallet to get started.
+      </Note>
+    </div>,
   )
   const [loginForm, setLoginForm] = useState(<></>)
   const [badLogin, setBadLogin] = useState(false)
@@ -56,12 +59,13 @@ export default function Login() {
   const showLoginHeader = () => {
     if (typeof window !== undefined && !window.ethereum) {
       return (
-        <h2 className="mt-10 text-center text-2xl tracking-tight">
-          Web3 is not available on this device.
-          <br />
-          Our guide is available on all devices, but please connect somewhere
-          with Metamask available to use our dApp.
-        </h2>
+        <div className="mt-32 mb-20 font-semibold">
+          <Note>
+            Web3 is not available on this device.
+            Our guide is available on all devices, but please connect somewhere
+            with Metamask available to use our dApp.
+          </Note>
+        </div>
       )
     } else if (walletConnected) {
       return (
@@ -82,9 +86,11 @@ export default function Login() {
       )
     } else {
       return (
-        <h2 className="mt-10 text-center text-3xl font-bold tracking-tight">
-          Please connect your wallet to get started.
-        </h2>
+        <div className="mt-32 mb-20 font-semibold items-center justify-center">
+          <Note>
+            Please connect your wallet to get started.
+          </Note>
+        </div>
       )
     }
   }
