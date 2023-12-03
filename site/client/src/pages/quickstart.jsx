@@ -425,19 +425,30 @@ export default function Quickstart() {
           showBottomText={errorBottomText}
           onClose={() => setShowErrorNotif(false)}
         />
-        <h2 className="my-48 text-center text-3xl font-bold tracking-tight">
+        <div className="my-48 mx-20 font-semibold items-center justify-center">
+          <Note>
+            Please connect your wallet to get started.
+          </Note>
+        </div>
+        {/* <h2 className="my-48 text-center text-3xl font-bold tracking-tight">
           Please connect your wallet to get started.
-        </h2>
+        </h2> */}
         </>
       )
     } else if (loggedIn) {
       return (
-        <h2 className="my-48 text-center text-2xl tracking-tight">
-          Account already exists for address {userAddress}.
-          <br />
-          Please disconnect wallet and reconnect with a new wallet to create a
-          new account.
-        </h2>
+        <div className="my-48 mx-20 font-semibold">
+          <Note>
+            Account already exists for address <span className="font-mono">{userAddress}</span>. 
+            Please disconnect wallet and reconnect with a new wallet to create a new account.
+          </Note>
+        </div>
+        // <h2 className="my-48 text-center text-2xl tracking-tight">
+        //   Account already exists for address {userAddress}.
+        //   <br />
+        //   Please disconnect wallet and reconnect with a new wallet to create a
+        //   new account.
+        // </h2>
       )
     } else {
       return (

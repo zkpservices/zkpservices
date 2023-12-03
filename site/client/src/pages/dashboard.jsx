@@ -284,7 +284,7 @@ export function Dashboard() {
   return (
     <>
 
-      <HeroPattern />
+      {/* <HeroPattern /> */}
       <div className="xl:max-w-none">{showDashboard}</div>
 
       <div>
