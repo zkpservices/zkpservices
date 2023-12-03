@@ -35,6 +35,7 @@ import { json } from '@codemirror/lang-json'
 import { abcdef } from '@uiw/codemirror-theme-abcdef'
 import { tokyoNight } from '@uiw/codemirror-theme-tokyo-night'
 import { tokyoNightDay } from '@uiw/codemirror-theme-tokyo-night-day'
+import { removeMetadata } from './HelperCalls'
 
 export function ViewFieldModal({
   title,
@@ -139,10 +140,6 @@ export function ViewFieldModal({
     onDelete(title.toLowerCase())
   }
 
-  const removeMetadata = (data) => {
-    const { _metadata, ...rest } = data
-    return rest
-  }
 
   const modifiedFieldData = open ? removeMetadata(fieldData[fieldName]) : {}
 
