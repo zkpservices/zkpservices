@@ -1,172 +1,53 @@
-*// INTRODUCTION TO GUIDES*
+# dApp Guide
 
 Using zkp.services is simple.
 
-All main features are easily accessible on our dashboard, these include:
+All available services are accessible through the Dashboard once you have set up your account.
 
-1. **Make - a data request;**
+Below is a step-by-step guide on how to use each service, which includes:
 
-   Get data from someone.
-   
-3. **Reply - to a data request**
+1. **Request Data**
+   Securely request a data snapshot and leverage custom MFA if needed.
+2. **Request Update**
+   Securely request a data update from another user or a smart device and leverage custom MFA if needed.
+3. **Cross-Chain Backups**
+   Back up your data with Web2/Web3 providers, including CCIP or EVM-compatible chains.
+4. **Onboard to New Chain**
+   Onboard your connected data source onto a new CCIP or EVM-compatible chain.
 
-   Answer a data request from someone.
-   
-5. **Secure - your data**
+## Request Data
 
-   Back up your data on different blockchains.
+Before you get started, here are all the values you will need to Request Data:
 
-Please find guides for each below.
+| **VALUE**                  | **DESCRIPTION**                                                                                                                    |
+| -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| Request                    | This is the data you want to request.                                                                                              |
+| Key                        | A secure key to help decrypt data once you receive it.                                                                             |
+| Time Limit                 | Time in seconds before the recipient must respond to your data request.                                                            |
+| 2FA Information (optional) | If you want added security, you can make it so that the responder has to undergo a 2FA requirement before responding.              |
+| Response fee               | A data request will cost 10 ZKP tokens by default. If you require more ZKP tokens from whom you request data, increase the number. |
 
-*// ONE-PAGE, USER CAN CLICK THROUGH TO DIFFERENT SECTION*
+### STEP 12&#xA; Initiate a data request.
 
-*// END VIEW*
+Once you are ready to initiate a data request, navigate to the Dashboard. Here you will find the "Request Data" card. Click it to open a modal that will allow you to request data.
 
-*// USER CLICKS "MAKE AN UPDATE REQUEST" IN THE GUIDE SECTION TO OPEN THE FOLLOWING VIEW*
+### STEP 2&#xA;Fill out your data request.
 
-# Make a Data Request
+You will be presented with the form below. Below are brief descriptions covering each input you must complete before requesting data.
 
-## 1 - Prepare your Data
+| **INPUT**             | **DESCRIPTION**                                                                                                                                                                                |
+| --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Address of Receiver   | The wallet address containing the requested data.                                                                                                                                  |
+| Field Requested       | This is the data you are requesting. &#xA; Please format the input here as an object.                                                                                           |
+| One Time Key          | Once you have received the requested data, the one-time key will be used to access it. You can put in your own or generate a random one. Either way, make sure you save it somewhere.          |
+| Time Limit of Request | The time limit dictates how long your request will be active for the requestee to respond in seconds.                                                                                          |
+| Require 2FA           | If selected, the requestee must complete 2 Factor Authentication ("2FA") to respond to your request. An additional set of inputs will be included if you decide to attach 2FA to your request. |
+| Set Response Fee      | The response fee will be the number of ZKP tokens the requestee requires to answer your request.                                                                                            |
 
-Before you start, here's an overview of what you'll need to make a data request:
+Once you have completed the form, clicking “Call Smart Contract” will initiate the data request.
 
-* **Encrypted Request:** This is the data you want to request.
-* **Encrypted Key:** A secure key to help decrypt the data once you receive it.
-* **Time Limit:** How long before the recipient must respond to your data request.
-* **2FA Information (*optional*):** If you want added security, you can make it so that the responder has to undergo a 2FA requirement before responding.
-* **Response fee:** A data request will cost 10 ZKP tokens by default. If you require more ZKP tokens from whom you request data, increase the number.
+### STEP 3&#xA;Confirming your data request was sent.
 
-## 2 - Check your balance
+Once you have initiated the data request, you will see that request in your recent activity at the bottom of the dashboard.
 
-Make sure you have some ZKP tokens in your wallet.
-
-*// INCLUDE PHOTO OF ZKP TOKEN IN METAMASK WALLET*
-
-**If you don't, you can:**
-
-**a.** request some from **\[x]; or**
-
-**b.** exchange for some at any of our supported exchanges below.
-
-*// INCLUDE PHOTO OF SUPPORTED EXCHANGES LINKED TO SUPPORTED EXCHANGES*
-
-## 3 - Initiate the request
-
-Navigate to your dashboard located in **\[x]**.
-
-Click the "Make a Request" option at the beginning of the page. A modal pop-up should appear.
-
-Use the data you've prepared earlier in step \[1] to fill out the data request form in the modal.
-
-Click "Call Smart Contract", and your data request will be sent to the person you are requesting from.
-
-## **4 - Wait**
-
-Once your request has successfully been sent to the recipient, you must wait for them to respond and approve your access to the requested data.
-
-## **5 - Receive and Decrypt Data**
-
-If the recipient approves your data request, you may now retrieve the data.
-
-Approved data requests will be encrypted, so to access this data, you must use the encrypted key you prepared in step \[1] to reveal the requested data.
-
-*// END VIEW*
-
-*// USER CLICKS "MAKE AN UPDATE REQUEST" IN THE GUIDE SECTION TO OPEN THE FOLLOWING VIEW*
-
-# Make an Update Request
-
-## 1 - Prepare your Data
-
-Before you start, here's an overview of what you'll need to make a data request:
-
-* **Encrypted Request:** This is the data you want to update.
-* **Encrypted Key:** A secure key to help decrypt the data once you receive it.
-* **Time Limit:** How long before the recipient must respond to your data request.
-* **2FA Information (*optional*):** If you want added security, you can make it so that the responder has to undergo a 2FA requirement before responding.
-// CONSIDER ADDING "2FA PROVIDER / 2FA REQUEST ID / 2FA ONE TIME TOKEN" UNDER "d." HERE.
-* **Data Hash:** A unique identifier for the data you want to update.
-* **Salt Hash:** A cryptographic salt to enhance data security.
-* **Response fee:** A data request will cost 10 ZKP tokens by default. If you require more ZKP tokens from whom you request data, increase the number.
-
-## 2 - Check your balance
-
-Make sure you have some ZKP tokens in your wallet.
-
-// INCLUDE PHOTO OF ZKP TOKEN IN METAMASK WALLET
-
-**If you don't, you can:**
-
-**a.** request some from **\[x]; or**
-
-**b.** exchange for some at any of our supported exchanges below.
-
-// INCLUDE PHOTO OF SUPPORTED EXCHANGES LINKED TO SUPPORTED EXCHANGES
-
-## 3 - Initiate the request
-
-Navigate to your dashboard located in **\[x]**.
-
-Click the "Make an Update Request" option at the beginning of the page. A modal pop-up should appear.
-
-Use the data you've prepared earlier in step \[1] to fill out the data request form in the modal.
-
-Click "Call Smart Contract", and your data update request will be sent to the person you request an update from.
-
-## **4 - Wait**
-
-Once your request has successfully been sent to the recipient, you must wait for them to respond and approve your access to the requested data.
-
-## 5 - Receive and Decrypt Data
-
-After the recipient responds, you can now check that the data has been updated as desired.
-
-The data will be encrypted, so to access this data, you must use the encrypted key you prepared in step \[1] to reveal the requested data.
-
-*// END VIEW*
-
-*// USER CLICKS "CROSS-CHAIN SYNC" IN THE GUIDE SECTION TO OPEN THE FOLLOWING VIEW*
-
-# Make a Cross-chain Backup of your Data/Requests/Responses
-
-## 1 - Prepare your Data
-
-Before you start, here's an overview of what you'll need to make a data request:
-
-**a.** **Destination chain:** The blockchain to which you want to back up your data.
-**b.** **Parameter to sync:** \[amir].
-**c.** **Data location:** The data you want to be stored.
-
-## 2 - Check your balance
-
-Make sure you have some ZKP tokens in your wallet.
-
-// INCLUDE PHOTO OF ZKP TOKEN IN METAMASK WALLET
-
-**If you don't, you can:**
-
-**a.** request some from **\[x]; or**
-
-**b.** exchange for some at any of our supported exchanges below.
-
-// INCLUDE PHOTO OF SUPPORTED EXCHANGES LINKED TO SUPPORTED EXCHANGES
-
-## 3 - Backup your data
-
-Navigate to your dashboard located in **\[x]**.
-
-Click the "**\[x]**" option at the beginning of the page. A modal pop-up should appear.
-
-Use the data you've prepared in step \[1] to fill out the cross-chain sync form in the modal.
-
-Once completed, click the "Call Smart Contract" button, and your data will be backed up and sent to the specified chain.
-
-## 4 - Check cross-chain sync status
-
-Navigate to your dashboard located in **\[x]**.
-
-Go to your recent activity table and navigate to the "Cross-chain sync" tab.
-
-Find the data sync that you're interested in checking. You can view the status in the **\[x]** column.
-
-Alternatively, you can click "View Details" to see what data was synced and when.
+Navigate to the "Outgoing" tab, and you can check the status of your data request here.
