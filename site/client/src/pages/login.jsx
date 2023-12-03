@@ -41,6 +41,17 @@ export default function Login() {
     }
     return ''
   })
+ 
+  const [rememberMe, setRememberMe] = useState(false);
+
+  useEffect(() => {
+    localStorage.setItem('rememberMe', rememberMe ? 'true' : 'false');
+  }, [rememberMe]);
+
+  const handleRememberMeChange = (event) => {
+    setRememberMe(event.target.checked);
+  };
+
   const router = useRouter()
   const showLoginHeader = () => {
     if (!metamaskAvailable) {
@@ -133,6 +144,7 @@ export default function Login() {
                   id="remember-me"
                   name="remember-me"
                   type="checkbox"
+                  onChange={handleRememberMeChange}
                   className="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
                 />
                 <label htmlFor="remember-me" className="ml-2 block text-sm ">

@@ -1,6 +1,7 @@
 import Head from 'next/head'
 import Script from 'next/script' // Import the Script component
 import { Router, useRouter } from 'next/router'
+import { useEffect } from 'react';
 import { MDXProvider } from '@mdx-js/react'
 import { GlobalProvider } from '@/components/GlobalStorage'
 import { Layout } from '@/components/Layout'
@@ -21,6 +22,22 @@ Router.events.on('routeChangeError', onRouteChange)
 
 export default function App({ Component, pageProps }) {
   let router = useRouter()
+
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      const rememberMe = localStorage.getItem('rememberMe');
+      
+      if (rememberMe != 'true') {
+        localStorage.clear();
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, []);
 
   return (
     <>
