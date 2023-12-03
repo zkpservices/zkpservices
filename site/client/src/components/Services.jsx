@@ -147,27 +147,19 @@ function ServiceCard({ service, onCardClick, openModal, isSelected }) {
         onCardClick(service.name)
         openModal(service.name) // Pass the service name to openModal
       }}
-      className={`group relative flex rounded-2xl bg-zinc-50 transition-shadow hover:shadow-md hover:shadow-zinc-900/5 dark:bg-white/2.5 dark:hover:shadow-black/5 ${
-        isSelected ? 'bg-zinc-900' : ''
-      }`}
-    >
+      className="group relative flex rounded-2xl bg-zinc-50 transition-shadow hover:shadow-md hover:shadow-zinc-900/5 dark:bg-white/2.5 dark:hover:shadow-black/5">
       <ServicePattern {...service.pattern} mouseX={mouseX} mouseY={mouseY} />
       <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-zinc-900/7.5 group-hover:ring-zinc-900/10 dark:ring-white/10 dark:group-hover:ring-white/20" />
       <div className="relative rounded-2xl px-4 pb-4 pt-16">
         <ServiceIcon icon={service.icon} />
         <h3
-          className={`mt-4 text-sm font-semibold leading-7 text-${
-            isSelected ? 'white' : 'zinc-900'
-          } dark:text-white`}
+          className={`mt-4 text-sm font-semibold leading-7 dark:text-white`}
         >
           <span className="absolute inset-0 rounded-2xl" />
           {service.name}
         </h3>
         <p
-          className={`mt-1 text-sm text-${
-            isSelected ? 'white' : 'zinc-600'
-          } dark:text-zinc-400`}
-        >
+          className="mt-1 text-sm">
           {service.description}
         </p>
       </div>
