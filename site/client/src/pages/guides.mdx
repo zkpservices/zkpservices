@@ -19,35 +19,207 @@ Below is a step-by-step guide on how to use each service, which includes:
 
 Before you get started, here are all the values you will need to Request Data:
 
-| **VALUE**                  | **DESCRIPTION**                                                                                                                    |
-| -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| Request                    | This is the data you want to request.                                                                                              |
-| Key                        | A secure key to help decrypt data once you receive it.                                                                             |
-| Time Limit                 | Time in seconds before the recipient must respond to your data request.                                                            |
-| 2FA Information (optional) | If you want added security, you can make it so that the responder has to undergo a 2FA requirement before responding.              |
-| Response fee               | A data request will cost 10 ZKP tokens by default. If you require more ZKP tokens from whom you request data, increase the number. |
+<table>
+  <tr>
+    <th>VALUE</th>
+    <th>DESCRIPTION</th>
+  </tr>
+  <tr>
+    <td><b>Request</b></td>
+    <td>This is the data you want to request.</td>
+  </tr>
+  <tr>
+    <td><b>Key</b></td>
+    <td>A secure key to help decrypt data once you receive it.</td>
+  </tr>
+  <tr>
+    <td><b>Time Limit</b></td>
+    <td>Time in seconds before the recipient must respond to your data request.</td>
+  </tr>
+  <tr>
+    <td><b>2FA Information (optional)</b></td>
+    <td>If you want added security, you can make it so that the responder has to undergo a 2FA requirement before responding.</td>
+  </tr>
+  <tr>
+    <td><b>Response fee</b></td>
+    <td>A data request will cost 10 ZKP tokens by default. If you require more ZKP tokens from whom you request data, increase the number.</td>
+  </tr>
+</table>
 
-### STEP 12&#xA; Initiate a data request.
+### STEP 1: Initiate a data request.
 
 Once you are ready to initiate a data request, navigate to the Dashboard. Here you will find the "Request Data" card. Click it to open a modal that will allow you to request data.
 
-### STEP 2&#xA;Fill out your data request.
+### STEP 2: Fill out your data request.
 
 You will be presented with the form below. Below are brief descriptions covering each input you must complete before requesting data.
 
-| **INPUT**             | **DESCRIPTION**                                                                                                                                                                                |
-| --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Address of Receiver   | The wallet address containing the requested data.                                                                                                                                  |
-| Field Requested       | This is the data you are requesting. &#xA; Please format the input here as an object.                                                                                           |
-| One Time Key          | Once you have received the requested data, the one-time key will be used to access it. You can put in your own or generate a random one. Either way, make sure you save it somewhere.          |
-| Time Limit of Request | The time limit dictates how long your request will be active for the requestee to respond in seconds.                                                                                          |
-| Require 2FA           | If selected, the requestee must complete 2 Factor Authentication ("2FA") to respond to your request. An additional set of inputs will be included if you decide to attach 2FA to your request. |
-| Set Response Fee      | The response fee will be the number of ZKP tokens the requestee requires to answer your request.                                                                                            |
+<table>
+  <tr>
+    <th>INPUT</th>
+    <th>DESCRIPTION</th>
+  </tr>
+  <tr>
+    <td><b>Address of Receiver</b></td>
+    <td>The wallet address containing the requested data.</td>
+  </tr>
+  <tr>
+    <td><b>One Time Key</b></td>
+    <td>Once you have received the requested data, the one-time key will be used to access it. You can put in your own or generate a random one. Either way, make sure you save it somewhere.</td>
+  </tr>
+  <tr>
+    <td><b>Time Limit of Request</b></td>
+    <td>The time limit dictates how long your request will be active for the requestee to respond in seconds.</td>
+  </tr>
+  <tr>
+    <td><b>Require 2FA</b></td>
+    <td>If selected, the requestee must complete 2 Factor Authentication ("2FA") to respond to your request. An additional set of inputs will be included if you decide to attach 2FA to your request.</td>
+  </tr>
+  <tr>
+    <td><b>Set Response Fee</b></td>
+    <td>The response fee will be the number of ZKP tokens the requestee requires to answer your request. </td>
+  </tr>
+</table>
+
 
 Once you have completed the form, clicking “Call Smart Contract” will initiate the data request.
 
-### STEP 3&#xA;Confirming your data request was sent.
+### STEP 3: Confirming your data request was sent.
 
 Once you have initiated the data request, you will see that request in your recent activity at the bottom of the dashboard.
 
 Navigate to the "Outgoing" tab, and you can check the status of your data request here.
+
+
+## Update data request
+
+Before you get started, here are all the values you will need to request an Update to Data:
+<table>
+  <tr>
+    <th>VALUE</th>
+    <th>DESCRIPTION</th>
+  </tr>
+  <tr>
+    <td><b>Request</b></td>
+    <td>This is the data you want to update.</td>
+  </tr>
+  <tr>
+    <td><b>Key</b></td>
+    <td>A secure key to help decrypt data once you receive it.</td>
+  </tr>
+  <tr>
+    <td><b>Time Limit</b></td>
+    <td>Time in seconds before the recipient must respond to your data request.</td>
+  </tr>
+  <tr>
+    <td><b>2FA Information (optional)</b></td>
+    <td>If you want added security, you can make it so that the responder has to undergo a 2FA requirement before responding.</td>
+  </tr>
+    <tr>
+    <td><b>Data Hash</b></td>
+    <td>A unique identifier for the data you want to update.</td>
+  </tr>
+    <tr>
+    <td><b>Salt Hash</b></td>
+    <td>A cryptographic salt to enhance data security.</td>
+  </tr>
+  <tr>
+    <td><b>Response fee</b></td>
+    <td>A data request will cost 10 ZKP tokens by default. If you require more ZKP tokens from whom you request data, increase the number.</td>
+  </tr>
+</table>
+
+### STEP 1: Initiate an Update Data request.
+
+Once you are ready to initiate an update data request, navigate to the Dashboard. Here you will find the "Request Update" card. Click it to open a modal that will allow you to request an update to data.
+
+### STEP 2: Fill out your update data request form.
+
+You will be presented with the form below. Below are brief descriptions covering each input you must complete before requesting data.
+<table>
+  <tr>
+    <th><b>INPUT</b></th>
+    <th><b>DESCRIPTION</b></th>
+  </tr>
+  <tr>
+    <td><b>Address of Receiver</b></td>
+    <td>The wallet address containing the data you want updated.</td>
+  </tr>
+  <tr>
+    <td><b>Field to Update</b></td>
+    <td> Provide the data you want the receiver's data updated with. Please make sure to format it as you would a JSON payload.</td>
+  </tr>
+  <tr>
+    <td><b>One Time Key</b></td>
+    <td>The one-time key will be used to access the requested data once you have received it. You can put in your own or generate a random one. Either way, make sure you save it somewhere.</td>
+  </tr>
+    <tr>
+    <td><b>One Time Salt</b></td>
+    <td>Ipsum lorem.</td>
+  </tr>
+    <tr>
+    <td><b>Time Limit of Request</b></td>
+    <td>The time limit dictates how long your request will be active for the requestee to respond to in seconds.</td>
+  </tr>
+  <tr>
+    <td><b>Require 2FA</b></td>
+    <td>If selected, the requestee must complete 2 Factor Authentication ("2FA") to respond to your request. An additional set of inputs will be included if you decide to attach 2FA to your request.</td>
+  </tr>
+  <tr>
+    <td><b>Set Response Fee</b></td>
+    <td>The response fee will be the number of ZKP tokens the requestee requires to answer your request. </td>
+  </tr>
+</table>
+
+Once you have completed the form, clicking “Call Smart Contract” will initiate the data request.
+
+### STEP 3: Request status and decryption.
+
+Once you have initiated the request to update data, you will see that request in your recent activity at the bottom of the dashboard.
+
+Navigate to the "Outgoing" tab, and you can check the status of your data request here.
+
+After the recipient approves your request, you can use your key and salt to verify the data has been changed.
+
+
+## Cross-Chain Backups
+
+Backing up your data to another chain is easy.
+
+### STEP 1: Initiate a cross-chain sync.
+
+Navigate to the dashboard to find the "Cross-Chain Backups" card. Click it to open a modal that will allow you to request an update to data.
+
+### STEP 2: Fill out your cross-chain backup form.
+
+You will be presented with the form below. Below are brief descriptions covering each input you must complete before requesting data.
+
+<table>
+  <tr>
+    <th>INPUT</th>
+    <th>DESCRIPTION</th>
+  </tr>
+  <tr>
+    <td><b>Destination Chain</b></td>
+    <td>This is the chain you will be backing up your data to.</td>
+  </tr>
+  <tr>
+    <td><b>Parameter to Sync</b></td>
+    <td>Quick select a data value associated with your account and wallet.</td>
+  </tr>
+   <tr>
+    <td><b>Parameter Key</b></td>
+    <td>Ipsum lorem.</td>
+  </tr>
+  <tr>
+    <td><b>Parameter Value</b></td>
+    <td>Using the "Fetch Parameter Value" below, you will be able to generate the Parameter </td>
+  </tr>
+  <tr>
+    <td><b>CCIP Fee</b></td>
+    <td>There is a default fee of 10 ZKP tokens to back up your data onto another chain.</td>
+  </tr>
+</table>
+
+### STEP 3: Confirm your data has been backed up.
+Confirming your data has been backed up on the designated chain is as easy as swapping to that chain on your connected wallet, navigating to the Dashboard, and clicking the "Add Data" card to check the backed-up parameter, which should now be showing in the drop-down.

@@ -11,6 +11,7 @@ import twoFAContractVRFABI from '../../public/contract_ABIs/ZKPServicesVRF2FA.js
 import twoFAContractGenericABI from '../../public/contract_ABIs/ZKPServicesGeneric2FA.json'
 import batchSignUpABI from '../../public/contract_ABIs/BatchSignUp.json'
 import Web3 from 'web3'
+import { HeroPattern } from '@/components/HeroPattern'
 
 export function Dashboard() {
   const [tableData, setTableData] = useState({
@@ -282,6 +283,8 @@ export function Dashboard() {
 
   return (
     <>
+
+      <HeroPattern />
       <div className="xl:max-w-none">{showDashboard}</div>
 
       <div>
