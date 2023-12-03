@@ -12,8 +12,7 @@ const services = [
     href: '/dashboard',
     name: 'Manage Your Data Securely',
     description:
-      'Access and exchange your data securely with encryption at rest, in transit, and ephemeral\
-      encryption for data snapshots applied.',
+      'Learn about the contact model and how to create, retrieve, update, delete, and list contacts.',
     icon: DataIcon,
     pattern: {
       y: 16,
@@ -27,8 +26,7 @@ const services = [
     href: '/dashboard',
     name: 'Request Data',
     description:
-      'Securely request a data snapshot from another user or smart device for your Web2/Web3 needs.\
-      Leverage custom MFA if needed.',
+      'Learn about the contact model and how to create, retrieve, update, delete, and list contacts.',
     icon: QuestionMarkIcon,
     pattern: {
       y: -6,
@@ -42,8 +40,7 @@ const services = [
     href: '/dashboard',
     name: 'Request Update',
     description:
-      'Request a data update from another user or smart device for your Web2/Web3 needs.\
-      Leverage custom MFA if needed.',
+      'Learn about the conversation model and how to create, retrieve, update, delete, and list conversations.',
     icon: UpdateIcon,
     pattern: {
       y: 32,
@@ -57,8 +54,7 @@ const services = [
     href: '/dashboard',
     name: 'Cross-Chain Backups',
     description:
-      'Back up your data with your Web2/Web3 data providers, including by makin use of CCIP on\
-      EVM-compatible chaiuns that support it.',
+      'Learn about the group model and how to create, retrieve, update, delete, and list groups.',
     icon: CrosschainIcon,
     pattern: {
       y: 22,
@@ -136,7 +132,7 @@ function ServiceCard({ service, isSelected }) {
             mouseY={mouseY}
           />
           <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-zinc-900/7.5 group-hover:ring-zinc-900/10 dark:ring-white/10 dark:group-hover:ring-white/20" />
-          <div className="relative rounded-2xl px-4 pb-4 pt-12">
+          <div className="relative rounded-2xl px-4 pb-4 pt-16">
             <ServiceIcon icon={service.icon} />
             <h3
               className={`mt-4 text-sm font-semibold leading-7 text-${

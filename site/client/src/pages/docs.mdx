@@ -1,252 +1,183 @@
-
-This section will cover the basics of the zkp.services protocol at a higher level. Some of the things
-covered, such as how the Zero Knowledge Proofs are integrated or how the custom Multi-Factor authentication
-works, for example, will be elaborated upon in signficantly more detail in the corresponding sections of
-our documentation.
-
-## The purpose of the protocol
-
-The zkp.services protocol is engineered to herald a future where safety, transparency, and decentralization are embedded into 
-all facets of data management. In an era where data drives almost every aspect of our lives, the current methods of data management
-— often leading to fragmentation and compromise —demand an innovative overhaul. This protocol is our answer to these challenges, offering
-a comprehensive and secure framework for data handling, exchange, and verification, while ensuring utmost privacy and security.
-
-### Central Hub for Data-Related Activities
-
-- **Wide Applicability:** zkp.services serves as a central hub for various data-related activities,
-catering to both individual users and smart services as well as a tool for other protocols.
-- **Data Management Across Platforms:** The protocol supports the retrieval, transformation, and exchange 
-of data across Web2 and Web3 platforms, ensuring versatility and adaptability in different technological 
-environments.
-
-### Security and Privacy Measures
-
-- **Encryption and Redundancy:** Data is encrypted at rest, whether stored on decentralized mediums or 
-Web2 databases. In transit, it's protected through TLS and ephemeral AES encryption, supplemented by obfuscation 
-and hashing during smart contract operations.
-- **Backup Capabilities:** The protocol allows for redundant storage and backups across multiple Web2 
-databases and EVM-compatible chains, facilitated by Chainlink CCIP or manual methods.
-
-### Integration of Advanced Technologies
-
-- **Zero Knowledge Proofs (ZKPs):** A pivotal feature of the protocol, ZKPs enable users to selectively 
-reveal specific data properties while verifying their authenticity, thus balancing privacy with transparency.
-- **Custom Multi-Factor Authentication (MFA):** This feature adds an extra layer of security, allowing 
-users to enhance their data protection as needed.
-
-### Universal Applicability and Future-Proofing
-
-- **EVM Compatibility:** The protocol's design is universally applicable, compatible with any Ethereum 
-Virtual Machine (EVM)-based blockchain. This ensures wide-ranging utility and integration capabilities.
-- **Adherence to API Guidelines:** It supports a broad spectrum of Web2 and Web3 data sources that adhere 
-to our API guide, promoting interoperability and ease of integration.
-- **Cross-Chain and Cross-Database Functionality:** The protocol extends to cross-chain and cross-database 
-exchanges and backups, enhancing its robustness and practical utility.
-
-zkp.services redefines data management and exchange for the digital age. Its combination of security, privacy, 
-and universal applicability positions it as an indispensable tool in today’s data-centric world, offering 
-extensive utility and security guarantees that are as vital as data itself.
-
-## How does it work in a nutshell?
-
-The zkp.services protocol utilizes zero-knowledge proofs to enhance user control over data while ensuring compliance 
-and auditing standards are met. In essence, it allows users to upload their encrypted data to a Web2/Web3 data provider 
-of their choice, such as IPFS or AWS. This data can then be used according to their needs, whether it's sharing with 
-authorized parties at specific times or updating the stored data as required.
-
-A significant aspect of this protocol is its ability to allow data recipients to verify the authenticity of received 
-data or confirm the execution of requested updates (like reducing a balance for metro access) without compromising 
-the user's privacy. This approach effectively balances compliance needs with privacy preservation.
-
-The protocol functions by storing data either on-chain or off-chain, but revealing it only through selective snapshots. 
-To validate the legitimacy of such data or updates, cryptographic techniques like hash functions and zero-knowledge 
-proofs are employed. Users upload 'proofs' or 'signatures' related to specific data fields or updates to a smart 
-contract. This enables them to provide evidence of lawful actions by referencing these proofs in the smart contract 
-when sharing data or claiming updates.
-
-The use of ZKPs and hashing algorithms in zkp.services provides a cryptographic guarantee of the legality and validity 
-of the data or updates, verified through a simple check by the recipient. Additionally, users can digitally sign their 
-uploaded data with RSA keys associated with zkp.services or their own private keys.
-
-The scalability of this protocol is attributed to the scalability properties of hash functions, which can efficiently 
-process data of any size. ZKPs and hash functions together facilitate the efficient and selective revelation of subsets 
-of a larger data set. The current implementation uses a Merkle Tree-like structure for this purpose, but the protocol is 
-exploring other methods like Cryptographic Accumulators for future enhancements.
-
-To ensure adaptability with technological advances, plans are in place to allow users to select their preferred ZKP 
-algorithms, moving away from the default Poseidon hash function and Groth16 verifier. Furthermore, the integration of Chainlink 
-CCIP and a customizable MFA system, which attaches MFA requirements to data requests, adds another layer of robustness 
-to the protocol. 
-
-zkp.services' design also allows for straightforward integration into other applications, facilitated by the API 
-guide and smart contracts provided by zkp.services. This makes it a versatile and adaptable solution for developers 
-looking to incorporate secure data management into their applications.
-
-## Who could make use of this protocol?
-
-The zkp.services protocol, with its focus on safety, transparency, and decentralization, is a versatile tool that caters to a wide 
-array of sectors and applications.
-
-Its ability to handle sensitive data securely while maintaining privacy and transparency makes it ideal for various industries and 
-individual needs. We will next go over a few of the potential possibilities.
-
- Healthcare Industry
-
-The healthcare sector, dealing with sensitive patient data, can benefit significantly from our protocol:
-
-    Patient Data Security: Safeguarding patient records while allowing for controlled access by authorized personnel.
-    Research and Development: Securely sharing data for research purposes without revealing patient identities.
-    Insurance Processing: Streamlining insurance claims and verifications while keeping patient data private.
-
- Smart Services and ZKML
-
-Our protocol's application extends to next-gen applications and machine learning:
-
-    Smart Services: Building secure and private smart services that integrate our contracts that validate actions without revealing 
-    underlying data such as for public transportation in a smart city.
-    ZKML (Zero-Knowledge Machine Learning): Training machine learning models on encrypted data, ensuring privacy and utility.
-    Decentralized machine learning: Tokenizing decentralized machine models and training them on private data as well as receiving 
-    results privately.
-    Federated learning: Training ML models in a truly decentralized fashion.
-
- Digital Identity and Wallet Services
-
-With the integration of ZKPs and custom MFA, our protocol offers innovative solutions in digital identity and wallet services:
-
-    Decentralized Identity Verification: Securely verifying user identities without exposing personal information.
-    Centralized Digital Wallets: Demonstrating proof of funds or credentials without disclosing exact figures or sensitive details.
- 
- Logistics and Transportation
-
-For logistics and transportation, zkp.services can enhance efficiency and security:
-
-    Cargo Tracking: Verifying the location and status of goods without disclosing sensitive information.
-    Supply Chain Management: Enhancing supply chain transparency while maintaining confidentiality of trade secrets.
-
- Financial Sector
-
-In finance, where security and confidentiality are paramount, our protocol offers a robust solution for secure transactions and data management. 
-Financial institutions can utilize zkp.services for activities like:
-
-    Secure Transactions: Ensuring the confidentiality and authenticity of transactions without revealing sensitive details.
-    Audit Compliance: Facilitating transparent audits without compromising client confidentiality.
-    Fraud Detection: Leveraging encrypted data analysis to detect and prevent fraudulent activities.
-
-   Integration of custom MFA equipment
-
- Document Verification
-
-In sectors requiring document authentication, zkp.services provides:
-
-    Secure Document Verification: Authenticating documents without exposing their content, crucial in legal, educational, and 
-    governmental sectors.
-
-In essence, zkp.services is not just a protocol for data management; it's a comprehensive solution for a variety of sectors, 
-addressing the growing need for data security, privacy, and efficiency in the digital economy. Its adaptability and forward-
-thinking design make it a critical tool for industries and individuals navigating the challenges of a data-driven world.
-
-## Leveraging Zero-Knowledge Proofs (ZKPs)
-
-Zero-Knowledge Proofs (ZKPs) stand as a cornerstone technology in the zkp.services protocol, offering a powerful
-means to ensure data privacy and authenticity. A ZKP is a cryptographic method where one party (the prover) can prove
-to another (the verifier) the truth of a statement, without revealing any information apart from the fact that the statement
-is indeed true. This technology is integral to our protocol for its ability to facilitate secure and private verification 
-processes.
-
-The integration of Zero-Knowledge Proofs in zkp.services enables secure and private verification of data possession and updates.
-It ensures that while data authenticity and compliance are maintained, the privacy of the underlying information remains intact.
-This blend of security and privacy is what sets our protocol apart in the realm of data management and exchange.
-
- Proving Possession of Data
-
-At the heart of our ZKP implementation is the capability for users to assert ownership or possession of data without exposing
-the data itself. This aspect is vital in scenarios where verification is necessary but privacy is paramount. For instance, a
-user can demonstrate that they meet the legal age requirement for alcohol consumption without disclosing their exact age or
-identity details. Our protocol leverages ZKPs to validate data ownership while keeping specific data attributes concealed,
-relying solely on mathematical and programming principles.
-
- Verifiably Legal Updates to Data
-
-Our protocol also empowers users to perform legally compliant and verifiable updates to their data. This functionality is key
-to maintaining the integrity and trustworthiness of the system. Consider a scenario where a pharmacist requests a patient to
-update their prescription information. Using ZKPs, the pharmacist can verify that the update has been made without accessing
-the sensitive details of the patient's medical records or prescription. This ensures a secure and private exchange of
-information, adhering to legal and ethical standards.
-
-## Custom MFA and Sybil Attack Resistance
-
-The zkp.services protocol acknowledges the diverse additional security needs of different data applications. The security
-demands for verifying identity documents at a border control are vastly different from those for checking the balance on a
-transportation card, for example. This diversity, coupled with the inevitable occurrence of false positives and negatives
-in identity verification mechanisms, necessitates a flexible and robust multi-factor authentication (MFA) framework.
-
- Trustless, On-Chain MFA Provider
-
-Our protocol features a unique, trustless MFA provider that operates entirely on-chain. This system is crafted using a
-combination of Chainlink Verifiable Random Functions (VRFs), Chainlink Automation, and Zero Knowledge Proofs (ZKPs).
-This innovative blend ensures:
-
-- **Trustless Verification:** Users can prove knowledge of a secret or a set of secrets without actual disclosure.
-- **Timeliness Proof via Chainlink VRFs:** The VRFs act as a one-time token, indicating the timeliness of a request.
-  This ensures the authentication is relevant and current.
-- **Scalability Through Chainlink Automation:** The MFA service is economically scalable, with a single VRF capable of
-  covering all MFA requests within a specified time frame (e.g., five minutes). This approach efficiently handles
-  thousands of requests per minute.
-
- Customizable MFA for Smart Services
-
-Beyond our in-house MFA solution, the protocol offers an interface for MFA verification tailored to the specific needs
-of different services. This feature allows:
-
-- **Integration of External MFA Logic:** Services can associate the address of a smart contract containing their unique
-  MFA logic with data requests or updates.
-- **Simple MFA Success Check:** When a response to a data request is sent, the system checks for a single boolean 'success'
- from the associated MFA smart contract, confirming that the necessary MFA requirements have been met.
-- **Flexibility for Diverse Use Cases:** Smart services can implement any MFA method or combination thereof, catering to 
-their specific security needs. This includes integration with custom MFA devices, such as palm scanners.
-
-In conclusion, the Custom MFA and Sybil Attack Resistance feature of the zkp.services protocol offers unparalleled flexibility
- and security. By providing both an in-house, on-chain MFA solution and the capability to integrate external MFA logic, the 
- protocol ensures that diverse data applications can maintain their unique security standards while benefiting from advanced
-  cryptographic techniques.
-
-## Tokenomics (Beta) of zkp.services
-
-zkp.services introduces its native ERC-20 token, "ZKP", which plays a central role in the protocol's economy. This token is 
-utilized in transactions involving data requests and responses, with a structure designed to balance incentives and maintain 
-the token's value.
-
- Transaction Fees and Burn Mechanism
-
-1. **Base Burn Fee:** Whenever a party requests data or a data update, they are charged a base burn fee. This fee is a 
-fundamental aspect of each request transaction and serves two purposes:
-
-   - **Spam Prevention:** By imposing a cost on data requests, the base burn fee acts as a deterrent against frivolous or 
-   spam requests.
-   - **Deflationary Mechanism:** The burn fee helps maintain or potentially increase the value of ZKP tokens by reducing the 
-   overall supply, creating a deflationary effect.
-
-2. **Transaction Completion Fee:** Completing an update/data transaction incurs a different fee from the recipient/responding
- party. This fee comprises two components:
-   - **Requester-Set Fee:** The party requesting the data/data update sets this part of the fee. It represents the fee that is
-    to be transferred from the responder to the requester and can be thought of as the fee for the service that the requester 
-    helps with such as paying for transportation.
-   - **Burn Fee (currently inactive):** Similar to the base burn fee, this component is also deducted to discourage spam and 
-   manage the token supply.
-
- Control and Consent
-
-- The party responsible for responding to data requests/completing requested updates retains full control over each transaction. 
-They have the autonomy to accept or reject each data request based on the offered terms, including the fee set by the requester.
-
- Cross-Chain Backups and Payment
-
-- **Initial Framework:** For chains supporting CCIP (Cross-Chain Interoperability Protocol), the base fee for backups is standardized 
-in ZKP tokens. This simplification is designed to enhance user experience by providing a consistent payment method across different chains.
-- **Future Expansion:** Plans are in place to broaden the range of accepted tokens for cross-chain backup services. This expansion 
-aims to offer greater flexibility and convenience to users engaging in cross-chain activities.
-
-The tokenomics of zkp.services is built around a balanced system of fees and burn mechanisms, designed to ensure the stability and 
-value of the ZKP token while facilitating a fair and controlled environment for data transactions. The incorporation of cross-chain
- functionality and future plans for token diversification further enhance the protocol's adaptability and utility in the evolving 
- blockchain ecosystem.
+##**How does zkp.services work?**
+
+**A trustless, serverless, decentralized architecture**
+
+zkp.services runs entirely without dedicated or provisioned
+infrastructure in a completely trust less system. The underlying
+blueprint of zkp.services is incredibly versatile and can be adapted to
+many different frameworks. We currently use serverless cloud-based
+resources for our API and main database, and our contracts are publicly
+available on-chain.
+
+The dApp itself is also extremely malleable to user and organizational
+requirements. We offer the ability to pick and choose services to be
+linked to a user's dashboard, meaning that you only need to communicate
+and share with the systems that you choose. Our interface is incredibly
+user-friendly and straightforward -- you simply add or remove from a
+list of services at any time. This not only makes your dashboard super
+easy to manage, but it gives you an enhanced sense of security over your
+own data. If you choose to remove a service, your data and all parties
+you have chosen to share that data with, is completely removed from our
+system. Since we use a blockchain ledger in our backend, you can even
+confidently verify this yourself.
+
+zkp.services offers plug-and-play functionality with an endless number
+of smart devices. This pushes our solution into the world of IoT where
+users will be able to share and control their data security from
+personal and wearable devices.
+
+We go a step further with user customization by offering cross-chain
+functionality, as well as the opportunity to onboard data from your
+*own* selected database, such as one hosted in the Interplanetary File
+System (IPFS). We believe this is important as it aligns strongly with
+our mission to provide users with a way to securely handle their data in
+a decentralized and trust less world, where the user is truly in
+control.
+
+**Storing data securely and redundantly**
+
+With zkp.services, your data is reliably stored with security and
+redundancy in mind. We utilise the decentralized nature of the
+blockchain to ensure all communications and data transfers are safely
+handled both at rest and in-transit. With our default database, your
+data is stored at rest using 256-bit AES-GCM across multiple
+availability zones, ensuring prolixity of your information. Data that is
+stored on-chain is secured using a combination of one-time hashes and
+keys, meaning your information is protected without a single point of
+failure.
+
+**Encrypting communications**
+
+All data in-transit is incredibly protected by multiple methods of
+encryption, ensuring that even in the extremely unlikely event of a
+single point of malicious decryption being compromised, your information
+is kept safe. Communications with our main API and database are firstly
+encrypted using 256-bit AES (@machin3boy, tbc), which is then wrapped
+strictly through TLS. This means that compromising data in-transit
+through an MITM attack is essentially impossible. Furthermore, all
+communications to our smart contract are encrypted using a combination
+of hashing and one-time keys, which fulfils the zero-knowledge component
+of our solution. As this data is stored on-chain we have made it so that
+malicious decryption of the communication is impossible.
+
+**2FA and Sybil Attack Resistance Policies**
+
+A Sybil attack involves a malicious actor generating numerous duplicate
+accounts to masquerade as genuine users. This tactic complicates the
+system\'s ability to accurately ascertain the true user count within the
+network. While this form of attack can be executed by anyone, it
+typically unfolds when an individual seeks to initiate a transaction
+while ensuring that the action is attributed to them and not an
+imposter. To achieve this, they fabricate multiple accounts and employ
+them concurrently to carry out transactions. The objective of this
+attack variation is to exploit fellow users by assuming their identity
+and leveraging their account credentials for digital possessions. As an
+illustration, an individual might forge an account with a high
+reputation rating to present themselves as possessing more wealth or
+followers than they genuinely do.
+
+To prevent such attacks on our system, we have created our own novel
+two-factor authentication system which integrates with Chainlink to
+ensure our users are protected from malicious users. Our 2FA system
+utilises the Chainlink Verifiable Random Function to generate a true
+random number to allow authorized contracts to request random numbers.
+Users would then be required to prove they have the same random number.
+This is similar to many commonly used MFA apps, however ours is
+completely on-chain, and therefore decentralized and trust less.
+
+**Leveraging ZKPs to store proofs of data and verifying updates to
+data**
+
+The use of zero-knowledge proofs is a core component of our solution. A
+zero-knowledge proof or ZKP is a method by which one party can prove to
+another party that a given statement is true, while avoiding conveying
+to the verifier any information beyond the mere fact of the statement\'s
+truth. The reason this protocol is so paramount to securely storing and
+sharing data is that it allows the complex process of verifying requests
+and responses for data to be done so in an airtight, obfuscated manner,
+where critical fields are able to stay undisclosed whilst still ensuring
+full authenticity of the information.
+
+\[BETA\] We go a step further by offering the ability for users to
+specify their own ZKP verifier contracts and interfaces. This is aligns
+strongly with our mission to provide users to be able to store and share
+data in a manner that is fully trust less and decentralized. We believe
+this does not only give users a stronger sense of ownership, but it also
+provides verifiers with the ability to tune the level of obfuscation to
+their requirements by specifying their own ZKP interfaces.
+
+**Onboarding and updating data with the smart contract**
+
+Updating and onboarding data to the zkp.services solution involves a
+simple user interaction on the dApp, however a complex and highly secure
+set of operations occurs internally. After the user submits an update
+from the dApp both the field that is being updated, and the new data
+itself, are first hashed and then placed into a compounded
+zero-knowledge proof (meaning that the information is verifiable without
+revealing the information itself). Once pushed, the obfuscated field and
+data can be safely verified that the data is correctly updated and
+matches what was presented in the update request, without actually
+revealing the data.
+
+**Sharing and proving ownership of the data with the smart contract**
+
+The process of a user sharing data with a trusted verifier begins with
+the verifier posting a request to the user of the field of information
+wanted which is, as always, encrypted securely with a one-time key.
+
+When a user receives a request to share their data, it will be presented
+as a notification on their dApp interface. The user is able to simply
+accept or deny the request. Internally, when a user accepts the request,
+the user posts a zero-knowledge proof of the hash of the requested field
+and it's with a one-time key. This verifies that the field is valid and
+that the data is proven for the request at this time, due to our
+one-time key. Our smart contract will store the result of this
+submission ensuring that the request is only valid for a single time.
+Once it has been expired, it cannot be used again.
+
+The response containing the actual data is then posted directly to the
+verifier, securely encrypted with the verifiers public key. The verifier
+is then able to check that the hash matches what is stored in the smart
+contract, verifying the response.
+
+Additionally, our custom 2FA system can be optionally included for a
+specific request for a verifier. This can be particularly useful when
+there is a request for a piece of critical data that is more susceptible
+to Sybil attacks, such as requesting passport information.
+
+**Using the smart contract privately**
+
+The zkp.services solution conceals the fields/data that is stored by
+default, through the use of compounding encryption/hashing and
+zero-knowledge proofs. This ensures that all on-chain communications are
+essentially intelligible to those outside of the one-to-one interaction
+between the user and the verifier. We believe that our solution is
+ground-breaking in this aspect, as safely sharing critical information
+across the blockchain is something that has not truly been demonstrated
+until now (@machin3boy, please verify ).
+
+We also offer the ability to include a composition of oracles and
+proxies, fully customizable by the user or verifier, for enhanced
+protection. This means that for particular use cases pertaining to
+highly critical or classified data, these additional oracles/proxies can
+be leveraged to include more obfuscating steps in the process of sharing
+and updating data.
+
+**Tokenomics \[BETA\]**
+
+zkp.services by default runs on \[coin name\], which is our own native
+ERC-20 token. Verifiers and users can both be receivers or senders of
+the token based on the nature of the data transaction. In general, the
+party that is requesting the data will be charged for the request, but
+this may vary by case. The cost of a transaction can be determined by
+the receiving party, but the amount is limited to be what we consider an
+extremely minimal cost for the service provided. As always, the party
+supplying tokens for the transaction is always in control and can accept
+or deny each individual request.
+
+In conjunction with our implementation of the Chainlink Cross-Chain
+Interoperability Protocol (CCIP), we offer the ability to fund
+transactions with a token of their choice, from a list of approved
+coins. This further aligns with our mission to provide a customizable
+method for users to share and store their data in a trust less manner --
+they are not obliged to use only our native token.

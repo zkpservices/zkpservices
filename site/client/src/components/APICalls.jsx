@@ -3,7 +3,7 @@
 import axios from 'axios'
 
 const API_BASE_URL =
-  'https://y1oeimdo63.execute-api.us-east-1.amazonaws.com/userdata'
+  'https://api.zkp.services/userdata'
 
 let api_call_count = 0
 

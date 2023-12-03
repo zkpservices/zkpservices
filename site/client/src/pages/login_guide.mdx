@@ -75,7 +75,7 @@ Our data model is an extremely versatile JSON object that gives way to an endles
     <CodeGroup title="Request" tag="GET" label="/v1/contacts">
 
     ```bash {{ title: 'cURL' }}
-    curl --location --request POST https://y1oeimdo63.execute-api.us-east-1.amazonaws.com/userdata' \
+    curl --location --request POST https://api.zkp.services/userdata' \
     --header 'Content-Type: application/json' \
     --data-raw '{
         "id": "Ox4",
@@ -87,7 +87,7 @@ Our data model is an extremely versatile JSON object that gives way to an endles
 
     ```js
     var settings = {
-      "url": "https://y1oeimdo63.execute-api.us-east-1.amazonaws.com/userdata",
+      "url": "https://api.zkp.services/userdata",
       "method": "POST",
       "timeout": 0,
       "headers": {
@@ -110,7 +110,7 @@ Our data model is an extremely versatile JSON object that gives way to an endles
     import requests
     import json
 
-    url = "https://y1oeimdo63.execute-api.us-east-1.amazonaws.com/userdata"
+    url = "https://api.zkp.services/userdata"
 
     payload = json.dumps({
       "id": "Ox4",
@@ -139,7 +139,7 @@ Our data model is an extremely versatile JSON object that gives way to an endles
     `n    `"key`": `"medical records - pharmacy central melbourne.data.active prescriptions.Amoxicillin`"
     `n}"
 
-    $response = Invoke-RestMethod 'https://y1oeimdo63.execute-api.us-east-1.amazonaws.com/userdata' -Method 'POST' -Headers $headers -Body $body
+    $response = Invoke-RestMethod 'https://api.zkp.services/userdata' -Method 'POST' -Headers $headers -Body $body
     $response | ConvertTo-Json
     ```
 
@@ -204,7 +204,7 @@ Our data model is an extremely versatile JSON object that gives way to an endles
     <CodeGroup title="Request" tag="POST" label="/v1/contacts">
 
     ```bash {{ title: 'cURL' }}
-      curl --location --request POST 'https://y1oeimdo63.execute-api.us-east-1.amazonaws.com/userdata' \
+      curl --location --request POST 'https://api.zkp.services/userdata' \
       --header 'Content-Type: application/json' \
       --data-raw '{
           "id": "Ox234",
@@ -226,7 +226,7 @@ Our data model is an extremely versatile JSON object that gives way to an endles
 
     ```js
     var settings = {
-      "url": "https://y1oeimdo63.execute-api.us-east-1.amazonaws.com/userdata",
+      "url": "https://api.zkp.services/userdata",
       "method": "POST",
       "timeout": 0,
       "headers": {
@@ -258,7 +258,7 @@ $.ajax(settings).done(function (response) {
       import requests
       import json
 
-      url = "https://y1oeimdo63.execute-api.us-east-1.amazonaws.com/userdata"
+      url = "https://api.zkp.services/userdata"
 
       payload = json.dumps({
         "id": "Ox234",
@@ -306,7 +306,7 @@ $.ajax(settings).done(function (response) {
     `n    
     `n}"
 
-    $response = Invoke-RestMethod 'https://y1oeimdo63.execute-api.us-east-1.amazonaws.com/userdata' -Method 'POST' -Headers $headers -Body $body
+    $response = Invoke-RestMethod 'https://api.zkp.services/userdata' -Method 'POST' -Headers $headers -Body $body
     $response | ConvertTo-Json
     ```
 
@@ -352,7 +352,7 @@ $.ajax(settings).done(function (response) {
     <CodeGroup title="Request" tag="PUT" label="/userdata">
 
     ```bash {{ title: 'cURL' }}
-    curl --location --request PUT 'https://y1oeimdo63.execute-api.us-east-1.amazonaws.com/userdata' \
+    curl --location --request PUT 'https://api.zkp.services/userdata' \
     --header 'Content-Type: application/json' \
     --data-raw '{
         "httpMethod": "PUT",
@@ -373,7 +373,7 @@ $.ajax(settings).done(function (response) {
 
     ```js
     var settings = {
-      "url": "https://y1oeimdo63.execute-api.us-east-1.amazonaws.com/userdata",
+      "url": "https://api.zkp.services/userdata",
       "method": "PUT",
       "timeout": 0,
       "headers": {
@@ -405,7 +405,7 @@ $.ajax(settings).done(function (response) {
     import requests
     import json
 
-    url = "https://y1oeimdo63.execute-api.us-east-1.amazonaws.com/userdata"
+    url = "https://api.zkp.services/userdata"
 
     payload = json.dumps({
       "httpMethod": "PUT",
@@ -452,7 +452,7 @@ $.ajax(settings).done(function (response) {
     `n    }
     `n}"
 
-    $response = Invoke-RestMethod 'https://y1oeimdo63.execute-api.us-east-1.amazonaws.com/userdata' -Method 'PUT' -Headers $headers -Body $body
+    $response = Invoke-RestMethod 'https://api.zkp.services/userdata' -Method 'PUT' -Headers $headers -Body $body
     $response | ConvertTo-Json
     ```
   </CodeGroup>
@@ -500,7 +500,7 @@ $.ajax(settings).done(function (response) {
     <CodeGroup title="Request" tag="PUT" label="/userdata">
 
     ```bash {{ title: 'cURL' }}
-    curl --location --request PUT 'https://y1oeimdo63.execute-api.us-east-1.amazonaws.com/userdata' \
+    curl --location --request PUT 'https://api.zkp.services/userdata' \
     --header 'Content-Type: application/json' \
     --data-raw '{
         "httpMethod": "PUT",
@@ -515,7 +515,7 @@ $.ajax(settings).done(function (response) {
 
     ```js
     var settings = {
-      "url": "https://y1oeimdo63.execute-api.us-east-1.amazonaws.com/userdata",
+      "url": "https://api.zkp.services/userdata",
       "method": "PUT",
       "timeout": 0,
       "headers": {
@@ -541,7 +541,7 @@ $.ajax(settings).done(function (response) {
     import requests
     import json
 
-    url = "https://y1oeimdo63.execute-api.us-east-1.amazonaws.com/userdata"
+    url = "https://api.zkp.services/userdata"
 
     payload = json.dumps({
       "httpMethod": "PUT",
@@ -575,7 +575,7 @@ $.ajax(settings).done(function (response) {
     `n    }
     `n}"
 
-    $response = Invoke-RestMethod 'https://y1oeimdo63.execute-api.us-east-1.amazonaws.com/userdata' -Method 'PUT' -Headers $headers -Body $body
+    $response = Invoke-RestMethod 'https://api.zkp.services/userdata' -Method 'PUT' -Headers $headers -Body $body
     $response | ConvertTo-Json
     ```
 
@@ -622,7 +622,7 @@ $.ajax(settings).done(function (response) {
     <CodeGroup title="Request" tag="PUT" label="/userdata">
 
     ```bash {{ title: 'cURL' }}
-    curl --location --request POST 'https://y1oeimdo63.execute-api.us-east-1.amazonaws.com/userdata' \
+    curl --location --request POST 'https://api.zkp.services/userdata' \
     --header 'Content-Type: application/json' \
     --data-raw '{
         "id": "Ox3",
@@ -640,7 +640,7 @@ $.ajax(settings).done(function (response) {
 
     ```js
     var settings = {
-      "url": "https://y1oeimdo63.execute-api.us-east-1.amazonaws.com/userdata",
+      "url": "https://api.zkp.services/userdata",
       "method": "POST",
       "timeout": 0,
       "headers": {
@@ -669,7 +669,7 @@ $.ajax(settings).done(function (response) {
     import requests
     import json
 
-    url = "https://y1oeimdo63.execute-api.us-east-1.amazonaws.com/userdata"
+    url = "https://api.zkp.services/userdata"
 
     payload = json.dumps({
       "id": "Ox3",
@@ -709,7 +709,7 @@ $.ajax(settings).done(function (response) {
     `n    }
     `n}"
 
-    $response = Invoke-RestMethod 'https://y1oeimdo63.execute-api.us-east-1.amazonaws.com/userdata' -Method 'POST' -Headers $headers -Body $body
+    $response = Invoke-RestMethod 'https://api.zkp.services/userdata' -Method 'POST' -Headers $headers -Body $body
     $response | ConvertTo-Json
     ```
 
@@ -756,7 +756,7 @@ $.ajax(settings).done(function (response) {
     <CodeGroup title="Request" tag="PUT" label="/userdata">
 
     ```bash {{ title: 'cURL' }}
-    curl --location --request POST 'https://y1oeimdo63.execute-api.us-east-1.amazonaws.com/userdata' \
+    curl --location --request POST 'https://api.zkp.services/userdata' \
     --header 'Content-Type: application/json' \
     --data-raw '{
         "id": "Ox3",
@@ -774,7 +774,7 @@ $.ajax(settings).done(function (response) {
 
     ```js
     var settings = {
-      "url": "https://y1oeimdo63.execute-api.us-east-1.amazonaws.com/userdata",
+      "url": "https://api.zkp.services/userdata",
       "method": "POST",
       "timeout": 0,
       "headers": {
@@ -803,7 +803,7 @@ $.ajax(settings).done(function (response) {
     import requests
     import json
 
-    url = "https://y1oeimdo63.execute-api.us-east-1.amazonaws.com/userdata"
+    url = "https://api.zkp.services/userdata"
 
     payload = json.dumps({
       "id": "Ox3",
@@ -843,7 +843,7 @@ $.ajax(settings).done(function (response) {
     `n    }
     `n}"
 
-    $response = Invoke-RestMethod 'https://y1oeimdo63.execute-api.us-east-1.amazonaws.com/userdata' -Method 'POST' -Headers $headers -Body $body
+    $response = Invoke-RestMethod 'https://api.zkp.services/userdata' -Method 'POST' -Headers $headers -Body $body
     $response | ConvertTo-Json
     ```
 

@@ -174,7 +174,7 @@ export function Dashboard() {
   const showDashboardConditional = () => {
     if (!metamaskAvailable) {
       return (
-        <h2 className="mt-10 text-center text-2xl tracking-tight my-48 text-center">
+        <h2 className="mt-10 text-center text-2xl tracking-tight">
           Web3 is not available on this device.
           <br />
           Our guide is available on all devices, but please connect somewhere
@@ -188,7 +188,7 @@ export function Dashboard() {
       !isOnboarding
     ) {
       return (
-        <div className="flex justify-center my-48 text-center">
+        <div className="flex justify-center">
           <h3 className="text-center text-2xl tracking-tight">
             You are currently connected to a network (chain ID: {chainId}) that
             has not been onboarded to this account.
@@ -208,7 +208,7 @@ export function Dashboard() {
       )
     } else {
       return (
-        <div className="flex justify-center my-48 text-center">
+        <div className="flex justify-center">
           <h2 className="text-center text-3xl font-bold tracking-tight">
             Please connect your wallet and log in to get started.
           </h2>
