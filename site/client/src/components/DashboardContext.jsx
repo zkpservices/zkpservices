@@ -337,14 +337,19 @@ export function DashboardContext() {
           if (Array.isArray(dataArray)) {
             // The parsed data is an array
             console.log(`CCTX item: ${JSON.stringify(dataArray, null, 2)}`)
+            let chains = {
+              '0xa869': 'Fuji',
+              '0x13881': 'Mumbai',
+              '0x15f902': 'Ripple Dev EVM',
+            }
             const transformedData = dataArray.map((item) => ({
               operation: ['Sync Data'],
               field: [
                 paramToSyncDict[item.parameter],
-                `From: ${item.source_chain} to ${item.target_chain}`,
+                `From: ${chains[item.source_chain]} to ${chains[item.target_chain]}`,
               ],
               status: ['Sync Completed', 'grey'],
-              details: ['View Details', `CCID: ${truncateAddress(item.ccid)}`],
+              details: ['View Details', `CCIP ID: ${truncateAddress(item.ccid)}`],
               type: 'cctx',
               paramKey: item.parameter_key,
               paramType: paramToSyncDict[item.parameter],
