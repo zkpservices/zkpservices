@@ -6,6 +6,11 @@ import { Notification } from '@/components/Notification'
 import { DashboardContext } from '@/components/DashboardContext'
 import { useGlobal } from '@/components/GlobalStorage'
 import { getDashboard } from '@/components/APICalls'
+import coreContractABI from '../../public/contract_ABIs/ZKPServicesCore.json'
+import twoFAContractVRFABI from '../../public/contract_ABIs/ZKPServicesVRF2FA.json'
+import twoFAContractGenericABI from '../../public/contract_ABIs/ZKPServicesGeneric2FA.json'
+import batchSignUpABI from '../../public/contract_ABIs/BatchSignUp.json'
+import Web3 from 'web3'
 
 export function Dashboard() {
   const [tableData, setTableData] = useState({
@@ -20,32 +25,152 @@ export function Dashboard() {
     showLoginNotification,
     setShowLoginNotification,
     loggedIn,
+    setLoggedIn,
     userPassword,
+    setUserPassword,
     username,
     setUsername,
-    onboardedChain,
-    setOnboardedChain,
+    twoFactorAuthPassword,
+    setTwoFactorAuthPassword,
+    contractPassword,
+    setContractPassword,
     chainId,
-    isOnboarding,
+    web3,
+    fujiCoreContract,
+    fujiTwoFAContract,
+    fujiBatchSignUpContract,
+    mumbaiCoreContract,
+    mumbaiTwoFAContract,
+    mumbaiBatchSignUpContract,
+    rippleCoreContract,
+    rippleTwoFAContract,
+    rippleBatchSignUpContract,
+    setWeb3,
+    setFujiCoreContract,
+    setFujiTwoFAContract,
+    setMumbaiCoreContract,
+    setMumbaiTwoFAContract,
+    setRippleCoreContract,
+    setRippleTwoFAContract,
+    setFujiBatchSignUpContract,
+    setMumbaiBatchSignUpContract,
+    setRippleBatchSignUpContract,
     metamaskAvailable,
-    setApiErrorNotif,
-    setApiErrorTopText,
-    setApiErrorBottomText
+    setMetamaskAvailable,
+    onboardedChain,
+    isOnboarding,
+    setOnboardedChain
   } = useGlobal()
 
   // loggedIn = true;
   // walletConnected = true;
 
   const [showDashboard, setShowDashboard] = useState(
-    <div className="min-h-screen"></div>
-    // <div className="flex justify-center">
-    //   <h2 className="text-center text-3xl font-bold tracking-tight">
-    //     Please connect your wallet and log in to get started
-    //   </h2>
-    // </div>,
+    <div className="flex justify-center">
+      <h2 className="text-center text-3xl font-bold tracking-tight">
+        Please connect your wallet and log in to get started
+      </h2>
+    </div>
   )
   const [usernameText, setUsernameText] = useState('')
   const [loginNotification, setLoginNotification] = useState(<></>)
+
+  async function initializeWeb3() {
+    if (window.ethereum) {
+      setMetamaskAvailable(true)
+      //these are too large for local storage and need to be reinstantiated each time
+      const web3Instance = new Web3(window.ethereum)
+      web3 = web3Instance
+      setWeb3(web3Instance)
+
+      const coreContractAbi = coreContractABI
+      const fujiCoreContractAddress =
+        '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'
+      const mumbaiCoreContractAddress =
+        '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'
+      const rippleCoreContractAddress =
+        '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'
+      const fujiCoreContractInstance = new web3Instance.eth.Contract(
+        coreContractAbi,
+        fujiCoreContractAddress,
+      )
+      const mumbaiCoreContractInstance = new web3Instance.eth.Contract(
+        coreContractAbi,
+        mumbaiCoreContractAddress,
+      )
+      const rippleCoreContractInstance = new web3Instance.eth.Contract(
+        coreContractAbi,
+        rippleCoreContractAddress,
+      )
+      fujiCoreContract = fujiCoreContractInstance
+      mumbaiCoreContract = mumbaiCoreContractInstance
+      rippleCoreContract = rippleCoreContractInstance
+      setFujiCoreContract(fujiCoreContractInstance)
+      setMumbaiCoreContract(mumbaiCoreContractInstance)
+      setRippleCoreContract(rippleCoreContractInstance)
+
+      const twoFAContractVRFAbi = twoFAContractVRFABI
+      const twoFAContractGenericAbi = twoFAContractGenericABI
+      const fujiTwoFAContractAddress =
+        '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'
+      const mumbaiTwoFAContractAddress =
+        '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'
+      const rippleTwoFAContractAddress =
+        '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'
+      const fujiTwoFAContractInstance = new web3Instance.eth.Contract(
+        twoFAContractVRFAbi,
+        fujiTwoFAContractAddress,
+      )
+      const mumbaiTwoFAContractInstance = new web3Instance.eth.Contract(
+        twoFAContractVRFAbi,
+        mumbaiTwoFAContractAddress,
+      )
+      const rippleTwoFAContractInstance = new web3Instance.eth.Contract(
+        twoFAContractGenericAbi,
+        rippleTwoFAContractAddress,
+      )
+      fujiTwoFAContract = fujiTwoFAContractInstance
+      mumbaiTwoFAContract = mumbaiTwoFAContractInstance
+      rippleTwoFAContract = rippleTwoFAContractInstance
+      setFujiTwoFAContract(fujiTwoFAContractInstance)
+      setMumbaiTwoFAContract(mumbaiTwoFAContractInstance)
+      setRippleTwoFAContract(rippleTwoFAContractInstance)
+
+      const batchSignUpContractAbi = batchSignUpABI
+      const fujiBatchSignUpContractAddress =
+        '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'
+      const mumbaiBatchSignUpContractAddress =
+        '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'
+      const rippleBatchSignUpContractAddress =
+        '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'
+      const fujiBatchSignUpContractInstance = new web3Instance.eth.Contract(
+        batchSignUpContractAbi,
+        fujiBatchSignUpContractAddress,
+      )
+      const mumbaiBatchSignUpContractInstance = new web3Instance.eth.Contract(
+        batchSignUpContractAbi,
+        mumbaiBatchSignUpContractAddress,
+      )
+      const rippleBatchSignUpContractInstance = new web3Instance.eth.Contract(
+        batchSignUpContractAbi,
+        rippleBatchSignUpContractAddress,
+      )
+      fujiBatchSignUpContract = fujiBatchSignUpContractInstance
+      mumbaiBatchSignUpContract = mumbaiBatchSignUpContractInstance
+      rippleBatchSignUpContract = rippleBatchSignUpContractInstance
+      setFujiBatchSignUpContract(fujiBatchSignUpContractInstance)
+      setMumbaiBatchSignUpContract(mumbaiBatchSignUpContractInstance)
+      setRippleBatchSignUpContract(rippleBatchSignUpContractInstance)
+    } else {
+      setMetamaskAvailable(false)
+    }
+  }
+
+  useEffect(() => {
+    initializeWeb3().then(() => {
+      setShowDashboard(showDashboardConditional());
+    });
+  }, [walletConnected, userAddress, metamaskAvailable, loggedIn]);
 
   const showDashboardConditional = () => {
     if (!metamaskAvailable) {
