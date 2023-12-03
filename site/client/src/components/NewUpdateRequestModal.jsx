@@ -480,6 +480,20 @@ export function NewUpdateRequestModal({
                       />
                     </div>
 
+                  <div className="mt-6">
+                    <label
+                      htmlFor="disclaimer"
+                      className="block text-sm font-bold leading-5 text-gray-900 dark:text-white"
+                    >
+                      Disclaimer:
+                    </label>
+                    <p className="mt-2 whitespace-normal text-gray-500 dark:text-gray-300">
+                      Please enter data in the form of a valid JSON payload matching the 
+                      example structure above. We are working on supporting all kinds of data types
+                      very soon.
+                    </p>
+                  </div>
+
                     <hr className="my-4 border-gray-300 dark:border-gray-700" />
 
                     <div className="mt-4">

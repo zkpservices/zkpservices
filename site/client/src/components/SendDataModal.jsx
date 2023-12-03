@@ -755,7 +755,7 @@ export function SendDataModal({
                           2FA can only be completed via this dApp if a
                           zkp.services 2FA provider has been chosen and the one
                           time token was attached. For other providers, please
-                          use the dApp/frontend/etc. to complete 2FA.
+                          use the corresponding dApp/frontend/etc. to complete 2FA.
                         </p>
                       </div>
                     </>

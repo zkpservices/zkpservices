@@ -185,7 +185,7 @@ export function DashboardContext() {
               item.operation === 'update' ? 'Complete Update' : 'Send Response',
               'button',
             ],
-        details: ['View Details', truncateAddress(item.requestID)],
+        details: ['View Details', `ID: ${truncateAddress(item.requestID)}`],
         type:
           item.operation === 'update'
             ? 'incoming_request_update'
@@ -256,7 +256,7 @@ export function DashboardContext() {
         status: hasMatchingResponse
           ? ['Response Sent', 'grey']
           : ['Awaiting Response', 'grey'],
-        details: ['View Details', truncateAddress(item.requestID)],
+        details: ['View Details', ` ID: ${truncateAddress(item.requestID)}`],
         type:
           item.operation === 'update'
             ? 'outgoing_request_update'
@@ -283,7 +283,7 @@ export function DashboardContext() {
         operation: [operationText, `By you`],
         field: [item.field, truncateAddress(item.address_sender)],
         status: ['Response Sent', 'grey'],
-        details: ['View Details', truncateAddress(item.responseID)],
+        details: ['View Details',  `ID: ${truncateAddress(item.responseID)}`],
         type:
           item.operation === 'update'
             ? 'outgoing_response_update'
@@ -343,7 +343,7 @@ export function DashboardContext() {
                 `From: ${item.source_chain} to ${item.target_chain}`,
               ],
               status: ['Sync Completed', 'grey'],
-              details: ['View Details', `${truncateAddress(item.ccid)}`],
+              details: ['View Details', `CCID: ${truncateAddress(item.ccid)}`],
               type: 'cctx',
               paramType: paramToSyncDict[item.parameter],
               sourceChain: item.source_chain,

@@ -472,13 +472,12 @@ export function NewCrossChainSyncModal({
                       Disclaimer:
                     </label>
                     <p className="mt-2 whitespace-normal text-gray-500 dark:text-gray-300">
-                      Data requests and update requests are only partially
-                      supported due to the fact that the (optional) selected 2FA
-                      providers would need to be able to support equivalent
-                      logic and have the same addresses on the destination chain
-                      (this is available with the default 2FA providers of
-                      zkp.services, ZKPServicesVRF2FA & ZKPServicesGeneric2FA,
-                      but may not be for other 2FA providers).
+                      Data requests and update requests that have a 2FA requirement
+                      are only partially for syncing due to the fact that the (optional) 
+                      selected 2FA providers would need equivalent logic and have the same 
+                      addresses on the destination chain. This is available with the default 
+                      2FA providers of zkp.services, ZKPServicesVRF2FA & ZKPServicesGeneric2FA,
+                      but may not be for other 2FA providers.
                     </p>
                   </div>
                 </div>
