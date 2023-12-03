@@ -14,6 +14,13 @@ export function CrossChainSyncStatusModal({
   parameterValue,
   ccipRequestID = '',
 }) {
+
+  let chains = {
+    '0xa869': 'Fuji',
+    '0x13881': 'Mumbai',
+    '0x15f902': 'Ripple Dev EVM',
+  }
+
   const [isOpen, setIsOpen] = useState(open)
   const [status, setStatus] = useState('Incomplete')
 
@@ -85,7 +92,7 @@ export function CrossChainSyncStatusModal({
                       rows={1}
                       readOnly
                       spellCheck="false"
-                      value={sourceChain}
+                      value={chains[sourceChain]}
                     />
                   </div>
 
@@ -102,7 +109,7 @@ export function CrossChainSyncStatusModal({
                       rows={1}
                       readOnly
                       spellCheck="false"
-                      value={destinationChain}
+                      value={chains[destinationChain]}
                     />
                   </div>
 
