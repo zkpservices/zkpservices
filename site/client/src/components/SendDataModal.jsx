@@ -70,6 +70,8 @@ export function SendDataModal({
   const [editorView, setEditorView] = useState(null);
   const [isEditorReady, setIsEditorReady] = useState(false);
 
+  const modifiedFieldData = open ? removeMetadata(JSON.parse(data)[fieldRequested]) : {}
+
   const borderTheme = EditorView.theme({
     '.cm-editor': { 'border-radius': '0.375rem' },
     '&': { 'border-radius': '0.375rem' },
@@ -81,6 +83,7 @@ export function SendDataModal({
   const currentTheme = document.documentElement.classList.contains('dark') ? tokyoNight : tokyoNightDay;
 
   useEffect(() => {
+    console.log(`DATA: ${data}`)
     if (open && !editorView && isEditorReady) {
       const newState = EditorState.create({
         doc: JSON.stringify(
@@ -184,8 +187,6 @@ export function SendDataModal({
     setErrorTopText(topText)
     setErrorBottomText(bottomText)
   }
-
-  const modifiedFieldData = open ? removeMetadata(JSON.parse(data)[fieldRequested]) : {}
 
   const resetSubmitButton = () => {
     if (document.getElementById('submitButton')) {

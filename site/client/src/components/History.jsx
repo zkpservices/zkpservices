@@ -8,6 +8,7 @@ import {
   addResponse,
   updateFieldData,
 } from '@/components/APICalls'
+import { stringToBigInt } from './HelperCalls'
 import { useGlobal } from '@/components/GlobalStorage'
 import { CompleteUpdateModal } from './CompleteUpdateModal'
 import { CompletedDataUpdateModal } from './CompletedDataUpdateModal'
@@ -17,6 +18,7 @@ import { AwaitingUpdateCompletionModal } from './AwaitingUpdateCompletionModal'
 import { ReceivedUpdateResponseModal } from './ReceivedUpdateResponseModal'
 import { CrossChainSyncStatusModal } from './CrossChainSyncStatusModal'
 import { Notification } from './Notification'
+import { poseidon } from './PoseidonHash'
 
 const classNames = (...classes) => {
   return classes.filter(Boolean).join(' ')
@@ -59,7 +61,7 @@ export function History({ tableData = {}, showRefresh = true, handleRefresh }) {
     twoFARequestID: '',
     twoFAOneTimeToken: '',
   })
-  let { userAddress, userPassword, chainId, setApiErrorNotif, setApiErrorTopText, setApiErrorBottomText } = useGlobal()
+  let { userAddress, userPassword, chainId, setApiErrorNotif, setApiErrorTopText, setApiErrorBottomText, fujiCoreContract, mumbaiCoreContract, contractPassword } = useGlobal()
   const handleRefreshAll = () => {
     // Call the loadAllHistory function from DashboardContext
     handleRefresh()
@@ -149,24 +151,114 @@ export function History({ tableData = {}, showRefresh = true, handleRefresh }) {
   }
 
   const openCrossChainSyncModal = async (rowData) => {
-    try {
-      const fieldData = await getFieldData(
-        userAddress,
-        userPassword,
-        rowData.field[0],
-        chainId,
-      )
-      const newRowData = {
-        ...rowData,
-        data: fieldData['data'],
-      }
-      setSelectedRowData(newRowData)
-      setShowCrossChainSyncModal(true)
-    } catch (error) {
+    let fetchedValue;
+    const contract =
+    chainId == 43113
+      ? fujiCoreContract
+      : chainId == 80001
+        ? mumbaiCoreContract
+        : chainId == 1440002
+          ? rippleCoreContract
+          : null
+
+  if (!contract) {
+    console.error('No contract instance available for the current chain')
+    return
+  }
+    switch (rowData.paramType) {
+      case 'Data':
+        try {
+        const fieldDataRequest = await getFieldData(
+          userAddress,
+          userPassword,
+          rowData.paramKey,
+          chainId,
+        )
+        console.log(fieldDataRequest)
+        const fieldData = fieldDataRequest['data']
+        const paramKeyRawEnd = stringToBigInt(rowData.paramKey.substring(24, 48))
+          ? stringToBigInt(rowData.paramKey.substring(24, 48))
+          : stringToBigInt('')
+        const contractPasswordEnd = stringToBigInt(
+          contractPassword.substring(24, 48),
+        )
+          ? stringToBigInt(contractPassword.substring(24, 48))
+          : stringToBigInt('')
+        let paramKey = await poseidon([
+          stringToBigInt(rowData.paramKey),
+          paramKeyRawEnd,
+          stringToBigInt(fieldData[rowData.paramKey]['_metadata']['salt']),
+          stringToBigInt(contractPassword),
+          contractPasswordEnd,
+        ])
+        const encryptedData = await contract.methods
+          .obfuscatedData(paramKey)
+          .call()
+        fetchedValue = JSON.stringify(
+          encryptedData,
+          (key, value) =>
+            typeof value === 'bigint' ? value.toString() : value, // return everything else unchanged
+          2,
+        )
+      } catch (error) {
         setApiErrorNotif(true)
         setApiErrorTopText("Error fetching field data")
         setApiErrorBottomText(error.toString())
+      }
+        break
+      case 'Data Request':
+        const encryptedDataRequest = await contract.methods
+          .dataRequests(rowData.paramKey)
+          .call()
+          fetchedValue = JSON.stringify(
+            encryptedDataRequest,
+            (key, value) =>
+              typeof value === 'bigint' ? value.toString() : value, // return everything else unchanged
+            2,
+          )
+        break
+      case 'Update Request':
+        const encryptedUpdateRequest = await contract.methods
+          .updateRequests(rowData.paramKey)
+          .call()
+        fetchedValue = JSON.stringify(
+          encryptedUpdateRequest,
+          (key, value) => {
+            if (typeof value === 'bigint') {
+              return value.toString()
+            }
+            return value
+          },
+          2,
+        )
+        break
+      case 'Response':
+        fetchedValue = await contract.methods.responses(rowData.paramKey).call()
+        break
+      case 'Public User Information':
+        fetchedValue = await contract.methods
+          .publicUserInformation(rowData.paramKey)
+          .call()
+        break
+      case 'RSA Encryption Keys':
+        fetchedValue = await contract.methods
+          .rsaEncryptionKeys(rowData.paramKey)
+          .call()
+        break
+      case 'RSA Signing Keys':
+        fetchedValue = await contract.methods.rsaSigningKeys(rowData.paramKey).call()
+        break
+      default:
+        console.error('Invalid parameter selected')
+        return
     }
+
+    const newRowData = {
+      ...rowData,
+      data: fetchedValue,
+    }
+    setSelectedRowData(newRowData)
+    setShowCrossChainSyncModal(true)
   }
 
   const closeCrossChainSyncModal = () => {
@@ -237,7 +329,7 @@ export function History({ tableData = {}, showRefresh = true, handleRefresh }) {
         address_receiver: selectedRowData.addressSender,
         chainID: chainId,
         operation: 'update',
-        data: selectedRowData.data,
+        updated_data: selectedRowData.data,
         field: selectedRowData.field[0],
         key: selectedRowData.key,
         require2FA: selectedRowData.require2FA,
@@ -509,7 +601,7 @@ export function History({ tableData = {}, showRefresh = true, handleRefresh }) {
         parameterValue={selectedRowData.data}
         ccipRequestID={selectedRowData.ccid}
         parameterSynced={selectedRowData.paramType}
-        parameterKey={selectedRowData.field[0]}
+        parameterKey={selectedRowData.paramKey}
         sourceChain={selectedRowData.sourceChain}
         destinationChain={selectedRowData.destinationChain}
       />

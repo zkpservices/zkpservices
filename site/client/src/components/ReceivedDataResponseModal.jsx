@@ -1,6 +1,7 @@
 import { Fragment, useRef, useState, useEffect } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
+import { removeMetadata } from './HelperCalls'
 import {
   autocompletion,
   closeBrackets,
@@ -53,6 +54,8 @@ export function ReceivedDataResponseModal({
   responseFee = '',
 }) {
 
+  const modifiedFieldData = open ? removeMetadata(JSON.parse(dataSnapshot)[fieldRequested]) : {}
+
   const editorContainerRef = useRef(null);
   const [editorView, setEditorView] = useState(null);
   const [isEditorReady, setIsEditorReady] = useState(false);
@@ -71,7 +74,7 @@ export function ReceivedDataResponseModal({
     if (open && !editorView && isEditorReady) {
       const newState = EditorState.create({
         doc: JSON.stringify(
-                          dataSnapshot,
+                          modifiedFieldData,
                           null,
                           2,
                         ),
@@ -253,14 +256,14 @@ export function ReceivedDataResponseModal({
                         className="block w-full font-mono"
                       ></div>
                     </div>
-                    {/* <textarea
+                    <textarea
                       id="dataSnapshot"
                       className="font-mono relative mt-1 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 dark:focus:border-emerald-500 sm:text-sm"
                       rows={8}
                       readOnly
                       spellCheck="false"
-                      value={dataSnapshot}
-                    /> */}
+                      value={JSON.stringify(modifiedFieldData, null, 2)}
+                    />
                   </div>
 
                   <hr className="my-4 border-gray-300 dark:border-gray-700" />

@@ -32,10 +32,7 @@ export function OnboardToNewChainModal({
     userPassword,
     chainId,
     onboardedChain,
-    setOnboardedChain,
-    setApiErrorNotif,
-    setApiErrorTopText,
-    setApiErrorBottomText
+    setOnboardedChain
   } = useGlobal()
 
   const [showErrorNotif, setShowErrorNotif] = useState(false);
@@ -121,9 +118,9 @@ export function OnboardToNewChainModal({
       let receipt = await web3.eth.sendTransaction(txObject)
       console.log('Batch SignUp Transaction Receipt:', receipt)
     } catch (error) {
-      setApiErrorNotif(true)
-      setApiErrorTopText("Error completing chain onboarding")
-      setApiErrorBottomText(error.toString())
+      showErrorNotif(true)
+      setErrorTopText("Error completing chain onboarding")
+      setErrorBottomText(error.toString())
     }
     if (document.getElementById('submitButton')) {
       document.getElementById('submitButton').textContent =
@@ -137,9 +134,9 @@ export function OnboardToNewChainModal({
         `0x${targetChainId.toString(16)}`,
       )
     } catch (error) {
-      setApiErrorNotif(true)
-      setApiErrorTopText("Error completing chain onboarding")
-      setApiErrorBottomText(error.toString())
+      showErrorNotif(true)
+      setErrorTopText("Error completing chain onboarding")
+      setErrorBottomText(error.toString())
     }
     showNotif(false, "Chain Onboarded", "Onboarded to new chain successfully.")
     onClose()
@@ -150,7 +147,7 @@ export function OnboardToNewChainModal({
     <Transition.Root show={open} as={Fragment}>
       <Dialog
         as="div"
-        className="fixed inset-0 z-10 overflow-y-auto"
+        className="fixed inset-0 z-50 overflow-y-auto"
         onClose={onClose}
       >
         <div className="flex min-h-screen items-center justify-center">

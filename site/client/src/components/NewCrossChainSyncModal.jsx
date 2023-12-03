@@ -21,7 +21,7 @@ export function NewCrossChainSyncModal({
     web3,
     chainId,
     contractPassword,
-    userPassword,
+    userPassword
   } = useGlobal()
 
   const [parameterValue, setParameterValue] = useState('')
@@ -126,16 +126,21 @@ export function NewCrossChainSyncModal({
             2,
           )
         } catch (error) {
-          setApiErrorNotif(true)
-          setApiErrorTopText("Error fetching field data")
-          setApiErrorBottomText(error.toString())
+          setShowErrorNotif(true)
+          setErrorTopText("Error fetching field data")
+          setErrorBottomText(error.toString())
         }
           break
         case 'Data Request':
           const encryptedDataRequest = await contract.methods
             .dataRequests(paramKey)
             .call()
-          fetchedValue = String(JSON.stringify(encryptedDataRequest, null, 4))
+            fetchedValue = JSON.stringify(
+              encryptedDataRequest,
+              (key, value) =>
+                typeof value === 'bigint' ? value.toString() : value, // return everything else unchanged
+              2,
+            )
           break
         case 'Update Request':
           const encryptedUpdateRequest = await contract.methods

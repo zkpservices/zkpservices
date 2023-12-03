@@ -221,6 +221,7 @@ export function DashboardContext() {
             ? 'incoming_response_update'
             : 'incoming_response_get',
         addressSender: item.address_sender,
+        requestID: item.responseID,
         data: item.data,
         salt: item.salt,
         limit: item.limit,
@@ -288,9 +289,9 @@ export function DashboardContext() {
           item.operation === 'update'
             ? 'outgoing_response_update'
             : 'outgoing_response_get',
-        requestID: item.requestID,
+        requestID: item.responseID,
         addressSender: item.address_sender,
-        data: item.data,
+        data: item.operation === 'update' ? item.updated_data : item.data,
         addressSender: item.address_sender,
         salt: item.salt,
         limit: item.limit,
@@ -339,13 +340,15 @@ export function DashboardContext() {
             const transformedData = dataArray.map((item) => ({
               operation: ['Sync Data'],
               field: [
-                item.parameter_key,
+                paramToSyncDict[item.parameter],
                 `From: ${item.source_chain} to ${item.target_chain}`,
               ],
               status: ['Sync Completed', 'grey'],
               details: ['View Details', `CCID: ${truncateAddress(item.ccid)}`],
               type: 'cctx',
+              paramKey: item.parameter_key,
               paramType: paramToSyncDict[item.parameter],
+              paramTypeRaw: item.parameter,
               sourceChain: item.source_chain,
               destinationChain: item.target_chain,
               ccid: item.ccid

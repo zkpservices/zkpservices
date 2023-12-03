@@ -573,6 +573,10 @@ export function splitTo24(str = '') {
 }
 
 export const removeMetadata = (data) => {
-  const { _metadata, ...rest } = data
-  return rest
+  if(data) {
+    const { _metadata, last_updated, ...rest } = data
+    return rest
+  } else {
+    return {}
+  }
 }

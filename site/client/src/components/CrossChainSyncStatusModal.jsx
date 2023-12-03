@@ -16,7 +16,6 @@ export function CrossChainSyncStatusModal({
 }) {
   const [isOpen, setIsOpen] = useState(open)
   const [status, setStatus] = useState('Incomplete')
-  const modifiedFieldData = isOpen ? removeMetadata(parameterValue[parameterKey]) : {}
 
   useEffect(() => {
     setIsOpen(open)
@@ -155,7 +154,7 @@ export function CrossChainSyncStatusModal({
                       rows={8}
                       readOnly
                       spellCheck="false"
-                      value={JSON.stringify(modifiedFieldData, null, 2)}
+                      value={parameterValue}
                     />
                   </div>
 
