@@ -276,6 +276,8 @@ export function Navigation(props) {
     // This effect will run after the component is mounted and rendered on the client
     // Here, you can set the initial button text based on the wallet and login state
     setLoginButtonText(loggedIn ? 'Logout' : 'Login')
+    if(!loggedIn)
+      localStorage.clear();
   }, [walletConnected, loggedIn])
 
   async function connectToMetaMask() {
@@ -305,6 +307,7 @@ export function Navigation(props) {
     const handleChainChanged = (_chainId) => {
       console.log(_chainId)
       setChainId(_chainId)
+      initializeWeb3();
     }
 
     if (metamaskAvailable) {

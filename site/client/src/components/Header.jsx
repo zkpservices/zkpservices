@@ -126,6 +126,8 @@ export const Header = forwardRef(function Header({ className }, ref) {
     // This effect will run after the component is mounted and rendered on the client
     // Here, you can set the initial button text based on the wallet and login state
     setLoginButtonText(loggedIn ? 'Logout' : 'Login')
+    if(!loggedIn)
+      localStorage.clear();
   }, [walletConnected, loggedIn])
 
   async function connectToMetaMask() {
@@ -172,6 +174,7 @@ export const Header = forwardRef(function Header({ className }, ref) {
     const handleChainChanged = (_chainId) => {
       console.log(_chainId)
       setChainId(_chainId)
+      initializeWeb3();
       if (loggedIn && walletConnected && !isOnboarding) {
         fetchUserDataFields()
       }

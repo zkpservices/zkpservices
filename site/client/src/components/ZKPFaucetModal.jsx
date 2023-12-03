@@ -35,33 +35,30 @@ export function ZKPFaucetModal({ open, showNotif, onClose }) {
   }
 
   useEffect(() => {
-    const contract =
-      chainId == 43113
-        ? fujiCoreContract
-        : chainId == 80001
-          ? mumbaiCoreContract
-          : chainId == 1440002
-            ? rippleCoreContract
-            : null
+    let isMounted = true; 
 
-    if (contract && balance === null) {
+    const contract =
+      chainId == 43113 ? fujiCoreContract :
+      chainId == 80001 ? mumbaiCoreContract :
+      chainId == 1440002 ? rippleCoreContract : null;
+
+    if (contract && isMounted && balance === null) {
       async function fetchInitialBalance() {
-        const initialBalance = await contract.methods
-          .balanceOf(userAddress)
-          .call()
-        setBalance(Number(initialBalance) / 10 ** 18)
+        try {
+          const initialBalance = await contract.methods.balanceOf(userAddress).call();
+          setBalance(Number(initialBalance) / 10 ** 18);
+        } catch (error) {
+          console.error("Error fetching balance:", error);
+        }
       }
-      fetchInitialBalance()
-      console.log(userAddress)
+      fetchInitialBalance();
     }
-  }, [
-    userAddress,
-    fujiCoreContract,
-    mumbaiCoreContract,
-    rippleCoreContract,
-    balance,
-    chainId,
-  ])
+
+    return () => {
+      isMounted = false; // Set the flag to false on unmount
+      if (!open) setBalance(null); // Clear balance when modal closes
+    };
+  }, [userAddress, fujiCoreContract, mumbaiCoreContract, rippleCoreContract, balance, chainId, open]);
 
   async function handleRequestTokens() {
     if (document.getElementById('submitButton')) {

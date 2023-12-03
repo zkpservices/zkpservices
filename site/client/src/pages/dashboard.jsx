@@ -11,7 +11,7 @@ import twoFAContractVRFABI from '../../public/contract_ABIs/ZKPServicesVRF2FA.js
 import twoFAContractGenericABI from '../../public/contract_ABIs/ZKPServicesGeneric2FA.json'
 import batchSignUpABI from '../../public/contract_ABIs/BatchSignUp.json'
 import Web3 from 'web3'
-import { HeroPattern } from '@/components/HeroPattern'
+import { Note } from '@/components/mdx'
 
 export function Dashboard() {
   const [tableData, setTableData] = useState({
@@ -70,7 +70,7 @@ export function Dashboard() {
   // walletConnected = true;
 
   const [showDashboard, setShowDashboard] = useState(
-<div class="min-h-screen"></div>
+    <div className="min-h-screen"></div>
   )
   const [usernameText, setUsernameText] = useState('')
   const [loginNotification, setLoginNotification] = useState(<></>)
@@ -175,12 +175,19 @@ export function Dashboard() {
   const showDashboardConditional = () => {
     if (typeof window !== undefined && !window.ethereum) {
       return (
-        <h2 className="text-center text-2xl tracking-tight my-48 text-center">
-          Web3 is not available on this device.
-          <br />
-          Our guide is available on all devices, but please connect somewhere
-          with Metamask available to use our dApp.
-        </h2>
+        <div className="my-48 mx-20 font-semibold">
+          <Note>
+            Web3 is not available on this device.
+            Our guide is available on all devices, but please connect somewhere
+            with Metamask available to use our dApp.
+          </Note>
+        </div>
+        // <h2 className="text-center text-2xl tracking-tight my-48 text-center">
+        //   Web3 is not available on this device.
+        //   <br />
+        //   Our guide is available on all devices, but please connect somewhere
+        //   with Metamask available to use our dApp.
+        // </h2>
       )
     } else if (
       walletConnected &&
@@ -189,16 +196,24 @@ export function Dashboard() {
       !isOnboarding
     ) {
       return (
-        <div className="flex justify-center my-48 text-center">
-          <h3 className="text-center text-2xl tracking-tight">
-            You are currently connected to a network (chain ID: {chainId}) that
-            has not been onboarded to this account.
-            <br />
-            <br />
-            Please swap to an onboarded chain and follow the onboarding process
-            for other required networks.
-          </h3>
+        <div className="my-48 mx-20 font-semibold items-center justify-center">
+          <Note>
+            You are currently connected to a network (chain ID: <span 
+            className="font-mono">{chainId})</span> that has not been onboarded 
+            to this account. Please swap to an onboarded chain and follow the 
+            onboarding process for other required networks.
+          </Note>
         </div>
+        // <div className="flex justify-center my-48 text-center">
+        //   <h3 className="text-center text-2xl tracking-tight">
+        //     You are currently connected to a network (chain ID: {chainId}) that
+        //     has not been onboarded to this account.
+        //     <br />
+        //     <br />
+        //     Please swap to an onboarded chain and follow the onboarding process
+        //     for other required networks.
+        //   </h3>
+        // </div>
       )
     }
     if (walletConnected && loggedIn) {
@@ -209,10 +224,10 @@ export function Dashboard() {
       )
     } else {
       return (
-        <div className="flex justify-center my-48 text-center">
-          <h2 className="text-center text-3xl font-bold tracking-tight">
-            Please connect your wallet and log in to get started.
-          </h2>
+        <div className="my-48 mx-20 font-semibold items-center justify-center">
+          <Note>
+            Please connect your wallet AND login to get started.
+          </Note>
         </div>
       )
     }
