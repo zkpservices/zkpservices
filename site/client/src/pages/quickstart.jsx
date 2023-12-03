@@ -16,6 +16,7 @@ import twoFAContractVRFABI from '../../public/contract_ABIs/ZKPServicesVRF2FA.js
 import twoFAContractGenericABI from '../../public/contract_ABIs/ZKPServicesGeneric2FA.json'
 import batchSignUpABI from '../../public/contract_ABIs/BatchSignUp.json'
 import { Notification } from '@/components/Notification'
+import { Note } from '@/components/mdx'
 
 const chains = {
   fuji: 43113,
@@ -398,14 +399,21 @@ export default function Quickstart() {
   }
 
   const showQuickstartConditional = () => {
-    if (!metamaskAvailable) {
+    if (typeof window !== undefined && !window.ethereum) {
       return (
-        <h2 className="my-48 text-center text-2xl tracking-tight">
-          Web3 is not available on this device.
-          <br />
-          Our guide is available on all devices, but please connect somewhere
-          with Metamask available to use our dApp.
-        </h2>
+        <div className="my-48 mx-20 font-semibold">
+          <Note>
+            Web3 is not available on this device.
+            Our guide is available on all devices, but please connect somewhere
+            with Metamask available to use our dApp.
+          </Note>
+        </div>
+        // <h2 className="my-48 text-center text-2xl tracking-tight">
+        //   Web3 is not available on this device.
+        //   <br />
+        //   Our guide is available on all devices, but please connect somewhere
+        //   with Metamask available to use our dApp.
+        // </h2>
       )
     } else if (!walletConnected) {
       return (

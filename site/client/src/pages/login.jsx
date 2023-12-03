@@ -54,7 +54,7 @@ export default function Login() {
 
   const router = useRouter()
   const showLoginHeader = () => {
-    if (!metamaskAvailable) {
+    if (typeof window !== undefined && !window.ethereum) {
       return (
         <h2 className="mt-10 text-center text-2xl tracking-tight">
           Web3 is not available on this device.
@@ -233,7 +233,7 @@ export default function Login() {
         onClose={badLoginNotifClose}
       />
       <div className="max-w-none">
-        <div className="flex min-h-full items-center justify-center pb-32 pt-6 sm:px-6 lg:px-8">
+        <div className="flex min-h-full items-center justify-center pb-20 pt-6 sm:px-6 lg:px-8">
           <div className="w-full max-w-md space-y-8">
             <div>
               <Logo className="mx-20" />

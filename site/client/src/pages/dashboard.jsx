@@ -173,9 +173,9 @@ export function Dashboard() {
   }, [walletConnected, userAddress, metamaskAvailable, loggedIn]);
 
   const showDashboardConditional = () => {
-    if (!metamaskAvailable) {
+    if (typeof window !== undefined && !window.ethereum) {
       return (
-        <h2 className="mt-10 text-center text-2xl tracking-tight my-48 text-center">
+        <h2 className="text-center text-2xl tracking-tight my-48 text-center">
           Web3 is not available on this device.
           <br />
           Our guide is available on all devices, but please connect somewhere
