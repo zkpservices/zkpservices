@@ -3,13 +3,20 @@ export const description =
 
 # User Data
 
-User data is the foundation of the zkp.services solution. On this page, we'll dive into the API requests that our dApp makes with our backend API to control your data securely. {{ className: 'lead' }}
+User data is the foundation of the zkp.services solution. On this page, we will dive into the API requests that our
+ dApp makes to the backend API to manage your data securely. Our serverless dApp frontend also allows you to 
+ specify your own custom URL for your data provider. In order to interact with the protocol through this particular
+ frontend, the data source needs to be compliant with these API guidelines and the custom URL needs to be specified
+ when logging in. {{ className: 'lead' }} 
 
 ## The structure of user data
 
-Our data model is an extremely versatile JSON object that gives way to endless data points a user can store for countless different services. As such, below, we will provide an example of a potential data structure for user data, but note that none of the fields in the data object are specifically required.
+Our data model is an extremely versatile JSON object that gives way to endless data points a user can store for
+ countless different services. As such, below, we will provide an example of a potential data structure for user
+  data, but note that none of the fields in the data object are specifically required.
+We will support other data and object types in the future.
 
-### Properties
+### Properties of JSON object
 
 <Properties>
   <Property name="id" type="string">
@@ -25,7 +32,8 @@ Our data model is an extremely versatile JSON object that gives way to endless d
     The smart contract password associated with the user.
   </Property>
   <Property name="chain_data" type="JSON Object[]">
-    JSON object containing the entire dataset for a specific user, where each chain ID they have onboarded to is a child of this object.
+    JSON object containing the entire dataset for a specific user, where each
+    chain ID they have onboarded to is a child of this object.
   </Property>
 </Properties>
 
@@ -69,12 +77,12 @@ Our data model is an extremely versatile JSON object that gives way to endless d
   </Col>
   <Col sticky>
 
-    <CodeGroup title="Request" tag="GET" label="/v1/contacts">
+    <CodeGroup title="Request" tag="POST" label="/userdata">
 
     ```bash {{ title: 'cURL' }}
     curl --location 'https://api.zkp.services/userdata' \
     --header 'Content-Type: application/json' \
-    --data '{    
+    --data '{
           "id": "0x84713a3a001E2157d134B97C59D6bdAb351dd69d",
           "action": "get_item",
           "password": "abc123",
@@ -139,7 +147,7 @@ Our data model is an extremely versatile JSON object that gives way to endless d
     $headers.Add("Content-Type", "application/json")
 
     $body = @"
-    {    
+    {
           `"id`": `"0xd7b250aa0c88def87cb6b92b6d40b5b52ab3507e`",
           `"action`": `"get_item`",
           `"password`": `"abc123`",
@@ -201,12 +209,11 @@ Our data model is an extremely versatile JSON object that gives way to endless d
 
 
     </Properties>
-    
 
   </Col>
   <Col sticky>
 
-    <CodeGroup title="Request" tag="POST" label="/v1/contacts">
+    <CodeGroup title="Request" tag="POST" label="/userdata">
 
     ```bash {{ title: 'cURL' }}
     curl --location 'https://api.zkp.services/userdata' \
@@ -262,9 +269,9 @@ Our data model is an extremely versatile JSON object that gives way to endless d
     });
 
 $.ajax(settings).done(function (response) {
-  console.log(response);
+console.log(response);
 });
-    ```
+```
 
     ```python
     import requests
@@ -373,7 +380,7 @@ $.ajax(settings).done(function (response) {
     ```bash {{ title: 'cURL' }}
     curl --location --request PUT 'https://api.zkp.services/userdata' \
     --header 'Content-Type: application/json' \
-    --data '{    
+    --data '{
           "id": "0x84713a3a001E2157d134B97C59D6bdAb351dd69d",
           "action": "update_item",
           "password": "abc123",
@@ -444,7 +451,7 @@ $.ajax(settings).done(function (response) {
     $headers.Add("Content-Type", "application/json")
 
     $body = @"
-    {    
+    {
           `"id`": `"0xd7b250aa0c88def87cb6b92b6d40b5b52ab3507e`",
           `"action`": `"update_item`",
           `"password`": `"abc123`",
@@ -460,6 +467,7 @@ $.ajax(settings).done(function (response) {
     $response = Invoke-RestMethod 'https://api.zkp.services/userdata' -Method 'PUT' -Headers $headers -Body $body
     $response | ConvertTo-Json
     ```
+
   </CodeGroup>
       ```json {{ title: 'Response' }}
       {
@@ -619,12 +627,12 @@ $.ajax(settings).done(function (response) {
   </Col>
   <Col sticky>
 
-    <CodeGroup title="Request" tag="PUT" label="/userdata">
+    <CodeGroup title="Request" tag="POST" label="/userdata">
 
     ```bash {{ title: 'cURL' }}
     curl --location 'https://api.zkp.services/userdata' \
     --header 'Content-Type: application/json' \
-    --data '{    
+    --data '{
           "id": "0x84713a3a001E2157d134B97C59D6bdAb351dd69d",
           "action": "login",
           "password": "pop",
@@ -680,7 +688,7 @@ $.ajax(settings).done(function (response) {
     $headers.Add("Content-Type", "application/json")
 
     $body = @"
-    {    
+    {
           `"id`": `"0xd7b250aa0c88def87cb6b92b6d40b5b52ab3507e`",
           `"action`": `"login`",
           `"password`": `"pop`",
@@ -732,7 +740,7 @@ $.ajax(settings).done(function (response) {
   </Col>
   <Col sticky>
 
-    <CodeGroup title="Request" tag="PUT" label="/userdata">
+    <CodeGroup title="Request" tag="POST" label="/userdata">
 
     ```bash {{ title: 'cURL' }}
     curl --location 'https://api.zkp.services/userdata' \
@@ -763,42 +771,43 @@ $.ajax(settings).done(function (response) {
     ```
 
     ```js
+
 var settings = {
-  "url": "https://api.zkp.services/userdata",
-  "method": "POST",
-  "timeout": 0,
-  "headers": {
-    "Content-Type": "application/json"
-  },
-  "data": JSON.stringify({
-    "id": "0x84713a3a001E2157d134B97C59D6bdAb351dd69d",
-    "action": "add_request",
-    "password": "abc123",
-    "request": {
-      "requestID": "20716965315651526627121156873417490254946957749778301596059776852466841093871",
-      "address_sender": "0x84713a3a001E2157d134B97C59D6bdAb351dd69d",
-      "address_receiver": "0x84713a3a001E2157d134B97C59D6bdAb351dd69d",
-      "attach_token": false,
-      "key": "49|imnkx;!9k{9YLMaPR(]eY",
-      "chainID": "0xa869",
-      "operation": "update",
-      "field": "medical data",
-      "updated_data": {
-        "blood type": "AB"
-      },
-      "limit": "86400",
-      "require2FA": false,
-      "response_fee": "10",
-      "timestamp": "1701715461439",
-      "twoFARequestID": ""
-    }
-  }),
+"url": "https://api.zkp.services/userdata",
+"method": "POST",
+"timeout": 0,
+"headers": {
+"Content-Type": "application/json"
+},
+"data": JSON.stringify({
+"id": "0x84713a3a001E2157d134B97C59D6bdAb351dd69d",
+"action": "add_request",
+"password": "abc123",
+"request": {
+"requestID": "20716965315651526627121156873417490254946957749778301596059776852466841093871",
+"address_sender": "0x84713a3a001E2157d134B97C59D6bdAb351dd69d",
+"address_receiver": "0x84713a3a001E2157d134B97C59D6bdAb351dd69d",
+"attach_token": false,
+"key": "49|imnkx;!9k{9YLMaPR(]eY",
+"chainID": "0xa869",
+"operation": "update",
+"field": "medical data",
+"updated_data": {
+"blood type": "AB"
+},
+"limit": "86400",
+"require2FA": false,
+"response_fee": "10",
+"timestamp": "1701715461439",
+"twoFARequestID": ""
+}
+}),
 };
 
 $.ajax(settings).done(function (response) {
-  console.log(response);
+console.log(response);
 });
-    ```
+```
 
     ```python
     import requests
@@ -913,7 +922,7 @@ $.ajax(settings).done(function (response) {
   </Col>
   <Col sticky>
 
-    <CodeGroup title="Request" tag="PUT" label="/userdata">
+    <CodeGroup title="Request" tag="POST" label="/userdata">
 
     ```bash {{ title: 'cURL' }}
     curl --location 'https://api.zkp.services/userdata' \
@@ -1090,12 +1099,12 @@ $.ajax(settings).done(function (response) {
   </Col>
   <Col sticky>
 
-    <CodeGroup title="Request" tag="POST" label="/v1/contacts">
+    <CodeGroup title="Request" tag="POST" label="/userdata">
 
     ```bash {{ title: 'cURL' }}
     curl --location 'https://api.zkp.services/userdata' \
     --header 'Content-Type: application/json' \
-    --data '{    
+    --data '{
           "id": "0x84713a3a001E2157d134B97C59D6bdAb351dd69d",
           "action": "get_dashboard",
           "password": "abc123",
@@ -1150,7 +1159,7 @@ $.ajax(settings).done(function (response) {
     $headers.Add("Content-Type", "application/json")
 
     $body = @"
-    {    
+    {
           `"id`": `"0xce231517da5940e0880c6a2062255640916016ba`",
           `"action`": `"get_dashboard`",
           `"password`": `"abc123`",
@@ -1202,12 +1211,12 @@ $.ajax(settings).done(function (response) {
   </Col>
   <Col sticky>
 
-    <CodeGroup title="Request" tag="POST" label="/v1/contacts">
+    <CodeGroup title="Request" tag="POST" label="/userdata">
 
     ```bash {{ title: 'cURL' }}
     curl --location 'https://api.zkp.services/userdata' \
     --header 'Content-Type: application/json' \
-    --data '{    
+    --data '{
           "id": "0x84713a3a001E2157d134B97C59D6bdAb351dd69d",
           "action": "get_available_dashboard",
           "password": "abc123",
@@ -1262,7 +1271,7 @@ $.ajax(settings).done(function (response) {
     $headers.Add("Content-Type", "application/json")
 
     $body = @"
-    {    
+    {
           `"id`": `"0xc6165a271f5cb5960c4554a8b44fcf3c75fa7f6c`",
           `"action`": `"get_available_dashboard`",
           `"password`": `"abc123`",
@@ -1317,12 +1326,12 @@ $.ajax(settings).done(function (response) {
   </Col>
   <Col sticky>
 
-    <CodeGroup title="Request" tag="POST" label="/v1/contacts">
+    <CodeGroup title="Request" tag="POST" label="/userdata">
 
     ```bash {{ title: 'cURL' }}
     curl --location 'https://api.zkp.services/userdata' \
     --header 'Content-Type: application/json' \
-    --data '{    
+    --data '{
           "id": "0x84713a3a001E2157d134B97C59D6bdAb351dd69d",
           "action": "add_to_dashboard",
           "password": "abc123",
@@ -1380,7 +1389,7 @@ $.ajax(settings).done(function (response) {
     $headers.Add("Content-Type", "application/json")
 
     $body = @"
-    {    
+    {
           `"id`": `"0xc6165a271f5cb5960c4554a8b44fcf3c75fa7f6c`",
           `"action`": `"add_to_dashboard`",
           `"password`": `"abc123`",
@@ -1435,12 +1444,12 @@ $.ajax(settings).done(function (response) {
   </Col>
   <Col sticky>
 
-    <CodeGroup title="Request" tag="POST" label="/v1/contacts">
+    <CodeGroup title="Request" tag="DELETE" label="/userdata">
 
     ```bash {{ title: 'cURL' }}
     curl --location --request DELETE 'https://api.zkp.services/userdata' \
     --header 'Content-Type: application/json' \
-    --data '{    
+    --data '{
           "id": "0x84713a3a001E2157d134B97C59D6bdAb351dd69d",
           "action": "remove_from_dashboard",
           "password": "abc123",
@@ -1498,7 +1507,7 @@ $.ajax(settings).done(function (response) {
     $headers.Add("Content-Type", "application/json")
 
     $body = @"
-    {    
+    {
           `"id`": `"0xc6165a271f5cb5960c4554a8b44fcf3c75fa7f6c`",
           `"action`": `"remove_from_dashboard`",
           `"password`": `"abc123`",
@@ -1559,7 +1568,7 @@ $.ajax(settings).done(function (response) {
   </Col>
   <Col sticky>
 
-    <CodeGroup title="Request" tag="POST" label="/v1/contacts">
+    <CodeGroup title="Request" tag="POST" label="/userdata">
 
     ```bash {{ title: 'cURL' }}
     curl --location 'https://api.zkp.services/userdata' \
@@ -1686,12 +1695,12 @@ $.ajax(settings).done(function (response) {
   </Col>
   <Col sticky>
 
-    <CodeGroup title="Request" tag="POST" label="/v1/contacts">
+    <CodeGroup title="Request" tag="POST" label="/userdata">
 
     ```bash {{ title: 'cURL' }}
     curl --location 'https://api.zkp.services/userdata' \
     --header 'Content-Type: application/json' \
-    --data '{    
+    --data '{
           "id": "0x84713a3a001E2157d134B97C59D6bdAb351dd69d",
           "action": "get_crosschain_transaction",
           "password": "pop",
@@ -1746,7 +1755,7 @@ $.ajax(settings).done(function (response) {
     $headers.Add("Content-Type", "application/json")
 
     $body = @"
-    {    
+    {
           `"id`": `"0xd7b250aa0c88def87cb6b92b6d40b5b52ab3507e`",
           `"action`": `"get_crosschain_transaction`",
           `"password`": `"pop`",
@@ -1797,7 +1806,7 @@ $.ajax(settings).done(function (response) {
   </Col>
   <Col sticky>
 
-    <CodeGroup title="Request" tag="POST" label="/v1/contacts">
+    <CodeGroup title="Request" tag="POST" label="/userdata">
 
     ```bash {{ title: 'cURL' }}
     curl --location 'https://api.zkp.services/userdata' \
@@ -1908,7 +1917,7 @@ $.ajax(settings).done(function (response) {
   </Col>
   <Col sticky>
 
-    <CodeGroup title="Request" tag="POST" label="/v1/contacts">
+    <CodeGroup title="Request" tag="POST" label="/userdata">
 
     ```bash {{ title: 'cURL' }}
     curl --location 'https://api.zkp.services/userdata' \
@@ -2023,7 +2032,7 @@ $.ajax(settings).done(function (response) {
   </Col>
   <Col sticky>
 
-    <CodeGroup title="Request" tag="POST" label="/v1/contacts">
+    <CodeGroup title="Request" tag="POST" label="/userdata">
 
     ```bash {{ title: 'cURL' }}
     curl --location 'https://api.zkp.services/userdata' \
@@ -2141,12 +2150,12 @@ $.ajax(settings).done(function (response) {
   </Col>
   <Col sticky>
 
-    <CodeGroup title="Request" tag="POST" label="/v1/contacts">
+    <CodeGroup title="Request" tag="POST" label="/userdata">
 
     ```bash {{ title: 'cURL' }}
     curl --location 'https://api.zkp.services/userdata' \
     --header 'Content-Type: application/json' \
-    --data '{    
+    --data '{
           "id": "0x84713a3a001E2157d134B97C59D6bdAb351dd69d",
           "action": "get_chain_data",
           "password": "pop",
@@ -2201,7 +2210,7 @@ $.ajax(settings).done(function (response) {
     $headers.Add("Content-Type", "application/json")
 
     $body = @"
-    {    
+    {
           `"id`": `"0xd7b250aa0c88def87cb6b92b6d40b5b52ab3507e`",
           `"action`": `"get_chain_data`",
           `"password`": `"pop`",
@@ -2214,6 +2223,10 @@ $.ajax(settings).done(function (response) {
     ```
 
     </CodeGroup>
+
+    ```text {{ title: 'Response' }}
+    "{"props": {"2fa_password": "pop", "contract_password": "pop", "onboarded_chains": ["0x13881", "0xa869"], "rsa_enc_pub_key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAo5uuPoztcZVMV0jr2Rw5rxqUFQ+C+l8v5tgJpKIkC0A2GpVviee70JsPD2wZjBB80HliBJPuzKtk/fapHO3W2udJAzWvPJN20Tj4NdxIIaB+ymOwVKFP1JIivTwqx0f13vBXuke2YcBT9zv4dyz8mH4UVNNxssPXSi02Ajp+MPjSR2FI+Le8frXvVyAF8HkQgoFW+3Tlw/fRyIW54zx353pmDRDFLhCsNA2a91abYyt/RmklkWVjz+i2d9Je6OnA9lTO7OWWx0tIDCIdEN6z6Qdiu87+cBlUDOA0jb/Il+atEQ6Rrb8CKHTGH4ZCdN7sx/fscPYGMmkb5d/ofAWWsQIDAQAB====", "rsa_sign_pub_key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnaGT6fhjMCWIL1KIp2V0Z0sXGO9qqDxvgUDOmA4wCoOK2h2mIAMLJ0BYRySykpBk9k3eYGSPkCihYz1xW4yIWwsNSlk8wqQ3NeiY/3dDl2yeoXlIX6+TDpPrtOVRI35k2ydVDja9vov227qiaOc/xSSfc3WLQY6/spFRjLPJkAdJF6ZXlKaJ2SgQrNME9qYNCp7/KzdMTpAn+waEfGBwzDNxqgFslUg0ZYNtTtkmOieFsigxYjSvl/RoQKk45leRQLlDYm6Hmw3EnsRgFRLSE3eMVqguQeUbACGP1CnzS43GdUo8MS956WRUXedKlPiW8n15p6w7Rt+NTlZzu0jX1QIDAQAB====", "public_info": "Mi chiamo Ploppini, il sono cane del tartufo"}}"
+    ```
 
   </Col>
 </Row>
