@@ -1,7 +1,7 @@
 import { Fragment, useRef, useState, useEffect } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
-import { removeMetadata } from './HelperCalls'
+import { removeMetadata, flattenJsonAndComputeHash } from './HelperCalls'
 import {
   autocompletion,
   closeBrackets,
@@ -54,11 +54,11 @@ export function ReceivedDataResponseModal({
   responseFee = '',
 }) {
 
-  const modifiedFieldData = open ? removeMetadata(JSON.parse(dataSnapshot)[fieldRequested]) : {}
-
   const editorContainerRef = useRef(null);
   const [editorView, setEditorView] = useState(null);
   const [isEditorReady, setIsEditorReady] = useState(false);
+  const [modifiedFieldData, setModifiedFieldData] = useState({});
+  let [modifiedDataHash, setDataHash] = useState("");
 
   const borderTheme = EditorView.theme({
     '.cm-editor': { 'border-radius': '0.375rem' },
@@ -71,13 +71,27 @@ export function ReceivedDataResponseModal({
   const currentTheme = document.documentElement.classList.contains('dark') ? tokyoNight : tokyoNightDay;
 
   useEffect(() => {
+    if (open) {
+      setModifiedFieldData(removeMetadata(JSON.parse(dataSnapshot)[fieldRequested]));
+      setDataHash("");
+
+      const timer = setTimeout(() => setIsEditorReady(true), 50);
+      return () => clearTimeout(timer);
+    } else {
+      if (editorView) {
+        editorView.destroy();
+      }
+      setIsEditorReady(false);
+      setEditorView(null);
+      setDataHash(""); 
+      setModifiedFieldData({}); 
+    }
+  }, [open, dataSnapshot, fieldRequested]);
+
+  useEffect(() => {
     if (open && !editorView && isEditorReady) {
       const newState = EditorState.create({
-        doc: JSON.stringify(
-                          modifiedFieldData,
-                          null,
-                          2,
-                        ),
+        doc: JSON.stringify(modifiedFieldData, null, 2),
         extensions: [
           lineNumbers(),
           highlightActiveLineGutter(),
@@ -116,9 +130,6 @@ export function ReceivedDataResponseModal({
         parent: editorContainerRef.current,
       });
 
-      console.log(view.state.doc.toString());
-      console.log(JSON.parse(view.state.doc.toString()));
-
       setEditorView(view);
     }
 
@@ -127,20 +138,23 @@ export function ReceivedDataResponseModal({
         editorView.destroy();
       }
     };
-  }, [open, isEditorReady]);
+  }, [open, isEditorReady, modifiedFieldData]);
 
   useEffect(() => {
-    if (open) {
-      const timer = setTimeout(() => setIsEditorReady(true), 50);
-      return () => clearTimeout(timer);
-    } else {
-      if(editorView){
-        editorView.destroy();
+    const hashData = async () => {
+      try {
+        let dataWithFieldKey = {[fieldRequested]: modifiedFieldData};
+        let res = await flattenJsonAndComputeHash(JSON.stringify(dataWithFieldKey));
+        setDataHash(res.rootHash);
+      } catch (error) {
+        console.error('Error fetching data:', error);
       }
-      setIsEditorReady(false);
-      setEditorView(null);
+    };
+
+    if (open && modifiedFieldData && Object.keys(modifiedFieldData).length > 0) {
+      hashData();
     }
-  }, [open]);  
+  }, [open, modifiedFieldData, fieldRequested]);
 
   return (
     <Transition.Root show={open} as={Fragment}>
@@ -264,6 +278,23 @@ export function ReceivedDataResponseModal({
                       spellCheck="false"
                       value={JSON.stringify(modifiedFieldData, null, 2)}
                     /> */}
+                  </div>
+
+                  <div className="mt-4">
+                    <label
+                      htmlFor="modifiedDataHash"
+                      className="block text-sm font-medium leading-5 text-gray-900 dark:text-white"
+                    >
+                      Root Hash (SHA256 of flattened JSON):
+                    </label>
+                    <textarea
+                      id="modifiedDataHash"
+                      className="font-mono relative mt-1 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 dark:focus:border-emerald-500 sm:text-sm"
+                      rows={1}
+                      readOnly
+                      spellCheck="false"
+                      value={modifiedDataHash}
+                    />
                   </div>
 
                   <hr className="my-4 border-gray-300 dark:border-gray-700" />

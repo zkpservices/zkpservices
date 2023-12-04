@@ -19,31 +19,60 @@ Below is a step-by-step guide on how to use each service, which includes:
 
 Before you get started, here are all the values you will need to Request Data:
 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Styled MDX Table</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            font-family: Arial, sans-serif;
+        }
+
+        th, td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        td b {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
 <table>
-  <tr>
-    <th>VALUE</th>
-    <th>DESCRIPTION</th>
-  </tr>
-  <tr>
-    <td><b>Request</b></td>
-    <td>This is the data you want to request.</td>
-  </tr>
-  <tr>
-    <td><b>Key</b></td>
-    <td>A secure key to help decrypt data once you receive it.</td>
-  </tr>
-  <tr>
-    <td><b>Time Limit</b></td>
-    <td>Time in seconds before the recipient must respond to your data request.</td>
-  </tr>
-  <tr>
-    <td><b>2FA Information (optional)</b></td>
-    <td>If you want added security, you can make it so that the responder has to undergo a 2FA requirement before responding.</td>
-  </tr>
-  <tr>
-    <td><b>Response fee</b></td>
-    <td>A data request will cost 10 ZKP tokens by default. If you require more ZKP tokens from whom you request data, increase the number.</td>
-  </tr>
+    <tr>
+        <th>VALUE</th>
+        <th>DESCRIPTION</th>
+    </tr>
+    <tr>
+        <td><b>Request</b></td>
+        <td>This is the data you want to request.</td>
+    </tr>
+    <tr>
+        <td><b>Key</b></td>
+        <td>A secure key to help decrypt data once you receive it.</td>
+    </tr>
+    <tr>
+        <td><b>Time Limit</b></td>
+        <td>Time in seconds before the recipient must respond to your data request.</td>
+    </tr>
+    <tr>
+        <td><b>2FA Information (optional)</b></td>
+        <td>If you want added security, you can make it so that the responder has to undergo a 2FA requirement before responding.</td>
+    </tr>
+    <tr>
+        <td><b>Response fee</b></td>
+        <td>A data request will cost 10 ZKP tokens by default. If you require more ZKP tokens from whom you request data, increase the number.</td>
+    </tr>
 </table>
 
 ### STEP 1: Initiate a data request.

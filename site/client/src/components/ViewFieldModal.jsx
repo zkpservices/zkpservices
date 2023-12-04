@@ -35,7 +35,7 @@ import { json } from '@codemirror/lang-json'
 import { abcdef } from '@uiw/codemirror-theme-abcdef'
 import { tokyoNight } from '@uiw/codemirror-theme-tokyo-night'
 import { tokyoNightDay } from '@uiw/codemirror-theme-tokyo-night-day'
-import { removeMetadata } from './HelperCalls'
+import { removeMetadata, flattenJsonAndComputeHash } from './HelperCalls'
 
 export function ViewFieldModal({
   title,
@@ -49,10 +49,11 @@ export function ViewFieldModal({
   obfuscationSalt = 'Default obfuscation salt',
   saltHash = 'Salt hash',
 }) {
-
   const editorContainerRef = useRef(null);
   const [editorView, setEditorView] = useState(null);
   const [isEditorReady, setIsEditorReady] = useState(false);
+  const [modifiedFieldData, setModifiedFieldData] = useState({});
+  let [modifiedDataHash, setDataHash] = useState("");
 
   const borderTheme = EditorView.theme({
     '.cm-editor': { 'border-radius': '0.375rem' },
@@ -65,13 +66,26 @@ export function ViewFieldModal({
   const currentTheme = document.documentElement.classList.contains('dark') ? tokyoNight : tokyoNightDay;
 
   useEffect(() => {
+    if (open) {
+      setModifiedFieldData(removeMetadata(fieldData[fieldName]));
+      setDataHash(""); 
+
+      const timer = setTimeout(() => setIsEditorReady(true), 50);
+      return () => clearTimeout(timer);
+    } else {
+      if (editorView) {
+        editorView.destroy();
+        setEditorView(null);
+      }
+      setIsEditorReady(false);
+      setModifiedFieldData({}); 
+    }
+  }, [open, fieldData, fieldName]);
+
+  useEffect(() => {
     if (open && !editorView && isEditorReady) {
       const newState = EditorState.create({
-        doc: JSON.stringify(
-                          modifiedFieldData,
-                          null,
-                          2,
-                        ),
+        doc: JSON.stringify(modifiedFieldData, null, 2),
         extensions: [
           lineNumbers(),
           highlightActiveLineGutter(),
@@ -110,9 +124,6 @@ export function ViewFieldModal({
         parent: editorContainerRef.current,
       });
 
-      console.log(view.state.doc.toString());
-      console.log(JSON.parse(view.state.doc.toString()));
-
       setEditorView(view);
     }
 
@@ -121,27 +132,27 @@ export function ViewFieldModal({
         editorView.destroy();
       }
     };
-  }, [open, isEditorReady]);
+  }, [open, isEditorReady, modifiedFieldData]);
 
   useEffect(() => {
-    if (open) {
-      const timer = setTimeout(() => setIsEditorReady(true), 50);
-      return () => clearTimeout(timer);
-    } else {
-      if(editorView){
-        editorView.destroy();
+    const hashData = async () => {
+      try {
+        let dataWithFieldKey = {[fieldName]: modifiedFieldData};
+        let res = await flattenJsonAndComputeHash(JSON.stringify(dataWithFieldKey));
+        setDataHash(res.rootHash);
+      } catch (error) {
+        console.error('Error fetching data:', error);
       }
-      setIsEditorReady(false);
-      setEditorView(null);
+    };
+
+    if (open && modifiedFieldData && Object.keys(modifiedFieldData).length > 0) {
+      hashData();
     }
-  }, [open]);  
+  }, [open, modifiedFieldData, fieldName]);
 
   async function handleDelete() {
-    onDelete(title.toLowerCase())
+    onDelete(title.toLowerCase());
   }
-
-
-  const modifiedFieldData = open ? removeMetadata(fieldData[fieldName]) : {}
 
   return (
     <Transition.Root show={open} as={Fragment}>
@@ -241,7 +252,7 @@ export function ViewFieldModal({
                         </div>
                         <div className="mb-2">
                           <label
-                            htmlFor="dataHash"
+                            htmlFor="modifiedDataHash"
                             className="block text-sm font-medium leading-6 text-gray-900 dark:text-white"
                           >
                             Data Hash:
@@ -250,7 +261,7 @@ export function ViewFieldModal({
                             rows={1}
                             id="dataHash"
                             className="font-mono relative mt-1 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 dark:focus:border-emerald-500 sm:text-sm"
-                            defaultValue={dataHash}
+                            defaultValue={modifiedDataHash}
                             readOnly
                           />
                         </div>
