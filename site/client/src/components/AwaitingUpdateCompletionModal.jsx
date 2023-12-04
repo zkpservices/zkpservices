@@ -40,7 +40,7 @@ export function AwaitingUpdateCompletionModal({
   open,
   onClose,
   requestID = '',
-  addressOfSendingParty = '',
+  addressOfReceivingParty = '',
   fieldToUpdate = '',
   snapshotAfterUpdate = '',
   oneTimeKey = '',
@@ -209,18 +209,18 @@ export function AwaitingUpdateCompletionModal({
 
                   <div className="mt-4">
                     <label
-                      htmlFor="addressOfSendingParty"
+                      htmlFor="addressOfReceivingParty"
                       className="block text-sm font-medium leading-5 text-gray-900 dark:text-white"
                     >
-                      Address of Sending Party:
+                      Address of Receiving Party:
                     </label>
                     <textarea
-                      id="addressOfSendingParty"
+                      id="addressOfReceivingParty"
                       className="font-mono relative mt-1 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 dark:focus:border-emerald-500 sm:text-sm"
                       rows={1}
                       readOnly
                       spellCheck="false"
-                      value={addressOfSendingParty}
+                      value={addressOfReceivingParty}
                     />
                   </div>
 

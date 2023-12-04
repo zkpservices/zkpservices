@@ -8,7 +8,6 @@ import { Layout } from '@/components/Layout'
 import * as mdxComponents from '@/components/mdx'
 import { useMobileNavigationStore } from '@/components/MobileNavigation'
 import { Analytics } from '@vercel/analytics/react';
-import { SpeedInsights } from '@vercel/speed-insights/next';
 
 import '@/styles/tailwind.css'
 import 'focus-visible'
@@ -53,7 +52,6 @@ export default function App({ Component, pageProps }) {
           <Layout {...pageProps}>
             <Component {...pageProps} />
             <Analytics />
-            <SpeedInsights />
           </Layout>
         </MDXProvider>
       </GlobalProvider>

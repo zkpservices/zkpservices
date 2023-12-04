@@ -51,7 +51,7 @@ export function History({ tableData = {}, showRefresh = true, handleRefresh }) {
     requestID: '',
     addressSender: '',
     data: {},
-    addressSender: '',
+    addressReceiver: '',
     salt: '',
     limit: '',
     key: '',
@@ -552,7 +552,7 @@ export function History({ tableData = {}, showRefresh = true, handleRefresh }) {
         open={showAwaitingDataModal}
         onClose={closeAwaitingDataModal}
         requestID={selectedRowData.requestID}
-        addressOfSendingParty={selectedRowData.addressSender}
+        addressOfReceivingParty={selectedRowData.addressReceiver}
         fieldRequested={selectedRowData.field[0]}
         oneTimeKey={selectedRowData.key}
         oneTimeSalt={selectedRowData.salt}
@@ -567,7 +567,7 @@ export function History({ tableData = {}, showRefresh = true, handleRefresh }) {
         open={showAwaitingUpdateModal}
         onClose={closeAwaitingUpdateModal}
         requestID={selectedRowData.requestID}
-        addressOfSendingParty={selectedRowData.addressSender}
+        addressOfReceivingParty={selectedRowData.addressReceiver}
         fieldToUpdate={selectedRowData.field[0]}
         snapshotAfterUpdate={JSON.stringify(selectedRowData.data, null, 2)}
         oneTimeKey={selectedRowData.key}

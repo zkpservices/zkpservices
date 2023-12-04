@@ -176,7 +176,7 @@ export function DashboardContext() {
       return {
         operation: [
           operationText,
-          `From: ${truncateAddress(item.address_sender)}`,
+          (hasMatchingResponse && item.operation == "update" ? "By: " : "From: ") + truncateAddress(item.address_sender),
         ],
         field: [item.field, truncateAddress(item.address_receiver)],
         status: hasMatchingResponse
@@ -193,7 +193,7 @@ export function DashboardContext() {
         requestID: item.requestID,
         addressSender: item.address_sender,
         data: item.operation === 'update' ? item.updated_data : item.data,
-        addressSender: item.address_sender,
+        addressReceiver: item.address_receiver,
         salt: item.salt,
         limit: item.limit,
         key: item.key,
@@ -213,7 +213,7 @@ export function DashboardContext() {
           operationText,
           `From: ${truncateAddress(item.address_sender)}`,
         ],
-        field: [item.field, truncateAddress(item.address_sender)],
+        field: [item.field, ` Owner: ${truncateAddress(item.address_sender)}`],
         status: ['Show Response', 'grey'],
         details: ['View Details', `ID: ${truncateAddress(item.responseID)}`],
         type:
@@ -221,6 +221,7 @@ export function DashboardContext() {
             ? 'incoming_response_update'
             : 'incoming_response_get',
         addressSender: item.address_sender,
+        addressReceiver: item.address_receiver,
         requestID: item.responseID,
         data: item.operation === 'update' ? item.updated_data : item.data,
         salt: item.salt,
@@ -265,7 +266,7 @@ export function DashboardContext() {
         requestID: item.requestID,
         addressSender: item.address_sender,
         data: item.operation === 'update' ? item.updated_data : item.data,
-        addressSender: item.address_sender,
+        addressReceiver: item.address_receiver,
         salt: item.salt,
         limit: item.limit,
         key: item.key,
@@ -282,7 +283,7 @@ export function DashboardContext() {
         item.operation === 'update' ? 'Update Completed' : 'Data Sent'
       return {
         operation: [operationText, `By you`],
-        field: [item.field, 'For: ' + truncateAddress(item.address_sender)],
+        field: [item.field, item.operation === 'update' ? truncateAddress(item.address_sender): 'To: ' + truncateAddress(item.address_receiver)],
         status: ['Response Sent', 'grey'],
         details: ['View Details',  `ID: ${truncateAddress(item.responseID)}`],
         type:
@@ -292,7 +293,7 @@ export function DashboardContext() {
         requestID: item.responseID,
         addressSender: item.address_sender,
         data: item.operation === 'update' ? item.updated_data : item.data,
-        addressSender: item.address_sender,
+        addressReceiver: item.address_receiver,
         salt: item.salt,
         limit: item.limit,
         key: item.key,
