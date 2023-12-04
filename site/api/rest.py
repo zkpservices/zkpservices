@@ -25,6 +25,15 @@ table_name = "userdata"
 # Get the DynamoDB table with the specified name
 table = dynamodb.Table(table_name)
 
+def dumps(item: dict) -> str:
+    return json.dumps(item, default=default_type_error_handler)
+
+
+def default_type_error_handler(obj):
+    if isinstance(obj, Decimal):
+        return int(obj)
+    raise TypeError
+
 def update_json(obj1, obj2):
     for key, value in obj2.items():
         if isinstance(value, dict) and key in obj1 and isinstance(obj1[key], dict):
@@ -400,19 +409,30 @@ def add_request(sender_id, request, password):
         receiver_requests_received = receiver_chain_data['requests_received']
         receiver_requests_received.append(request)
         receiver_data[chain_id]['requests_received'] = receiver_requests_received
-        # Update sender's and receiver's data in the database
-        response = table.update_item(
-            Key={"id": sender_id},
-            UpdateExpression="set #chain_data = :chain_data",
-            ExpressionAttributeNames={"#chain_data": "chain_data"},
-            ExpressionAttributeValues={":chain_data": sender_data}
-        )
-        response = table.update_item(
-            Key={"id": receiver_id},
-            UpdateExpression="set #chain_data = :chain_data",
-            ExpressionAttributeNames={"#chain_data": "chain_data"},
-            ExpressionAttributeValues={":chain_data": receiver_data}
-        )
+
+        if(receiver_id == sender_id):
+            # Update sender's and receiver's data in the database
+            sender_data[chain_id]['requests_received'].append(request)
+            response = table.update_item(
+                Key={"id": sender_id},
+                UpdateExpression="set #chain_data = :chain_data",
+                ExpressionAttributeNames={"#chain_data": "chain_data"},
+                ExpressionAttributeValues={":chain_data": sender_data}
+            )
+        else:
+            # Update sender's and receiver's data in the database
+            response = table.update_item(
+                Key={"id": sender_id},
+                UpdateExpression="set #chain_data = :chain_data",
+                ExpressionAttributeNames={"#chain_data": "chain_data"},
+                ExpressionAttributeValues={":chain_data": sender_data}
+            )
+            response = table.update_item(
+                Key={"id": receiver_id},
+                UpdateExpression="set #chain_data = :chain_data",
+                ExpressionAttributeNames={"#chain_data": "chain_data"},
+                ExpressionAttributeValues={":chain_data": receiver_data}
+            )
 
         return {
             "statusCode": 200,
@@ -459,7 +479,12 @@ def add_response(sender_id, response, password):
         # Update sender's sent_responses
         sender_chain_data = sender_data[chain_id]
         sender_responses_sent = sender_chain_data['responses_sent']
+        print("sender responses sent")
+        print(type(sender_responses_sent))
+        print(sender_responses_sent)
         sender_responses_sent.append(response)
+        print("after appending response")
+        print(sender_responses_sent)
         
         sender_data[chain_id]['responses_sent'] = sender_responses_sent
 
@@ -468,20 +493,34 @@ def add_response(sender_id, response, password):
         receiver_responses_received = receiver_chain_data['responses_received']
         receiver_responses_received.append(response)
         receiver_data[chain_id]['responses_received'] = receiver_responses_received
-
-        # Update sender's and receiver's data in the database
-        response = table.update_item(
-            Key={"id": sender_id},
-            UpdateExpression="set #chain_data = :chain_data",
-            ExpressionAttributeNames={"#chain_data": "chain_data"},
-            ExpressionAttributeValues={":chain_data": sender_data}
-        )
-        response = table.update_item(
-            Key={"id": receiver_id},
-            UpdateExpression="set #chain_data = :chain_data",
-            ExpressionAttributeNames={"#chain_data": "chain_data"},
-            ExpressionAttributeValues={":chain_data": receiver_data}
-        )
+        print("sender_id")
+        print(sender_id)
+        print("receiver_id")
+        print(receiver_id)
+        if(sender_id == receiver_id):
+            print("response sender and receiver ID match")
+            sender_data[chain_id]['responses_received'].append(response)
+            # Update sender's and receiver's data in the database
+            response = table.update_item(
+                Key={"id": sender_id},
+                UpdateExpression="set #chain_data = :chain_data",
+                ExpressionAttributeNames={"#chain_data": "chain_data"},
+                ExpressionAttributeValues={":chain_data": sender_data}
+            )
+        else:
+            # Update sender's and receiver's data in the database
+            response = table.update_item(
+                Key={"id": sender_id},
+                UpdateExpression="set #chain_data = :chain_data",
+                ExpressionAttributeNames={"#chain_data": "chain_data"},
+                ExpressionAttributeValues={":chain_data": sender_data}
+            )
+            response = table.update_item(
+                Key={"id": receiver_id},
+                UpdateExpression="set #chain_data = :chain_data",
+                ExpressionAttributeNames={"#chain_data": "chain_data"},
+                ExpressionAttributeValues={":chain_data": receiver_data}
+            )
 
         return {
             "statusCode": 200,
