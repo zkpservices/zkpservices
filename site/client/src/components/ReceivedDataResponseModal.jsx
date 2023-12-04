@@ -1,6 +1,9 @@
 import { Fragment, useRef, useState, useEffect } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
+import { useGlobal } from '@/components/GlobalStorage'
+import { Button } from '@/components/Button'
+import { RedButton } from '@/components/RedButton'
 import { removeMetadata, flattenJsonAndComputeHash } from './HelperCalls'
 import {
   autocompletion,
@@ -40,7 +43,7 @@ import { tokyoNightDay } from '@uiw/codemirror-theme-tokyo-night-day'
 export function ReceivedDataResponseModal({
   open,
   onClose,
-  requestID='',
+  requestID = '',
   addressOfSendingParty = '',
   fieldRequested = '',
   dataSnapshot = '',
@@ -53,12 +56,60 @@ export function ReceivedDataResponseModal({
   twoFAOneTimeToken = '',
   responseFee = '',
 }) {
+  let {
+    userAddress,
+    fujiCoreContract,
+    mumbaiCoreContract,
+    rippleCoreContract,
+    web3,
+    chainId,
+  } = useGlobal()
+  const [contractHash, setContractHash] = useState(null)
 
-  const editorContainerRef = useRef(null);
-  const [editorView, setEditorView] = useState(null);
-  const [isEditorReady, setIsEditorReady] = useState(false);
-  const [modifiedFieldData, setModifiedFieldData] = useState({});
-  let [modifiedDataHash, setDataHash] = useState("");
+  useEffect(() => {
+    let isMounted = true
+
+    const contract =
+      chainId == 43113
+        ? fujiCoreContract
+        : chainId == 80001
+        ? mumbaiCoreContract
+        : chainId == 1440002
+        ? rippleCoreContract
+        : null
+
+    if (contract && isMounted && contractHash === null) {
+      async function fetchContractHash() {
+        try {
+          const res = await contract.methods.responses(requestID).call()
+          console.log(res)
+          setContractHash(res)
+        } catch (error) {
+          console.error('Error fetching balance:', error)
+        }
+      }
+      fetchContractHash()
+    }
+
+    return () => {
+      isMounted = false
+      if (!open) setContractHash(null)
+    }
+  }, [
+    userAddress,
+    fujiCoreContract,
+    mumbaiCoreContract,
+    rippleCoreContract,
+    contractHash,
+    chainId,
+    open,
+  ])
+
+  const editorContainerRef = useRef(null)
+  const [editorView, setEditorView] = useState(null)
+  const [isEditorReady, setIsEditorReady] = useState(false)
+  const [modifiedFieldData, setModifiedFieldData] = useState({})
+  let [modifiedDataHash, setDataHash] = useState('')
 
   const borderTheme = EditorView.theme({
     '.cm-editor': { 'border-radius': '0.375rem' },
@@ -66,27 +117,31 @@ export function ReceivedDataResponseModal({
     '.cm-scroller': { 'border-radius': '0.375rem' },
     '.cm-content': { 'border-radius': '0.375rem' },
     '.cm-focused': { 'border-radius': '0.375rem' },
-  });
+  })
 
-  const currentTheme = document.documentElement.classList.contains('dark') ? tokyoNight : tokyoNightDay;
+  const currentTheme = document.documentElement.classList.contains('dark')
+    ? tokyoNight
+    : tokyoNightDay
 
   useEffect(() => {
     if (open) {
-      setModifiedFieldData(removeMetadata(JSON.parse(dataSnapshot)[fieldRequested]));
-      setDataHash("");
+      setModifiedFieldData(
+        removeMetadata(JSON.parse(dataSnapshot)[fieldRequested])
+      )
+      setDataHash('')
 
-      const timer = setTimeout(() => setIsEditorReady(true), 50);
-      return () => clearTimeout(timer);
+      const timer = setTimeout(() => setIsEditorReady(true), 50)
+      return () => clearTimeout(timer)
     } else {
       if (editorView) {
-        editorView.destroy();
+        editorView.destroy()
       }
-      setIsEditorReady(false);
-      setEditorView(null);
-      setDataHash(""); 
-      setModifiedFieldData({}); 
+      setIsEditorReady(false)
+      setEditorView(null)
+      setDataHash('')
+      setModifiedFieldData({})
     }
-  }, [open, dataSnapshot, fieldRequested]);
+  }, [open, dataSnapshot, fieldRequested])
 
   useEffect(() => {
     if (open && !editorView && isEditorReady) {
@@ -121,40 +176,46 @@ export function ReceivedDataResponseModal({
           json(),
           currentTheme,
           borderTheme,
-          EditorState.readOnly.of(true)
+          EditorState.readOnly.of(true),
         ],
-      });
+      })
 
       const view = new EditorView({
         state: newState,
         parent: editorContainerRef.current,
-      });
+      })
 
-      setEditorView(view);
+      setEditorView(view)
     }
 
     return () => {
       if (editorView) {
-        editorView.destroy();
+        editorView.destroy()
       }
-    };
-  }, [open, isEditorReady, modifiedFieldData]);
+    }
+  }, [open, isEditorReady, modifiedFieldData])
 
   useEffect(() => {
     const hashData = async () => {
       try {
-        let dataWithFieldKey = {[fieldRequested]: modifiedFieldData};
-        let res = await flattenJsonAndComputeHash(JSON.stringify(dataWithFieldKey));
-        setDataHash(res.rootHash);
+        let dataWithFieldKey = { [fieldRequested]: modifiedFieldData }
+        let res = await flattenJsonAndComputeHash(
+          JSON.stringify(dataWithFieldKey)
+        )
+        setDataHash(res.rootHash)
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Error fetching data:', error)
       }
-    };
-
-    if (open && modifiedFieldData && Object.keys(modifiedFieldData).length > 0) {
-      hashData();
     }
-  }, [open, modifiedFieldData, fieldRequested]);
+
+    if (
+      open &&
+      modifiedFieldData &&
+      Object.keys(modifiedFieldData).length > 0
+    ) {
+      hashData()
+    }
+  }, [open, modifiedFieldData, fieldRequested])
 
   return (
     <Transition.Root show={open} as={Fragment}>
@@ -173,7 +234,7 @@ export function ReceivedDataResponseModal({
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <div className="fixed inset-0 bg-gray-600 dark:bg-gray-900 bg-opacity-50 dark:bg-opacity-50 backdrop-filter backdrop-blur-sm" />
+            <div className="fixed inset-0 bg-gray-600 bg-opacity-50 backdrop-blur-sm backdrop-filter dark:bg-gray-900 dark:bg-opacity-50" />
           </Transition.Child>
 
           <Transition.Child
@@ -216,7 +277,7 @@ export function ReceivedDataResponseModal({
                     </label>
                     <textarea
                       id="requestID"
-                      className="font-mono relative mt-1 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 dark:focus:border-emerald-500 sm:text-sm"
+                      className="relative mt-1 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 font-mono text-gray-900 placeholder-gray-500 focus:z-10 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 dark:focus:border-emerald-500 sm:text-sm"
                       rows={1}
                       readOnly
                       spellCheck="false"
@@ -232,7 +293,7 @@ export function ReceivedDataResponseModal({
                     </label>
                     <textarea
                       id="addressOfSendingParty"
-                      className="font-mono relative mt-1 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 dark:focus:border-emerald-500 sm:text-sm"
+                      className="relative mt-1 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 font-mono text-gray-900 placeholder-gray-500 focus:z-10 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 dark:focus:border-emerald-500 sm:text-sm"
                       rows={1}
                       readOnly
                       spellCheck="false"
@@ -249,7 +310,7 @@ export function ReceivedDataResponseModal({
                     </label>
                     <textarea
                       id="fieldRequested"
-                      className="font-mono relative mt-1 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 dark:focus:border-emerald-500 sm:text-sm"
+                      className="relative mt-1 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 font-mono text-gray-900 placeholder-gray-500 focus:z-10 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 dark:focus:border-emerald-500 sm:text-sm"
                       rows={1}
                       readOnly
                       spellCheck="false"
@@ -285,16 +346,41 @@ export function ReceivedDataResponseModal({
                       htmlFor="modifiedDataHash"
                       className="block text-sm font-medium leading-5 text-gray-900 dark:text-white"
                     >
-                      Root Hash (SHA256 of flattened JSON):
+                      Calculated Root Hash (SHA256 of flattened JSON):
                     </label>
                     <textarea
                       id="modifiedDataHash"
-                      className="font-mono relative mt-1 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 dark:focus:border-emerald-500 sm:text-sm"
+                      className="relative mt-1 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 font-mono text-gray-900 placeholder-gray-500 focus:z-10 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 dark:focus:border-emerald-500 sm:text-sm"
                       rows={1}
                       readOnly
                       spellCheck="false"
                       value={modifiedDataHash}
                     />
+                  </div>
+
+                  <div className="mt-4">
+                    <label
+                      htmlFor="modifiedDataHash"
+                      className="block text-sm font-medium leading-5 text-gray-900 dark:text-white"
+                    >
+                      Root Hash Stored in Smart Contract:
+                    </label>
+                    <textarea
+                      id="modifiedDataHash"
+                      className="relative mt-1 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 font-mono text-gray-900 placeholder-gray-500 focus:z-10 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 dark:focus:border-emerald-500 sm:text-sm"
+                      rows={1}
+                      readOnly
+                      spellCheck="false"
+                      value={contractHash}
+                    />
+                  </div>
+
+                  <div className="mt-4">
+                    {modifiedDataHash == contractHash ? (
+                      <Button className="px-5 font-semibold pointer-events-none">Data Received is Valid</Button>
+                    ) : (
+                      <RedButton className="px-5 font-semibold pointer-events-none">Data Received is Invalid</RedButton>
+                    )}
                   </div>
 
                   <hr className="my-4 border-gray-300 dark:border-gray-700" />
@@ -308,7 +394,7 @@ export function ReceivedDataResponseModal({
                     </label>
                     <textarea
                       id="oneTimeKey"
-                      className="font-mono relative mt-1 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 dark:focus:border-emerald-500 sm:text-sm"
+                      className="relative mt-1 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 font-mono text-gray-900 placeholder-gray-500 focus:z-10 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 dark:focus:border-emerald-500 sm:text-sm"
                       rows={1}
                       readOnly
                       spellCheck="false"
@@ -325,7 +411,7 @@ export function ReceivedDataResponseModal({
                     </label>
                     <textarea
                       id="oneTimeSalt"
-                      className="font-mono relative mt-1 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 dark:focus:border-emerald-500 sm:text-sm"
+                      className="relative mt-1 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 font-mono text-gray-900 placeholder-gray-500 focus:z-10 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 dark:focus:border-emerald-500 sm:text-sm"
                       rows={1}
                       readOnly
                       spellCheck="false"
@@ -342,7 +428,7 @@ export function ReceivedDataResponseModal({
                     </label>
                     <textarea
                       id="timeLimit"
-                      className="font-mono relative mt-1 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 dark:focus:border-emerald-500 sm:text-sm"
+                      className="relative mt-1 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 font-mono text-gray-900 placeholder-gray-500 focus:z-10 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 dark:focus:border-emerald-500 sm:text-sm"
                       rows={1}
                       readOnly
                       spellCheck="false"
@@ -377,7 +463,7 @@ export function ReceivedDataResponseModal({
                         </label>
                         <textarea
                           id="twoFAProvider"
-                          className="font-mono relative mt-1 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 dark:focus:border-emerald-500 sm:text-sm"
+                          className="relative mt-1 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 font-mono text-gray-900 placeholder-gray-500 focus:z-10 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 dark:focus:border-emerald-500 sm:text-sm"
                           rows={1}
                           readOnly
                           spellCheck="false"
@@ -394,7 +480,7 @@ export function ReceivedDataResponseModal({
                         </label>
                         <textarea
                           id="twoFARequestID"
-                          className="font-mono relative mt-1 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 dark:focus:border-emerald-500 sm:text-sm"
+                          className="relative mt-1 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 font-mono text-gray-900 placeholder-gray-500 focus:z-10 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 dark:focus:border-emerald-500 sm:text-sm"
                           rows={1}
                           readOnly
                           spellCheck="false"
@@ -411,7 +497,7 @@ export function ReceivedDataResponseModal({
                         </label>
                         <textarea
                           id="twoFAOneTimeToken"
-                          className="font-mono relative mt-1 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 dark:focus:border-emerald-500 sm:text-sm"
+                          className="relative mt-1 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 font-mono text-gray-900 placeholder-gray-500 focus:z-10 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 dark:focus:border-emerald-500 sm:text-sm"
                           rows={1}
                           readOnly
                           spellCheck="false"
@@ -432,7 +518,7 @@ export function ReceivedDataResponseModal({
                     </label>
                     <textarea
                       id="responseFee"
-                      className="font-mono relative mt-1 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 dark:focus:border-emerald-500 sm:text-sm"
+                      className="relative mt-1 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 font-mono text-gray-900 placeholder-gray-500 focus:z-10 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 dark:focus:border-emerald-500 sm:text-sm"
                       rows={1}
                       readOnly
                       spellCheck="false"

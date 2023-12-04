@@ -129,11 +129,11 @@ export function NewUpdateRequestModal({
     if (open && !editorView && isEditorReady) {
       const newState = EditorState.create({
         doc: `{
-  "<field_name>": {
-    "<first_key>": "value1",
-    "<second_key>": "2",
-    "<third_key>": {
-      "<third_key_first>": "value3"
+  "field_name": {
+    "first_key": "value1",
+    "second_key": "2",
+    "third_key": {
+      "third_key_first": "value3"
     }
   }
 }`,

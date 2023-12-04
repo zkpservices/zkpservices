@@ -21,7 +21,6 @@ export function GlobalProvider({ children }) {
     return false
   })
   const [userAddress, setUserAddress] = useState(() => {
-    console.log("NIGHTMARE NIGHTMARE NIGHTMARE")
     if (typeof window !== 'undefined') {
       return localStorage.getItem('userAddress') || ''
     }
