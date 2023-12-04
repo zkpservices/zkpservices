@@ -211,9 +211,7 @@ export function Services({ handleRefresh }) {
     try {
       const chainData = await getChainData(userAddress, userPassword, chainId)
       console.log(JSON.stringify(chainData, null, 2))
-      let keysList = Object.keys(chainData['data']).filter(
-        (a) => a !== '2fa_password',
-      )
+      let keysList = chainData['data']['props']['onboarded_chains']
       const filteredKeysList = Object.keys(chains).filter(
         (item) => !keysList.includes(item),
       )
@@ -232,10 +230,10 @@ export function Services({ handleRefresh }) {
       const propsLocal = chainData['data']['props']
       propsLocal['userSecretHash'] = userSecretHashLocal
       propsLocal['rsa_enc_pub_key'] =
-        chainData['data'][chainId]['rsa_enc_pub_key']
+        chainData['data']['props']['rsa_enc_pub_key']
       propsLocal['rsa_sign_pub_key'] =
-        chainData['data'][chainId]['rsa_sign_pub_key']
-      propsLocal['public_info'] = chainData['data'][chainId]['public_info']
+        chainData['data']['props']['rsa_sign_pub_key']
+      propsLocal['public_info'] = chainData['data']['props']['public_info']
       setProps(propsLocal)
     } catch (error) {
       setApiErrorNotif(true)

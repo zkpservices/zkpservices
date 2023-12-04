@@ -458,6 +458,8 @@ def add_response(sender_id, response, password):
         # Get sender's data from the database
         sender_data = get_full_data(sender_id)
 
+        print("GET FUCKED CUNT")
+
         if not sender_data:
             return {
                 "statusCode": 404,
@@ -920,8 +922,8 @@ def get_chain_data(id, password, chain_id):
         return password_auth_result
 
     try:
-        full_data = get_full_data(id)
-        if not full_data:
+        response = table.get_item(Key={"id": id})
+        if not response:
             return {
                 "statusCode": 500,
                 "body": json.dumps("User not found")
@@ -929,13 +931,16 @@ def get_chain_data(id, password, chain_id):
         else:
             response = table.get_item(Key={"id": id})
             item = response.get("Item", None)
-
+            full_data = {
+                'props': {}
+            }
             full_data['props'] = {
                 '2fa_password': item['2fa_password'],
                 'contract_password': item['contract_password'],
-            #     'rsa_enc_pub_key': item['rsa_enc_pub_key'],
-            #     'rsa_sign_pub_key': item['rsa_sign_pub_key'],
-            #     'public_info': item['public_info']
+                'onboarded_chains': list(item['chain_data'].keys()),
+                'rsa_enc_pub_key': item['chain_data'][chain_id]['rsa_enc_pub_key'],
+                'rsa_sign_pub_key': item['chain_data'][chain_id]['rsa_sign_pub_key'],
+                'public_info': item['chain_data'][chain_id]['public_info']
             }
             return full_data
 
