@@ -176,7 +176,7 @@ export function DashboardContext() {
       return {
         operation: [
           operationText,
-          (hasMatchingResponse && item.operation == "update" ? "By: " : "From: ") + truncateAddress(item.address_sender),
+          (item.operation == "update" ? "By: " : "From: ") + truncateAddress(item.address_sender),
         ],
         field: [item.field, ` Owner: ${truncateAddress(item.address_sender)}`],
         status: hasMatchingResponse
@@ -211,7 +211,7 @@ export function DashboardContext() {
       return {
         operation: [
           operationText,
-          `From: ${truncateAddress(item.address_sender)}`,
+          (item.operation === 'update' ? 'By: ' : 'From: ') + truncateAddress(item.address_sender), 
         ],
         field: [item.field, ` Owner: ${truncateAddress(item.address_sender)}`],
         status: ['Show Response', 'grey'],
