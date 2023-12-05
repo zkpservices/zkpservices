@@ -42,7 +42,7 @@ const services = [
     href: '/dashboard',
     name: 'Request Update',
     description:
-      'Request a data update from another user or smart device for your Web2/Web3 needs.\
+      'Securely request a data update from another user or smart device for your Web2/Web3 needs.\
       Leverage custom MFA if needed.',
     icon: UpdateIcon,
     pattern: {
@@ -136,7 +136,7 @@ function ServiceCard({ service, isSelected }) {
             mouseY={mouseY}
           />
           <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-zinc-900/7.5 group-hover:ring-zinc-900/10 dark:ring-white/10 dark:group-hover:ring-white/20" />
-          <div className="relative rounded-2xl px-4 pb-4 pt-12">
+          <div className="relative rounded-2xl px-4 pb-4 pt-10">
             <ServiceIcon icon={service.icon} />
             <h3
               className={`mt-4 text-sm font-semibold leading-7 text-${

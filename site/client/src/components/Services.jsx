@@ -22,7 +22,7 @@ const services = [
     href: '/dashboard',
     name: 'Request Data',
     description:
-      'Learn about the contact model and how to create, retrieve, update, delete, and list contacts.',
+      'Securely request a data snapshot from another user or smart device for your Web2/Web3 needs. Leverage custom MFA if needed.',
     icon: QuestionMarkIcon,
     pattern: {
       y: 16,
@@ -36,7 +36,8 @@ const services = [
     href: '/dashboard',
     name: 'Request Update',
     description:
-      'Learn about the conversation model and how to create, retrieve, update, delete, and list conversations.',
+      'Securely request a data update from another user or smart device for your Web2/Web3 needs.\
+      Leverage custom MFA if needed.',
     icon: UpdateIcon,
     pattern: {
       y: -6,
@@ -50,7 +51,7 @@ const services = [
     href: '/dashboard',
     name: 'Cross-Chain Backups',
     description:
-      'Learn about the group model and how to create, retrieve, update, delete, and list groups.',
+      'Back up your data to other CCIP-supported EVM-compatible chains.',
     icon: CrosschainIcon,
     pattern: {
       y: 32,
@@ -63,7 +64,7 @@ const services = [
   {
     href: '/dashboard',
     name: 'ZKP Tokens Faucet',
-    description: 'Get some test tokens for our ERC20 contract',
+    description: 'Get some test tokens for our ERC20 contract.',
     icon: TokenIcon,
     pattern: {
       y: 22,
@@ -74,7 +75,7 @@ const services = [
     href: '/dashboard',
     name: 'Onboard To New Chain',
     description:
-      'Learn about the conversation model and how to create, retrieve, update, delete, and list conversations.',
+      'Onboard your connected data source onto a new EVM-compatible chain.',
     icon: PlusIcon,
     pattern: {
       y: -6,
