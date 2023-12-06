@@ -494,7 +494,14 @@ def add_response(sender_id, response, password):
         receiver_chain_data = receiver_data[chain_id]
         receiver_responses_received = receiver_chain_data['responses_received']
         receiver_responses_received.append(response)
+        receiver_requests_sent = receiver_chain_data['requests_sent']
+        if response['operation'] == 'get':
+            for idx, request in enumerate(receiver_requests_sent):
+                if request['requestID'] == response['responseID']:
+                    receiver_requests_sent[idx]['data'] = response['data']
+
         receiver_data[chain_id]['responses_received'] = receiver_responses_received
+        receiver_data[chain_id]['requests_sent'] = receiver_requests_sent
         print("sender_id")
         print(sender_id)
         print("receiver_id")

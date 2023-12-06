@@ -93,7 +93,7 @@ export function History({ tableData = {}, showRefresh = true, handleRefresh }) {
       openReceivedUpdateResponseModal(rowData)
     } else if (rowData.type === 'outgoing_request_get') {
       if (rowData.status[0] === 'Response Sent') {
-        openRequestedDataSentModal(rowData)
+        openReceivedDataResponseModal(rowData)
       } else {
         openAwaitingDataModal(rowData)
       }
@@ -442,6 +442,7 @@ export function History({ tableData = {}, showRefresh = true, handleRefresh }) {
       setSelectedRowData(newRowData)
       setShowRequestedDataSentModal(true)
     } catch (error) {
+      console.error(error)
       setApiErrorNotif(true)
       setApiErrorTopText("Error fetching field data")
       setApiErrorBottomText(error.toString())
