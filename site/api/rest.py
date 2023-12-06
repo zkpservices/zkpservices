@@ -499,6 +499,7 @@ def add_response(sender_id, response, password):
             for idx, request in enumerate(receiver_requests_sent):
                 if request['requestID'] == response['responseID']:
                     receiver_requests_sent[idx]['data'] = response['data']
+                    receiver_requests_sent[idx]['salt'] = response['salt']
 
         receiver_data[chain_id]['responses_received'] = receiver_responses_received
         receiver_data[chain_id]['requests_sent'] = receiver_requests_sent

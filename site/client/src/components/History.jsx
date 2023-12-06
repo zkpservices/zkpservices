@@ -92,7 +92,7 @@ export function History({ tableData = {}, showRefresh = true, handleRefresh }) {
     } else if (rowData.type === 'incoming_response_update') {
       openReceivedUpdateResponseModal(rowData)
     } else if (rowData.type === 'outgoing_request_get') {
-      if (rowData.status[0] === 'Response Sent') {
+      if (rowData.status[0] === 'Response Received') {
         openReceivedDataResponseModal(rowData)
       } else {
         openAwaitingDataModal(rowData)
