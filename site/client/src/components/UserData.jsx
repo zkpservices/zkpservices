@@ -216,6 +216,7 @@ export function UserData({ fieldNames = [], handleRemove, handleAdd }) {
     setSelectedHash(dataHash['rootHash'])
     setSelectedSalt(localFieldData['data'][fieldName]['_metadata']['salt'])
   } catch (error) {
+    console.error(error)
     setApiErrorNotif(true)
     setApiErrorTopText("Error fetching field data")
     setApiErrorBottomText(error.toString())

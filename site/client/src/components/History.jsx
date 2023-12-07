@@ -74,6 +74,7 @@ export function History({ tableData = {}, showRefresh = true, handleRefresh }) {
   ]
 
   const openModal = (rowData) => {
+    console.log(JSON.stringify(rowData, null, 2))
     if (rowData.type === 'incoming_request_get') {
       if (rowData.status[0] === 'Response Sent') {
         openRequestedDataSentModal(rowData)
@@ -133,6 +134,9 @@ export function History({ tableData = {}, showRefresh = true, handleRefresh }) {
         rowData.field[0],
         chainId,
       )
+      if(Object.keys(fieldData['data']).length == 0) {
+        throw "Current user does not have this field set."
+      }
       const newRowData = {
         ...rowData,
         data: fieldData['data'],
@@ -141,6 +145,7 @@ export function History({ tableData = {}, showRefresh = true, handleRefresh }) {
       setSelectedRowData(newRowData)
       setShowSendDataModal(true)
     } catch (error) {
+      console.error(error)
       setApiErrorNotif(true)
       setApiErrorTopText("Error fetching field data")
       setApiErrorBottomText(error.toString())
@@ -197,6 +202,7 @@ export function History({ tableData = {}, showRefresh = true, handleRefresh }) {
           2,
         )
       } catch (error) {
+        console.error(error)
         setApiErrorNotif(true)
         setApiErrorTopText("Error fetching field data")
         setApiErrorBottomText(error.toString())

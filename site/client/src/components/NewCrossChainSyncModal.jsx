@@ -121,6 +121,7 @@ export function NewCrossChainSyncModal({
             2,
           )
         } catch (error) {
+          console.error(error)
           setShowErrorNotif(true)
           setErrorTopText("Error fetching field data")
           setErrorBottomText(error.toString())

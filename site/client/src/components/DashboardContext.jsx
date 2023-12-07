@@ -202,6 +202,7 @@ export function DashboardContext() {
         twoFAProvider: item.twoFAProvider,
         twoFARequestID: item.twoFARequestID,
         twoFAOneTimeToken: item.twoFAOneTimeToken,
+        lastUpdated: item.last_updated
       }
     })
 
@@ -232,10 +233,18 @@ export function DashboardContext() {
         twoFAProvider: item.twoFAProvider,
         twoFARequestID: item.twoFARequestID,
         twoFAOneTimeToken: item.twoFAOneTimeToken,
+        lastUpdated: item.last_updated
       }
     })
 
-    return [...formattedRequests, ...formattedResponses]
+    let allIncoming =  [...formattedRequests, ...formattedResponses]
+    return allIncoming.sort((a, b) => {
+      const timestampA = parseInt(a.lastUpdated, 10);
+      const timestampB = parseInt(b.lastUpdated, 10);
+    
+      // Compare timestamps in descending order (newest first)
+      return timestampB - timestampA;
+    });
   }
 
   function formatOutgoingData(
@@ -275,6 +284,7 @@ export function DashboardContext() {
         twoFAProvider: item.twoFAProvider,
         twoFARequestID: item.twoFARequestID,
         twoFAOneTimeToken: item.twoFAOneTimeToken,
+        lastUpdated: item.last_updated
       }
     })
 
@@ -302,9 +312,17 @@ export function DashboardContext() {
         twoFAProvider: item.twoFAProvider,
         twoFARequestID: item.twoFARequestID,
         twoFAOneTimeToken: item.twoFAOneTimeToken,
+        lastUpdated: item.last_updated
       }
     })
-    return [...formattedRequests, ...formattedResponses]
+    let allOutgoing =  [...formattedRequests, ...formattedResponses]
+    return allOutgoing.sort((a, b) => {
+      const timestampA = parseInt(a.lastUpdated, 10);
+      const timestampB = parseInt(b.lastUpdated, 10);
+    
+      // Compare timestamps in descending order (newest first)
+      return timestampB - timestampA;
+    });
   }
 
   const paramToSyncDict = {
@@ -356,11 +374,19 @@ export function DashboardContext() {
               paramTypeRaw: item.parameter,
               sourceChain: item.source_chain,
               destinationChain: item.target_chain,
-              ccid: item.ccid
+              ccid: item.ccid,
+              lastUpdated: item.last_updated
             }))
+            const sortedCCTX = transformedData.sort((a, b) => {
+              const timestampA = parseInt(a.lastUpdated, 10);
+              const timestampB = parseInt(b.lastUpdated, 10);
+            
+              // Compare timestamps in descending order (newest first)
+              return timestampB - timestampA;
+            });
             setTableData((prevTableData) => ({
               ...prevTableData,
-              'Cross-Chain Sync': transformedData,
+              'Cross-Chain Sync': sortedCCTX,
             }))
           } else {
             // If it's not an array, handle this case accordingly
