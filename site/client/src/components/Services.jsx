@@ -172,8 +172,7 @@ export function Services({ handleRefresh }) {
   const [selectedService, setSelectedService] = useState(null)
   const [availableChains, setAvailableChains] = useState([
     'Avalanche Fuji',
-    'Polygon Mumbai',
-    'Ripple EVM Devnet',
+    'Polygon Mumbai'
   ])
   const [usedChains, setUsedChains] = useState([])
   const [props, setProps] = useState({})

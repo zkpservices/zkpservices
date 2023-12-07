@@ -63,13 +63,16 @@ export default function Quickstart() {
     setRippleBatchSignUpContract,
     metamaskAvailable,
     setMetamaskAvailable,
+    setApiErrorNotif,
+    setApiErrorTopText,
+    setApiErrorBottomText
   } = useGlobal()
-  const [showErrorNotif, setShowErrorNotif] = useState(false);
-  const [errorTopText, setErrorTopText] = useState('')
-  const [errorBottomText, setErrorBottomText] = useState('')
+  // const [showErrorNotif, setShowErrorNotif] = useState(false);
+  // const [errorTopText, setApiErrorTopText] = useState('')
+  // const [errorBottomText, setApiErrorBottomText] = useState('')
   const [showQuickstart, setShowQuickstart] = useState(
     <div className="min-h-screen">
-      {/* <Notification
+      {/* setApiErrorNotif
         open={showErrorNotif}
         error={true}
         showTopText={errorTopText}
@@ -82,11 +85,11 @@ export default function Quickstart() {
     </div>
   )
 
-  const makeErrorNotif = (topText, bottomText) => {
-    setShowErrorNotif(true)
-    setErrorTopText(topText)
-    setErrorBottomText(bottomText)
-  }
+  // const makeErrorNotif = (topText, bottomText) => {
+  //   setShowErrorNotif(true)
+  //   setApiErrorTopText(topText)
+  //   setApiErrorBottomText(bottomText)
+  // }
 
   const resetSubmitButton = () => {
     if (document.getElementById('submitButton')) {
@@ -159,9 +162,12 @@ export default function Quickstart() {
     try {
       let receipt = await web3.eth.sendTransaction(txObject)
     } catch (error) {
-      console.error('Batch SignUp Transaction error:', error)
+      console.error('Batch SignUp Transaction error:', error.toString())
       resetSubmitButton()
-      makeErrorNotif('Batch SignUp Transaction error:', error.toString())
+      setApiErrorNotif(true)
+      setApiErrorTopText('Batch SignUp Transaction error:')
+      setApiErrorBottomText(error.data.message.toString())
+      return false
     }
   }
 
@@ -175,7 +181,9 @@ export default function Quickstart() {
     } catch (error) {
       console.error('Error switching chains:', error)
       resetSubmitButton()
-      makeErrorNotif("Error switching chains:", error.toString())
+      setApiErrorNotif(true)
+      setApiErrorTopText('Error switching chains:')
+      setApiErrorBottomText(error.toString())
     }
   }
 
@@ -247,7 +255,9 @@ export default function Quickstart() {
       } catch (error) {
         console.error('User Rejected Switching to Original Chain', error)
         resetSubmitButton()
-        makeErrorNotif("User Rejected Switching to Original Chain", error.toString())
+        setApiErrorNotif(true)
+        setApiErrorTopText('User Rejected Switching to Original Chain')
+        setApiErrorBottomText(error.toString())
         return
       }
 
@@ -264,17 +274,18 @@ export default function Quickstart() {
             setContractPassword(formDataJSON['contract_password'])
             setTwoFactorAuthPassword(formDataJSON['2fa_password'])
             setUserPassword(formDataJSON['password'])
-          } else {
-            console.error('Error in signing up user.', createUserResponse)
-            setShowErrorNotif(true)
-            setErrorTopText('Error in signing up user.')
-            setErrorBottomText(createUserResponse['data'])
           }
+          // } else {
+          //   console.error('Error in signing up user.', createUserResponse)
+          //   setApiErrorNotif(true)
+          //   setApiErrorTopText('Error in signing up user.')
+          //   setApiErrorBottomText(createUserResponse['data'])
+          // }
         } catch (error) {
           resetSubmitButton()
-          setShowErrorNotif(true)
-          setErrorTopText('Error in signing up user.')
-          setErrorBottomText(createUserResponse['data'])
+          setApiErrorNotif(true)
+          setApiErrorTopText('Error in signing up user.')
+          setApiErrorBottomText(error.toString())
           return
         }
       }
@@ -284,9 +295,9 @@ export default function Quickstart() {
       callCreateUser()
     } catch (error) {
       resetSubmitButton()
-      setShowErrorNotif(true)
-      setErrorTopText('Error in signing up user.')
-      setErrorBottomText(createUserResponse['data'])
+      setApiErrorNotif(true)
+      setApiErrorTopText('Error in signing up user.')
+      setApiErrorBottomText(createUserResponse['data'])
       return
     }
   }
@@ -402,13 +413,6 @@ export default function Quickstart() {
     } else if (!walletConnected) {
       return (
         <>
-        <Notification
-          open={showErrorNotif}
-          error={true}
-          showTopText={errorTopText}
-          showBottomText={errorBottomText}
-          onClose={() => setShowErrorNotif(false)}
-        />
         <div className="my-48 mx-20 font-semibold items-center justify-center">
           <Note>
             Please connect your wallet to get started.

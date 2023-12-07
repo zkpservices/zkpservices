@@ -522,7 +522,11 @@ export function CompleteUpdateModal({
     } catch (error) {
       console.error(error)
       resetSubmitButton()
-      makeErrorNotif("Error submitting response transaction", error.toString())
+      if(error.data) {
+        makeErrorNotif("Error submitting response transaction", error.data.message.toString())
+      } else {
+        makeErrorNotif("Error submitting response transaction", error.toString())
+      }
       return
     }
     if (document.getElementById('submitButton')) {
@@ -738,6 +742,13 @@ export function CompleteUpdateModal({
                       checked={require2FA}
                     />
                   </div>
+                  <Notification
+                          open={showErrorNotif}
+                          error={true}
+                          showTopText={errorTopText}
+                          showBottomText={errorBottomText}
+                          onClose={() => setShowErrorNotif(false)}
+                        />
 
                   {require2FA && (
                     <>
@@ -813,13 +824,6 @@ export function CompleteUpdateModal({
                       )}
 
                       <div className="mt-6">
-                        <Notification
-                          open={showErrorNotif}
-                          error={true}
-                          showTopText={errorTopText}
-                          showBottomText={errorBottomText}
-                          onClose={() => setShowErrorNotif(false)}
-                        />
                         <label
                           htmlFor="disclaimer"
                           className="block text-sm font-bold leading-5 text-gray-900 dark:text-white"

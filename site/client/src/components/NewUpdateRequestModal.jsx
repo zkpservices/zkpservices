@@ -474,7 +474,12 @@ export function NewUpdateRequestModal({
     } catch (error) {
       console.error('Error in Core Contract Call:', error)
       resetSubmitButton()
-      makeErrorNotif('Error in Core Contract Call', error.toString())
+      if(error.data) {
+        makeErrorNotif('Error in Core Contract Call', error.data.message.toString())
+      } else {
+        makeErrorNotif('Error in Core Contract Call', error.toString())
+      }
+      
       return
     }
 

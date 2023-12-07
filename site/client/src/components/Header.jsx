@@ -179,7 +179,6 @@ export const Header = forwardRef(function Header({ className }, ref) {
 
     if (metamaskAvailable) {
       window.ethereum.on('chainChanged', handleChainChanged)
-
       return () => {
         // Clean up the event listener when the component is unmounted
         window.ethereum.removeListener('chainChanged', handleChainChanged)
