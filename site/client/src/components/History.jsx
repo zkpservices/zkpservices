@@ -97,7 +97,7 @@ export function History({ tableData = {}, showRefresh = true, handleRefresh }) {
         openAwaitingDataModal(rowData)
       }
     } else if (rowData.type === 'outgoing_request_update') {
-      if (rowData.status[0] === 'Response Sent') {
+      if (rowData.status[0] === 'Response Received') {
         openReceivedUpdateResponseModal(rowData)
       } else {
         openAwaitingUpdateModal(rowData)
@@ -516,7 +516,7 @@ export function History({ tableData = {}, showRefresh = true, handleRefresh }) {
       <CompletedDataUpdateModal
         open={showCompletedUpdateModal}
         onClose={closeCompletedUpdateModal}
-        addressOfRequestingParty={selectedRowData.addressSender}
+        addressOfRequestingParty={selectedRowData.addressReceiver}
         fieldToUpdate={selectedRowData.field[0]}
         requestID={selectedRowData.requestID}
         snapshotDataAfterUpdate={JSON.stringify(selectedRowData.data, null, 2)}
