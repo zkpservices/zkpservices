@@ -9,8 +9,6 @@ let api_call_count = 0
 
 export const makeAPICall = async (method, data) => {
   api_call_count++
-  console.log(api_call_count)
-  console.log(data['action'])
   try {
     const response = await axios({
       method,
@@ -27,7 +25,6 @@ export const makeAPICall = async (method, data) => {
 }
 
 export const login = async (userId, password) => { //error notifs handled
-  console.log(`logging in with the following data, userId: ${userId}`)
   const data = {
     id: userId,
     password: password,
@@ -45,7 +42,6 @@ export const createUser = async (userId, quickstart_JSON) => { //error notifs ha
     ...data,
     ...quickstart_JSON,
   }
-  console.log(mergedData)
   return makeAPICall('POST', mergedData)
 }
 
@@ -97,7 +93,6 @@ export const truncateAddress = (address) => {
 }
 
 export const getFieldData = async (userId, password, key, chainId) => { //error notifs handled
-  console.log(`getFieldData params: ${userId}, ${password}, ${key}, ${chainId}`)
   const data = {
     id: userId,
     password: password,
@@ -166,9 +161,6 @@ export const addRequest = async (userId, password, requestData, chainId) => { //
     ...data,
     ...requestData,
   }
-  console.log(
-    `API Calls merged request data ${JSON.stringify(mergedData, null, 2)}`,
-  )
   return makeAPICall('POST', mergedData)
 }
 
@@ -183,7 +175,6 @@ export const addResponse = async (userId, password, responseData, chainId) => { 
     ...data,
     ...responseData,
   }
-  console.log(mergedData)
   return makeAPICall('POST', mergedData)
 }
 
@@ -203,7 +194,6 @@ export const updateFieldData = async ( //error notifs handled
     ...data,
     ...updatedData,
   }
-  console.log(`Ready to update item ${JSON.stringify(mergedData, null, 2)}`)
   return makeAPICall('PUT', mergedData)
 }
 

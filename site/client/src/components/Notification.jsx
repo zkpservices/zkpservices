@@ -41,7 +41,6 @@ export function Notification({
   }, [error])
 
   useEffect(() => {
-    console.log(`open change detected, setting show to: ${open}`)
     setShow(open)
     const timer = setTimeout(() => {
       onClose()

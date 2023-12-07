@@ -82,7 +82,6 @@ export function ReceivedDataResponseModal({
       async function fetchContractHash() {
         try {
           const res = await contract.methods.responses(requestID).call()
-          console.log(res)
           setContractHash(res)
         } catch (error) {
           console.error('Error fetching balance:', error)

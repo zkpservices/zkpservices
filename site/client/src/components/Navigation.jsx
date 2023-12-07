@@ -252,7 +252,6 @@ export function Navigation(props) {
   function handleChainChanged(metamask_chain_id) {
     // We recommend reloading the page, unless you must do otherwise.
     setChainId(metamask_chain_id)
-    console.log(metamask_chain_id)
   }
 
   // window.ethereum.on('chainChanged', handleChainChanged);
@@ -292,7 +291,6 @@ export function Navigation(props) {
         method: 'eth_chainId',
       })
       setChainId(metamask_chain_id)
-      console.log(metamask_chain_id)
       setUserAddress(accounts[0])
       initializeWeb3()
     } catch (error) {
@@ -305,7 +303,6 @@ export function Navigation(props) {
     initializeWeb3()
 
     const handleChainChanged = (_chainId) => {
-      console.log(_chainId)
       setChainId(_chainId)
       initializeWeb3();
     }

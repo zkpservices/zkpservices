@@ -125,15 +125,11 @@ export default function Quickstart() {
     userSecretHash,
     publicInformation,
   ) => {
-    console.log(targetChainId)
-    console.log(fujiBatchSignUpContract)
 
     if (fujiBatchSignUpContract == null) {
       await initializeWeb3()
     }
 
-    console.log(fujiBatchSignUpContract)
-    console.log(fujiBatchSignUpContract == null)
 
     const batchSignUpContract =
       targetChainId == chains['fuji']
@@ -141,11 +137,6 @@ export default function Quickstart() {
         : targetChainId == chains['mumbai']
           ? mumbaiBatchSignUpContract
           : rippleBatchSignUpContract
-
-    console.log(`targetChainId: ${targetChainId}, chains['fuji']:`)
-    console.log(
-      `batchSignUpContract: ${batchSignUpContract}, chainId: ${chainId}`,
-    )
 
     let data = batchSignUpContract.methods
       .batchSignUp(
@@ -167,7 +158,6 @@ export default function Quickstart() {
     }
     try {
       let receipt = await web3.eth.sendTransaction(txObject)
-      console.log('Batch SignUp Transaction Receipt:', receipt)
     } catch (error) {
       console.error('Batch SignUp Transaction error:', error)
       resetSubmitButton()
@@ -211,7 +201,6 @@ export default function Quickstart() {
       const chainsToSwitch = Object.entries(chains)
         .filter(([key, value]) => formDataJSON[key + '_checkbox'] === 'on')
         .map(([key, value]) => value)
-      console.log(chainsToSwitch)
       let chain_data = {}
       chainsToSwitch.forEach((chain) => {
         chain_data[`0x${chain.toString(16)}`] = {
@@ -234,7 +223,6 @@ export default function Quickstart() {
         rsa_sign_key_pub_check: true,
       }
 
-      console.log(quickstart_JSON)
 
       const userSecretHashBigint = stringToBigInt(formDataJSON['2fa_password'])
       const userSecretHash = await poseidon([userSecretHashBigint.toString()])
@@ -243,9 +231,6 @@ export default function Quickstart() {
       }
       for (const targetChainId of chainsToSwitch) {
         await switchChain(targetChainId)
-        console.log(
-          `targetChainId: ${targetChainId}, formDataJSON: ${formDataJSON}, userSecretHash: ${userSecretHash}, formDataJSON['data']: ${formDataJSON['data']}`,
-        )
         await callContractMethods(
           targetChainId,
           formDataJSON,
@@ -273,7 +258,6 @@ export default function Quickstart() {
             quickstart_JSON,
           )
           if (createUserResponse['data'] === 'Item created successfully!') {
-            console.log(createUserResponse)
             Router.push('/dashboard')
             setLoggedIn(true)
             setShowLoginNotification(true)

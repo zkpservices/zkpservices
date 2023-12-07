@@ -208,11 +208,6 @@ export function UserData({ fieldNames = [], handleRemove, handleAdd }) {
       stringToBigInt(splitUserSecret[0]),
       stringToBigInt(splitUserSecret[1]),
     ])
-    console.log(localFieldData['data'][fieldName]['_metadata']['salt'])
-    console.log(
-      stringToBigInt(localFieldData['data'][fieldName]['_metadata']['salt']),
-    )
-    console.log(saltHash)
     const dataHash = await flattenJsonAndComputeHash(
       JSON.stringify(localFieldData['data'], null, 2),
     )

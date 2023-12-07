@@ -74,7 +74,6 @@ export function History({ tableData = {}, showRefresh = true, handleRefresh }) {
   ]
 
   const openModal = (rowData) => {
-    console.log(`openModal rowData: ${JSON.stringify(rowData, null, 2)}`)
     if (rowData.type === 'incoming_request_get') {
       if (rowData.status[0] === 'Response Sent') {
         openRequestedDataSentModal(rowData)
@@ -118,7 +117,6 @@ export function History({ tableData = {}, showRefresh = true, handleRefresh }) {
   }
 
   const openShowReceivedDataResponseModal = (rowData) => {
-    console.log(rowData)
     setSelectedRowData(rowData)
     setShowReceivedDataResponseModal(true)
   }
@@ -140,7 +138,6 @@ export function History({ tableData = {}, showRefresh = true, handleRefresh }) {
         data: fieldData['data'],
         salt: fieldData['data'][rowData.field[0]]['_metadata']['salt'],
       }
-      console.log(newRowData)
       setSelectedRowData(newRowData)
       setShowSendDataModal(true)
     } catch (error) {
@@ -174,7 +171,6 @@ export function History({ tableData = {}, showRefresh = true, handleRefresh }) {
           rowData.paramKey,
           chainId,
         )
-        console.log(fieldDataRequest)
         const fieldData = fieldDataRequest['data']
         const paramKeyRawEnd = stringToBigInt(rowData.paramKey.substring(24, 48))
           ? stringToBigInt(rowData.paramKey.substring(24, 48))
@@ -717,7 +713,14 @@ export function History({ tableData = {}, showRefresh = true, handleRefresh }) {
                                     ))}
                                   </td>
                                   <td className="flex items-center whitespace-nowrap px-6 py-4 text-sm text-gray-800 dark:text-gray-200">
-                                    {rowData.status[1] === 'grey' ? (
+                                    {rowData.status[1] === 'grey' && rowData.status[0] === 'Show Response' ? (
+                                      <button className="rounded-md bg-gray-200 px-2 py-1 text-sm font-medium text-white dark:bg-gray-700 dark:text-white"
+                                      onClick={() => {
+                                        openModal(rowData)
+                                      }}>
+                                        {rowData.status[0]}
+                                      </button>
+                                    ) : rowData.status[1] === 'grey' ? (
                                       <button className="rounded-md bg-gray-200 px-2 py-1 text-sm font-medium text-gray-400 dark:bg-gray-700 dark:text-gray-400">
                                         {rowData.status[0]}
                                       </button>

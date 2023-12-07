@@ -168,7 +168,6 @@ export function DashboardContext() {
   ) {
     const formattedRequests = incomingRequests.map((item) => {
       const hasMatchingResponse = outgoingResponses.some((response) => {
-        // console.log(response)
         return response.responseID === item.requestID
       })
       const operationText =
@@ -338,7 +337,6 @@ export function DashboardContext() {
           // Check if dataArray is an array
           if (Array.isArray(dataArray)) {
             // The parsed data is an array
-            console.log(`CCTX item: ${JSON.stringify(dataArray, null, 2)}`)
             let chains = {
               '0xa869': 'Fuji',
               '0x13881': 'Mumbai',
@@ -441,7 +439,6 @@ export function DashboardContext() {
   }, [loggedIn, userAddress, chainId])
 
   // useEffect(() => {
-  //   console.log(`the chain ID has been changed`)
   //   loadAllHistory()
   //   fetchUserDataFields()
   // }, [chainId]);

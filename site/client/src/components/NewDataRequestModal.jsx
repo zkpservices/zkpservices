@@ -72,7 +72,6 @@ export function NewDataRequestModal({
     web3,
     chainId,
   } = useGlobal()
-  console.log(web3)
 
   const coreContract =
     chainId == 43113
@@ -272,7 +271,6 @@ export function NewDataRequestModal({
           ),
         }
 
-        console.log(_2FASmartContractCallData)
 
         const data = _2FAContract.methods
           .generate2FA(
@@ -292,7 +290,6 @@ export function NewDataRequestModal({
             'Awaiting 2FA acceptance...'
         }
         const receipt = await web3.eth.sendTransaction(txObject)
-        console.log('2FA Contract Transaction Receipt:', receipt)
       } catch (error) {
         console.error('Error in 2FA Contract Call:', error)
         resetSubmitButton()
@@ -317,7 +314,6 @@ export function NewDataRequestModal({
         responseFeeAmount: formDataJSON['responseFee'],
       }
 
-      console.log(coreContractCallData)
 
       const data = coreContract.methods
         .requestData(
@@ -342,7 +338,6 @@ export function NewDataRequestModal({
           'Awaiting request acceptance...'
       }
       const receipt = await web3.eth.sendTransaction(txObject)
-      console.log('Core Contract Transaction Receipt:', receipt)
     } catch (error) {
       console.error('Error in Core Contract Call:', error)
       console.error('Error in Core Contract Call:', error)
@@ -351,7 +346,6 @@ export function NewDataRequestModal({
       return
     }
 
-    console.log(request)
     document.getElementById('submitButton').textContent =
       'Submitting request...'
     try {

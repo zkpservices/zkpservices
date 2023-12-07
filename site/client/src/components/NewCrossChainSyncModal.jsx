@@ -60,8 +60,6 @@ export function NewCrossChainSyncModal({
   async function handleFetchValue() {
     try {
       let fetchedValue
-      console.log('chainID')
-      console.log(chainId)
 
       const contract =
         chainId == 43113
@@ -82,9 +80,7 @@ export function NewCrossChainSyncModal({
       // let paramKeyRaw = document.getElementById('parameterKey').value;
 
       // const fieldDataRequest = await getFieldData(userAddress, userPassword, paramKeyRaw, chainId)
-      // console.log(fieldDataRequest)
       // const fieldData = fieldDataRequest['data']
-      // console.log(`all poseidon data: [${paramKeyRaw}, ${fieldData[paramKeyRaw]['_metadata']['salt']}, ${contractPassword}]`)
       // const paramKeyRawEnd = stringToBigInt(paramKeyRaw.substring(24, 48)) ? stringToBigInt(paramKeyRaw.substring(24, 48)) : stringToBigInt("")
       // const saltEnd = stringToBigInt(fieldData[paramKeyRaw]['_metadata']['salt'].substring(24, 48)) ? stringToBigInt(fieldData[paramKeyRaw]['_metadata']['salt'].substring(24, 48)) : stringToBigInt("")
       // const contractPasswordEnd = stringToBigInt(contractPassword.substring(24, 48)) ? stringToBigInt(contractPassword.substring(24, 48)) : stringToBigInt("")
@@ -99,7 +95,6 @@ export function NewCrossChainSyncModal({
             paramKey,
             chainId,
           )
-          console.log(fieldDataRequest)
           const fieldData = fieldDataRequest['data']
           const paramKeyRawEnd = stringToBigInt(paramKey.substring(24, 48))
             ? stringToBigInt(paramKey.substring(24, 48))
@@ -179,7 +174,6 @@ export function NewCrossChainSyncModal({
       }
 
       setParameterValue(fetchedValue)
-      console.log('Fetched Value:', fetchedValue)
     } catch (error) {
       console.error('Error in fetching value:', error)
       makeErrorNotif("Error in fetching value:", error.toString())
@@ -195,8 +189,6 @@ export function NewCrossChainSyncModal({
       document.getElementById('submitButton').disabled = true
     }
     await handleFetchValue()
-    console.log(parameterValue, 'submitted')
-    console.log(paramKey, paramToSync)
 
     try {
       let encodedData
@@ -274,7 +266,6 @@ export function NewCrossChainSyncModal({
           'Awaiting transaction acceptance...'
       }
       let receipt = await web3.eth.sendTransaction(txObject)
-      console.log('Transaction Receipt:', receipt)
 
       // CCIP message ID
       let messageId
@@ -287,7 +278,6 @@ export function NewCrossChainSyncModal({
 
       const transactionId = receipt.logs[receipt.logs.length - 1].data
 
-      console.log('Message ID:', messageId)
       const type = paramToSyncDict[`${paramToSync}`]
       const targetChain = chainId == 43113 ? 80001 : 43113
       paramKey = document.getElementById('parameterKey').value

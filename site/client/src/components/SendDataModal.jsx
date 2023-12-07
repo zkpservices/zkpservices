@@ -83,7 +83,6 @@ export function SendDataModal({
   const currentTheme = document.documentElement.classList.contains('dark') ? tokyoNight : tokyoNightDay;
 
   useEffect(() => {
-    console.log(`DATA: ${data}`)
     if (open && !editorView && isEditorReady) {
       const newState = EditorState.create({
         doc: JSON.stringify(
@@ -128,9 +127,6 @@ export function SendDataModal({
         state: newState,
         parent: editorContainerRef.current,
       });
-
-      console.log(view.state.doc.toString());
-      console.log(JSON.parse(view.state.doc.toString()));
 
       setEditorView(view);
     }
@@ -204,14 +200,6 @@ export function SendDataModal({
         'ml-3 inline-flex justify-center rounded-md border border-transparent bg-gray-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2'
       document.getElementById('submitButton').disabled = true
     }
-    console.log('2FA _id', twoFARequestID)
-    console.log('2FA _oneTimeKey', twoFAOneTimeToken)
-    console.log('2FA two_factor_secret', twoFactorAuthPassword)
-    console.log('core requestId', requestID)
-    console.log('field', fieldRequested)
-    console.log('salt', oneTimeSalt)
-    console.log('contract password', contractPassword)
-    console.log('core one time key', oneTimeKey)
 
     if (require2FA) {
       if (chainId != 1440002) {
@@ -239,9 +227,7 @@ export function SendDataModal({
         }
         try {
           let receipt = await web3.eth.sendTransaction(txObject)
-          console.log('request random number receipt:', receipt)
         } catch (error) {
-          console.log(error)
           resetSubmitButton()
           makeErrorNotif("Error requesting random number", error.toString())
           return
@@ -256,7 +242,6 @@ export function SendDataModal({
             randomNumber = await _2FAContract.methods
               .getRandomNumber(twoFARequestID)
               .call()
-            console.log('Random number:', randomNumber)
             break
           } catch (error) {
             if (attempt === 3) {
@@ -266,7 +251,6 @@ export function SendDataModal({
               }
             }
             if (attempt < 30) {
-              console.log('Random number not ready, retrying...')
               await new Promise((resolve) => setTimeout(resolve, 2000))
             } else {
               console.error("Failed to retrieve random number after 1 minute.")
@@ -277,12 +261,6 @@ export function SendDataModal({
           }
         }
 
-        console.log(String(randomNumber))
-        console.log(String(stringToBigInt(twoFactorAuthPassword)))
-        console.log(
-          String(await poseidon([stringToBigInt(twoFactorAuthPassword)])),
-        )
-
         let _2FA_secret_hash = String(
           await poseidon([stringToBigInt(twoFactorAuthPassword)]),
         )
@@ -292,8 +270,6 @@ export function SendDataModal({
           two_factor_secret: String(stringToBigInt(twoFactorAuthPassword)),
           secret_hash: _2FA_secret_hash,
         })
-
-        console.log(_2FAProof)
 
         const _2FASmartContractVerifyProofCallData = {
           _id: twoFARequestID,
@@ -312,8 +288,6 @@ export function SendDataModal({
             pubSignals1: _2FAProof.proof.pubSignals[1],
           },
         }
-
-        console.log(_2FASmartContractVerifyProofCallData)
 
         data = _2FAContract.methods
           .verifyProof(
@@ -336,7 +310,6 @@ export function SendDataModal({
         }
         try {
           let receipt = await web3.eth.sendTransaction(txObject)
-          console.log('2FA verify proof receipt:', receipt)
         } catch (error) {
           console.error(error)
           resetSubmitButton()
@@ -350,7 +323,6 @@ export function SendDataModal({
           _oneTimeKey: twoFAOneTimeToken,
         }
 
-        console.log(_2FASmartContractRequestProofCallData)
 
         let data = _2FAContract.methods
           .requestProof(
@@ -370,7 +342,6 @@ export function SendDataModal({
         }
         try {
           let receipt = await web3.eth.sendTransaction(txObject)
-          console.log('request proof receipt:', receipt)
         } catch (error) {
           console.error(error)
           resetSubmitButton()
@@ -378,10 +349,6 @@ export function SendDataModal({
           return
         }
 
-        console.log(String(stringToBigInt(twoFactorAuthPassword)))
-        console.log(
-          String(await poseidon([stringToBigInt(twoFactorAuthPassword)])),
-        )
 
         let _2FA_secret_hash = String(
           await poseidon([stringToBigInt(twoFactorAuthPassword)]),
@@ -393,7 +360,6 @@ export function SendDataModal({
           secret_hash: _2FA_secret_hash,
         })
 
-        console.log(_2FAProof)
 
         const _2FASmartContractVerifyProofCallData = {
           _id: twoFARequestID,
@@ -412,7 +378,6 @@ export function SendDataModal({
           },
         }
 
-        console.log(_2FASmartContractVerifyProofCallData)
 
         data = _2FAContract.methods
           .verifyProof(
@@ -440,7 +405,6 @@ export function SendDataModal({
           makeErrorNotif("Error verifying 2FA proof", error.toString())
           return
         }
-        console.log('2FA verify proof receipt:', receipt)
       }
     }
 
@@ -453,53 +417,34 @@ export function SendDataModal({
             ? rippleCoreContract
             : null
 
-    console.log('2FA _id', twoFARequestID)
-    console.log('2FA _oneTimeKey', twoFAOneTimeToken)
-    console.log('2FA two_factor_secret', twoFactorAuthPassword)
-    console.log('core requestId', requestID)
-    console.log('field', fieldRequested)
-    console.log('salt', oneTimeSalt)
-    console.log('contract password', contractPassword)
-    console.log('core one time key', oneTimeKey)
 
     const field = splitTo24(fieldRequested)
-    console.log('field:', field)
 
     const salt = oneTimeSalt
-    console.log('salt:', oneTimeSalt)
 
     const one_time_key = splitTo24(oneTimeKey)
-    console.log('one_time_key:', one_time_key)
 
     const user_secret = splitTo24(contractPassword)
-    console.log('user_secret:', user_secret)
 
     const provided_field_and_key_hash = await poseidon(
       [field[0], field[1], one_time_key[0], one_time_key[1]].map((x) =>
         stringToBigInt(x),
       ),
     )
-    console.log('provided_field_and_key_hash:', provided_field_and_key_hash)
 
     const provided_field_and_salt_and_user_secret_hash = await poseidon(
       [field[0], field[1], salt, user_secret[0], user_secret[1]].map((x) =>
         stringToBigInt(x),
       ),
     )
-    console.log(
-      'provided_field_and_salt_and_user_secret_hash:',
-      provided_field_and_salt_and_user_secret_hash,
-    )
 
     const provided_salt_hash = await poseidon([stringToBigInt(oneTimeSalt)])
-    console.log('provided_salt_hash:', provided_salt_hash)
 
     const dataLocation = await poseidon(
       [field[0], field[1], salt, user_secret[0], user_secret[1]].map((x) =>
         stringToBigInt(x),
       ),
     )
-    console.log('dataLocation:', dataLocation)
 
     const coreProof = await generateCoreProof({
       field_0: stringToBigInt(field[0]),
@@ -514,9 +459,7 @@ export function SendDataModal({
         provided_field_and_salt_and_user_secret_hash,
       provided_salt_hash: provided_salt_hash,
     })
-    console.log('coreProof:', coreProof)
 
-    console.log(coreProof)
 
     const respondCallData = {
       requestId: requestID,
@@ -538,7 +481,6 @@ export function SendDataModal({
       isUpdate: false,
     }
 
-    console.log(respondCallData)
 
     let data = coreContract.methods
       .respond(
@@ -564,7 +506,6 @@ export function SendDataModal({
           twoFASuccess = await _2FAContract.methods
             .twoFactorData(twoFARequestID)
             .call()
-          console.log('2FA Finality:', twoFASuccess.success)
           if (twoFASuccess.success) break
           await new Promise((resolve) => setTimeout(resolve, 2000))
         }
@@ -576,7 +517,6 @@ export function SendDataModal({
     }
     try {
       let receipt = await web3.eth.sendTransaction(txObject)
-      console.log('core verify proof receipt:', receipt)
     } catch (error) {
       console.error(error)
       resetSubmitButton()

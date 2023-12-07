@@ -211,7 +211,6 @@ export function Services({ handleRefresh }) {
   const pullChainData = async (userAddress, userPassword, chainId) => {
     try {
       const chainData = await getChainData(userAddress, userPassword, chainId)
-      console.log(JSON.stringify(chainData, null, 2))
       let keysList = chainData['data']['props']['onboarded_chains']
       const filteredKeysList = Object.keys(chains).filter(
         (item) => !keysList.includes(item),

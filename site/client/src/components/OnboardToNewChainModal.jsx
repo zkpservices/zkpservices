@@ -72,9 +72,6 @@ export function OnboardToNewChainModal({
           ? mumbaiBatchSignUpContract
           : rippleBatchSignUpContract
 
-    console.log(batchSignUpContract)
-    console.log(web3)
-    console.log(targetChainId)
     if (document.getElementById('submitButton')) {
       document.getElementById('submitButton').textContent =
         'Awaiting chain swap...'
@@ -88,7 +85,6 @@ export function OnboardToNewChainModal({
         })
         setOnboardedChain(false)
       } catch (error) {
-        console.log(error)
         resetSubmitButton()
         makeErrorNotif("Error switching chains", error.toString())
         return
@@ -116,7 +112,6 @@ export function OnboardToNewChainModal({
     }
     try {
       let receipt = await web3.eth.sendTransaction(txObject)
-      console.log('Batch SignUp Transaction Receipt:', receipt)
     } catch (error) {
       showErrorNotif(true)
       setErrorTopText("Error completing chain onboarding")

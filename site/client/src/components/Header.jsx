@@ -98,7 +98,6 @@ export const Header = forwardRef(function Header({ className }, ref) {
   function handleChainChanged(metamask_chain_id) {
     // We recommend reloading the page, unless you must do otherwise.
     setChainId(metamask_chain_id)
-    console.log(metamask_chain_id)
   }
 
   // window.ethereum.on('chainChanged', handleChainChanged);
@@ -142,7 +141,6 @@ export const Header = forwardRef(function Header({ className }, ref) {
         method: 'eth_chainId',
       })
       setChainId(metamask_chain_id)
-      console.log(metamask_chain_id)
       setUserAddress(accounts[0])
       initializeWeb3()
     } catch (error) {
@@ -172,7 +170,6 @@ export const Header = forwardRef(function Header({ className }, ref) {
     initializeWeb3()
 
     const handleChainChanged = (_chainId) => {
-      console.log(_chainId)
       setChainId(_chainId)
       initializeWeb3();
       if (loggedIn && walletConnected && !isOnboarding) {

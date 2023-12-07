@@ -113,9 +113,6 @@ export function CompletedDataUpdateModal({
         parent: editorContainerRef.current,
       });
 
-      console.log(view.state.doc.toString());
-      console.log(JSON.parse(view.state.doc.toString()));
-
       setEditorView(view);
     }
 

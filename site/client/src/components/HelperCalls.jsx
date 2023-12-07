@@ -370,7 +370,6 @@ export async function generateCoreProof(inputs) {
   )
   if (response.ok) {
     vKey = await response.json()
-    console.log('vKey:', vKey)
   } else {
     console.error('Failed to fetch verification key.')
   }
@@ -402,7 +401,6 @@ export async function generateCoreProof(inputs) {
         },
       }
 
-      console.log(res)
 
       return res
     } else {
@@ -434,7 +432,6 @@ export async function generate2FAProof(inputs) {
   )
   if (response.ok) {
     vKey = await response.json()
-    console.log('vKey:', vKey)
   } else {
     console.error('Failed to fetch verification key.')
   }
@@ -465,7 +462,6 @@ export async function generate2FAProof(inputs) {
           pubSignals: _pubSignals,
         },
       }
-      console.log(res)
       return res
     } else {
       return { result: 'Invalid proof' }
@@ -497,7 +493,6 @@ export async function generatePasswordChangeProof(inputs) {
   )
   if (response.ok) {
     vKey = await response.json()
-    console.log('vKey:', vKey)
   } else {
     console.error('Failed to fetch verification key.')
   }
@@ -528,7 +523,6 @@ export async function generatePasswordChangeProof(inputs) {
           pubSignals: _pubSignals,
         },
       }
-      console.log(res)
       return res
     } else {
       return { result: 'Invalid proof' }

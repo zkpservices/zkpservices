@@ -109,7 +109,6 @@ export function NewUpdateRequestModal({
     web3,
     chainId,
   } = useGlobal();
-  console.log(web3);
 
   const editorContainerRef = useRef(null);
   const [editorView, setEditorView] = useState(null);
@@ -173,9 +172,6 @@ export function NewUpdateRequestModal({
         state: newState,
         parent: editorContainerRef.current,
       });
-
-      console.log(view.state.doc.toString());
-      console.log(JSON.parse(view.state.doc.toString()));
 
       setEditorView(view);
     }
@@ -389,11 +385,9 @@ export function NewUpdateRequestModal({
       twoFAOneTimeToken: formDataJSON['twoFAOneTimeToken'],
       attach_token: formDataJSON['attachToken'] === 'on',
     }
-    console.log(request)
 
     let dataHashes = await flattenJsonAndComputeHash(editorView.state.doc.toString())
     let rootHash = dataHashes['rootHash']
-    console.log('rootHash', rootHash)
 
     if (isTwoFAEnabled) {
       try {
@@ -404,7 +398,6 @@ export function NewUpdateRequestModal({
           ),
         }
 
-        console.log(_2FASmartContractCallData)
 
         const data = _2FAContract.methods
           .generate2FA(
@@ -424,7 +417,6 @@ export function NewUpdateRequestModal({
             'Awaiting 2FA acceptance...'
         }
         const receipt = await web3.eth.sendTransaction(txObject)
-        console.log('2FA Contract Transaction Receipt:', receipt)
       } catch (error) {
         console.error('Error in 2FA Contract Call:', error)
         resetSubmitButton()
@@ -453,7 +445,6 @@ export function NewUpdateRequestModal({
         ]),
       }
 
-      console.log(coreContractCallData)
 
       const data = coreContract.methods
         .requestUpdate(
@@ -480,7 +471,6 @@ export function NewUpdateRequestModal({
           'Awaiting request acceptance...'
       }
       const receipt = await web3.eth.sendTransaction(txObject)
-      console.log('Core Contract Transaction Receipt:', receipt)
     } catch (error) {
       console.error('Error in Core Contract Call:', error)
       resetSubmitButton()
@@ -488,7 +478,6 @@ export function NewUpdateRequestModal({
       return
     }
 
-    console.log(request)
     document.getElementById('submitButton').textContent =
       'Submitting request...'
     try {
@@ -725,7 +714,6 @@ export function NewUpdateRequestModal({
                         className="ml-1 mt-2 h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500 dark:border-gray-700"
                         checked={isTwoFAEnabled}
                         onChange={(e) => {
-                          console.log(e)
                           setIsTwoFAEnabled(!isTwoFAEnabled) // Update the state variable
                         }}
                       />
