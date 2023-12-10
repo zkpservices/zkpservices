@@ -1,14 +1,11 @@
-// AwaitingDataModal.jsx
+import { Fragment, useState } from 'react'
+import { Dialog, Transition } from '@headlessui/react'
+import { XMarkIcon } from '@heroicons/react/24/outline'
 
-import { Fragment, useState } from 'react';
-import { Dialog, Transition } from '@headlessui/react';
-import { XMarkIcon } from '@heroicons/react/24/outline';
-
-// A React component to display a modal for awaiting data
 export function AwaitingDataModal({
-  open, // Flag indicating whether the modal is open or not
-  onClose, // Callback function to close the modal
-  requestID = '',
+  open,
+  onClose,
+  requestID='',
   addressOfReceivingParty = '',
   fieldRequested = '',
   oneTimeKey = '',

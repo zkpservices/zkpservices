@@ -36,7 +36,6 @@ import { abcdef } from '@uiw/codemirror-theme-abcdef'
 import { tokyoNight } from '@uiw/codemirror-theme-tokyo-night'
 import { tokyoNightDay } from '@uiw/codemirror-theme-tokyo-night-day'
 
-// React component for displaying a modal with information about a completed data update
 export function CompletedDataUpdateModal({
   open,
   onClose,
@@ -53,14 +52,11 @@ export function CompletedDataUpdateModal({
   responseFee = '',
   require2FA = false,
 }) {
-  // Ref for the CodeMirror editor container
+
   const editorContainerRef = useRef(null);
-  // State for CodeMirror editor view
   const [editorView, setEditorView] = useState(null);
-  // State to track editor readiness
   const [isEditorReady, setIsEditorReady] = useState(false);
 
-  // Theme for CodeMirror editor border
   const borderTheme = EditorView.theme({
     '.cm-editor': { 'border-radius': '0.375rem' },
     '&': { 'border-radius': '0.375rem' },
@@ -69,36 +65,57 @@ export function CompletedDataUpdateModal({
     '.cm-focused': { 'border-radius': '0.375rem' },
   });
 
-  // Determine the current theme based on the application's dark mode
   const currentTheme = document.documentElement.classList.contains('dark') ? tokyoNight : tokyoNightDay;
 
-  // Effect to handle CodeMirror editor initialization and cleanup
   useEffect(() => {
-    // Open the modal and the editor is ready
     if (open && !editorView && isEditorReady) {
-      // Create a new editor state with appropriate extensions
       const newState = EditorState.create({
         doc: JSON.stringify(
-          JSON.parse(snapshotDataAfterUpdate),
-          null,
-          2,
-        ),
+                          JSON.parse(snapshotDataAfterUpdate),
+                          null,
+                          2,
+                        ),
         extensions: [
-          // ... various CodeMirror extensions
+          lineNumbers(),
+          highlightActiveLineGutter(),
+          highlightSpecialChars(),
+          history(),
+          foldGutter(),
+          drawSelection(),
+          dropCursor(),
+          EditorState.allowMultipleSelections.of(true),
+          indentOnInput(),
+          syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
+          bracketMatching(),
+          closeBrackets(),
+          rectangularSelection(),
+          crosshairCursor(),
+          highlightActiveLine(),
+          highlightSelectionMatches(),
+          keymap.of([
+            ...closeBracketsKeymap,
+            ...defaultKeymap,
+            ...searchKeymap,
+            ...historyKeymap,
+            ...foldKeymap,
+            ...completionKeymap,
+            ...lintKeymap,
+          ]),
+          json(),
+          currentTheme,
+          borderTheme,
+          EditorState.readOnly.of(true)
         ],
       });
 
-      // Initialize the editor view with the new state
       const view = new EditorView({
         state: newState,
         parent: editorContainerRef.current,
       });
 
-      // Set the editor view in the component state
       setEditorView(view);
     }
 
-    // Clean up the editor when the modal is closed
     return () => {
       if (editorView) {
         editorView.destroy();
@@ -106,14 +123,11 @@ export function CompletedDataUpdateModal({
     };
   }, [open, isEditorReady]);
 
-  // Effect to handle modal open/close and editor readiness
   useEffect(() => {
-    // Set a timer to ensure the editor is ready shortly after modal open
     if (open) {
       const timer = setTimeout(() => setIsEditorReady(true), 50);
       return () => clearTimeout(timer);
     } else {
-      // Destroy the editor and reset readiness when the modal is closed
       if(editorView){
         editorView.destroy();
       }
@@ -122,7 +136,6 @@ export function CompletedDataUpdateModal({
     }
   }, [open]); 
 
-  // JSX rendering of the modal using the Transition and Dialog components
   return (
     <Transition.Root show={open} as={Fragment}>
       <Dialog

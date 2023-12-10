@@ -54,114 +54,89 @@ export function OnboardToNewChainModal({
     }
   }
 
-// Asynchronous function handling the form submission for onboarding to a new blockchain
-const handleSubmit = async () => {
-  // Update UI to indicate that the submission is in progress
-  if (document.getElementById('submitButton')) {
-    document.getElementById('submitButton').textContent = 'Running...'
-    document.getElementById('submitButton').className =
-      'ml-3 inline-flex justify-center rounded-md border border-transparent bg-gray-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2'
-    document.getElementById('submitButton').disabled = true
-  }
-
-  // Store the current chain ID before potential changes
-  const oldChainId = chainId
-
-  // Retrieve the selected value from the chain selection dropdown
-  const selectedValue = document.getElementById('chain').value
-
-  // Determine the target chain ID based on the selected value
-  const targetChainId = chains[selectedValue]
-
-  // Select the appropriate batch sign-up contract based on the target chain
-  const batchSignUpContract =
-    targetChainId === 43113
-      ? fujiBatchSignUpContract
-      : targetChainId === 80001
-      ? mumbaiBatchSignUpContract
-      : rippleBatchSignUpContract
-
-  // Update UI to indicate that the chain swap is in progress
-  if (document.getElementById('submitButton')) {
-    document.getElementById('submitButton').textContent =
-      'Awaiting chain swap...'
-  }
-
-  // Check if a chain swap is needed and attempt to switch the Ethereum chain
-  if (targetChainId !== chainId) {
-    const chainIdHex = `0x${targetChainId.toString(16)}`
-    try {
-      await window.ethereum.request({
-        method: 'wallet_switchEthereumChain',
-        params: [{ chainId: chainIdHex }],
-      })
-      // Set the state to indicate that the user is not yet onboarded to the new chain
-      setOnboardedChain(false)
-    } catch (error) {
-      // Handle errors during chain switching
-      resetSubmitButton()
-      makeErrorNotif("Error switching chains", error.toString())
-      return
+  const handleSubmit = async () => {
+    if (document.getElementById('submitButton')) {
+      document.getElementById('submitButton').textContent = 'Running...'
+      document.getElementById('submitButton').className =
+        'ml-3 inline-flex justify-center rounded-md border border-transparent bg-gray-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2'
+      document.getElementById('submitButton').disabled = true
     }
+    const oldChainId = chainId
+    const selectedValue = document.getElementById('chain').value
+    const targetChainId = chains[selectedValue]
+
+    const batchSignUpContract =
+      targetChainId == 43113
+        ? fujiBatchSignUpContract
+        : targetChainId == 80001
+          ? mumbaiBatchSignUpContract
+          : rippleBatchSignUpContract
+
+    if (document.getElementById('submitButton')) {
+      document.getElementById('submitButton').textContent =
+        'Awaiting chain swap...'
+    }
+    if (targetChainId != chainId) {
+      const chainIdHex = `0x${targetChainId.toString(16)}`
+      try {
+        await window.ethereum.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: chainIdHex }],
+        })
+        setOnboardedChain(false)
+      } catch (error) {
+        resetSubmitButton()
+        makeErrorNotif("Error switching chains", error.toString())
+        return
+      }
+    }
+
+    let data = batchSignUpContract.methods
+      .batchSignUp(
+        props.userSecretHash,
+        props.rsa_enc_pub_key,
+        props.rsa_sign_pub_key,
+        props.public_info,
+      )
+      .encodeABI()
+
+    let txObject = {
+      from: userAddress,
+      to: batchSignUpContract.options.address,
+      data: data,
+      gas: 3000000,
+    }
+    if (document.getElementById('submitButton')) {
+      document.getElementById('submitButton').textContent =
+        'Awaiting transaction acceptance...'
+    }
+    try {
+      let receipt = await web3.eth.sendTransaction(txObject)
+    } catch (error) {
+      showErrorNotif(true)
+      setErrorTopText("Error completing chain onboarding")
+      setErrorBottomText(error.toString())
+    }
+    if (document.getElementById('submitButton')) {
+      document.getElementById('submitButton').textContent =
+        'Submitting transaction...'
+    }
+    try {
+      addNewChain(
+        userAddress,
+        userPassword,
+        oldChainId,
+        `0x${targetChainId.toString(16)}`,
+      )
+    } catch (error) {
+      showErrorNotif(true)
+      setErrorTopText("Error completing chain onboarding")
+      setErrorBottomText(error.toString())
+    }
+    showNotif(false, "Chain Onboarded", "Onboarded to new chain successfully.")
+    onClose()
+
   }
-
-  // Prepare data for batch sign-up contract method invocation
-  let data = batchSignUpContract.methods
-    .batchSignUp(
-      props.userSecretHash,
-      props.rsa_enc_pub_key,
-      props.rsa_sign_pub_key,
-      props.public_info,
-    )
-    .encodeABI()
-
-  // Prepare transaction object for the Ethereum transaction
-  let txObject = {
-    from: userAddress,
-    to: batchSignUpContract.options.address,
-    data: data,
-    gas: 3000000,
-  }
-
-  // Update UI to indicate that transaction acceptance is awaited
-  if (document.getElementById('submitButton')) {
-    document.getElementById('submitButton').textContent =
-      'Awaiting transaction acceptance...'
-  }
-
-  try {
-    // Send the transaction and await the receipt
-    let receipt = await web3.eth.sendTransaction(txObject)
-  } catch (error) {
-    // Handle errors during transaction submission
-    showErrorNotif(true)
-    setErrorTopText("Error completing chain onboarding")
-    setErrorBottomText(error.toString())
-  }
-
-  // Update UI to indicate that the transaction is being submitted
-  if (document.getElementById('submitButton')) {
-    document.getElementById('submitButton').textContent =
-      'Submitting transaction...'
-  }
-
-  try {
-    // Add the new chain information to the user's account
-    addNewChain(userAddress, userPassword, oldChainId, `0x${targetChainId.toString(16)}`)
-  } catch (error) {
-    // Handle errors during the addition of the new chain
-    showErrorNotif(true)
-    setErrorTopText("Error completing chain onboarding")
-    setErrorBottomText(error.toString())
-  }
-
-  // Display a notification for successful chain onboarding
-  showNotif(false, "Chain Onboarded", "Onboarded to new chain successfully.")
-
-  // Close the modal
-  onClose()
-}
-
 
   return (
     <Transition.Root show={open} as={Fragment}>

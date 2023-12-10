@@ -207,90 +207,62 @@ export function Services({ handleRefresh }) {
   const [notifTopText, setNotifTopText] = useState("");
   const [notifBottomText, setNotifBottomText] = useState("");
 
-const pullChainData = async (userAddress, userPassword, chainId) => {
-  try {
-    // Fetch chain data using provided user credentials and chain identifier.
-    const chainData = await getChainData(userAddress, userPassword, chainId);
-
-    // Extract the list of onboarded chains from the fetched data.
-    let keysList = chainData['data']['props']['onboarded_chains'];
-
-    // Filter out chains that are already onboarded.
-    const filteredKeysList = Object.keys(chains).filter(
-      (item) => !keysList.includes(item)
-    );
-
-    // Identify and map the chains that are currently in use.
-    const usedChainsList = Object.keys(chains)
-      .filter((item) => keysList.includes(item) && item !== chainId)
-      .map((key) => chains[key]);
-
-    // Update the state with the list of used chains.
-    setUsedChains(usedChainsList);
-
-    // Create a result list containing chains that can be onboarded.
-    const result = filteredKeysList.map((key) => chains[key]);
-
-    // Extract and process user secret hash for local use.
-    const userSecretHashBigint = stringToBigInt(
-      chainData['data']['props']['2fa_password']
-    );
-    const userSecretHashLocal = await poseidon([
-      userSecretHashBigint.toString(),
-    ]);
-
-    // Update the state with the available chains, user secret hash, and other properties.
-    setAvailableChains(result);
-    const propsLocal = chainData['data']['props'];
-    propsLocal['userSecretHash'] = userSecretHashLocal;
-    propsLocal['rsa_enc_pub_key'] =
-      chainData['data']['props']['rsa_enc_pub_key'];
-    propsLocal['rsa_sign_pub_key'] =
-      chainData['data']['props']['rsa_sign_pub_key'];
-    propsLocal['public_info'] = chainData['data']['props']['public_info'];
-    setProps(propsLocal);
-  } catch (error) {
-    // Handle errors by setting error notifications.
-    setApiErrorNotif(true);
-    setApiErrorTopText("Error fetching chain data");
-    setApiErrorBottomText(error.toString());
+  const pullChainData = async (userAddress, userPassword, chainId) => {
+    try {
+      const chainData = await getChainData(userAddress, userPassword, chainId)
+      let keysList = chainData['data']['props']['onboarded_chains']
+      const filteredKeysList = Object.keys(chains).filter(
+        (item) => !keysList.includes(item),
+      )
+      const usedChainsList = Object.keys(chains)
+        .filter((item) => keysList.includes(item) && item != chainId)
+        .map((key) => chains[key])
+      setUsedChains(usedChainsList)
+      const result = filteredKeysList.map((key) => chains[key])
+      const userSecretHashBigint = stringToBigInt(
+        chainData['data']['props']['2fa_password'],
+      )
+      const userSecretHashLocal = await poseidon([
+        userSecretHashBigint.toString(),
+      ])
+      setAvailableChains(result)
+      const propsLocal = chainData['data']['props']
+      propsLocal['userSecretHash'] = userSecretHashLocal
+      propsLocal['rsa_enc_pub_key'] =
+        chainData['data']['props']['rsa_enc_pub_key']
+      propsLocal['rsa_sign_pub_key'] =
+        chainData['data']['props']['rsa_sign_pub_key']
+      propsLocal['public_info'] = chainData['data']['props']['public_info']
+      setProps(propsLocal)
+    } catch (error) {
+      setApiErrorNotif(true)
+      setApiErrorTopText("Error fetching chain data")
+      setApiErrorBottomText(error.toString())
+    }
   }
-};
 
-
-async function addNewRequest(requestData) {
-  // Compile request data with additional sender address and chain ID.
-  const compiledRequestData = {
-    ...requestData,
-    address_sender: userAddress,
-    chainID: chainId,
-  };
-
-  // Create a final data structure for the request.
-  const finalRequestData = {
-    request: compiledRequestData,
-  };
-
-  try {
-    // Attempt to add the new request to the blockchain using API call.
+  async function addNewRequest(requestData) {
+    const compiledRequestData = {
+      ...requestData,
+      address_sender: userAddress,
+      chainID: chainId,
+    }
+    const finalRequestData = {
+      request: compiledRequestData,
+    }
+    try {
     const addRequestResult = await addRequest(
       userAddress,
       userPassword,
       finalRequestData,
-      chainId
-    );
-
-    // Optionally handle the result of the addRequest operation.
-    // (This part is not provided in the code snippet.)
-
-  } catch (error) {
-    // Handle errors by setting error notifications.
-    setApiErrorNotif(true);
-    setApiErrorTopText("Error adding request");
-    setApiErrorBottomText(error.toString());
+      chainId,
+    )
+    } catch (error) {
+      setApiErrorNotif(true)
+      setApiErrorTopText("Error adding request")
+      setApiErrorBottomText(error.toString())
+    }
   }
-}
-
 
   useEffect(() => {
     if (userAddress && onboardedChain) {

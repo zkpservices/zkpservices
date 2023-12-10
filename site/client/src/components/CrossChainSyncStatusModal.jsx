@@ -4,35 +4,30 @@ import { XMarkIcon } from '@heroicons/react/24/outline' // Import the XMarkIcon
 import { truncateAddress } from './APICalls'
 import { removeMetadata } from './HelperCalls'
 
-// React component for Cross-Chain Sync Status Modal
 export function CrossChainSyncStatusModal({
-  open, // Modal open state
-  onClose, // Function to close the modal
-  sourceChain = '', // Source chain ID
-  destinationChain = '', // Destination chain ID
-  parameterSynced = '', // Synced parameter
-  parameterKey = '', // Parameter key (Address/Request ID/Response ID/Data Location, etc.)
-  parameterValue, // Parameter value
-  ccipRequestID = '', // Cross-Chain Integration Protocol (CCIP) Request ID
+  open,
+  onClose,
+  sourceChain = '',
+  destinationChain = '',
+  parameterSynced = '',
+  parameterKey = '',
+  parameterValue,
+  ccipRequestID = '',
 }) {
 
-  // Mapping of chain IDs to chain names
   let chains = {
     '0xa869': 'Fuji',
     '0x13881': 'Mumbai',
     '0x15f902': 'Ripple Dev EVM',
   }
 
-  // State to manage modal open status
   const [isOpen, setIsOpen] = useState(open)
-  // State to manage sync status
   const [status, setStatus] = useState('Incomplete')
 
-  // Effect to update modal open status when 'open' prop changes
   useEffect(() => {
     setIsOpen(open)
   }, [open])
-  
+
   return (
     <Transition.Root show={isOpen} as={Fragment}>
       <Dialog
@@ -183,7 +178,7 @@ export function CrossChainSyncStatusModal({
                       id="ccipFee"
                       className="font-mono relative mt-1 block w-full appearance-none rounded-md border border-gray-300 bg-slate-100 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 dark:border-gray-600 dark:border-gray-700 dark:bg-slate-700 dark:text-white dark:placeholder-gray-300 dark:focus:border-emerald-500 sm:text-sm"
                       rows={1}
-                      defaultValue="5 ZKP"
+                      defaultValue="10 ZKP"
                       readOnly
                       spellCheck="false"
                     />

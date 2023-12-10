@@ -166,7 +166,7 @@ export default function Quickstart() {
       resetSubmitButton()
       setApiErrorNotif(true)
       setApiErrorTopText('Batch SignUp Transaction error:')
-      setApiErrorBottomText(error.data.message.toString())
+      setApiErrorBottomText(error.toString())
       return false
       
     }
