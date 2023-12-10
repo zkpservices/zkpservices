@@ -168,9 +168,7 @@ export default function Quickstart() {
       setApiErrorTopText('Batch SignUp Transaction error:')
       setApiErrorBottomText(error.data.message.toString())
       return false
-      
     }
-    return true
   }
 
   const switchChain = async (targetChainId) => {
@@ -241,15 +239,12 @@ export default function Quickstart() {
       }
       for (const targetChainId of chainsToSwitch) {
         await switchChain(targetChainId)
-        const chainResponse = await callContractMethods(
+        await callContractMethods(
           targetChainId,
           formDataJSON,
           userSecretHash,
           formDataJSON['data'],
         )
-        if(!chainResponse) {
-          return
-        }
       }
 
       try {
@@ -302,7 +297,7 @@ export default function Quickstart() {
       resetSubmitButton()
       setApiErrorNotif(true)
       setApiErrorTopText('Error in signing up user.')
-      setApiErrorBottomText(error)
+      setApiErrorBottomText(createUserResponse['data'])
       return
     }
   }
@@ -718,7 +713,7 @@ export default function Quickstart() {
                               <div className="ml-3 text-sm">
                                 <label
                                   htmlFor="comments"
-                                  className="font-medium"
+                                  className="font-bold"
                                 >
                                   Avalanche Fuji Testnet
                                 </label>
@@ -741,7 +736,7 @@ export default function Quickstart() {
                               <div className="ml-3 text-sm">
                                 <label
                                   htmlFor="candidates"
-                                  className="font-medium"
+                                  className="font-bold"
                                 >
                                   Polygon Mumbai Testnet
                                 </label>
@@ -763,7 +758,7 @@ export default function Quickstart() {
                                 />
                               </div>
                               <div className="ml-3 text-sm">
-                                <label htmlFor="offers" className="font-medium">
+                                <label htmlFor="offers" className="font-bold">
                                   Ripple EVM Sidechain
                                 </label>
                                 <p>
