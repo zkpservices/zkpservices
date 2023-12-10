@@ -1,0 +1,60 @@
+chainlink variables:
+
+
+avalanche fuji keyhash: 0x354d2f95da55398f44b7cff77da56283d9c6c829a4bdf1bbcaf2ad6a4d081f61
+avalanche fuji VRF coordinator:0x2eD832Ba664535e5886b75D64C46EB9a228C2610
+avalanche fuji VRF minimum confirmations: 1
+avalanche fuji router address: 0x554472a2720E5E7D5D3C817529aBA05EEd5F82D8
+avalanche fuji chain selector: 14767482510784806043
+avalanche fuji LINK address: 0x0b9d5D9136855f6FEc3c0993feE6E9CE8a297846
+
+polygon mumbai keyhash: 0x4b09e658ed251bcafeebbc69400383d49f344ace09b9576fe248bb02c003fe9f
+polygon mumbai VRF coordinator: 0x7a1BaC17Ccc5b313516C5E16fb24f7659aA5ebed
+polygon mumbai VRF minimum confirmations: 3
+polygon mumbai router address: 0x70499c328e1E2a3c41108bd3730F6670a44595D1
+polygon mumbai chain selector: 12532609583862916517
+polygon mumbai LINK address: 0x326C977E6efc84E512bB9C30f76E30c160eD06FB
+
+========================================================================================
+
+deployment steps:
+
+
+- set compiler to 0.8.20, set EVM version to paris, set to 200 optimizations
+- deploy the contracts/verifiers for each network
+- create a subscription on vrf.chain.link and fund it with testnet link for each chainlink compatible network
+- deploy 2FA/VRF.sol to the chains you wish and that it is supported on, with params from above
+	- avalanche
+	- polygon
+- add VRF contract as a consumer of the VRF subscription on vrf.chain.link
+- deploy ZKPServicesVRF2FA.sol/ZKPServicesGeneric2FA.sol with verifier addresses
+- authorize ZKPServicesVRF2FA.sol address in VRF.sol with the setAuthorized method
+- confirm that ZKPServicesVRF2FA.sol works:
+	0) set a user secret as the poseidon hash in the ZKPServicesVRF2FA contract first
+		- choose a user secret: "usersecret"
+		- convert to big int: 117115101114115101099114101116
+		- calculate poseidon hash: 
+			8728143378907758220150300158112402160091207357639356933448980725720229078034
+		- onboard for address with setSecret
+	1) call generate2FA with a random number and the keccak256 hash of a random secret:
+		for 1000, "test", it's 
+		generate2FA(1000, 0x9c22ff5f21f0b81b113e63f7db6da94fedef11b2119b4088b89664fb9a3cb658)
+	2) call requestRandomNumber(1000, "test")
+	3) getRandomNumber(1000) should work after a few seconds
+	4) a ZKP can later be submitted to prove knowledge of the user secret without revealing
+		it while submitting the random number returned. this will guarantee timely knowledge
+		of the user secret
+- register ZKPServicesVRF2FA contract with automation.chain.link and fund the custom logic upkeep
+- deploy ZKPServicesCore.sol with core response verifier address and CCIPreceiverrouter/dummy address for
+  non-CCIP compatible chains
+- call register2FAProvider with the ZKPServicesVRF2FA/ZKPServicesGeneric2FA address
+- deploy BatchSignUp.sol with the 2FA contract address and core contract address
+- call setBatchSignUpContractAddress in ZKPServicesCore and ZKPServicesVRF2FA/ZKPServicesGeneric2FA
+
+CCIP steps:
+
+- fund ZKPServicesCore itself with LINK
+- call setSender with the router address and LINK address for the network
+- call setReceiver with the shorthand for receiver "mumbai"/"fuji", destination chain selector, 
+	CCIPFee in ZKP tokens (5 * 10**18), and receiving contract address
+
