@@ -1,9 +1,0 @@
-
-fantom faucet (5 FTM/account every 5 minutes): https://faucet.fantom.network/
-fantom chainlink faucet (20 LINK every hour): https://faucets.chain.link/fantom-testnet
-
-avalanche fuji faucet (2 AVAX/account every day): https://core.app/en/tools/testnet-faucet/?subnet=c&token=c
-avalanche fuji chainlink faucet (20 LINK every hour): https://faucets.chain.link/fuji
-
-polygon mumbai faucet (0.2 MATIC/account every day): https://faucet.polygon.technology/
-polygon mumbai chainlink faucet (20 LINK every hour): https://faucets.chain.link/mumbai

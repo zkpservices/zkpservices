@@ -458,8 +458,6 @@ def add_response(sender_id, response, password):
         # Get sender's data from the database
         sender_data = get_full_data(sender_id)
 
-        print("GET FUCKED CUNT")
-
         if not sender_data:
             return {
                 "statusCode": 404,
