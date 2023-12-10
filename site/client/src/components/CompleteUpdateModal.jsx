@@ -264,7 +264,6 @@ export function CompleteUpdateModal({
             }
           }
         }
-    
         // Generate the hash of the 2FA secret
         let _2FA_secret_hash = String(
           await poseidon([stringToBigInt(twoFactorAuthPassword)]),

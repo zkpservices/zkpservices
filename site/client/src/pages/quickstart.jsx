@@ -168,7 +168,9 @@ export default function Quickstart() {
       setApiErrorTopText('Batch SignUp Transaction error:')
       setApiErrorBottomText(error.data.message.toString())
       return false
+      
     }
+    return true
   }
 
   const switchChain = async (targetChainId) => {
@@ -239,12 +241,15 @@ export default function Quickstart() {
       }
       for (const targetChainId of chainsToSwitch) {
         await switchChain(targetChainId)
-        await callContractMethods(
+        const chainResponse = await callContractMethods(
           targetChainId,
           formDataJSON,
           userSecretHash,
           formDataJSON['data'],
         )
+        if(!chainResponse) {
+          return
+        }
       }
 
       try {
@@ -297,7 +302,7 @@ export default function Quickstart() {
       resetSubmitButton()
       setApiErrorNotif(true)
       setApiErrorTopText('Error in signing up user.')
-      setApiErrorBottomText(createUserResponse['data'])
+      setApiErrorBottomText(error)
       return
     }
   }
