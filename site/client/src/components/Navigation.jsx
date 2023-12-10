@@ -199,6 +199,7 @@ export const navigation = [
       { title: 'Multi-Factor Authentication', href: '/mfa' },
       { title: 'API Documentation', href: '/api_docs' },
       { title: 'dApp Guide', href: '/guides' },
+      { title: 'Contract References', href: '/references' },
     ],
   },
   {
