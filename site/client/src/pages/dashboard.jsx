@@ -142,7 +142,7 @@ export function Dashboard() {
       const mumbaiBatchSignUpContractAddress =
         '0x86Bdca1Dee159b0e20Ad9107F73E7c0925C4708b'
       const rippleBatchSignUpContractAddress =
-        '0x0a7051c92430561D0ee014b572Fb9F6ED2c78f0'
+        '0x0a7051c92430561D0ee014b572Fb9F6ED2c78f0E'
       const fujiBatchSignUpContractInstance = new web3Instance.eth.Contract(
         batchSignUpContractAbi,
         fujiBatchSignUpContractAddress,
