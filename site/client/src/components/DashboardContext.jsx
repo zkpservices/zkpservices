@@ -173,121 +173,168 @@ const [tableData, setTableData] = useState({
   Incoming: [],
   Outgoing: [],
   'Cross-Chain Sync': [],
-});
-const [userDataFields, setUserDataFields] = useState([]);
+})
+const [userDataFields, setUserDataFields] = useState([])
 
-// Function to format incoming data for display in the table
-function formatIncomingData(incomingRequests, incomingResponses, outgoingResponses) {
-  // Format incoming requests
+function formatIncomingData(
+  incomingRequests,
+  incomingResponses,
+  outgoingResponses,
+) {
   const formattedRequests = incomingRequests.map((item) => {
-    // Check if there is a matching response for the request
     const hasMatchingResponse = outgoingResponses.some((response) => {
-      return response.responseID === item.requestID;
-    });
-
-    // Determine operation text based on the type of request
-    const operationText = item.operation === 'update' ? 'Update Requested' : 'Data Requested';
-
-    // Create formatted object for the request
+      return response.responseID === item.requestID
+    })
+    const operationText =
+      item.operation === 'update' ? 'Update Requested' : 'Data Requested'
     return {
       operation: [
         operationText,
+        // (item.operation == "update" ? "By: " : "From: ") + truncateAddress(item.address_sender),
         "By: " + truncateAddress(item.address_sender),
       ],
       field: [item.field, ` Owner: You`],
       status: hasMatchingResponse
         ? ['Response Sent', 'grey']
-        : [item.operation === 'update' ? 'Complete Update' : 'Send Response', 'button'],
+        : [
+            item.operation === 'update' ? 'Complete Update' : 'Send Response',
+            'button',
+          ],
       details: ['View Details', `ID: ${truncateAddress(item.requestID)}`],
-      type: item.operation === 'update' ? 'incoming_request_update' : 'incoming_request_get',
-      // ... other properties
-      lastUpdated: item.last_updated,
-    };
-  });
+      type:
+        item.operation === 'update'
+          ? 'incoming_request_update'
+          : 'incoming_request_get',
+      requestID: item.requestID,
+      addressSender: item.address_sender,
+      data: item.operation === 'update' ? item.updated_data : item.data,
+      addressReceiver: item.address_receiver,
+      salt: item.salt,
+      limit: item.limit,
+      key: item.key,
+      response_fee: item.response_fee,
+      require2FA: item.require2FA,
+      twoFAProvider: item.twoFAProvider,
+      twoFARequestID: item.twoFARequestID,
+      twoFAOneTimeToken: item.twoFAOneTimeToken,
+      lastUpdated: item.last_updated
+    }
+  })
 
-  // Format incoming responses
   const formattedResponses = incomingResponses.map((item) => {
-    // Determine operation text based on the type of response
-    const operationText = item.operation === 'update' ? 'Update Completed' : 'Data Received';
-
-    // Create formatted object for the response
+    const operationText =
+      item.operation === 'update' ? 'Update Completed' : 'Data Received'
     return {
       operation: [
         operationText,
-        (item.operation === 'update' ? 'By: ' : 'From: ') + truncateAddress(item.address_sender),
+        (item.operation === 'update' ? 'By: ' : 'From: ') + truncateAddress(item.address_sender), 
       ],
       field: [item.field, ` Owner: ${truncateAddress(item.address_sender)}`],
       status: ['Show Response', 'grey'],
       details: ['View Details', `ID: ${truncateAddress(item.responseID)}`],
-      type: item.operation === 'update' ? 'incoming_response_update' : 'incoming_response_get',
-      // ... other properties
-      lastUpdated: item.last_updated,
-    };
-  });
+      type:
+        item.operation === 'update'
+          ? 'incoming_response_update'
+          : 'incoming_response_get',
+      addressSender: item.address_sender,
+      addressReceiver: item.address_receiver,
+      requestID: item.responseID,
+      data: item.operation === 'update' ? item.updated_data : item.data,
+      salt: item.salt,
+      limit: item.limit,
+      key: item.key,
+      response_fee: item.response_fee,
+      require2FA: item.require2FA,
+      twoFAProvider: item.twoFAProvider,
+      twoFARequestID: item.twoFARequestID,
+      twoFAOneTimeToken: item.twoFAOneTimeToken,
+      lastUpdated: item.last_updated
+    }
+  })
 
-  // Combine and sort incoming requests and responses by timestamp
-  let allIncoming = [...formattedRequests, ...formattedResponses];
+  let allIncoming =  [...formattedRequests, ...formattedResponses]
   return allIncoming.sort((a, b) => {
     const timestampA = parseInt(a.lastUpdated, 10);
     const timestampB = parseInt(b.lastUpdated, 10);
-  
+
     // Compare timestamps in descending order (newest first)
     return timestampB - timestampA;
   });
 }
 
-// Function to format outgoing data for display in the table
-function formatOutgoingData(outgoingRequests, outgoingResponses, incomingResponses) {
-  // Format outgoing requests
+function formatOutgoingData(
+  outgoingRequests,
+  outgoingResponses,
+  incomingResponses,
+) {
   const formattedRequests = outgoingRequests.map((item) => {
-    // Check if there is a matching response for the request
     const hasMatchingResponse = incomingResponses.some(
       (response) => response.responseID === item.requestID,
-    );
-
-    // Determine operation text based on the type of request
-    const operationText = item.operation === 'update' ? 'Update Requested' : 'Data Requested';
-
-    // Create formatted object for the request
+    )
+    const operationText =
+      item.operation === 'update' ? 'Update Requested' : 'Data Requested'
     return {
       operation: [
         operationText,
-        'By you',
+        'By you'
       ],
       field: [item.field, 'From: ' + truncateAddress(item.address_receiver)],
       status: hasMatchingResponse
         ? ['Response Received', 'grey']
         : ['Awaiting Response', 'grey'],
       details: ['View Details', ` ID: ${truncateAddress(item.requestID)}`],
-      type: item.operation === 'update' ? 'outgoing_request_update' : 'outgoing_request_get',
-      // ... other properties
-      lastUpdated: item.last_updated,
-    };
-  });
+      type:
+        item.operation === 'update'
+          ? 'outgoing_request_update'
+          : 'outgoing_request_get',
+      requestID: item.requestID,
+      addressSender: item.address_sender,
+      data: item.operation === 'update' ? item.updated_data : item.data,
+      addressReceiver: item.address_receiver,
+      salt: item.salt,
+      limit: item.limit,
+      key: item.key,
+      response_fee: item.response_fee,
+      require2FA: item.require2FA,
+      twoFAProvider: item.twoFAProvider,
+      twoFARequestID: item.twoFARequestID,
+      twoFAOneTimeToken: item.twoFAOneTimeToken,
+      lastUpdated: item.last_updated
+    }
+  })
 
-  // Format outgoing responses
   const formattedResponses = outgoingResponses.map((item) => {
-    // Determine operation text based on the type of response
-    const operationText = item.operation === 'update' ? 'Update Completed' : 'Data Sent';
-
-    // Create formatted object for the response
+    const operationText =
+      item.operation === 'update' ? 'Update Completed' : 'Data Sent'
     return {
       operation: [operationText, `By you`],
       field: [item.field, item.operation === 'update' ? null : 'To: ' + truncateAddress(item.address_receiver)],
       status: ['Response Sent', 'grey'],
       details: ['View Details',  `ID: ${truncateAddress(item.responseID)}`],
-      type: item.operation === 'update' ? 'outgoing_response_update' : 'outgoing_response_get',
-      // ... other properties
-      lastUpdated: item.last_updated,
-    };
-  });
-
-  // Combine and sort outgoing requests and responses by timestamp
-  let allOutgoing = [...formattedRequests, ...formattedResponses];
+      type:
+        item.operation === 'update'
+          ? 'outgoing_response_update'
+          : 'outgoing_response_get',
+      requestID: item.responseID,
+      addressSender: item.address_sender,
+      data: item.operation === 'update' ? item.updated_data : item.data,
+      addressReceiver: item.address_receiver,
+      salt: item.salt,
+      limit: item.limit,
+      key: item.key,
+      response_fee: item.response_fee,
+      require2FA: item.require2FA,
+      twoFAProvider: item.twoFAProvider,
+      twoFARequestID: item.twoFARequestID,
+      twoFAOneTimeToken: item.twoFAOneTimeToken,
+      lastUpdated: item.last_updated
+    }
+  })
+  let allOutgoing =  [...formattedRequests, ...formattedResponses]
   return allOutgoing.sort((a, b) => {
     const timestampA = parseInt(a.lastUpdated, 10);
     const timestampB = parseInt(b.lastUpdated, 10);
-  
+
     // Compare timestamps in descending order (newest first)
     return timestampB - timestampA;
   });
