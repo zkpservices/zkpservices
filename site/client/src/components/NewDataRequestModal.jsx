@@ -308,7 +308,7 @@ export function NewDataRequestModal({
           formDataJSON['twoFAProvider'] == 'zkp.services' && isTwoFAEnabled
             ? _2FAContract['_address']
             : !isTwoFAEnabled
-            ? '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'
+            ? '0x0000000000000000000000000000000000000000'
             : formDataJSON['twoFAProvider'],
         _2FAID: String(stringToBigInt(formDataJSON['twoFARequestID'])),
         responseFeeAmount: formDataJSON['responseFee'],
