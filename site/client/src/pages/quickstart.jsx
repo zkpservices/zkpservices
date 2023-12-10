@@ -463,7 +463,7 @@ export default function Quickstart() {
                 </div>
 
                 <div>
-                  <h3 className="text-lg font-medium leading-6">Passwords</h3>
+                  <h3 className="text-lg font-bold leading-6">Passwords</h3>
                   <p className="mt-1 max-w-2xl text-sm">
                     Select a secure password for each of the following services.
                   </p>
@@ -472,7 +472,7 @@ export default function Quickstart() {
                 <div className="dark:border-gray-700 sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:border-t sm:border-gray-200 sm:pt-5">
                   <label
                     htmlFor="email"
-                    className="block text-sm font-medium sm:mt-px sm:pt-2"
+                    className="block text-sm font-bold sm:mt-px sm:pt-2"
                   >
                     Database Password:
                   </label>
@@ -490,7 +490,7 @@ export default function Quickstart() {
                 <div className="dark:border-gray-700 sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:border-t sm:border-gray-200 sm:pt-5">
                   <label
                     htmlFor="email"
-                    className="block text-sm font-medium sm:mt-px sm:pt-2"
+                    className="block text-sm font-bold sm:mt-px sm:pt-2"
                   >
                     2FA Password:
                   </label>
@@ -508,7 +508,7 @@ export default function Quickstart() {
                 <div className="dark:border-gray-700 sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:border-t sm:border-gray-200 sm:pt-5">
                   <label
                     htmlFor="email"
-                    className="block text-sm font-medium sm:mt-px sm:pt-2"
+                    className="block text-sm font-bold sm:mt-px sm:pt-2"
                   >
                     Smart Contract Password:
                   </label>
@@ -526,7 +526,7 @@ export default function Quickstart() {
 
               <div className="space-y-6 pt-3 sm:space-y-5 sm:pt-5">
                 <div>
-                  <h3 className="text-lg font-medium leading-6">
+                  <h3 className="text-lg font-bold leading-6">
                     RSA Encryption Keys
                   </h3>
                   <p className="mt-1 max-w-2xl text-sm">
@@ -537,7 +537,7 @@ export default function Quickstart() {
                 <div className="dark:border-gray-700 sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:border-t sm:border-gray-200 sm:pt-5">
                   <label
                     htmlFor="about"
-                    className="block text-sm font-medium sm:mt-px sm:pt-2"
+                    className="block text-sm font-bold sm:mt-px sm:pt-2"
                   >
                     RSA Encryption Key - Public Key
                   </label>
@@ -556,7 +556,7 @@ export default function Quickstart() {
                 <div className="dark:border-gray-700 sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:border-t sm:border-gray-200 sm:pt-5">
                   <label
                     htmlFor="about"
-                    className="block text-sm font-medium sm:mt-px sm:pt-2"
+                    className="block text-sm font-bold sm:mt-px sm:pt-2"
                   >
                     RSA Encryption Key - Private Key
                   </label>
@@ -587,7 +587,7 @@ export default function Quickstart() {
 
               <div className="space-y-6 pt-3 sm:space-y-5 sm:pt-5">
                 <div>
-                  <h3 className="text-lg font-medium leading-6">
+                  <h3 className="text-lg font-bold leading-6">
                     RSA Signing Keys
                   </h3>
                   <p className="mt-1 max-w-2xl text-sm">
@@ -598,7 +598,7 @@ export default function Quickstart() {
                 <div className="dark:border-gray-700 sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:border-t sm:border-gray-200 sm:pt-5">
                   <label
                     htmlFor="about"
-                    className="block text-sm font-medium sm:mt-px sm:pt-2"
+                    className="block text-sm font-bold sm:mt-px sm:pt-2"
                   >
                     RSA Signing Key - Public Key
                   </label>
@@ -617,7 +617,7 @@ export default function Quickstart() {
                 <div className="dark:border-gray-700 sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:border-t sm:border-gray-200 sm:pt-5">
                   <label
                     htmlFor="about"
-                    className="block text-sm font-medium sm:mt-px sm:pt-2"
+                    className="block text-sm font-bold sm:mt-px sm:pt-2"
                   >
                     RSA Signing Key - Private Key
                   </label>
@@ -648,7 +648,7 @@ export default function Quickstart() {
 
               <div className="space-y-6 pt-3 sm:space-y-5 sm:pt-5">
                 <div>
-                  <h3 className="text-lg font-medium leading-6">
+                  <h3 className="text-lg font-bold leading-6">
                     (Optional) Public Information
                   </h3>
                   <p className="mt-1 max-w-2xl text-sm">
@@ -660,7 +660,7 @@ export default function Quickstart() {
                 <div className="dark:border-gray-700 sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:border-t sm:border-gray-200 sm:pt-5">
                   <label
                     htmlFor="about"
-                    className="block text-sm font-medium sm:mt-px sm:pt-2"
+                    className="block text-sm font-bold sm:mt-px sm:pt-2"
                   >
                     Public Information
                   </label>
@@ -682,7 +682,7 @@ export default function Quickstart() {
 
               <div className="space-y-6 divide-y divide-gray-200 pt-8 dark:divide-gray-700 sm:space-y-5 sm:pt-10">
                 <div>
-                  <h3 className="text-lg font-medium leading-6">
+                  <h3 className="text-lg font-bold leading-6">
                     Onboard to Smart Contract
                   </h3>
                   <p className="mt-1 max-w-none text-sm">
@@ -697,7 +697,7 @@ export default function Quickstart() {
                       <div className="sm:grid sm:grid-cols-3 sm:items-baseline sm:gap-4">
                         <div>
                           <div
-                            className="text-base font-medium sm:text-sm"
+                            className="text-base font-bold sm:text-sm"
                             id="label-email"
                           >
                             Blockchain:

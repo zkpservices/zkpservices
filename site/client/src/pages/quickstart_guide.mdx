@@ -1,13 +1,23 @@
 # Quickstart
 
-This form will allow you to set up the necessary parameters required to use various zkp.services. 
-These consist of a DB password, 2FA password, smart contract password, RSA encryption keys, and RSA signing keys. 
-The role of each is subsequently explained.
+<div className="mt-6">
+Welcome to the sign-up form that will enable you to set up and use various zkp.services. This includes configuring 
+your database password, zkp.services 2FA provider password, smart contract password for obfuscation, 
+RSA encryption keys and RSA signing keys. All parameters are further elaborated upon in each of their 
+respective sections, however, if you have any further issues or questions, please feel free to reach us at 
+<span className="font-mono">contact@zkp.services</span>. {{ className: 'lead' }}
 
 <Note>
-  Please make sure you have a positive balance of the native currency of the EVM-compatible chain you are trying to onboard to.
+  Please make sure you have a positive balance of the native currency of the EVM-compatible chain you are trying to onboard to. 
+  Please also be sure to make use of our ZKP token faucet after you onboard to be able to start using our services.
 </Note>
+</div>
 
+---
+
+# Description of Parameters
+
+<div className="mt-6">
 ### Database Password
 
 The database password will allow you to securely authenticate access to data stored with your chosen data provider, which will house
@@ -19,9 +29,10 @@ The 2FA password is used to validate that you are you through knowledge of an ad
 
 ### Smart Contract Password
 
-This is a password string that is used to obfuscate at which fields in the smart contract mappings proofs of plaintext data are stored.
-For example, `"Pharmacy Records for Good Pharmacy Co." => { obfuscated proof of data }` becomes 
-`"fdq928888f0q9u3333fuh0q98324fh9qqqqqqqq" => { obfuscated proof of data }`
+This is a password string that is used to obfuscate at which fields in the smart contract mappings/dictionaries proofs of plaintext data are stored.
+For example, `"Pharmacy Records for Good Pharmacy Co."` becomes `"fdq928888f0q9u3333fuh0q98324fh9qqqqqqqq"` in the smart contract as the location
+of the proof for this pharmacy records field. The proof of the plaintext data is also obfuscated so it cannot be easily read, as is the case with the
+field/location.
 
 ### RSA Encryption Keys
 
@@ -30,3 +41,6 @@ Used to encrypt communications between two entities - that is, used to encrypt r
 ### RSA Signing Keys
 
 Used to sign and validate stored data.
+</div>
+
+---
