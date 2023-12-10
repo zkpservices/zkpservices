@@ -194,83 +194,107 @@ export function SendDataModal({
   }
 
   const handleSubmit = async () => {
+    // Update UI to indicate that the submission is in progress
     if (document.getElementById('submitButton')) {
-      document.getElementById('submitButton').textContent = 'Running...'
+      document.getElementById('submitButton').textContent = 'Running...';
       document.getElementById('submitButton').className =
-        'ml-3 inline-flex justify-center rounded-md border border-transparent bg-gray-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2'
-      document.getElementById('submitButton').disabled = true
+        'ml-3 inline-flex justify-center rounded-md border border-transparent bg-gray-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2';
+      document.getElementById('submitButton').disabled = true;
     }
-
+  
+    // Handle two-factor authentication if required
     if (require2FA) {
       if (chainId != 1440002) {
-        //chainlink 2FA variants
+        // Chainlink 2FA variants
+  
+        // Prepare data for requesting a random number from the 2FA smart contract
         const _2FASmartContractRequestRandomNumberCallData = {
-          _id: twoFARequestID, //cast to big int once it's a string
+          _id: twoFARequestID, // cast to big int once it's a string
           _oneTimeKey: twoFAOneTimeToken,
-        }
-
+        };
+  
+        // Encode the ABI for the requestRandomNumber method
         let data = _2FAContract.methods
           .requestRandomNumber(
             _2FASmartContractRequestRandomNumberCallData._id,
             _2FASmartContractRequestRandomNumberCallData._oneTimeKey,
           )
-          .encodeABI()
+          .encodeABI();
+  
+        // Prepare the transaction object
         let txObject = {
           from: userAddress,
           to: _2FAContract.options.address,
           data: data,
           gas: 500000,
-        }
+        };
+  
+        // Update UI to indicate waiting for a random number
         if (document.getElementById('submitButton')) {
           document.getElementById('submitButton').textContent =
-            'Awaiting random number request...'
+            'Awaiting random number request...';
         }
+  
+        // Send the transaction to request a random number
         try {
-          let receipt = await web3.eth.sendTransaction(txObject)
+          let receipt = await web3.eth.sendTransaction(txObject);
         } catch (error) {
-          resetSubmitButton()
-          makeErrorNotif("Error requesting random number", error.toString())
-          return
+          // Handle errors and reset UI
+          resetSubmitButton();
+          makeErrorNotif("Error requesting random number", error.toString());
+          return;
         }
+  
+        // Update UI to indicate getting the random number
         if (document.getElementById('submitButton')) {
           document.getElementById('submitButton').textContent =
-            'Getting random number...'
+            'Getting random number...';
         }
-        let randomNumber
+  
+        // Get the random number from the 2FA smart contract
+        let randomNumber;
         for (let attempt = 0; attempt < 30; attempt++) {
           try {
             randomNumber = await _2FAContract.methods
               .getRandomNumber(twoFARequestID)
-              .call()
-            break
+              .call();
+            break;
           } catch (error) {
+            // Handle errors and retry
             if (attempt === 3) {
               if (document.getElementById('submitButton')) {
                 document.getElementById('submitButton').textContent =
-                  'Still getting random number...'
+                  'Still getting random number...';
               }
             }
             if (attempt < 30) {
-              await new Promise((resolve) => setTimeout(resolve, 2000))
+              await new Promise((resolve) => setTimeout(resolve, 2000));
             } else {
-              console.error("Failed to retrieve random number after 1 minute.")
-              resetSubmitButton()
-              makeErrorNotif("Error requesting random number", "Failed to retrieve random number after 1 minute.")
-              return
+              // Handle failure to retrieve the random number after 1 minute
+              console.error("Failed to retrieve random number after 1 minute.");
+              resetSubmitButton();
+              makeErrorNotif(
+                "Error requesting random number",
+                "Failed to retrieve random number after 1 minute."
+              );
+              return;
             }
           }
         }
-
+  
+        // Calculate the hash of the 2FA secret
         let _2FA_secret_hash = String(
           await poseidon([stringToBigInt(twoFactorAuthPassword)]),
-        )
-
+        );
+  
+        // Generate 2FA proof
         const _2FAProof = await generate2FAProof({
           random_number: String(randomNumber),
           two_factor_secret: String(stringToBigInt(twoFactorAuthPassword)),
           secret_hash: _2FA_secret_hash,
-        })
-
+        });
+  
+        // Prepare data for verifying the 2FA proof
         const _2FASmartContractVerifyProofCallData = {
           _id: twoFARequestID,
           _randomNumber: randomNumber,
@@ -287,8 +311,9 @@ export function SendDataModal({
             pubSignals0: _2FAProof.proof.pubSignals[0],
             pubSignals1: _2FAProof.proof.pubSignals[1],
           },
-        }
-
+        };
+  
+        // Encode the ABI for the verifyProof method
         data = _2FAContract.methods
           .verifyProof(
             _2FASmartContractVerifyProofCallData._id,
@@ -296,71 +321,84 @@ export function SendDataModal({
             _2FASmartContractVerifyProofCallData._userSecretHash,
             _2FASmartContractVerifyProofCallData.params,
           )
-          .encodeABI()
-
-        txObject = {
-          from: userAddress,
-          to: _2FAContract.options.address,
-          data: data,
-          gas: 5000000,
-        }
+          .encodeABI();
+  
+        // Update UI to indicate awaiting 2FA acceptance
         if (document.getElementById('submitButton')) {
           document.getElementById('submitButton').textContent =
-            'Awaiting 2FA acceptance...'
+            'Awaiting 2FA acceptance...';
         }
+  
+        // Send the transaction to verify the 2FA proof
         try {
-          let receipt = await web3.eth.sendTransaction(txObject)
+          let receipt = await web3.eth.sendTransaction({
+            from: userAddress,
+            to: _2FAContract.options.address,
+            data: data,
+            gas: 5000000,
+          });
         } catch (error) {
-          console.error(error)
-          resetSubmitButton()
-          makeErrorNotif("Error verifying 2FA proof", error.toString())
-          return
+          // Handle errors and reset UI
+          console.error(error);
+          resetSubmitButton();
+          makeErrorNotif("Error verifying 2FA proof", error.toString());
+          return;
         }
       } else {
-        //non-chainlink 2FA variants
+        // Non-chainlink 2FA variants
+  
+        // Prepare data for requesting a proof from the 2FA smart contract
         const _2FASmartContractRequestProofCallData = {
           _id: twoFARequestID,
           _oneTimeKey: twoFAOneTimeToken,
-        }
-
-
+        };
+  
+        // Encode the ABI for the requestProof method
         let data = _2FAContract.methods
           .requestProof(
             _2FASmartContractRequestProofCallData._id,
             _2FASmartContractRequestProofCallData._oneTimeKey,
           )
-          .encodeABI()
+          .encodeABI();
+  
+        // Prepare the transaction object
         let txObject = {
           from: userAddress,
           to: _2FAContract.options.address,
           data: data,
           gas: 500000,
-        }
+        };
+  
+        // Update UI to indicate awaiting response acceptance
         if (document.getElementById('submitButton')) {
           document.getElementById('submitButton').textContent =
-            'Awaiting response acceptance...'
+            'Awaiting response acceptance...';
         }
+  
+        // Send the transaction to request a proof
         try {
-          let receipt = await web3.eth.sendTransaction(txObject)
+          let receipt = await web3.eth.sendTransaction(txObject);
         } catch (error) {
-          console.error(error)
-          resetSubmitButton()
-          makeErrorNotif("Error verifying request proof", error.toString())
-          return
+          // Handle errors and reset UI
+          console.error(error);
+          resetSubmitButton();
+          makeErrorNotif("Error verifying request proof", error.toString());
+          return;
         }
-
-
+  
+        // Calculate the hash of the 2FA secret
         let _2FA_secret_hash = String(
           await poseidon([stringToBigInt(twoFactorAuthPassword)]),
-        )
-
+        );
+  
+        // Generate 2FA proof with a random number of 0 (specific to non-Chainlink variants)
         const _2FAProof = await generate2FAProof({
           random_number: String(0),
           two_factor_secret: String(stringToBigInt(twoFactorAuthPassword)),
           secret_hash: _2FA_secret_hash,
-        })
-
-
+        });
+  
+        // Prepare data for verifying the 2FA proof
         const _2FASmartContractVerifyProofCallData = {
           _id: twoFARequestID,
           _userSecretHash: _2FA_secret_hash,
@@ -376,76 +414,76 @@ export function SendDataModal({
             pubSignals0: _2FAProof.proof.pubSignals[0],
             pubSignals1: _2FAProof.proof.pubSignals[1],
           },
-        }
-
-
+        };
+  
+        // Encode the ABI for the verifyProof method
         data = _2FAContract.methods
           .verifyProof(
             _2FASmartContractVerifyProofCallData._id,
             _2FASmartContractVerifyProofCallData._userSecretHash,
             _2FASmartContractVerifyProofCallData.params,
           )
-          .encodeABI()
-
-        txObject = {
-          from: userAddress,
-          to: _2FAContract.options.address,
-          data: data,
-          gas: 5000000,
-        }
+          .encodeABI();
+  
+        // Update UI to indicate awaiting response acceptance
         if (document.getElementById('submitButton')) {
           document.getElementById('submitButton').textContent =
-            'Awaiting response acceptance...'
+            'Awaiting response acceptance...';
         }
+  
+        // Send the transaction to verify the 2FA proof
         try {
-          let receipt = await web3.eth.sendTransaction(txObject)
+          let receipt = await web3.eth.sendTransaction({
+            from: userAddress,
+            to: _2FAContract.options.address,
+            data: data,
+            gas: 5000000,
+          });
         } catch (error) {
-          console.error(error)
-          resetSubmitButton()
-          makeErrorNotif("Error verifying 2FA proof", error.toString())
-          return
+          // Handle errors and reset UI
+          console.error(error);
+          resetSubmitButton();
+          makeErrorNotif("Error verifying 2FA proof", error.toString());
+          return;
         }
       }
     }
-
+  
+    // Determine the core contract based on the chainId
     const coreContract =
       chainId == 43113
         ? fujiCoreContract
         : chainId == 80001
-          ? mumbaiCoreContract
-          : chainId == 1440002
-            ? rippleCoreContract
-            : null
-
-
-    const field = splitTo24(fieldRequested)
-
-    const salt = oneTimeSalt
-
-    const one_time_key = splitTo24(oneTimeKey)
-
-    const user_secret = splitTo24(contractPassword)
-
+        ? mumbaiCoreContract
+        : chainId == 1440002
+        ? rippleCoreContract
+        : null;
+  
+    // Split the fieldRequested, oneTimeSalt, oneTimeKey, and contractPassword into 24-character chunks
+    const field = splitTo24(fieldRequested);
+    const salt = oneTimeSalt;
+    const one_time_key = splitTo24(oneTimeKey);
+    const user_secret = splitTo24(contractPassword);
+  
+    // Calculate various hashes using Poseidon hash function
     const provided_field_and_key_hash = await poseidon(
       [field[0], field[1], one_time_key[0], one_time_key[1]].map((x) =>
         stringToBigInt(x),
       ),
-    )
-
+    );
     const provided_field_and_salt_and_user_secret_hash = await poseidon(
       [field[0], field[1], salt, user_secret[0], user_secret[1]].map((x) =>
         stringToBigInt(x),
       ),
-    )
-
-    const provided_salt_hash = await poseidon([stringToBigInt(oneTimeSalt)])
-
+    );
+    const provided_salt_hash = await poseidon([stringToBigInt(oneTimeSalt)]);
     const dataLocation = await poseidon(
       [field[0], field[1], salt, user_secret[0], user_secret[1]].map((x) =>
         stringToBigInt(x),
       ),
-    )
-
+    );
+  
+    // Generate proof for the core contract
     const coreProof = await generateCoreProof({
       field_0: stringToBigInt(field[0]),
       field_1: stringToBigInt(field[1]),
@@ -458,9 +496,9 @@ export function SendDataModal({
       provided_field_and_salt_and_user_secret_hash:
         provided_field_and_salt_and_user_secret_hash,
       provided_salt_hash: provided_salt_hash,
-    })
-
-
+    });
+  
+    // Prepare data for the respond method of the core contract
     const respondCallData = {
       requestId: requestID,
       dataLocation: dataLocation,
@@ -479,9 +517,9 @@ export function SendDataModal({
         pubSignals2: coreProof.proof.pubSignals[2],
       },
       isUpdate: false,
-    }
-
-
+    };
+  
+    // Encode the ABI for the respond method
     let data = coreContract.methods
       .respond(
         respondCallData.requestId,
@@ -490,14 +528,17 @@ export function SendDataModal({
         respondCallData.params,
         respondCallData.isUpdate,
       )
-      .encodeABI()
-
+      .encodeABI();
+  
+    // Prepare the transaction object for the core contract
     let txObject = {
       from: userAddress,
       to: coreContract.options.address,
       data: data,
       gas: 5000000,
-    }
+    };
+  
+    // Handle additional steps if two-factor authentication is required  
 
     if (require2FA) {
       if (chainId != 1440002) {

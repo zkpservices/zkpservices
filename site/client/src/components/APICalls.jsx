@@ -1,49 +1,68 @@
 // APICalls.jsx
 
-import axios from 'axios'
+// Import the Axios library for making HTTP requests
+import axios from 'axios';
 
-const API_BASE_URL =
-  'https://api.zkp.services/userdata'
+// Base URL for the API calls
+const API_BASE_URL = 'https://api.zkp.services/userdata';
 
-let api_call_count = 0
+// Counter to keep track of the number of API calls made
+let api_call_count = 0;
 
+// Function to make an API call using Axios
 export const makeAPICall = async (method, data) => {
-  api_call_count++
+  // Increment the API call count
+  api_call_count++;
+
   try {
+    // Make the API call using Axios
     const response = await axios({
       method,
       url: `${API_BASE_URL}`,
       data,
     }).then((res) => {
-      return res
-    })
-    return response
+      return res;
+    });
+
+    // Return the response from the API call
+    return response;
   } catch (error) {
     // Handle errors (e.g., show a toast message or perform other error handling)
-    throw error
+    throw error;
   }
 }
 
-export const login = async (userId, password) => { //error notifs handled
+// Function to login a user
+export const login = async (userId, password) => { 
+  // Prepare data for the login API call
   const data = {
     id: userId,
     password: password,
     action: 'login',
-  }
-  return await makeAPICall('POST', data)
+  };
+
+  // Make the API call using the common makeAPICall function with POST method
+  return await makeAPICall('POST', data);
 }
 
-export const createUser = async (userId, quickstart_JSON) => { //error notifs handled
+// Function to create a user
+export const createUser = async (userId, quickstart_JSON) => { 
+  // Prepare data for creating a user API call
   const data = {
     id: userId,
     action: 'create_item',
-  }
+  };
+
+  // Merge additional data from quickstart_JSON with the base data
   const mergedData = {
     ...data,
     ...quickstart_JSON,
-  }
-  return makeAPICall('POST', mergedData)
+  };
+
+  // Make the API call using the common makeAPICall function with POST method
+  return makeAPICall('POST', mergedData);
 }
+
 
 // export const getUser = async (userId, password) => {
 //   const data = {
@@ -55,35 +74,48 @@ export const createUser = async (userId, quickstart_JSON) => { //error notifs ha
 //   return makeAPICall('POST', data);
 // };
 
-export const getCCTX = async (userId, password, chainId) => { //error notifs handled
+// Function to retrieve cross-chain transaction data
+export const getCCTX = async (userId, password, chainId) => { 
+  // Prepare data for the cross-chain transaction API call
   const data = {
     id: userId,
     password: password,
     chain_id: chainId,
     action: 'get_crosschain_transaction',
-  }
-  return makeAPICall('POST', data)
+  };
+
+  // Make the API call using the common makeAPICall function with POST method
+  return makeAPICall('POST', data);
 }
 
-export const getIncoming = async (userId, password, chainId) => { //error notifs handled
+// Function to retrieve incoming data for a specific chain
+export const getIncoming = async (userId, password, chainId) => { 
+  // Prepare data for the incoming data API call
   const data = {
     id: userId,
     password: password,
     action: 'get_incoming',
     chain_id: chainId,
-  }
-  return makeAPICall('POST', data)
+  };
+
+  // Make the API call using the common makeAPICall function with POST method
+  return makeAPICall('POST', data);
 }
 
-export const getOutgoing = async (userId, password, chainId) => { //error notifs handled
+// Function to retrieve outgoing data for a specific chain
+export const getOutgoing = async (userId, password, chainId) => { 
+  // Prepare data for the outgoing data API call
   const data = {
     id: userId,
     password: password,
     action: 'get_outgoing',
     chain_id: chainId,
-  }
-  return makeAPICall('POST', data)
+  };
+
+  // Make the API call using the common makeAPICall function with POST method
+  return makeAPICall('POST', data);
 }
+
 
 export const truncateAddress = (address) => {
   if (!address) return ''
@@ -92,133 +124,183 @@ export const truncateAddress = (address) => {
   return `${start}...${end}`
 }
 
-export const getFieldData = async (userId, password, key, chainId) => { //error notifs handled
+// Function to retrieve field data for a specific key and chain
+export const getFieldData = async (userId, password, key, chainId) => { 
+  // Prepare data for the field data API call
   const data = {
     id: userId,
     password: password,
     action: 'get_item',
     key: key,
     chain_id: chainId,
-  }
-  return makeAPICall('POST', data)
+  };
+
+  // Make the API call using the common makeAPICall function with POST method
+  return makeAPICall('POST', data);
 }
 
-export const getDashboard = async (userId, password, chainId) => { //error notifs handled
+// Function to retrieve dashboard data for a specific chain
+export const getDashboard = async (userId, password, chainId) => { 
+  // Prepare data for the dashboard data API call
   const data = {
     id: userId,
     password: password,
     action: 'get_dashboard',
     chain_id: chainId,
-  }
-  return makeAPICall('POST', data)
+  };
+
+  // Make the API call using the common makeAPICall function with POST method
+  return makeAPICall('POST', data);
 }
 
-export const getAvailableDashboard = async (userId, password, chainId) => { //error notifs handled
+// Function to retrieve available dashboard data for a specific chain
+export const getAvailableDashboard = async (userId, password, chainId) => { 
+  // Prepare data for the available dashboard data API call
   const data = {
     id: userId,
     password: password,
     action: 'get_available_dashboard',
     chain_id: chainId,
-  }
-  return makeAPICall('POST', data)
+  };
+
+  // Make the API call using the common makeAPICall function with POST method
+  return makeAPICall('POST', data);
 }
 
-export const addToDashboard = async (userId, password, service, chainId) => { //error notifs handled
+
+// Function to add a service to the user's dashboard
+export const addToDashboard = async (userId, password, service, chainId) => { 
+  // Prepare data for the add to dashboard API call
   const data = {
     id: userId,
     password: password,
     action: 'add_to_dashboard',
     service: service,
     chain_id: chainId,
-  }
-  return makeAPICall('POST', data)
+  };
+
+  // Make the API call using the common makeAPICall function with POST method
+  return makeAPICall('POST', data);
 }
 
-export const removeFromDashboard = async ( //error notifs handled
+// Function to remove a service from the user's dashboard
+export const removeFromDashboard = async ( 
   userId,
   password,
   service,
   chainId,
 ) => {
+  // Prepare data for the remove from dashboard API call
   const data = {
     id: userId,
     password: password,
     action: 'remove_from_dashboard',
     service: service,
     chain_id: chainId,
-  }
-  return makeAPICall('DELETE', data)
+  };
+
+  // Make the API call using the common makeAPICall function with DELETE method
+  return makeAPICall('DELETE', data);
 }
 
-export const addRequest = async (userId, password, requestData, chainId) => { //error notifs handled
+
+// Function to add a request for a specific chain
+export const addRequest = async (userId, password, requestData, chainId) => { 
+  // Prepare data for the add request API call
   const data = {
     id: userId,
     password: password,
     action: 'add_request',
     chainID: chainId,
-  }
+  };
+
+  // Merge additional data from requestData with the base data
   const mergedData = {
     ...data,
     ...requestData,
-  }
-  return makeAPICall('POST', mergedData)
+  };
+
+  // Make the API call using the common makeAPICall function with POST method
+  return makeAPICall('POST', mergedData);
 }
 
-export const addResponse = async (userId, password, responseData, chainId) => { //error notifs handled
+// Function to add a response for a specific chain
+export const addResponse = async (userId, password, responseData, chainId) => { 
+  // Prepare data for the add response API call
   const data = {
     id: userId,
     password: password,
     action: 'add_response',
     chainID: chainId,
-  }
+  };
+
+  // Merge additional data from responseData with the base data
   const mergedData = {
     ...data,
     ...responseData,
-  }
-  return makeAPICall('POST', mergedData)
+  };
+
+  // Make the API call using the common makeAPICall function with POST method
+  return makeAPICall('POST', mergedData);
 }
 
-export const updateFieldData = async ( //error notifs handled
+
+// Function to update field data for a specific chain
+export const updateFieldData = async ( 
   userId,
   password,
   updatedData,
   chainId,
 ) => {
+  // Prepare data for the update field data API call
   const data = {
     id: userId,
     password: password,
     action: 'update_item',
     chain_id: chainId,
-  }
+  };
+
+  // Merge additional data from updatedData with the base data
   const mergedData = {
     ...data,
     ...updatedData,
-  }
-  return makeAPICall('PUT', mergedData)
+  };
+
+  // Make the API call using the common makeAPICall function with PUT method
+  return makeAPICall('PUT', mergedData);
 }
 
-export const getChainData = async (userId, password, chainId) => { //error notifs handled
+// Function to retrieve chain data for a specific chain
+export const getChainData = async (userId, password, chainId) => { 
+  // Prepare data for the get chain data API call
   const data = {
     id: userId,
     password: password,
     chain_id: chainId,
     action: 'get_chain_data',
-  }
-  return makeAPICall('POST', data)
+  };
+
+  // Make the API call using the common makeAPICall function with POST method
+  return makeAPICall('POST', data);
 }
 
-export const addNewChain = async (userId, password, oldChainId, chainId) => { //error notifs handled
+// Function to add a new chain
+export const addNewChain = async (userId, password, oldChainId, chainId) => { 
+  // Prepare data for the add new chain API call
   const data = {
     id: userId,
     password: password,
     chain_id: chainId,
     old_chain_id: oldChainId,
     action: 'add_new_chain',
-  }
-  return makeAPICall('POST', data)
+  };
+
+  // Make the API call using the common makeAPICall function with POST method
+  return makeAPICall('POST', data);
 }
 
-export const addCCTX = async ( //error notifs handled
+// Function to add a new cross-chain transaction
+export const addCCTX = async ( 
   userId,
   password,
   type,
@@ -227,6 +309,7 @@ export const addCCTX = async ( //error notifs handled
   targetChain,
   ccid,
 ) => {
+  // Prepare data for adding a cross-chain transaction API call
   const data = {
     id: userId,
     password: password,
@@ -236,6 +319,8 @@ export const addCCTX = async ( //error notifs handled
     param_key: paramKey,
     type: type,
     ccid: ccid,
-  }
-  return makeAPICall('POST', data)
+  };
+  // Make the API call and return the result
+  return makeAPICall('POST', data);
 }
+

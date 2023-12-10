@@ -220,145 +220,165 @@ export function NewDataRequestModal({
     }
   }
 
-  const handleSubmit = async (event) => {
-    if (document.getElementById('submitButton')) {
-      document.getElementById('submitButton').textContent = 'Running...'
-      document.getElementById('submitButton').className =
-        'ml-3 inline-flex justify-center rounded-md border border-transparent bg-gray-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2'
-      document.getElementById('submitButton').disabled = true
-    }
+// Function to handle the form submission
+const handleSubmit = async (event) => {
+  // Update the submit button appearance to indicate that the request is being processed
+  if (document.getElementById('submitButton')) {
+    document.getElementById('submitButton').textContent = 'Running...';
+    document.getElementById('submitButton').className =
+      'ml-3 inline-flex justify-center rounded-md border border-transparent bg-gray-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2';
+    document.getElementById('submitButton').disabled = true;
+  }
 
-    event.preventDefault()
-    const formData = new FormData(event.target)
-    const formDataJSON = formToJSON(formData)
+  // Prevent the default form submission behavior
+  event.preventDefault();
 
-    const requestID = await poseidon([
-      stringToBigInt(formDataJSON['fieldRequested'].substring(0, 24)),
-      stringToBigInt(formDataJSON['fieldRequested'].substring(24, 48)),
-      stringToBigInt(formDataJSON['oneTimeKey'].substring(0, 24)),
-      stringToBigInt(formDataJSON['oneTimeKey'].substring(24, 48)),
-    ])
+  // Extract form data and convert it to JSON format
+  const formData = new FormData(event.target);
+  const formDataJSON = formToJSON(formData);
 
-    const twoFARequestIDBigInt = stringToBigInt(formDataJSON['twoFARequestID'])
-      ? stringToBigInt(formDataJSON['twoFARequestID'])
-      : ''
-    const request = {
-      address_receiver: formDataJSON['receiverAddress'].toLowerCase(),
-      requestID: requestID.toString(),
-      operation: 'get',
-      field: formDataJSON['fieldRequested'],
-      key: formDataJSON['oneTimeKey'],
-      salt: oneTimeSalt,
-      limit: formDataJSON['timeLimit'],
-      timestamp: Date.now().toString(),
-      response_fee: formDataJSON['responseFee'],
-      require2FA: isTwoFAEnabled,
-      twoFAProvider:
-        formDataJSON['twoFAProvider'] == 'zkp.services'
-          ? _2FAContract['_address']
-          : formDataJSON['twoFAProvider'],
-      twoFARequestID: String(twoFARequestIDBigInt),
-      twoFAOneTimeToken: formDataJSON['twoFAOneTimeToken'],
-      attach_token: formDataJSON['attachToken'] === 'on',
-    }
+  // Generate a request ID using the Poseidon hash function
+  const requestID = await poseidon([
+    stringToBigInt(formDataJSON['fieldRequested'].substring(0, 24)),
+    stringToBigInt(formDataJSON['fieldRequested'].substring(24, 48)),
+    stringToBigInt(formDataJSON['oneTimeKey'].substring(0, 24)),
+    stringToBigInt(formDataJSON['oneTimeKey'].substring(24, 48)),
+  ]);
 
-    if (isTwoFAEnabled) {
-      try {
-        const _2FASmartContractCallData = {
-          _id: String(twoFARequestIDBigInt),
-          _oneTimeKeyHash: web3.utils.keccak256(
-            formDataJSON['twoFAOneTimeToken']
-          ),
-        }
+  // Extract 2FA request ID and construct the main request object
+  const twoFARequestIDBigInt = stringToBigInt(formDataJSON['twoFARequestID']) || '';
+  const request = {
+    address_receiver: formDataJSON['receiverAddress'].toLowerCase(),
+    requestID: requestID.toString(),
+    operation: 'get',
+    field: formDataJSON['fieldRequested'],
+    key: formDataJSON['oneTimeKey'],
+    salt: oneTimeSalt,
+    limit: formDataJSON['timeLimit'],
+    timestamp: Date.now().toString(),
+    response_fee: formDataJSON['responseFee'],
+    require2FA: isTwoFAEnabled,
+    twoFAProvider:
+      formDataJSON['twoFAProvider'] === 'zkp.services'
+        ? _2FAContract['_address']
+        : formDataJSON['twoFAProvider'],
+    twoFARequestID: String(twoFARequestIDBigInt),
+    twoFAOneTimeToken: formDataJSON['twoFAOneTimeToken'],
+    attach_token: formDataJSON['attachToken'] === 'on',
+  };
 
-
-        const data = _2FAContract.methods
-          .generate2FA(
-            _2FASmartContractCallData._id,
-            _2FASmartContractCallData._oneTimeKeyHash
-          )
-          .encodeABI()
-
-        const txObject = {
-          from: userAddress,
-          to: _2FAContract.options.address,
-          data: data,
-          gas: 500000,
-        }
-        if (document.getElementById('submitButton')) {
-          document.getElementById('submitButton').textContent =
-            'Awaiting 2FA acceptance...'
-        }
-        const receipt = await web3.eth.sendTransaction(txObject)
-      } catch (error) {
-        console.error('Error in 2FA Contract Call:', error)
-        resetSubmitButton()
-        makeErrorNotif('Error in 2FA Contract Call', error.toString())
-        return
-      }
-    }
-
+  // If 2FA is enabled, initiate the 2FA contract call
+  if (isTwoFAEnabled) {
     try {
-      const coreContractCallData = {
-        requestID: requestID.toString(),
-        encryptedRequest: '',
-        encryptedKey: '',
-        timeLimit: formDataJSON['timeLimit'],
-        _2FAProvider:
-          formDataJSON['twoFAProvider'] == 'zkp.services' && isTwoFAEnabled
-            ? _2FAContract['_address']
-            : !isTwoFAEnabled
-            ? '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'
-            : formDataJSON['twoFAProvider'],
-        _2FAID: String(stringToBigInt(formDataJSON['twoFARequestID'])),
-        responseFeeAmount: formDataJSON['responseFee'],
-      }
+      const _2FASmartContractCallData = {
+        _id: String(twoFARequestIDBigInt),
+        _oneTimeKeyHash: web3.utils.keccak256(formDataJSON['twoFAOneTimeToken']),
+      };
 
-
-      const data = coreContract.methods
-        .requestData(
-          coreContractCallData.requestID,
-          coreContractCallData.encryptedRequest,
-          coreContractCallData.encryptedKey,
-          coreContractCallData.timeLimit,
-          coreContractCallData._2FAProvider,
-          coreContractCallData._2FAID,
-          coreContractCallData.responseFeeAmount
+      // Generate ABI-encoded data for the 2FA contract call
+      const data = _2FAContract.methods
+        .generate2FA(
+          _2FASmartContractCallData._id,
+          _2FASmartContractCallData._oneTimeKeyHash
         )
-        .encodeABI()
+        .encodeABI();
 
+      // Prepare the transaction object for the 2FA contract call
       const txObject = {
         from: userAddress,
-        to: coreContract.options.address,
+        to: _2FAContract.options.address,
         data: data,
         gas: 500000,
-      }
+      };
+
+      // Update the submit button text to indicate waiting for 2FA acceptance
       if (document.getElementById('submitButton')) {
-        document.getElementById('submitButton').textContent =
-          'Awaiting request acceptance...'
+        document.getElementById('submitButton').textContent = 'Awaiting 2FA acceptance...';
       }
-      const receipt = await web3.eth.sendTransaction(txObject)
+
+      // Send the transaction to the blockchain
+      const receipt = await web3.eth.sendTransaction(txObject);
     } catch (error) {
-      console.error('Error in Core Contract Call:', error)
-      console.error('Error in Core Contract Call:', error)
-      resetSubmitButton()
-      makeErrorNotif("Error in Core Contract Call", error.toString())
-      return
+      console.error('Error in 2FA Contract Call:', error);
+      // Reset the submit button appearance and display an error notification
+      resetSubmitButton();
+      makeErrorNotif('Error in 2FA Contract Call', error.toString());
+      return;
+    }
+  }
+
+  // Try to make a call to the core contract to initiate the data request
+  try {
+    const coreContractCallData = {
+      requestID: requestID.toString(),
+      encryptedRequest: '',
+      encryptedKey: '',
+      timeLimit: formDataJSON['timeLimit'],
+      _2FAProvider:
+        formDataJSON['twoFAProvider'] === 'zkp.services' && isTwoFAEnabled
+          ? _2FAContract['_address']
+          : !isTwoFAEnabled
+          ? '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'
+          : formDataJSON['twoFAProvider'],
+      _2FAID: String(stringToBigInt(formDataJSON['twoFARequestID'])),
+      responseFeeAmount: formDataJSON['responseFee'],
+    };
+
+    // Generate ABI-encoded data for the core contract call
+    const data = coreContract.methods
+      .requestData(
+        coreContractCallData.requestID,
+        coreContractCallData.encryptedRequest,
+        coreContractCallData.encryptedKey,
+        coreContractCallData.timeLimit,
+        coreContractCallData._2FAProvider,
+        coreContractCallData._2FAID,
+        coreContractCallData.responseFeeAmount
+      )
+      .encodeABI();
+
+    // Prepare the transaction object for the core contract call
+    const txObject = {
+      from: userAddress,
+      to: coreContract.options.address,
+      data: data,
+      gas: 500000,
+    };
+
+    // Update the submit button text to indicate waiting for request acceptance
+    if (document.getElementById('submitButton')) {
+      document.getElementById('submitButton').textContent = 'Awaiting request acceptance...';
     }
 
-    document.getElementById('submitButton').textContent =
-      'Submitting request...'
-    try {
-      const result = await onSubmit(request)
-    } catch (error) {
-      console.error('Error submitting request to API:', error)
-      resetSubmitButton()
-      makeErrorNotif('Error submitting request to API:', error.toString())
-      return
-    }
-    showNotif(false, 'New Data Request', 'Request submitted successfully.')
-    onClose()
+    // Send the transaction to the blockchain
+    const receipt = await web3.eth.sendTransaction(txObject);
+  } catch (error) {
+    console.error('Error in Core Contract Call:', error);
+    // Reset the submit button appearance, display an error notification, and return
+    resetSubmitButton();
+    makeErrorNotif('Error in Core Contract Call', error.toString());
+    return;
   }
+
+  // Update the submit button text to indicate the request is being submitted
+  document.getElementById('submitButton').textContent = 'Submitting request...';
+
+  // Try to submit the request to the API
+  try {
+    const result = await onSubmit(request);
+  } catch (error) {
+    console.error('Error submitting request to API:', error);
+    // Reset the submit button appearance, display an error notification, and return
+    resetSubmitButton();
+    makeErrorNotif('Error submitting request to API:', error.toString());
+    return;
+  }
+
+  // Display a notification for successful request submission and close the modal
+  showNotif(false, 'New Data Request', 'Request submitted successfully.');
+  onClose();
+};
+
 
   return (
     <Transition.Root show={open} as={Fragment}>

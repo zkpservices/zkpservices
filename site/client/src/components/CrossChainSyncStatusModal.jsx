@@ -4,30 +4,35 @@ import { XMarkIcon } from '@heroicons/react/24/outline' // Import the XMarkIcon
 import { truncateAddress } from './APICalls'
 import { removeMetadata } from './HelperCalls'
 
+// React component for Cross-Chain Sync Status Modal
 export function CrossChainSyncStatusModal({
-  open,
-  onClose,
-  sourceChain = '',
-  destinationChain = '',
-  parameterSynced = '',
-  parameterKey = '',
-  parameterValue,
-  ccipRequestID = '',
+  open, // Modal open state
+  onClose, // Function to close the modal
+  sourceChain = '', // Source chain ID
+  destinationChain = '', // Destination chain ID
+  parameterSynced = '', // Synced parameter
+  parameterKey = '', // Parameter key (Address/Request ID/Response ID/Data Location, etc.)
+  parameterValue, // Parameter value
+  ccipRequestID = '', // Cross-Chain Integration Protocol (CCIP) Request ID
 }) {
 
+  // Mapping of chain IDs to chain names
   let chains = {
     '0xa869': 'Fuji',
     '0x13881': 'Mumbai',
     '0x15f902': 'Ripple Dev EVM',
   }
 
+  // State to manage modal open status
   const [isOpen, setIsOpen] = useState(open)
+  // State to manage sync status
   const [status, setStatus] = useState('Incomplete')
 
+  // Effect to update modal open status when 'open' prop changes
   useEffect(() => {
     setIsOpen(open)
   }, [open])
-
+  
   return (
     <Transition.Root show={isOpen} as={Fragment}>
       <Dialog

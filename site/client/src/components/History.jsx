@@ -153,224 +153,273 @@ export function History({ tableData = {}, showRefresh = true, handleRefresh }) {
   }
 
   const openCrossChainSyncModal = async (rowData) => {
+    // Variable to store the fetched value
     let fetchedValue;
+  
+    // Determine the contract based on the current chain ID
     const contract =
-    chainId == 43113
-      ? fujiCoreContract
-      : chainId == 80001
+      chainId == 43113
+        ? fujiCoreContract
+        : chainId == 80001
         ? mumbaiCoreContract
         : chainId == 1440002
-          ? rippleCoreContract
-          : null
-
-  if (!contract) {
-    console.error('No contract instance available for the current chain')
-    return
-  }
+        ? rippleCoreContract
+        : null;
+  
+    // Check if a valid contract instance is available for the current chain
+    if (!contract) {
+      console.error('No contract instance available for the current chain');
+      return;
+    }
+  
+    // Switch based on the parameter type to fetch the corresponding data
     switch (rowData.paramType) {
       case 'Data':
         try {
-        const fieldDataRequest = await getFieldData(
-          userAddress,
-          userPassword,
-          rowData.paramKey,
-          chainId,
-        )
-        const fieldData = fieldDataRequest['data']
-        const paramKeyRawEnd = stringToBigInt(rowData.paramKey.substring(24, 48))
-          ? stringToBigInt(rowData.paramKey.substring(24, 48))
-          : stringToBigInt('')
-        const contractPasswordEnd = stringToBigInt(
-          contractPassword.substring(24, 48),
-        )
-          ? stringToBigInt(contractPassword.substring(24, 48))
-          : stringToBigInt('')
-        let paramKey = await poseidon([
-          stringToBigInt(rowData.paramKey),
-          paramKeyRawEnd,
-          stringToBigInt(fieldData[rowData.paramKey]['_metadata']['salt']),
-          stringToBigInt(contractPassword),
-          contractPasswordEnd,
-        ])
-        const encryptedData = await contract.methods
-          .obfuscatedData(paramKey)
-          .call()
-        fetchedValue = JSON.stringify(
-          encryptedData,
-          (key, value) =>
-            typeof value === 'bigint' ? value.toString() : value, // return everything else unchanged
-          2,
-        )
-      } catch (error) {
-        console.error(error)
-        setApiErrorNotif(true)
-        setApiErrorTopText("Error fetching field data")
-        setApiErrorBottomText(error.toString())
-      }
-        break
+          // Fetch field data associated with the specified parameter key
+          const fieldDataRequest = await getFieldData(
+            userAddress,
+            userPassword,
+            rowData.paramKey,
+            chainId,
+          );
+  
+          // Extract relevant information from the field data
+          const fieldData = fieldDataRequest['data'];
+          const paramKeyRawEnd = stringToBigInt(rowData.paramKey.substring(24, 48))
+            ? stringToBigInt(rowData.paramKey.substring(24, 48))
+            : stringToBigInt('');
+          const contractPasswordEnd = stringToBigInt(
+            contractPassword.substring(24, 48),
+          )
+            ? stringToBigInt(contractPassword.substring(24, 48))
+            : stringToBigInt('');
+  
+          // Calculate paramKey using Poseidon hash function
+          let paramKey = await poseidon([
+            stringToBigInt(rowData.paramKey),
+            paramKeyRawEnd,
+            stringToBigInt(fieldData[rowData.paramKey]['_metadata']['salt']),
+            stringToBigInt(contractPassword),
+            contractPasswordEnd,
+          ]);
+  
+          // Fetch encrypted data from the contract based on the calculated paramKey
+          const encryptedData = await contract.methods
+            .obfuscatedData(paramKey)
+            .call();
+  
+          // Stringify the encrypted data for display
+          fetchedValue = JSON.stringify(
+            encryptedData,
+            (key, value) =>
+              typeof value === 'bigint' ? value.toString() : value, // Return everything else unchanged
+            2,
+          );
+        } catch (error) {
+          // Handle errors and set notification for API error
+          console.error(error);
+          setApiErrorNotif(true);
+          setApiErrorTopText('Error fetching field data');
+          setApiErrorBottomText(error.toString());
+        }
+        break;
       case 'Data Request':
+        // Fetch data associated with a data request
         const encryptedDataRequest = await contract.methods
           .dataRequests(rowData.paramKey)
-          .call()
-          fetchedValue = JSON.stringify(
-            encryptedDataRequest,
-            (key, value) =>
-              typeof value === 'bigint' ? value.toString() : value, // return everything else unchanged
-            2,
-          )
-        break
+          .call();
+  
+        // Stringify the fetched data for display
+        fetchedValue = JSON.stringify(
+          encryptedDataRequest,
+          (key, value) =>
+            typeof value === 'bigint' ? value.toString() : value, // Return everything else unchanged
+          2,
+        );
+        break;
       case 'Update Request':
+        // Fetch data associated with an update request
         const encryptedUpdateRequest = await contract.methods
           .updateRequests(rowData.paramKey)
-          .call()
+          .call();
+  
+        // Stringify the fetched data for display
         fetchedValue = JSON.stringify(
           encryptedUpdateRequest,
           (key, value) => {
             if (typeof value === 'bigint') {
-              return value.toString()
+              return value.toString();
             }
-            return value
+            return value;
           },
           2,
-        )
-        break
+        );
+        break;
       case 'Response':
-        fetchedValue = await contract.methods.responses(rowData.paramKey).call()
-        break
+        // Fetch data associated with a response
+        fetchedValue = await contract.methods.responses(rowData.paramKey).call();
+        break;
       case 'Public User Information':
+        // Fetch public user information
         fetchedValue = await contract.methods
           .publicUserInformation(rowData.paramKey)
-          .call()
-        break
+          .call();
+        break;
       case 'RSA Encryption Keys':
+        // Fetch RSA encryption keys
         fetchedValue = await contract.methods
           .rsaEncryptionKeys(rowData.paramKey)
-          .call()
-        break
+          .call();
+        break;
       case 'RSA Signing Keys':
-        fetchedValue = await contract.methods.rsaSigningKeys(rowData.paramKey).call()
-        break
+        // Fetch RSA signing keys
+        fetchedValue = await contract.methods.rsaSigningKeys(rowData.paramKey).call();
+        break;
       default:
-        console.error('Invalid parameter selected')
-        return
+        // If an invalid parameter type is selected, log an error and return
+        console.error('Invalid parameter selected');
+        return;
     }
-
+  
+    // Create a new row data object with the fetched value
     const newRowData = {
       ...rowData,
       data: fetchedValue,
-    }
-    setSelectedRowData(newRowData)
-    setShowCrossChainSyncModal(true)
-  }
+    };
+  
+    // Set the selected row data and display the Cross-Chain Sync modal
+    setSelectedRowData(newRowData);
+    setShowCrossChainSyncModal(true);
+  };
 
   const closeCrossChainSyncModal = () => {
     setShowCrossChainSyncModal(false)
   }
 
-  const addResponseToRequest = async () => {
-    const responseData = {
-      response: {
-        responseID: selectedRowData.requestID,
-        address_sender: userAddress,
-        address_receiver: selectedRowData.addressSender,
-        chainID: chainId,
-        operation: 'get',
-        data: selectedRowData.data,
-        field: selectedRowData.field[0],
-        key: selectedRowData.key,
-        require2FA: selectedRowData.require2FA,
-        salt: selectedRowData.salt,
-        limit: selectedRowData.limit,
-        timestamp: Date.now().toString(),
-        response_fee: selectedRowData.response_fee,
-        twoFAProvider: selectedRowData.twoFAProvider,
-        twoFARequestID: selectedRowData.twoFARequestID,
-        twoFAOneTimeToken: selectedRowData.twoFAOneTimeToken,
-      },
-    }
-    try {
-      const result = await addResponse(
-        userAddress,
-        userPassword,
-        responseData,
-        chainId,
-      )
-    } catch (error) {
-      setApiErrorNotif(true)
-      setApiErrorTopText("Error adding response")
-      setApiErrorBottomText(error.toString())
-    }
-    handleRefresh()
+const addResponseToRequest = async () => {
+  // Construct the response data based on the selected row data
+  const responseData = {
+    response: {
+      responseID: selectedRowData.requestID,
+      address_sender: userAddress,
+      address_receiver: selectedRowData.addressSender,
+      chainID: chainId,
+      operation: 'get',
+      data: selectedRowData.data,
+      field: selectedRowData.field[0],
+      key: selectedRowData.key,
+      require2FA: selectedRowData.require2FA,
+      salt: selectedRowData.salt,
+      limit: selectedRowData.limit,
+      timestamp: Date.now().toString(),
+      response_fee: selectedRowData.response_fee,
+      twoFAProvider: selectedRowData.twoFAProvider,
+      twoFARequestID: selectedRowData.twoFARequestID,
+      twoFAOneTimeToken: selectedRowData.twoFAOneTimeToken,
+    },
+  };
+
+  try {
+    // Attempt to add the constructed response to the request using the addResponse function
+    const result = await addResponse(
+      userAddress,
+      userPassword,
+      responseData,
+      chainId,
+    );
+  } catch (error) {
+    // Handle errors by displaying an API error notification
+    setApiErrorNotif(true);
+    setApiErrorTopText('Error adding response');
+    setApiErrorBottomText(error.toString());
   }
 
-  const completeUpdate = async () => {
-    const fieldComplete = {
-      [selectedRowData.field[0]]: {
-        ...selectedRowData.data[selectedRowData.field[0]],
-        _metadata: {
-          twoFAProvider: selectedRowData.twoFAProvider,
-          twoFARequestID: selectedRowData.twoFARequestID,
-          twoFAOneTimeToken: selectedRowData.twoFAOneTimeToken,
-          key: selectedRowData.key,
-          require2FA: selectedRowData.require2FA,
-          salt: selectedRowData.salt,
-          limit: selectedRowData.limit,
-        },
-      },
-    }
+  // Refresh the data to reflect the changes
+  handleRefresh();
+};
 
-    const updateData = {
-      key: selectedRowData.field[0],
-      data: fieldComplete,
-    }
 
-    const responseData = {
-      response: {
-        responseID: selectedRowData.requestID,
-        address_sender: userAddress,
-        address_receiver: selectedRowData.addressSender,
-        chainID: chainId,
-        operation: 'update',
-        updated_data: selectedRowData.data,
-        field: selectedRowData.field[0],
+const completeUpdate = async () => {
+  // Construct the updated field data with metadata
+  const fieldComplete = {
+    [selectedRowData.field[0]]: {
+      ...selectedRowData.data[selectedRowData.field[0]],
+      _metadata: {
+        twoFAProvider: selectedRowData.twoFAProvider,
+        twoFARequestID: selectedRowData.twoFARequestID,
+        twoFAOneTimeToken: selectedRowData.twoFAOneTimeToken,
         key: selectedRowData.key,
         require2FA: selectedRowData.require2FA,
         salt: selectedRowData.salt,
         limit: selectedRowData.limit,
-        timestamp: Date.now().toString(),
-        response_fee: selectedRowData.response_fee,
-        twoFAProvider: selectedRowData.twoFAProvider,
-        twoFARequestID: selectedRowData.twoFARequestID,
-        twoFAOneTimeToken: selectedRowData.twoFAOneTimeToken,
       },
-    }
-    try {
+    },
+  };
+
+  // Prepare the update data with the key and the complete field data
+  const updateData = {
+    key: selectedRowData.field[0],
+    data: fieldComplete,
+  };
+
+  // Prepare the response data for the update request
+  const responseData = {
+    response: {
+      responseID: selectedRowData.requestID,
+      address_sender: userAddress,
+      address_receiver: selectedRowData.addressSender,
+      chainID: chainId,
+      operation: 'update',
+      updated_data: selectedRowData.data,
+      field: selectedRowData.field[0],
+      key: selectedRowData.key,
+      require2FA: selectedRowData.require2FA,
+      salt: selectedRowData.salt,
+      limit: selectedRowData.limit,
+      timestamp: Date.now().toString(),
+      response_fee: selectedRowData.response_fee,
+      twoFAProvider: selectedRowData.twoFAProvider,
+      twoFARequestID: selectedRowData.twoFARequestID,
+      twoFAOneTimeToken: selectedRowData.twoFAOneTimeToken,
+    },
+  };
+
+  try {
+    // Attempt to update the field using the updateFieldData function
     const updateResult = await updateFieldData(
       userAddress,
       userPassword,
       updateData,
       chainId,
-    )
-    } catch (error) {
-      setApiErrorNotif(true)
-      setApiErrorTopText("Error updating field")
-      setApiErrorBottomText(error.toString())
-    }
-    try {
+    );
+  } catch (error) {
+    // Handle errors by displaying an API error notification
+    setApiErrorNotif(true);
+    setApiErrorTopText('Error updating field');
+    setApiErrorBottomText(error.toString());
+  }
+
+  try {
+    // Attempt to add a response to the update request using the addResponse function
     const responseResult = await addResponse(
       userAddress,
       userPassword,
       responseData,
       chainId,
-    )
-    } catch (error) {
-    setApiErrorNotif(true)
-    setApiErrorTopText("Error adding response to update request")
-    setApiErrorBottomText(error.toString())
-    }
-    closeCompleteUpdateModal()
-    handleRefresh()
+    );
+  } catch (error) {
+    // Handle errors by displaying an API error notification
+    setApiErrorNotif(true);
+    setApiErrorTopText('Error adding response to update request');
+    setApiErrorBottomText(error.toString());
   }
+
+  // Close the complete update modal and trigger a refresh to reflect the changes
+  closeCompleteUpdateModal();
+  handleRefresh();
+};
+
 
   const openCompleteUpdateModal = (rowData) => {
     setSelectedRowData(rowData)

@@ -199,13 +199,15 @@ export function CompleteUpdateModal({
     }
 
     if (require2FA) {
+      // Check if 2FA is required
       if (chainId != 1440002) {
-        //chainlink 2FA variants
+        // Chainlink 2FA variants
         const _2FASmartContractRequestRandomNumberCallData = {
-          _id: twoFARequestID, //cast to big int once it's a string
+          _id: twoFARequestID, // Cast to big int once it's a string
           _oneTimeKey: twoFAOneTimeToken,
         }
-
+    
+        // Request a random number from the 2FA smart contract
         let data = _2FAContract.methods
           .requestRandomNumber(
             _2FASmartContractRequestRandomNumberCallData._id,
@@ -223,13 +225,14 @@ export function CompleteUpdateModal({
             'Awaiting 2FA acceptance...'
         }
         try {
-        let receipt = await web3.eth.sendTransaction(txObject)
+          let receipt = await web3.eth.sendTransaction(txObject)
         } catch (error) {
           resetSubmitButton()
           makeErrorNotif("Error requesting random number", error.toString())
           return
         }
-
+    
+        // Retrieve the generated random number
         if (document.getElementById('submitButton')) {
           document.getElementById('submitButton').textContent =
             'Getting random number...'
@@ -242,35 +245,39 @@ export function CompleteUpdateModal({
               .call()
             break
           } catch (error) {
-            if(attempt == 3) {
+            if (attempt == 3) {
               if (document.getElementById('submitButton')) {
                 document.getElementById('submitButton').textContent =
                   'Still getting random number...'
               }
-            } 
+            }
             if (attempt < 30) {
               await new Promise((resolve) => setTimeout(resolve, 2000))
             } else {
               console.error('Failed to retrieve random number after 1 minute.')
               resetSubmitButton()
-              makeErrorNotif("Error requesting random number", "Failed to retrieve random number after 1 minute.")
+              makeErrorNotif(
+                "Error requesting random number",
+                "Failed to retrieve random number after 1 minute."
+              )
               return
             }
           }
         }
-
-
+    
+        // Generate the hash of the 2FA secret
         let _2FA_secret_hash = String(
           await poseidon([stringToBigInt(twoFactorAuthPassword)]),
         )
-
+    
+        // Generate a proof for 2FA
         const _2FAProof = await generate2FAProof({
           random_number: String(randomNumber),
           two_factor_secret: String(stringToBigInt(twoFactorAuthPassword)),
           secret_hash: _2FA_secret_hash,
         })
-
-
+    
+        // Prepare data for verifying the 2FA proof
         const _2FASmartContractVerifyProofCallData = {
           _id: twoFARequestID,
           _randomNumber: randomNumber,
@@ -288,8 +295,8 @@ export function CompleteUpdateModal({
             pubSignals1: _2FAProof.proof.pubSignals[1],
           },
         }
-
-
+    
+        // Verify the 2FA proof by calling the smart contract
         data = _2FAContract.methods
           .verifyProof(
             _2FASmartContractVerifyProofCallData._id,
@@ -298,7 +305,7 @@ export function CompleteUpdateModal({
             _2FASmartContractVerifyProofCallData.params,
           )
           .encodeABI()
-
+    
         txObject = {
           from: userAddress,
           to: _2FAContract.options.address,
@@ -318,13 +325,13 @@ export function CompleteUpdateModal({
           return
         }
       } else {
-        //non-chainlink 2FA variants
+        // Non-chainlink 2FA variants
         const _2FASmartContractRequestProofCallData = {
-          _id: twoFARequestID, //cast to big int once it's a string
+          _id: twoFARequestID, // Cast to big int once it's a string
           _oneTimeKey: twoFAOneTimeToken,
         }
-
-
+    
+        // Request a proof from the 2FA smart contract
         let data = _2FAContract.methods
           .requestProof(
             _2FASmartContractRequestProofCallData._id,
@@ -349,20 +356,20 @@ export function CompleteUpdateModal({
           makeErrorNotif("Error verifying random number", error.toString())
           return
         }
-
-
-
+    
+        // Generate the hash of the 2FA secret
         let _2FA_secret_hash = String(
           await poseidon([stringToBigInt(twoFactorAuthPassword)]),
         )
-
+    
+        // Generate a proof for 2FA
         const _2FAProof = await generate2FAProof({
           random_number: String(0),
           two_factor_secret: String(stringToBigInt(twoFactorAuthPassword)),
           secret_hash: _2FA_secret_hash,
         })
-
-
+    
+        // Prepare data for verifying the 2FA proof
         const _2FASmartContractVerifyProofCallData = {
           _id: twoFARequestID,
           _userSecretHash: _2FA_secret_hash,
@@ -379,8 +386,8 @@ export function CompleteUpdateModal({
             pubSignals1: _2FAProof.proof.pubSignals[1],
           },
         }
-
-
+    
+        // Verify the 2FA proof by calling the smart contract
         data = _2FAContract.methods
           .verifyProof(
             _2FASmartContractVerifyProofCallData._id,
@@ -388,7 +395,7 @@ export function CompleteUpdateModal({
             _2FASmartContractVerifyProofCallData.params,
           )
           .encodeABI()
-
+    
         txObject = {
           from: userAddress,
           to: _2FAContract.options.address,
@@ -400,7 +407,7 @@ export function CompleteUpdateModal({
             'Awaiting 2FA acceptance...'
         }
         try {
-        let receipt = await web3.eth.sendTransaction(txObject)
+          let receipt = await web3.eth.sendTransaction(txObject)
         } catch (error) {
           console.error(error)
           resetSubmitButton()
@@ -409,7 +416,8 @@ export function CompleteUpdateModal({
         }
       }
     }
-
+    
+    // Determine the appropriate core contract based on the chain ID
     const coreContract =
       chainId == 43113
         ? fujiCoreContract
@@ -418,36 +426,34 @@ export function CompleteUpdateModal({
           : chainId == 1440002
             ? rippleCoreContract
             : null
-
-
+    
+    // Split the fieldToUpdate into 24-byte chunks
     const field = splitTo24(fieldToUpdate)
-
+    
+    // Extract values for one-time key, salt, and user secret
     const salt = oneTimeSalt
-
     const one_time_key = splitTo24(oneTimeKey)
-
     const user_secret = splitTo24(contractPassword)
-
+    
+    // Generate hash values required for proof generation
     const provided_field_and_key_hash = await poseidon(
       [field[0], field[1], one_time_key[0], one_time_key[1]].map((x) =>
         stringToBigInt(x),
       ),
     )
-
     const provided_field_and_salt_and_user_secret_hash = await poseidon(
       [field[0], field[1], salt, user_secret[0], user_secret[1]].map((x) =>
         stringToBigInt(x),
       ),
     )
-
     const provided_salt_hash = await poseidon([stringToBigInt(oneTimeSalt)])
-
     const dataLocation = await poseidon(
       [field[0], field[1], salt, user_secret[0], user_secret[1]].map((x) =>
         stringToBigInt(x),
       ),
     )
-
+    
+    // Generate proof for the core contract
     const coreProof = await generateCoreProof({
       field_0: stringToBigInt(field[0]),
       field_1: stringToBigInt(field[1]),
@@ -461,8 +467,8 @@ export function CompleteUpdateModal({
         provided_field_and_salt_and_user_secret_hash,
       provided_salt_hash: provided_salt_hash,
     })
-
-
+    
+    // Prepare data for responding to the request
     const respondCallData = {
       requestId: requestID,
       dataLocation: dataLocation,
@@ -482,8 +488,8 @@ export function CompleteUpdateModal({
       },
       isUpdate: true,
     }
-
-
+    
+    // Prepare data and transaction object for submitting the response
     let data = coreContract.methods
       .respond(
         respondCallData.requestId,
@@ -493,14 +499,14 @@ export function CompleteUpdateModal({
         respondCallData.isUpdate,
       )
       .encodeABI()
-
     let txObject = {
       from: userAddress,
       to: coreContract.options.address,
       data: data,
       gas: 5000000,
     }
-
+    
+    // Check if 2FA success status needs to be waited for
     if (require2FA) {
       if (chainId != 1440002) {
         let twoFASuccess
@@ -513,37 +519,54 @@ export function CompleteUpdateModal({
         }
       }
     }
+    
+    // Update the UI to indicate waiting for response acceptance
     if (document.getElementById('submitButton')) {
       document.getElementById('submitButton').textContent =
         'Awaiting response acceptance...'
     }
+    
     try {
+      // Send the transaction to submit the response
       let receipt = await web3.eth.sendTransaction(txObject)
     } catch (error) {
       console.error(error)
       resetSubmitButton()
-      if(error.data) {
-        makeErrorNotif("Error submitting response transaction", error.data.message.toString())
+      // Display error notification based on error type
+      if (error.data) {
+        makeErrorNotif(
+          "Error submitting response transaction",
+          error.data.message.toString()
+        )
       } else {
-        makeErrorNotif("Error submitting response transaction", error.toString())
+        makeErrorNotif(
+          "Error submitting response transaction",
+          error.toString()
+        )
       }
       return
     }
+    
+    // Update the UI to indicate submitting response
     if (document.getElementById('submitButton')) {
       document.getElementById('submitButton').textContent =
         'Submitting response...'
     }
+    
     try {
-    onSubmit()
+      // Call the onSubmit function upon successful response submission
+      onSubmit()
     } catch (error) {
       console.error(error)
       resetSubmitButton()
       makeErrorNotif("Error submitting response to API", error.toString())
       return
     }
+    
+    // Show success notification, close the modal, and reset UI
     showNotif(false, "Update Response Sent", "Response sent successfully.")
     onClose()
-  }
+  }    
 
   return (
     <Transition.Root show={open} as={Fragment}>

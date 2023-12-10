@@ -1,3 +1,4 @@
+// Importing necessary React components and libraries
 import { Fragment, useRef, useState, useEffect } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
@@ -36,27 +37,30 @@ import { abcdef } from '@uiw/codemirror-theme-abcdef'
 import { tokyoNight } from '@uiw/codemirror-theme-tokyo-night'
 import { tokyoNightDay } from '@uiw/codemirror-theme-tokyo-night-day'
 
+// Define a functional React component named AwaitingUpdateCompletionModal
 export function AwaitingUpdateCompletionModal({
-  open,
-  onClose,
-  requestID = '',
-  addressOfReceivingParty = '',
-  fieldToUpdate = '',
-  snapshotAfterUpdate = '',
-  oneTimeKey = '',
-  oneTimeSalt = '',
-  timeLimit = '',
-  twoFAProvider = '',
-  twoFARequestID = '',
-  twoFAOneTimeToken = '',
-  responseFee = '',
-  require2FA = false,
+  open,  // Boolean to determine if the modal is open or closed
+  onClose,  // Function to handle modal closure
+  requestID = '',  // Request ID for the update
+  addressOfReceivingParty = '',  // Address of the receiving party
+  fieldToUpdate = '',  // Field to be updated
+  snapshotAfterUpdate = '',  // Snapshot of data after the update
+  oneTimeKey = '',  // One-time key for security
+  oneTimeSalt = '',  // One-time salt for security
+  timeLimit = '',  // Time limit for the request
+  twoFAProvider = '',  // 2FA provider information
+  twoFARequestID = '',  // 2FA request ID
+  twoFAOneTimeToken = '',  // 2FA one-time token
+  responseFee = '',  // Response fee for the update
+  require2FA = false,  // Boolean indicating if 2FA is required
 }) {
 
+  // References and state variables for managing the CodeMirror editor
   const editorContainerRef = useRef(null);
   const [editorView, setEditorView] = useState(null);
   const [isEditorReady, setIsEditorReady] = useState(false);
 
+  // Define a custom border theme for the CodeMirror editor
   const borderTheme = EditorView.theme({
     '.cm-editor': { 'border-radius': '0.375rem' },
     '&': { 'border-radius': '0.375rem' },
@@ -65,17 +69,21 @@ export function AwaitingUpdateCompletionModal({
     '.cm-focused': { 'border-radius': '0.375rem' },
   });
 
+  // Determine the current theme based on the document's class
   const currentTheme = document.documentElement.classList.contains('dark') ? tokyoNight : tokyoNightDay;
 
+  // useEffect to initialize the CodeMirror editor when the modal is open
   useEffect(() => {
     if (open && !editorView && isEditorReady) {
+      // Create a new EditorState with specified extensions
       const newState = EditorState.create({
         doc: JSON.stringify(
-                          JSON.parse(snapshotAfterUpdate),
-                          null,
-                          2,
-                        ),
+          JSON.parse(snapshotAfterUpdate),
+          null,
+          2,
+        ),
         extensions: [
+          // Various CodeMirror extensions for syntax highlighting, autocomplete, etc.
           lineNumbers(),
           highlightActiveLineGutter(),
           highlightSpecialChars(),
@@ -108,6 +116,7 @@ export function AwaitingUpdateCompletionModal({
         ],
       });
 
+      // Create a new EditorView and set it in the state
       const view = new EditorView({
         state: newState,
         parent: editorContainerRef.current,
@@ -116,6 +125,7 @@ export function AwaitingUpdateCompletionModal({
       setEditorView(view);
     }
 
+    // Cleanup function to destroy the editor when the modal closes
     return () => {
       if (editorView) {
         editorView.destroy();
@@ -123,6 +133,7 @@ export function AwaitingUpdateCompletionModal({
     };
   }, [open, isEditorReady]);
 
+  // useEffect to set the editor as ready after a short delay when the modal opens
   useEffect(() => {
     if (open) {
       const timer = setTimeout(() => setIsEditorReady(true), 50);
@@ -134,8 +145,9 @@ export function AwaitingUpdateCompletionModal({
       setIsEditorReady(false);
       setEditorView(null);
     }
-  }, [open]);  
+  }, [open]);
 
+  // Return JSX for the modal using Transition.Root and Dialog components
   return (
     <Transition.Root show={open} as={Fragment}>
       <Dialog

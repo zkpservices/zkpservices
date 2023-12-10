@@ -193,110 +193,125 @@ export const Header = forwardRef(function Header({ className }, ref) {
     return `${start}...${end}`
   }
 
-  async function disconnectWallet() {
-    try {
-      // Reset your application state related to the wallet
-      // For example, set userAddress to null
-      // setConnected(false);
-      setUserAddress('')
-      setLoggedIn(false)
-      setWalletConnected(false)
-      localStorage.clear()
-    } catch (error) {
-      console.error(error)
-    }
+// Disconnects the user's wallet by resetting relevant application state.
+// For example, sets userAddress to null, logs the user out, and clears localStorage.
+async function disconnectWallet() {
+  try {
+    // Reset your application state related to the wallet
+    // setConnected(false);
+    setUserAddress('');
+    setLoggedIn(false);
+    setWalletConnected(false);
+    localStorage.clear();
+  } catch (error) {
+    console.error(error);
   }
+}
 
-  async function initializeWeb3() {
-    if (window.ethereum) {
-      setMetamaskAvailable(true)
-      //these are too large for local storage and need to be reinstantiated each time
-      const web3Instance = new Web3(window.ethereum)
-      web3 = web3Instance
-      setWeb3(web3Instance)
 
-      const coreContractAbi = coreContractABI
-      const fujiCoreContractAddress =
-        '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'
-      const mumbaiCoreContractAddress =
-        '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'
-      const rippleCoreContractAddress =
-        '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'
-      const fujiCoreContractInstance = new web3Instance.eth.Contract(
-        coreContractAbi,
-        fujiCoreContractAddress
-      )
-      const mumbaiCoreContractInstance = new web3Instance.eth.Contract(
-        coreContractAbi,
-        mumbaiCoreContractAddress
-      )
-      const rippleCoreContractInstance = new web3Instance.eth.Contract(
-        coreContractAbi,
-        rippleCoreContractAddress
-      )
-      fujiCoreContract = fujiCoreContractInstance
-      mumbaiCoreContract = mumbaiCoreContractInstance
-      rippleCoreContract = rippleCoreContractInstance
-      setFujiCoreContract(fujiCoreContractInstance)
-      setMumbaiCoreContract(mumbaiCoreContractInstance)
-      setRippleCoreContract(rippleCoreContractInstance)
+async function initializeWeb3() {
+  // Check if MetaMask extension is available
+  if (window.ethereum) {
+    // MetaMask is available
+    setMetamaskAvailable(true);
 
-      const twoFAContractVRFAbi = twoFAContractVRFABI
-      const twoFAContractGenericAbi = twoFAContractGenericABI
-      const fujiTwoFAContractAddress =
-        '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'
-      const mumbaiTwoFAContractAddress =
-        '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'
-      const rippleTwoFAContractAddress =
-        '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'
-      const fujiTwoFAContractInstance = new web3Instance.eth.Contract(
-        twoFAContractVRFAbi,
-        fujiTwoFAContractAddress
-      )
-      const mumbaiTwoFAContractInstance = new web3Instance.eth.Contract(
-        twoFAContractVRFAbi,
-        mumbaiTwoFAContractAddress
-      )
-      const rippleTwoFAContractInstance = new web3Instance.eth.Contract(
-        twoFAContractGenericAbi,
-        rippleTwoFAContractAddress
-      )
-      fujiTwoFAContract = fujiTwoFAContractInstance
-      mumbaiTwoFAContract = mumbaiTwoFAContractInstance
-      rippleTwoFAContract = rippleTwoFAContractInstance
-      setFujiTwoFAContract(fujiTwoFAContractInstance)
-      setMumbaiTwoFAContract(mumbaiTwoFAContractInstance)
-      setRippleTwoFAContract(rippleTwoFAContractInstance)
+    // Initialize Web3 instance with MetaMask provider
+    const web3Instance = new Web3(window.ethereum);
+    web3 = web3Instance;
+    setWeb3(web3Instance);
 
-      const batchSignUpContractAbi = batchSignUpABI
-      const fujiBatchSignUpContractAddress =
-        '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'
-      const mumbaiBatchSignUpContractAddress =
-        '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'
-      const rippleBatchSignUpContractAddress =
-        '0x84713a3a001E2157d134B97C59D6bdAb351dd69d'
-      const fujiBatchSignUpContractInstance = new web3Instance.eth.Contract(
-        batchSignUpContractAbi,
-        fujiBatchSignUpContractAddress
-      )
-      const mumbaiBatchSignUpContractInstance = new web3Instance.eth.Contract(
-        batchSignUpContractAbi,
-        mumbaiBatchSignUpContractAddress
-      )
-      const rippleBatchSignUpContractInstance = new web3Instance.eth.Contract(
-        batchSignUpContractAbi,
-        rippleBatchSignUpContractAddress
-      )
-      fujiBatchSignUpContract = fujiBatchSignUpContractInstance
-      mumbaiBatchSignUpContract = mumbaiBatchSignUpContractInstance
-      rippleBatchSignUpContract = rippleBatchSignUpContractInstance
-      setFujiBatchSignUpContract(fujiBatchSignUpContractInstance)
-      setMumbaiBatchSignUpContract(mumbaiBatchSignUpContractInstance)
-      setRippleBatchSignUpContract(rippleBatchSignUpContractInstance)
-    } else {
-      setMetamaskAvailable(false)
-    }
+    // Ethereum core contract configurations for different networks
+    const coreContractAbi = coreContractABI;
+    const fujiCoreContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d';
+    const mumbaiCoreContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d';
+    const rippleCoreContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d';
+
+    // Instantiate core contracts for different networks
+    const fujiCoreContractInstance = new web3Instance.eth.Contract(
+      coreContractAbi,
+      fujiCoreContractAddress,
+    );
+    const mumbaiCoreContractInstance = new web3Instance.eth.Contract(
+      coreContractAbi,
+      mumbaiCoreContractAddress,
+    );
+    const rippleCoreContractInstance = new web3Instance.eth.Contract(
+      coreContractAbi,
+      rippleCoreContractAddress,
+    );
+
+    // Set contract instances and state variables
+    fujiCoreContract = fujiCoreContractInstance;
+    mumbaiCoreContract = mumbaiCoreContractInstance;
+    rippleCoreContract = rippleCoreContractInstance;
+
+    setFujiCoreContract(fujiCoreContractInstance);
+    setMumbaiCoreContract(mumbaiCoreContractInstance);
+    setRippleCoreContract(rippleCoreContractInstance);
+
+    // Two-Factor Authentication (2FA) contract configurations for different networks
+    const twoFAContractVRFAbi = twoFAContractVRFABI;
+    const twoFAContractGenericAbi = twoFAContractGenericABI;
+    const fujiTwoFAContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d';
+    const mumbaiTwoFAContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d';
+    const rippleTwoFAContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d';
+
+    // Instantiate 2FA contracts for different networks
+    const fujiTwoFAContractInstance = new web3Instance.eth.Contract(
+      twoFAContractVRFAbi,
+      fujiTwoFAContractAddress,
+    );
+    const mumbaiTwoFAContractInstance = new web3Instance.eth.Contract(
+      twoFAContractVRFAbi,
+      mumbaiTwoFAContractAddress,
+    );
+    const rippleTwoFAContractInstance = new web3Instance.eth.Contract(
+      twoFAContractGenericAbi,
+      rippleTwoFAContractAddress,
+    );
+
+    // Set 2FA contract instances and state variables
+    fujiTwoFAContract = fujiTwoFAContractInstance;
+    mumbaiTwoFAContract = mumbaiTwoFAContractInstance;
+    rippleTwoFAContract = rippleTwoFAContractInstance;
+
+    setFujiTwoFAContract(fujiTwoFAContractInstance);
+    setMumbaiTwoFAContract(mumbaiTwoFAContractInstance);
+    setRippleTwoFAContract(rippleTwoFAContractInstance);
+
+    // Batch Sign-Up contract configurations for different networks
+    const batchSignUpContractAbi = batchSignUpABI;
+    const fujiBatchSignUpContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d';
+    const mumbaiBatchSignUpContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d';
+    const rippleBatchSignUpContractAddress = '0x84713a3a001E2157d134B97C59D6bdAb351dd69d';
+
+    // Instantiate Batch Sign-Up contracts for different networks
+    const fujiBatchSignUpContractInstance = new web3Instance.eth.Contract(
+      batchSignUpContractAbi,
+      fujiBatchSignUpContractAddress,
+    );
+    const mumbaiBatchSignUpContractInstance = new web3Instance.eth.Contract(
+      batchSignUpContractAbi,
+      mumbaiBatchSignUpContractAddress,
+    );
+    const rippleBatchSignUpContractInstance = new web3Instance.eth.Contract(
+      batchSignUpContractAbi,
+      rippleBatchSignUpContractAddress,
+    );
+
+    // Set Batch Sign-Up contract instances and state variables
+    fujiBatchSignUpContract = fujiBatchSignUpContractInstance;
+    mumbaiBatchSignUpContract = mumbaiBatchSignUpContractInstance;
+    rippleBatchSignUpContract = rippleBatchSignUpContractInstance;
+
+    setFujiBatchSignUpContract(fujiBatchSignUpContractInstance);
+    setMumbaiBatchSignUpContract(mumbaiBatchSignUpContractInstance);
+    setRippleBatchSignUpContract(rippleBatchSignUpContractInstance);
+  } else {
+    // MetaMask is not available
+    setMetamaskAvailable(false);
   }
+}
 
   function updateWalletConnect() {
     if (metamaskAvailable) {

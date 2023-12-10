@@ -57,253 +57,288 @@ export function NewCrossChainSyncModal({
     }
   }
 
-  async function handleFetchValue() {
-    try {
-      let fetchedValue
+async function handleFetchValue() {
+  try {
+    // Variable to store the fetched value
+    let fetchedValue;
 
-      const contract =
-        chainId == 43113
-          ? fujiCoreContract
-          : chainId == 80001
-            ? mumbaiCoreContract
-            : chainId == 1440002
-              ? rippleCoreContract
-              : null
+    // Determine the contract based on the current chain ID
+    const contract =
+      chainId == 43113
+        ? fujiCoreContract
+        : chainId == 80001
+        ? mumbaiCoreContract
+        : chainId == 1440002
+        ? rippleCoreContract
+        : null;
 
-      if (!contract) {
-        console.error('No contract instance available for the current chain')
-        return
-      }
+    // Check if a valid contract instance is available
+    if (!contract) {
+      console.error('No contract instance available for the current chain');
+      return;
+    }
 
-      paramToSync = document.getElementById('parameterToSync').value
-      paramKey = document.getElementById('parameterKey').value
-      // let paramKeyRaw = document.getElementById('parameterKey').value;
+    // Get the selected parameter type and parameter key from the form
+    paramToSync = document.getElementById('parameterToSync').value;
+    paramKey = document.getElementById('parameterKey').value;
 
-      // const fieldDataRequest = await getFieldData(userAddress, userPassword, paramKeyRaw, chainId)
-      // const fieldData = fieldDataRequest['data']
-      // const paramKeyRawEnd = stringToBigInt(paramKeyRaw.substring(24, 48)) ? stringToBigInt(paramKeyRaw.substring(24, 48)) : stringToBigInt("")
-      // const saltEnd = stringToBigInt(fieldData[paramKeyRaw]['_metadata']['salt'].substring(24, 48)) ? stringToBigInt(fieldData[paramKeyRaw]['_metadata']['salt'].substring(24, 48)) : stringToBigInt("")
-      // const contractPasswordEnd = stringToBigInt(contractPassword.substring(24, 48)) ? stringToBigInt(contractPassword.substring(24, 48)) : stringToBigInt("")
-      // paramKey = await poseidon([stringToBigInt(paramKeyRaw), paramKeyRawEnd, stringToBigInt(fieldData[paramKeyRaw]['_metadata']['salt']), saltEnd, stringToBigInt(contractPassword)], contractPasswordEnd)
-
-      switch (paramToSync) {
-        case 'Data':
-          try {
+    // Handle specific operations based on the selected parameter type
+    switch (paramToSync) {
+      case 'Data':
+        try {
+          // Fetch field data for the specified parameter key
           const fieldDataRequest = await getFieldData(
             userAddress,
             userPassword,
             paramKey,
             chainId,
-          )
-          const fieldData = fieldDataRequest['data']
+          );
+
+          // Extract field data and perform additional processing
+          const fieldData = fieldDataRequest['data'];
           const paramKeyRawEnd = stringToBigInt(paramKey.substring(24, 48))
             ? stringToBigInt(paramKey.substring(24, 48))
-            : stringToBigInt('')
+            : stringToBigInt('');
           const contractPasswordEnd = stringToBigInt(
             contractPassword.substring(24, 48),
           )
             ? stringToBigInt(contractPassword.substring(24, 48))
-            : stringToBigInt('')
+            : stringToBigInt('');
+
+          // Hash the parameter key using Poseidon hash function
           paramKey = await poseidon([
             stringToBigInt(paramKey),
             paramKeyRawEnd,
             stringToBigInt(fieldData[paramKey]['_metadata']['salt']),
             stringToBigInt(contractPassword),
             contractPasswordEnd,
-          ])
+          ]);
+
+          // Retrieve obfuscated data from the contract using the hashed parameter key
           const encryptedData = await contract.methods
             .obfuscatedData(paramKey)
-            .call()
+            .call();
+
+          // Convert the fetched data to a formatted JSON string
           fetchedValue = JSON.stringify(
             encryptedData,
             (key, value) =>
-              typeof value === 'bigint' ? value.toString() : value, // return everything else unchanged
+              typeof value === 'bigint' ? value.toString() : value, // Return everything else unchanged
             2,
-          )
+          );
         } catch (error) {
-          console.error(error)
-          setShowErrorNotif(true)
-          setErrorTopText("Error fetching field data")
-          setErrorBottomText(error.toString())
+          // Handle errors during data fetching
+          console.error(error);
+          setShowErrorNotif(true);
+          setErrorTopText('Error fetching field data');
+          setErrorBottomText(error.toString());
         }
-          break
-        case 'Data Request':
-          const encryptedDataRequest = await contract.methods
-            .dataRequests(paramKey)
-            .call()
-            fetchedValue = JSON.stringify(
-              encryptedDataRequest,
-              (key, value) =>
-                typeof value === 'bigint' ? value.toString() : value, // return everything else unchanged
-              2,
-            )
-          break
-        case 'Update Request':
-          const encryptedUpdateRequest = await contract.methods
-            .updateRequests(paramKey)
-            .call()
-          fetchedValue = JSON.stringify(
-            encryptedUpdateRequest,
-            (key, value) => {
-              if (typeof value === 'bigint') {
-                return value.toString()
-              }
-              return value
-            },
-            2,
-          )
-          break
-        case 'Response':
-          fetchedValue = await contract.methods.responses(paramKey).call()
-          break
-        case 'Public User Information':
-          fetchedValue = await contract.methods
-            .publicUserInformation(paramKey)
-            .call()
-          break
-        case 'RSA Encryption Keys':
-          fetchedValue = await contract.methods
-            .rsaEncryptionKeys(paramKey)
-            .call()
-          break
-        case 'RSA Signing Keys':
-          fetchedValue = await contract.methods.rsaSigningKeys(paramKey).call()
-          break
-        default:
-          console.error('Invalid parameter selected')
-          return
-      }
-
-      setParameterValue(fetchedValue)
-    } catch (error) {
-      console.error('Error in fetching value:', error)
-      makeErrorNotif("Error in fetching value:", error.toString())
-      return
+        break;
+      // Handle other parameter types similarly
+      case 'Data Request':
+        const encryptedDataRequest = await contract.methods
+          .dataRequests(paramKey)
+          .call();
+        fetchedValue = JSON.stringify(
+          encryptedDataRequest,
+          (key, value) =>
+            typeof value === 'bigint' ? value.toString() : value, // Return everything else unchanged
+          2,
+        );
+        break;
+      case 'Update Request':
+        const encryptedUpdateRequest = await contract.methods
+          .updateRequests(paramKey)
+          .call();
+        fetchedValue = JSON.stringify(
+          encryptedUpdateRequest,
+          (key, value) => {
+            if (typeof value === 'bigint') {
+              return value.toString();
+            }
+            return value;
+          },
+          2,
+        );
+        break;
+      case 'Response':
+        fetchedValue = await contract.methods.responses(paramKey).call();
+        break;
+      case 'Public User Information':
+        fetchedValue = await contract.methods
+          .publicUserInformation(paramKey)
+          .call();
+        break;
+      case 'RSA Encryption Keys':
+        fetchedValue = await contract.methods
+          .rsaEncryptionKeys(paramKey)
+          .call();
+        break;
+      case 'RSA Signing Keys':
+        fetchedValue = await contract.methods.rsaSigningKeys(paramKey).call();
+        break;
+      default:
+        console.error('Invalid parameter selected');
+        return;
     }
+
+    // Set the fetched value to the state variable for rendering in the UI
+    setParameterValue(fetchedValue);
+  } catch (error) {
+    // Handle errors during the overall process
+    console.error('Error in fetching value:', error);
+    makeErrorNotif('Error in fetching value:', error.toString());
+    return;
+  }
+}
+
+
+async function handleSubmit() {
+  // Update UI elements to indicate the submission process
+  if (document.getElementById('submitButton')) {
+    document.getElementById('submitButton').textContent = 'Running...';
+    document.getElementById('submitButton').className =
+      'ml-3 inline-flex justify-center rounded-md border border-transparent bg-gray-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2';
+    document.getElementById('submitButton').disabled = true;
   }
 
-  async function handleSubmit() {
+  // Fetch and handle the value of the selected parameter
+  await handleFetchValue();
+
+  try {
+    let encodedData;
+    let dataTypeByte;
+
+    // Determine the contract and receiver based on the current chain ID
+    const contract =
+      chainId == 43113
+        ? fujiCoreContract
+        : chainId == 80001
+        ? mumbaiCoreContract
+        : null;
+    const receiver = chainId == 43113 ? 'mumbai' : 'fuji';
+
+    // Check if a valid contract instance is available
+    if (!contract) {
+      console.error('No contract instance available for the current chain');
+      return;
+    }
+
+    // Encoding the data based on the selected parameter type
+    switch (paramToSync) {
+      case 'Data':
+        encodedData = await contract.methods.encodeData(paramKey).call();
+        dataTypeByte = '0x03';
+        break;
+      case 'Data Request':
+        encodedData = await contract.methods
+          .encodeDataRequest(paramKey)
+          .call();
+        dataTypeByte = '0x04';
+        break;
+      // Handle other parameter types similarly
+      case 'Update Request':
+        encodedData = await contract.methods
+          .encodeUpdateRequest(paramKey)
+          .call();
+        dataTypeByte = '0x05';
+        break;
+      case 'Response':
+        encodedData = await contract.methods.encodeResponse(paramKey).call();
+        dataTypeByte = '0x06';
+        break;
+      case 'Public User Information':
+        encodedData = await contract.methods
+          .encodePublicUserInformation(paramKey)
+          .call();
+        dataTypeByte = '0x07';
+        break;
+      case 'RSA Encryption Keys':
+        encodedData = await contract.methods
+          .encodeRSAEncryptionKey(paramKey)
+          .call();
+        dataTypeByte = '0x01';
+        break;
+      case 'RSA Signing Keys':
+        encodedData = await contract.methods
+          .encodeRSASigningKey(paramKey)
+          .call();
+        dataTypeByte = '0x02';
+        break;
+      default:
+        console.error('Invalid parameter selected');
+        return;
+    }
+
+    // Prepare the data for the transaction
+    let dataBytes = dataTypeByte + encodedData.slice(2); // Removing '0x' from encodedData
+    let data = contract.methods.sendMessage(receiver, dataBytes).encodeABI();
+
+    // Prepare the transaction object
+    let txObject = {
+      from: userAddress,
+      to: contract.options.address,
+      data: data,
+      gas: 3000000, // 3000000 = gas limit for CCIP
+    };
+
+    // Update UI to indicate awaiting transaction acceptance
     if (document.getElementById('submitButton')) {
-      document.getElementById('submitButton').textContent = 'Running...'
-      document.getElementById('submitButton').className =
-        'ml-3 inline-flex justify-center rounded-md border border-transparent bg-gray-500 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2'
-      document.getElementById('submitButton').disabled = true
+      document.getElementById('submitButton').textContent =
+        'Awaiting transaction acceptance...';
     }
-    await handleFetchValue()
 
-    try {
-      let encodedData
-      let dataTypeByte
-      const contract =
-        chainId == 43113
-          ? fujiCoreContract
-          : chainId == 80001
-            ? mumbaiCoreContract
-            : null
-      const receiver = chainId == 43113 ? 'mumbai' : 'fuji'
+    // Send the transaction and get the receipt
+    let receipt = await web3.eth.sendTransaction(txObject);
 
-      if (!contract) {
-        console.error('No contract instance available for the current chain')
-        return
+    // Extract CCIP message ID from the transaction logs
+    let messageId;
+    for (let log of receipt.logs) {
+      if (
+        log.address.toLowerCase() == contract._address.toLowerCase()
+      ) {
+        messageId = log.data;
+        break;
       }
-
-      // Encoding the data
-      switch (paramToSync) {
-        case 'Data':
-          encodedData = await contract.methods.encodeData(paramKey).call()
-          dataTypeByte = '0x03'
-          break
-        case 'Data Request':
-          encodedData = await contract.methods
-            .encodeDataRequest(paramKey)
-            .call()
-          dataTypeByte = '0x04'
-          break
-        case 'Update Request':
-          encodedData = await contract.methods
-            .encodeUpdateRequest(paramKey)
-            .call()
-          dataTypeByte = '0x05'
-          break
-        case 'Response':
-          encodedData = await contract.methods.encodeResponse(paramKey).call()
-          dataTypeByte = '0x06'
-          break
-        case 'Public User Information':
-          encodedData = await contract.methods
-            .encodePublicUserInformation(paramKey)
-            .call()
-          dataTypeByte = '0x07'
-          break
-        case 'RSA Encryption Keys':
-          encodedData = await contract.methods
-            .encodeRSAEncryptionKey(paramKey)
-            .call()
-          dataTypeByte = '0x01'
-          break
-        case 'RSA Signing Keys':
-          encodedData = await contract.methods
-            .encodeRSASigningKey(paramKey)
-            .call()
-          dataTypeByte = '0x02'
-          break
-        default:
-          console.error('Invalid parameter selected')
-          return
-      }
-
-      let dataBytes = dataTypeByte + encodedData.slice(2) // Removing '0x' from encodedData
-      let data = contract.methods.sendMessage(receiver, dataBytes).encodeABI()
-
-      //   // 3000000 = gas limit for CCIP
-      let txObject = {
-        from: userAddress,
-        to: contract.options.address,
-        data: data,
-        gas: 3000000,
-      }
-      if (document.getElementById('submitButton')) {
-        document.getElementById('submitButton').textContent =
-          'Awaiting transaction acceptance...'
-      }
-      let receipt = await web3.eth.sendTransaction(txObject)
-
-      // CCIP message ID
-      let messageId
-      for (let log of receipt.logs) {
-        if (log.address.toLowerCase() == contract._address.toLowerCase()) {
-          messageId = log.data
-          break
-        }
-      }
-
-      const transactionId = receipt.logs[receipt.logs.length - 1].data
-
-      const type = paramToSyncDict[`${paramToSync}`]
-      const targetChain = chainId == 43113 ? 80001 : 43113
-      paramKey = document.getElementById('parameterKey').value
-      if (document.getElementById('submitButton')) {
-        document.getElementById('submitButton').textContent =
-          'Submitting transaction...'
-      }
-      const result = await addCCTX(
-        userAddress,
-        userPassword,
-        type,
-        paramKey,
-        chainId,
-        `0x${targetChain.toString(16)}`,
-        transactionId,
-      )
-      showNotif(false, "Cross-Chain Sync Submitted", "Transaction submitted successfully, awaiting Chainlink to complete sync.")
-      onClose()
-    } catch (error) {
-      console.error('Error in transaction:', error)
-      resetSubmitButton()
-      makeErrorNotif("Error in transaction:", error.toString())
-      return
     }
+
+    // Extract transaction ID and other details from the receipt
+    const transactionId = receipt.logs[receipt.logs.length - 1].data;
+    const type = paramToSyncDict[`${paramToSync}`];
+    const targetChain = chainId == 43113 ? 80001 : 43113;
+
+    // Update UI to indicate submitting the cross-chain sync transaction
+    paramKey = document.getElementById('parameterKey').value;
+    if (document.getElementById('submitButton')) {
+      document.getElementById('submitButton').textContent =
+        'Submitting transaction...';
+    }
+
+    // Add the cross-chain transaction and display success notification
+    const result = await addCCTX(
+      userAddress,
+      userPassword,
+      type,
+      paramKey,
+      chainId,
+      `0x${targetChain.toString(16)}`,
+      transactionId,
+    );
+    showNotif(
+      false,
+      'Cross-Chain Sync Submitted',
+      'Transaction submitted successfully, awaiting Chainlink to complete sync.',
+    );
+    onClose();
+  } catch (error) {
+    // Handle errors during the transaction submission process
+    console.error('Error in transaction:', error);
+    resetSubmitButton();
+    makeErrorNotif('Error in transaction:', error.toString());
+    return;
   }
+}
+
 
   return (
     <Transition.Root show={open} as={Fragment}>
