@@ -58,7 +58,7 @@ The logic for setting `upkeepNeeded` is as follows: If a VRF request has not bee
 
 #### Why is this approach significant?
 
-- <div className="font-bold">Economical Resource Use:</div> It determines whether a new VRF request (which consumes Chainlink tokens) is genuinely needed for a window of blocks. If a recent VRF is already available for the window, there's no need to expend additional resources.
+- <div className="font-bold">Economical Resource Use:</div> It determines whether a new VRF request (which consumes Chainlink tokens) is genuinely needed for a window of blocks. If a recent VRF is already available for the window, there's no need to expend additional resources. As a consequence, at most 1 Automation and 1 VRF call are required per window.
 - <div className="font-bold">Guaranteeing Recent Entropy:</div> The function ensures that there is always a sufficiently recent source of randomness available for MFA purposes. This randomness isn't the primary security mechanism (that's the role of Zero Knowledge Proofs) but is still crucial for the process.
 - <div className="font-bold">Scalability:</div> Whether there's one MFA request or a million in the given window, the function ensures entropy without requiring additional VRF requests for each individual MFA request. This design makes the system scalable and efficient, as it doesn't increase resource consumption based on the number of MFA requests.
 
@@ -155,3 +155,7 @@ function verifyProof(
     twoFactorData[_id].timestamp = block.timestamp;
 }
 ```
+
+### Expanding MFA Capabilities With Chainlink
+
+Chainlink's tools and capabilities extend beyond the VRF used in this example. With Chainlink's oracles and external adapters, developers can create highly secure, custom 2FA processes tailored to unique requirements. For instance, Chainlink's external adapters could be used to interface with APIs or perform complex off-chain computations. This flexibility could even extend to include biometric checks, where a custom adapter could verify biometric data like a fingerprint or face scan and return the verification result to the smart contract. This shows the potential to create an advanced, highly secure 2FA process that goes beyond traditional methods.
