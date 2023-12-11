@@ -7,9 +7,7 @@ Given the diverse security needs of different applications using zkp.services, c
 ## MFA Interface Enabling Custom MFA
 <CodeGroup>
 
-```solidity {{ title: 'Powershell' }}
-pragma solidity ^0.8.7;
-
+```solidity {{ title: 'Solidity' }}
 interface ITwoFactor {
     struct TwoFactorData {
         bool success;
@@ -27,9 +25,137 @@ interface ITwoFactor {
 
 </CodeGroup>
 
-The MFA Interface required for custom MFA smart contracts is straightforward yet highly adaptable. It mandates only two functions: a function to generate an MFA request and a function to return the MFA status. As shown in the provided Solidity interface, the generate2FA function associates a request ID with a keccak256 hash. It is up to the third-party MFA provider to define the method for setting the TwoFactorData struct's success flag to true for that ID. In the core zkp.services protocol, when a request or response is checked and it has an associated 2FA ID, this success flag must be true, indicating that the 2FA check was successful according to the custom logic of the provider. Optionally, a timestamp can be included to impose a time limit on the request, offering additional control. The core protocol also allows specifying the address of the 2FA provider to be associated with the request, along with the 2FA request ID.
+The MFA Interface required for custom MFA smart contracts is straightforward yet highly adaptable. It mandates only two functions: a function to generate a MFA request and a function to return the MFA status. As shown in the provided Solidity interface, the generate2FA function associates a request ID with a keccak256 hash. It is up to the third-party MFA provider to define the method for setting the TwoFactorData struct's success flag to true for that ID. In the core zkp.services protocol, when a request or response is checked and it has an associated 2FA ID, this success flag must be true, indicating that the 2FA check was successful according to the custom logic of the provider. Optionally, a timestamp can be included to impose a time limit on the request, offering additional control. The core protocol also allows specifying the address of the 2FA provider to be associated with the request, along with the 2FA request ID.
 
-## zkp.services' Chainlink VRF & Automation Trustless, On-Chain MFA Provider
+## Trustless & On-chain MFA
 
+zkp.services integrates a trustless and entirely on-chain MFA provider using Chainlink VRF (Verifiable Random Function) for generating randomness, Chainlink Automation for timely execution, and Zero Knowledge Proofs to securely verify private information without public disclosure. While it is true that it relies on Chainlink's off-chain infrastructure (and thus not technically entirely trustless and on-chain), the robustness and reliability of the Chainlink network make it a superior choice over other third-party APIs that might collect data or suffer downtime.
 
+### Chainlink Automation
+
+Firstly, lets discuss the role of Chainlink Automation in more detail. 
+
+```solidity {{ title: 'Solidity' }}
+function checkUpkeep(
+    bytes calldata /* checkData */
+)
+    external
+    view
+    override
+    returns (
+        bool upkeepNeeded,
+        bytes memory /* performData */
+    )
+{
+    uint256 currentWindow = block.number / WINDOW_SIZE;
+    uint256 priorWindow = currentWindow - 1;
+    upkeepNeeded = ((!windowVRFRequested[currentWindow] &&
+        windowVRFRequestRequired[currentWindow]) ||
+        (!windowVRFRequested[priorWindow] &&
+            windowVRFRequestRequired[priorWindow]));
+}
+```
+In the Solidity code snippet above, the `checkUpkeep` function plays a pivotal role in the zkp.services MFA system by deciding when automation actions are necessary. This decision is based on the value of the boolean `upkeepNeeded`. The function works by checking two specific 'windows' of block numbers - the current window and the prior window. A 'window' is a group of blocks determined by dividing the current block number by a predefined `WINDOW_SIZE`.
+
+The logic for setting `upkeepNeeded` is as follows: If a VRF request has not been made for the current or prior window, and a VRF request is required for these windows, then `upkeepNeeded` is set to true. This condition ensures that a new source of randomness (VRF) is requested only when necessary.
+
+#### Why is this approach significant?
+
+- <div className="font-bold">Economical Resource Use:</div> It determines whether a new VRF request (which consumes Chainlink tokens) is genuinely needed for a window of blocks. If a recent VRF is already available for the window, there's no need to expend additional resources.
+- <div className="font-bold">Guaranteeing Recent Entropy:</div> The function ensures that there is always a sufficiently recent source of randomness available for MFA purposes. This randomness isn't the primary security mechanism (that's the role of Zero Knowledge Proofs) but is still crucial for the process.
+- <div className="font-bold">Scalability:</div> Whether there's one MFA request or a million in the given window, the function ensures entropy without requiring additional VRF requests for each individual MFA request. This design makes the system scalable and efficient, as it doesn't increase resource consumption based on the number of MFA requests.
+
+In essence, the `checkUpkeep` function smartly manages the request for randomness, balancing the need for fresh entropy with economical use of Chainlink resources, thus playing a critical role in scaling the zkp.services MFA system efficiently.
+
+### Chainlink VRFs
+
+```solidity {{ title: 'Solidity' }}
+function performUpkeep(
+    bytes calldata /* performData */
+) external override {
+    uint256 currentWindow = block.number / WINDOW_SIZE;
+    uint256 priorWindow = currentWindow - 1;
+
+    // prevent block overlap problem
+    // example: with a WINDOW_SIZE of 50, a request for a random number is made at block 50
+    // but the minimum block height difference to generate a VRF + to trigger chainlink
+    // automation would only make it available at block 50 + vrf_difference + trigger_difference
+    // meaning it would only be available in the next window
+    // vrf_difference + trigger_difference is assumed to be roughly 5-6 blocks at most, thus
+    // maintaining a WINDOW_SIZE of 10 or more is very reasonable and ensuring both the
+    // prior window and the current window have an assigned VRF in cases of overlap is sufficient
+    if (
+        !windowVRFRequested[priorWindow] &&
+        windowVRFRequestRequired[priorWindow]
+    ) {
+        windowToVRFRequestIds[priorWindow] = vrf.requestRandomWords();
+        windowVRFRequested[priorWindow] = true;
+    }
+
+    if (
+        !windowVRFRequested[currentWindow] &&
+        windowVRFRequestRequired[currentWindow]
+    ) {
+        windowToVRFRequestIds[currentWindow] = vrf.requestRandomWords();
+        windowVRFRequested[currentWindow] = true;
+    }
+}
+```
+
+In the Solidity code snippet above, the `performUpkeep` function is integral to the zkp.services MFA system, managing the assignment of Verifiable Random Functions (VRFs) to specific block windows. This function ensures a fresh source of entropy (randomness) for each window, essential for the MFA process.
+How the Function Works:
+
+- <div className="font-bold">Identifying Windows:</div> The function calculates the current and prior windows based on the current block number divided by a predefined `WINDOW_SIZE`.
+- <div className="font-bold">Handling Block Overlaps:</div> To mitigate block overlap issues, where a VRF request might occur at the end of a window, the function ensures both the current and prior windows have VRFs assigned.
+- <div className="font-bold">Requesting VRFs:</div> The function requests new VRFs for windows where they are needed and not yet requested.
+
+Why is this approach significant?
+
+- <div className="font-bold">Ensuring Timely Entropy:</div> It assigns a VRF to each window, ensuring there's always a recent source of randomness for the MFA process.
+- <div className="font-bold">Preventing Overlaps in VRF Assignment:</div> By considering both current and prior windows, the function avoids situations where a VRF might be needed but isn't available due to processing delays.
+- <div className="font-bold">Efficient Use of Chainlink Resources:</div> The function only requests new VRFs when necessary, avoiding unnecessary consumption of Chainlink tokens.
+
+The `performUpkeep` function, therefore, plays a critical role in ensuring each window has an assigned VRF, contributing to the secure and efficient operation of the zkp.services MFA system.
+
+### Zero Knowledge Proofs
+
+Zero Knowledge Proofs bring all of the above elements together cohesively. To complete the zkp.services MFA check, the request ID's associated VRF (for the window) must be provided as part of the MFA verification request. This random number is also included in the public ZKP inputs. The randomness ensures the timeliness of the request, thanks to Chainlink VRF and Automation, and is vital in proving that the knowledge of the user's secret is demonstrated only once, without being flagrantly reused.
+
+```solidity {{ title: 'Solidity' }}
+function verifyProof(
+    uint256 _id,
+    uint256 _randomNumber,
+    uint256 _userSecretHash,
+    ProofParameters memory params
+) public {
+    require(msg.sender == requesters[_id], "Unauthorized");
+    require(userSecrets[msg.sender] != 0, "User secret has not been set");
+
+    uint256 randomNumber = getRandomNumber(_id);
+    require(randomNumber == _randomNumber, "Invalid random number");
+    require(
+        userSecrets[msg.sender] == _userSecretHash,
+        "Invalid user secret"
+    );
+    require(
+        params.pubSignals0 == _randomNumber,
+        "Public signal for random number mismatch"
+    );
+    require(
+        params.pubSignals1 == _userSecretHash,
+        "Public signal for user secret hash mismatch"
+    );
+
+    uint256[2] memory pA = [params.pA0, params.pA1];
+    uint256[2][2] memory pB = [[params.pB00, params.pB01], [params.pB10, params.pB11]];
+    uint256[2] memory pC = [params.pC0, params.pC1];
+    uint256[2] memory pubSignals = [params.pubSignals0, params.pubSignals1];
+
+    bool proofVerified = responseVerifier.verifyProof(pA, pB, pC, pubSignals);
+    require(proofVerified, "Invalid proof");
+
+    twoFactorData[_id].success = true;
+    twoFactorData[_id].timestamp = block.timestamp;
+}
+```
 
