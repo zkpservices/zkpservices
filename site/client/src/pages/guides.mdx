@@ -19,30 +19,30 @@ services are slightly more involved and are covered in more detail in this guide
 
 Before you get started, here are all the values you will need to Request Data:
 
-<table className="border-collapse border border-gray-200 w-full">
+<table className="border-separate border border-gray-200 dark:border-gray-700 w-full rounded-xl">
   <tr>
-    <th className="border border-gray-300 px-4 py-2 text-left">VALUE</th>
-    <th className="border border-gray-300 px-4 py-2 text-left">DESCRIPTION</th>
+    <th className="border border-gray-300 dark:border-gray-600 px-4 py-2 text-left rounded-tl-lg">VALUE</th>
+    <th className="border border-gray-300 dark:border-gray-600 px-4 py-2 text-left rounded-tr-lg">DESCRIPTION</th>
   </tr>
   <tr>
-    <td className="border border-gray-300 px-4 py-2"><b>Request</b></td>
-    <td className="border border-gray-300 px-4 py-2">This is the data field (e.g. "Medical Records") you want to request.</td>
+    <td className="border border-gray-300 dark:border-gray-600 px-4 py-2"><b>Request</b></td>
+    <td className="border border-gray-300 dark:border-gray-600 px-4 py-2">This is the data field (e.g. "Medical Records") you want to request.</td>
   </tr>
   <tr>
-    <td className="border border-gray-300 px-4 py-2"><b>Key</b></td>
-    <td className="border border-gray-300 px-4 py-2">A secure key to help decrypt data once you receive it.</td>
+    <td className="border border-gray-300 dark:border-gray-600 px-4 py-2"><b>Key</b></td>
+    <td className="border border-gray-300 dark:border-gray-600 px-4 py-2">A secure key to help decrypt data once you receive it.</td>
   </tr>
   <tr>
-    <td className="border border-gray-300 px-4 py-2"><b>Time Limit</b></td>
-    <td className="border border-gray-300 px-4 py-2">Time in seconds before the recipient must respond to your data request.</td>
+    <td className="border border-gray-300 dark:border-gray-600 px-4 py-2"><b>Time Limit</b></td>
+    <td className="border border-gray-300 dark:border-gray-600 px-4 py-2">Time in seconds before the recipient must respond to your data request.</td>
   </tr>
   <tr>
-    <td className="border border-gray-300 px-4 py-2"><b>2FA Information (optional)</b></td>
-    <td className="border border-gray-300 px-4 py-2">If you want added security, you can make it so that the responder has to undergo a 2FA requirement before responding.</td>
+    <td className="border border-gray-300 dark:border-gray-600 px-4 py-2"><b>2FA Information (optional)</b></td>
+    <td className="border border-gray-300 dark:border-gray-600 px-4 py-2">If you want added security, you can make it so that the responder has to undergo a 2FA requirement before responding.</td>
   </tr>
   <tr>
-    <td className="border border-gray-300 px-4 py-2"><b>Response fee</b></td>
-    <td className="border border-gray-300 px-4 py-2">A data request will cost 10 ZKP tokens by default. If you require more ZKP tokens from whom you request data, increase the number.</td>
+    <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 rounded-bl-lg"><b>Response fee</b></td>
+    <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 rounded-br-lg">A data request will cost 10 ZKP tokens by default. If you require more ZKP tokens from whom you request data, increase the number.</td>
   </tr>
 </table>
 
@@ -55,30 +55,30 @@ Once you are ready to initiate a data request, navigate to the dashboard. Here y
 
 You will be presented with the form below. Below are brief descriptions covering each input you must complete before requesting data.
 
-<table className="border-collapse border border-gray-200 w-full">
+<table className="border-separate border border-gray-200 dark:border-gray-700 w-full rounded-xl">
   <tr>
-    <th className="border border-gray-300 px-4 py-2 text-left">INPUT</th>
-    <th className="border border-gray-300 px-4 py-2 text-left">DESCRIPTION</th>
+    <th className="border border-gray-300 dark:border-gray-600 px-4 py-2 text-left rounded-tl-lg">INPUT</th>
+    <th className="border border-gray-300 dark:border-gray-600 px-4 py-2 text-left rounded-tr-lg">DESCRIPTION</th>
   </tr>
   <tr>
-    <td className="border border-gray-300 px-4 py-2"><b>Address of Receiver</b></td>
-    <td className="border border-gray-300 px-4 py-2">The wallet address containing the requested data.</td>
+    <td className="border border-gray-300 dark:border-gray-600 px-4 py-2"><b>Address of Receiver</b></td>
+    <td className="border border-gray-300 dark:border-gray-600 px-4 py-2">The wallet address containing the requested data.</td>
   </tr>
   <tr>
-    <td className="border border-gray-300 px-4 py-2"><b>One Time Key</b></td>
-    <td className="border border-gray-300 px-4 py-2">Once you have received the requested data, the one-time key will be used to access it. You can put in your own or generate a random one. Either way, make sure you save it somewhere.</td>
+    <td className="border border-gray-300 dark:border-gray-600 px-4 py-2"><b>One Time Key</b></td>
+    <td className="border border-gray-300 dark:border-gray-600 px-4 py-2">Once you have received the requested data, the one-time key will be used to access it. You can put in your own or generate a random one. Either way, make sure you save it somewhere.</td>
   </tr>
   <tr>
-    <td className="border border-gray-300 px-4 py-2"><b>Time Limit of Request</b></td>
-    <td className="border border-gray-300 px-4 py-2">The time limit dictates how long your request will be active for the requestee to respond in seconds.</td>
+    <td className="border border-gray-300 dark:border-gray-600 px-4 py-2"><b>Time Limit of Request</b></td>
+    <td className="border border-gray-300 dark:border-gray-600 px-4 py-2">The time limit dictates how long your request will be active for the requestee to respond in seconds.</td>
   </tr>
   <tr>
-    <td className="border border-gray-300 px-4 py-2"><b>Require 2FA</b></td>
-    <td className="border border-gray-300 px-4 py-2">If selected, the requestee must complete 2 Factor Authentication ("2FA") to respond to your request. An additional set of inputs will be included if you decide to attach 2FA to your request.</td>
+    <td className="border border-gray-300 dark:border-gray-600 px-4 py-2"><b>Require 2FA</b></td>
+    <td className="border border-gray-300 dark:border-gray-600 px-4 py-2">If selected, the requestee must complete 2 Factor Authentication ("2FA") to respond to your request. An additional set of inputs will be included if you decide to attach 2FA to your request.</td>
   </tr>
   <tr>
-    <td className="border border-gray-300 px-4 py-2"><b>Set Response Fee</b></td>
-    <td className="border border-gray-300 px-4 py-2">The response fee will be the number of ZKP tokens the requestee requires to answer your request.</td>
+    <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 rounded-bl-lg"><b>Set Response Fee</b></td>
+    <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 rounded-br-lg">The response fee will be the number of ZKP tokens the requestee requires to answer your request.</td>
   </tr>
 </table>
 
@@ -94,38 +94,38 @@ Once you have initiated the data request, you will see that request in your rece
 
 Before you get started, here are all the values you will need to request an Update to Data:
 
-<table className="border-collapse border border-gray-200 w-full">
+<table className="border-separate border border-gray-200 dark:border-gray-700 w-full rounded-xl">
   <tr>
-    <th className="border border-gray-300 px-4 py-2 text-left">VALUE</th>
-    <th className="border border-gray-300 px-4 py-2 text-left">DESCRIPTION</th>
+    <th className="border border-gray-300 dark:border-gray-600 px-4 py-2 text-left rounded-tl-lg">VALUE</th>
+    <th className="border border-gray-300 dark:border-gray-600 px-4 py-2 text-left rounded-tr-lg">DESCRIPTION</th>
   </tr>
   <tr>
-    <td className="border border-gray-300 px-4 py-2"><b>Request</b></td>
-    <td className="border border-gray-300 px-4 py-2">This is the data you want to update.</td>
+    <td className="border border-gray-300 dark:border-gray-600 px-4 py-2"><b>Request</b></td>
+    <td className="border border-gray-300 dark:border-gray-600 px-4 py-2">This is the data you want to update.</td>
   </tr>
   <tr>
-    <td className="border border-gray-300 px-4 py-2"><b>Key</b></td>
-    <td className="border border-gray-300 px-4 py-2">A secure key to help decrypt data once you receive it.</td>
+    <td className="border border-gray-300 dark:border-gray-600 px-4 py-2"><b>Key</b></td>
+    <td className="border border-gray-300 dark:border-gray-600 px-4 py-2">A secure key to help decrypt data once you receive it.</td>
   </tr>
   <tr>
-    <td className="border border-gray-300 px-4 py-2"><b>Time Limit</b></td>
-    <td className="border border-gray-300 px-4 py-2">Time in seconds before the recipient must respond to your data request.</td>
+    <td className="border border-gray-300 dark:border-gray-600 px-4 py-2"><b>Time Limit</b></td>
+    <td className="border border-gray-300 dark:border-gray-600 px-4 py-2">Time in seconds before the recipient must respond to your data request.</td>
   </tr>
   <tr>
-    <td className="border border-gray-300 px-4 py-2"><b>2FA Information (optional)</b></td>
-    <td className="border border-gray-300 px-4 py-2">If you want added security, you can make it so that the responder has to undergo a 2FA requirement before responding.</td>
+    <td className="border border-gray-300 dark:border-gray-600 px-4 py-2"><b>2FA Information (optional)</b></td>
+    <td className="border border-gray-300 dark:border-gray-600 px-4 py-2">If you want added security, you can make it so that the responder has to undergo a 2FA requirement before responding.</td>
   </tr>
   <tr>
-    <td className="border border-gray-300 px-4 py-2"><b>Data Hash</b></td>
-    <td className="border border-gray-300 px-4 py-2">A unique identifier for the data you want to update.</td>
+    <td className="border border-gray-300 dark:border-gray-600 px-4 py-2"><b>Data Hash</b></td>
+    <td className="border border-gray-300 dark:border-gray-600 px-4 py-2">A unique identifier for the data you want to update.</td>
   </tr>
   <tr>
-    <td className="border border-gray-300 px-4 py-2"><b>Salt Hash</b></td>
-    <td className="border border-gray-300 px-4 py-2">A cryptographic salt to enhance data security.</td>
+    <td className="border border-gray-300 dark:border-gray-600 px-4 py-2"><b>Salt Hash</b></td>
+    <td className="border border-gray-300 dark:border-gray-600 px-4 py-2">A cryptographic salt to enhance data security.</td>
   </tr>
   <tr>
-    <td className="border border-gray-300 px-4 py-2"><b>Response fee</b></td>
-    <td className="border border-gray-300 px-4 py-2">A data request will cost 10 ZKP tokens by default. If you require more ZKP tokens from whom you request data, increase the number.</td>
+    <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 rounded-bl-lg"><b>Response fee</b></td>
+    <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 rounded-br-lg">A data request will cost 10 ZKP tokens by default. If you require more ZKP tokens from whom you request data, increase the number.</td>
   </tr>
 </table>
 
@@ -138,38 +138,38 @@ Once you are ready to initiate an update data request, navigate to the Dashboard
 
 You will be presented with the form below. Below are brief descriptions covering each input you must complete before requesting data.
 
-<table className="border-collapse border border-gray-200 w-full">
+<table className="border-separate border border-gray-200 dark:border-gray-700 w-full rounded-xl">
   <tr>
-    <th className="border border-gray-300 px-4 py-2 text-left"><b>INPUT</b></th>
-    <th className="border border-gray-300 px-4 py-2 text-left"><b>DESCRIPTION</b></th>
+    <th className="border border-gray-300 dark:border-gray-600 px-4 py-2 text-left rounded-tl-lg">INPUT</th>
+    <th className="border border-gray-300 dark:border-gray-600 px-4 py-2 text-left rounded-tr-lg">DESCRIPTION</th>
   </tr>
   <tr>
-    <td className="border border-gray-300 px-4 py-2"><b>Address of Receiver</b></td>
-    <td className="border border-gray-300 px-4 py-2">The wallet address containing the data you want updated.</td>
+    <td className="border border-gray-300 dark:border-gray-600 px-4 py-2"><b>Address of Receiver</b></td>
+    <td className="border border-gray-300 dark:border-gray-600 px-4 py-2">The wallet address containing the data you want updated.</td>
   </tr>
   <tr>
-    <td className="border border-gray-300 px-4 py-2"><b>Field to Update</b></td>
-    <td className="border border-gray-300 px-4 py-2"> Provide the data you want the receiver's data updated with. Please make sure to format it as you would a JSON payload.</td>
+    <td className="border border-gray-300 dark:border-gray-600 px-4 py-2"><b>Field to Update</b></td>
+    <td className="border border-gray-300 dark:border-gray-600 px-4 py-2"> Provide the data you want the receiver's data updated with. Please make sure to format it as you would a JSON payload.</td>
   </tr>
   <tr>
-    <td className="border border-gray-300 px-4 py-2"><b>One Time Key</b></td>
-    <td className="border border-gray-300 px-4 py-2">The one-time key will be used to access the requested data once you have received it. You can put in your own or generate a random one. Either way, make sure you save it somewhere.</td>
+    <td className="border border-gray-300 dark:border-gray-600 px-4 py-2"><b>One Time Key</b></td>
+    <td className="border border-gray-300 dark:border-gray-600 px-4 py-2">The one-time key will be used to access the requested data once you have received it. You can put in your own or generate a random one. Either way, make sure you save it somewhere.</td>
   </tr>
   <tr>
-    <td className="border border-gray-300 px-4 py-2"><b>One Time Salt</b></td>
-    <td className="border border-gray-300 px-4 py-2">Ipsum lorem.</td>
+    <td className="border border-gray-300 dark:border-gray-600 px-4 py-2"><b>One Time Salt</b></td>
+    <td className="border border-gray-300 dark:border-gray-600 px-4 py-2">Ipsum lorem.</td>
   </tr>
   <tr>
-    <td className="border border-gray-300 px-4 py-2"><b>Time Limit of Request</b></td>
-    <td className="border border-gray-300 px-4 py-2">The time limit dictates how long your request will be active for the requestee to respond to in seconds.</td>
+    <td className="border border-gray-300 dark:border-gray-600 px-4 py-2"><b>Time Limit of Request</b></td>
+    <td className="border border-gray-300 dark:border-gray-600 px-4 py-2">The time limit dictates how long your request will be active for the requestee to respond to in seconds.</td>
   </tr>
   <tr>
-    <td className="border border-gray-300 px-4 py-2"><b>Require 2FA</b></td>
-    <td className="border border-gray-300 px-4 py-2">If selected, the requestee must complete 2 Factor Authentication ("2FA") to respond to your request. An additional set of inputs will be included if you decide to attach 2FA to your request.</td>
+    <td className="border border-gray-300 dark:border-gray-600 px-4 py-2"><b>Require 2FA</b></td>
+    <td className="border border-gray-300 dark:border-gray-600 px-4 py-2">If selected, the requestee must complete 2 Factor Authentication ("2FA") to respond to your request. An additional set of inputs will be included if you decide to attach 2FA to your request.</td>
   </tr>
   <tr>
-    <td className="border border-gray-300 px-4 py-2"><b>Set Response Fee</b></td>
-    <td className="border border-gray-300 px-4 py-2">The response fee will be the number of ZKP tokens the requestee requires to answer your request.</td>
+    <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 rounded-bl-lg"><b>Set Response Fee</b></td>
+    <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 rounded-br-lg">The response fee will be the number of ZKP tokens the requestee requires to answer your request.</td>
   </tr>
 </table>
 
@@ -177,11 +177,7 @@ Once you have completed the form, clicking “Call Smart Contract” will initia
 
 ### <div className="font-bold">STEP 3: Request status and decryption</div>
 
-Once you have initiated the request to update data, you will see that request in your recent activity at the bottom of the dashboard.
-
-Navigate to the "Outgoing" tab, and you can check the status of your data request here.
-
-After the recipient approves your request, you can use your key and salt to verify the data has been changed.
+Once you have initiated the request to update data, you will see that request in your recent activity at the bottom of the dashboard. Navigate to the "Outgoing" tab, and you can check the status of your data request here. After the recipient approves your request, you can use your key and salt to verify the data has been changed.
 
 ---
 
@@ -197,30 +193,30 @@ Navigate to the dashboard to find the "Cross-Chain Backups" card. Click it to op
 
 You will be presented with the form below. Below are brief descriptions covering each input you must complete before requesting data.
 
-<table className="border-collapse border border-gray-200 w-full">
+<table className="border-separate border border-gray-200 dark:border-gray-700 w-full rounded-xl">
   <tr>
-    <th className="border border-gray-300 px-4 py-2 text-left">INPUT</th>
-    <th className="border border-gray-300 px-4 py-2 text-left">DESCRIPTION</th>
+    <th className="border border-gray-300 dark:border-gray-600 px-4 py-2 text-left rounded-tl-lg">INPUT</th>
+    <th className="border border-gray-300 dark:border-gray-600 px-4 py-2 text-left rounded-tr-lg">DESCRIPTION</th>
   </tr>
   <tr>
-    <td className="border border-gray-300 px-4 py-2"><b>Destination Chain</b></td>
-    <td className="border border-gray-300 px-4 py-2">This is the chain you will be backing up your data to.</td>
+    <td className="border border-gray-300 dark:border-gray-600 px-4 py-2"><b>Destination Chain</b></td>
+    <td className="border border-gray-300 dark:border-gray-600 px-4 py-2">This is the chain you will be backing up your data to.</td>
   </tr>
   <tr>
-    <td className="border border-gray-300 px-4 py-2"><b>Parameter to Sync</b></td>
-    <td className="border border-gray-300 px-4 py-2">Quick select a data value associated with your account and wallet.</td>
+    <td className="border border-gray-300 dark:border-gray-600 px-4 py-2"><b>Parameter to Sync</b></td>
+    <td className="border border-gray-300 dark:border-gray-600 px-4 py-2">Quick select a data value associated with your account and wallet.</td>
   </tr>
   <tr>
-    <td className="border border-gray-300 px-4 py-2"><b>Parameter Key</b></td>
-    <td className="border border-gray-300 px-4 py-2">Ipsum lorem.</td>
+    <td className="border border-gray-300 dark:border-gray-600 px-4 py-2"><b>Parameter Key</b></td>
+    <td className="border border-gray-300 dark:border-gray-600 px-4 py-2">Ipsum lorem.</td>
   </tr>
   <tr>
-    <td className="border border-gray-300 px-4 py-2"><b>Parameter Value</b></td>
-    <td className="border border-gray-300 px-4 py-2">Using the "Fetch Parameter Value" below, you will be able to generate the Parameter</td>
+    <td className="border border-gray-300 dark:border-gray-600 px-4 py-2"><b>Parameter Value</b></td>
+    <td className="border border-gray-300 dark:border-gray-600 px-4 py-2">Using the "Fetch Parameter Value" below, you will be able to generate the Parameter</td>
   </tr>
   <tr>
-    <td className="border border-gray-300 px-4 py-2"><b>CCIP Fee</b></td>
-    <td className="border border-gray-300 px-4 py-2">There is a default fee of 10 ZKP tokens to back up your data onto another chain.</td>
+    <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 rounded-bl-lg"><b>CCIP Fee</b></td>
+    <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 rounded-br-lg">There is a default fee of 10 ZKP tokens to back up your data onto another chain.</td>
   </tr>
 </table>
 
