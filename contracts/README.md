@@ -1,7 +1,10 @@
+
 # ZKPServicesCore
 
+Please consult our protocol [overview](https://zkp.services/overview) as well as the other guides on our site and in this repository for a high level overview of this smart contract and its purpose. For a deeper technical overview, please consult our protocol [blueprint](https://zkp.services/blueprint).
+
 ## Overview
-ZKPServicesCore is a robust smart contract built on the Ethereum platform, written in Solidity ^0.8.7. The contract serves as an advanced data management system leveraging cryptographic proofs and two-factor authentication mechanisms. It blends the power of decentralized platforms with RSA and AES encryption techniques, providing a secure medium to request, update, and validate obfuscated data.
+`ZKPServicesCore` is a robust smart contract built on the Ethereum platform, written in Solidity ^0.8.7. The contract serves as an advanced data management system leveraging cryptographic proofs and two-factor authentication mechanisms. It blends the power of decentralized platforms with RSA and AES encryption techniques, providing a secure medium to request, update, and validate obfuscated data.
 
 ## Features
 ### 1. Token System (the tokenomics aspect is just implemented for testing to demonstrate token utility):
