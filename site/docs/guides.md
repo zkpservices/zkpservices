@@ -34,7 +34,7 @@ Before you start, here's an overview of what you'll need to make a data request:
 * **Encrypted Key:** A secure key to help decrypt the data once you receive it.
 * **Time Limit:** How long before the recipient must respond to your data request.
 * **2FA Information (*optional*):** If you want added security, you can make it so that the responder has to undergo a 2FA requirement before responding.
-* **Response fee:** A data request will cost 10 ZKP tokens by default. If you require more ZKP tokens from whom you request data, increase the number.
+* **Response fee:** A data request will cost 5 ZKP tokens by default. If you require more ZKP tokens from whom you request data, increase the number.
 
 ## 2 - Check your balance
 
@@ -87,7 +87,7 @@ Before you start, here's an overview of what you'll need to make a data request:
 // CONSIDER ADDING "2FA PROVIDER / 2FA REQUEST ID / 2FA ONE TIME TOKEN" UNDER "d." HERE.
 * **Data Hash:** A unique identifier for the data you want to update.
 * **Salt Hash:** A cryptographic salt to enhance data security.
-* **Response fee:** A data request will cost 10 ZKP tokens by default. If you require more ZKP tokens from whom you request data, increase the number.
+* **Response fee:** A data request will cost 5 ZKP tokens by default. If you require more ZKP tokens from whom you request data, increase the number.
 
 ## 2 - Check your balance
 
