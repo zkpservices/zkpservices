@@ -591,7 +591,7 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
             data: dataBytes,
             tokenAmounts: new Client.EVMTokenAmount[](0),
             extraArgs: Client._argsToBytes(
-                Client.EVMExtraArgsV1({gasLimit: 2000000})
+                Client.EVMExtraArgsV1({gasLimit: 2000000, strict: false})
             ),
             feeToken: address(senderToken)
         });
@@ -668,7 +668,7 @@ contract ZKPServicesCore is ERC20Burnable, Ownable, CCIPReceiver {
             data: dataBytes,
             tokenAmounts: new Client.EVMTokenAmount[](0),
             extraArgs: Client._argsToBytes(
-                Client.EVMExtraArgsV1({gasLimit: 2000000})
+                Client.EVMExtraArgsV1({gasLimit: 200_000, strict: false})
             ),
             feeToken: address(senderToken)
         });

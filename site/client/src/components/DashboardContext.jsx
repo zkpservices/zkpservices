@@ -73,11 +73,11 @@ export function DashboardContext() {
 
       const coreContractAbi = coreContractABI
       const fujiCoreContractAddress =
-        '0x119F505c62B2ddD5A32E3137d66eBC75E92421C5'
+        '0x17f7Ffe5B2F4dDf066F5D979D9C0aBE4860e59F7'
       const mumbaiCoreContractAddress =
-        '0xCb853FC4788e3e148720d12d787Ed4b4f0D7B43B'
+        '0xdD7aaBb4fe41728CC3d145613c144E3edFad46c8'
       const rippleCoreContractAddress =
-        '0xDf7cb58E4C0302F1FA24048e1B355f4ca5CC5Cc1'
+        '0x417ACBA9a9D4151aAF1e8FBe84070b665E5FB35e'
       const fujiCoreContractInstance = new web3Instance.eth.Contract(
         coreContractAbi,
         fujiCoreContractAddress,
@@ -100,11 +100,11 @@ export function DashboardContext() {
       const twoFAContractVRFAbi = twoFAContractVRFABI
       const twoFAContractGenericAbi = twoFAContractGenericABI
       const fujiTwoFAContractAddress =
-        '0x0be63a7958e0eC9E9bd0f80428b6D2aCd620175D'
+        '0x94713a3a001E2157d134B97C59D6bdAb351dd69d'
       const mumbaiTwoFAContractAddress =
-        '0xF909B805621a2DF0CD659E87CD679997Cf853455'
+        '0x3FF67eC0D26c38E40dC22450C0B076902D2F38b1'
       const rippleTwoFAContractAddress =
-        '0x4db90ac24648E383e49517947FcfCF357731759E'
+        '0x96CB3A818f684bA218d5e630e151DCd489780521'
       const fujiTwoFAContractInstance = new web3Instance.eth.Contract(
         twoFAContractVRFAbi,
         fujiTwoFAContractAddress,
@@ -126,11 +126,11 @@ export function DashboardContext() {
 
       const batchSignUpContractAbi = batchSignUpABI
       const fujiBatchSignUpContractAddress =
-        '0x7DDe6e9F67e4214eFB6343734f833ac9F90a3e90'
+        '0xE1514d45B772Ca76e02E4d086672E8b87eFb45C6'
       const mumbaiBatchSignUpContractAddress =
-        '0x86Bdca1Dee159b0e20Ad9107F73E7c0925C4708b'
+        '0x17f7Ffe5B2F4dDf066F5D979D9C0aBE4860e59F7'
       const rippleBatchSignUpContractAddress =
-        '0x0a7051c92430561D0ee014b572Fb9F6ED2c78f0E'
+        '0x207cEf30488576E99C780f06CF7388A8365DB9fb'
       const fujiBatchSignUpContractInstance = new web3Instance.eth.Contract(
         batchSignUpContractAbi,
         fujiBatchSignUpContractAddress,
