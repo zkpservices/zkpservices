@@ -8,7 +8,7 @@ Please consult our protocol [overview](https://zkp.services/docs) as well as the
 
 ## Features
 ### 1. Token System (covered in more detail on site guide)
-The tokenomics aspect is just implemented for testing to demonstrate token utility - however they are covered on our site in the [tokenomics guide]([https://www.zkp.services/docs](https://www.zkp.services/docs#tokenomics-beta-of-zkp-services)
+The tokenomics aspect is just implemented for testing to demonstrate token utility - however they are covered on our site in the [tokenomics guide](https://www.zkp.services/docs#tokenomics-beta-of-zkp-services)
 - **ERC20Burnable Token:** Built on the ERC20 standard with burn capabilities.
 - **Token Distribution:** Upon deployment, all of the ZKP tokens are allocated to the contract itself.
 - **Vault System:** Allows users to request a limited amount of tokens from the contract's vault to act as a faucet for testing.
