@@ -46,7 +46,7 @@ Initializes the contract, sets the Groth16 verifier, mints the total ZKP tokens 
 
 ## Advantages
 - **Data Privacy:** Only hashed data is stored, preserving data confidentiality.
-- **Enhanced Security:** Incorporates RSA, AES encryption, and two-factor authentication.
+- **Enhanced Security:** Incorporates security techniques such as salted hashes and ZKPs for obfuscation as well as RSA, AES encryption, and two-factor authentication.
 - **Decentralized System:** Utilizes the strengths of decentralized platforms to ensure data transparency and integrity.
 - **Economic Incentives:** Uses the ZKP token system to ensure participants are compensated or penalized for their actions within the ecosystem.
 
