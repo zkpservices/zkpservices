@@ -1,14 +1,14 @@
 
 # ZKPServicesCore
 
-Please consult our protocol [overview](https://zkp.services/overview) as well as the other guides on our site and in this repository for a high level overview of this smart contract and its purpose. For a deeper technical overview, please consult our protocol [blueprint](https://zkp.services/blueprint).
+Please consult our protocol [overview](https://zkp.services/docs) as well as the other guides on our site and in this repository for a high level overview of this smart contract and its purpose. For a deeper technical overview, please consult our protocol [blueprint](https://zkp.services/blueprint).
 
 ## Overview
 `ZKPServicesCore` is a robust smart contract built for EVM-compatible chains written in Solidity. The contract serves as an advanced data management system leveraging cryptographic proofs and two-factor authentication mechanisms. It blends the power of decentralized platforms with various encryption and obfuscation techniques, providing a secure medium to request, update, and validate obfuscated data in a privacy-preserving manner.
 
 ## Features
 ### 1. Token System (covered in more detail on site guide)
-The tokenomics aspect is just implemented for testing to demonstrate token utility - however they are covered on our site in the [tokenomics guide](https://www.zkp.services/overview)
+The tokenomics aspect is just implemented for testing to demonstrate token utility - however they are covered on our site in the [tokenomics guide]([https://www.zkp.services/docs](https://www.zkp.services/docs#tokenomics-beta-of-zkp-services)
 - **ERC20Burnable Token:** Built on the ERC20 standard with burn capabilities.
 - **Token Distribution:** Upon deployment, all of the ZKP tokens are allocated to the contract itself.
 - **Vault System:** Allows users to request a limited amount of tokens from the contract's vault to act as a faucet for testing.
