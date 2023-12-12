@@ -1,6 +1,6 @@
-# [zkp.services](https://zkp.services/overview)
+# [zkp.services](https://zkp.services)
 
-Please consult our protocol's [overview](https://zkp.services/overview) page for a more extensive overview. The site also includes extensive documentation on other aspects of the protocol as well as references you may find useful.
+Please consult our protocol's [overview](https://zkp.services/docs) page for a more extensive overview. The site also includes extensive documentation on other aspects of the protocol as well as references you may find useful.
 
 ## Introduction
 
