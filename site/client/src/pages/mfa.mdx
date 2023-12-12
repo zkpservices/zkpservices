@@ -1,8 +1,11 @@
 # Multi-Factor Authentication 
+<div className="mt-4"></div>
 
 This section explains how users can integrate custom Multi-Factor Authentication (MFA) into the zkp.services protocol. It also highlights the use of zkp.services’ Chainlink VRF and Chainlink Automation-based MFA provider, which is trustless and operates entirely on-chain.
 
 Given the diverse security needs of different applications using zkp.services, custom MFA requirements can be incorporated into every request, response, and operation. For instance, the security requirements for accessing a metro gate are significantly different from the biometric security commonly used at airports. To accommodate such variations, zkp.services enables users to specify and use their own MFA providers, as long as these providers adhere to a simple interface. This flexibility is essential due to the inherent possibilities of false positives and negatives in identity verification systems, necessitating a robust and adaptable MFA framework.
+
+---
 
 ## MFA Interface Enabling Custom MFA
 
@@ -24,7 +27,10 @@ interface ITwoFactor {
 
 The MFA Interface required for custom MFA smart contracts is straightforward yet highly adaptable. It mandates only two functions: a function to generate a MFA request and a function to return the MFA status. As shown in the provided Solidity interface, the generate2FA function associates a request ID with a keccak256 hash. It is up to the third-party MFA provider to define the method for setting the TwoFactorData struct's success flag to true for that ID. In the core zkp.services protocol, when a request or response is checked and it has an associated 2FA ID, this success flag must be true, indicating that the 2FA check was successful according to the custom logic of the provider. Optionally, a timestamp can be included to impose a time limit on the request, offering additional control. The core protocol also allows specifying the address of the 2FA provider to be associated with the request, along with the 2FA request ID.
 
+---
+
 ## Trustless & On-chain MFA
+<div className="mt-4"></div>
 
 zkp.services integrates a trustless and entirely on-chain MFA provider using Chainlink VRF (Verifiable Random Function) for generating randomness, Chainlink Automation for timely execution, and Zero Knowledge Proofs to securely verify private information without public disclosure. While it is true that it relies on Chainlink's off-chain infrastructure (and thus not technically entirely trustless and on-chain), the robustness and reliability of the Chainlink network make it a superior choice over other third-party APIs that might collect data or suffer downtime.
 

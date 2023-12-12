@@ -1,3 +1,544 @@
-
 # Protocol Blueprint
+<div className="mt-4"></div>
 
+The purpose of this section is to explain the purpose and give an overview of some of the most critical components that
+make the solution possible. The `ZKPServicesCore` contract is covered in more detail as well as explaining how MFA 
+contracts that make use of our `ITwoFactor` interface can be integrated seamlessly. For a higher-level [overview](/docs) 
+of the protocol and for an explanation of the [MFA methodology](/mfa), please consult the relevant guides linked. If, 
+after reading this guide, you still have additional questions and curiosities please don't hesitate to reach us at 
+<span className="font-mono">contact@zkp.services.</span>
+
+---
+
+## Data Storage & Handling in the Protocol
+
+<div className="mt-4"></div>
+### Format of Data Exchange
+
+The data exchanged with our protocol is formatted as JSON objects, exemplified by the structure below. We opt for a dictionary data structure, which is ideal for our requirements due to its compatibility with NoSQL. This compatibility facilitates fast lookups of nested key-value pairs and enhances the efficiency of hashing tree leaves.
+
+```json {{ title: 'Sample Data' }}
+{
+  "medical records": {
+    "id": {
+      "name": "Johnathan Doe",
+      "DOB": "25/03/2002"
+    },
+    "allergies": ["pollen", "gluten"],
+    "active prescriptions": {
+      "Amoxicillin": {
+        "usage": "Antibiotic",
+        "dosage": "250mg to 500mg every 8 hours or 875mg every 12 hours",
+        "refills remaining": "3 for 50 x 1g or equivalent"
+      },
+      "Levothyroxine": {
+        "usage": "Thyroid Hormone Replacement",
+        "dosage": "Varies based on individual needs, typically 25mcg to 200mcg daily",
+        "refills remaining": "1 for 100 x 100mcg or equivalent"
+      },
+      "Atorvastatin": {
+        "usage": "Cholesterol-lowering",
+        "dosage": "10mg to 80mg once daily",
+        "refills remaining": "15 for 200 x 50mg or equivalent"
+      }
+    }
+  }
+}
+```
+
+In this example, the top-level key represents the data structure's field, with nested keys denoting its subproperties.
+
+### Hashing Mechanism Inspired by Merkle Trees
+
+Drawing inspiration from Merkle Trees, our approach involves computing the hashes of child nodes at each level. We then concatenate these hashes and compute the hash of this concatenation, proceeding upwards until we reach the "root" of the tree. This root-level hash represents the hash of the data structure. Prior to hashing, we sort the parsed JSON to ensure consistent and reliable root hash computation.
+
+### Efficient Verification of Large Data Sets
+
+A key advantage of this method is its efficiency in verifying large data sets. For example, to prove the validity of a specific key-value pair within a massive data structure (like terabyte-sized medical records), one only needs to provide the hashes of siblings at each level up to the root, along with the specific key-value pair. This process allows for the recomputation and comparison of the root hash, ensuring the pair's authenticity within the larger structure.
+
+### Flexible Data Storage and Retrieval
+
+Our protocol is designed to handle data objects of any size, stored in various locations, be it decentralized platforms like IPFS or centralized services like AWS. Protocol users can reliably retrieve data from these custom sources. The verification process, which we will detail shortly, ensures the authenticity of any shared or updated data for a given field, regardless of the data's storage location.
+
+---
+
+## Smart Contract Data Structures 
+<div className="mt-4"></div>
+
+This section delves into the smart contract's data structures, each serving a unique and crucial function within the system.
+
+```solidity {{ title: 'Data Structures' }}
+mapping(uint256 => Data) public obfuscatedData;
+struct Data {
+    string dataHash; // SHA256 of associated data
+    uint256 saltHash; // Poseidon hash of obfuscation salt
+}
+
+mapping(uint256 => DataRequest) public dataRequests;
+mapping(uint256 => UpdateRequest) public updateRequests;
+mapping(uint256 => bool) public usedRequestIds;
+mapping(uint256 => bool) public usedResponseIds;
+mapping(address => ITwoFactor) public _2FAProviders;
+struct DataRequest {
+    string encryptedRequest; // AES encrypted request
+    string encryptedKey; // AES key encrypted with RSA public encryption key of recipient
+    uint256 timeLimit; // Time limit in seconds for response
+    address _2FAProvider; // (optional) Address of 2FA provider
+    uint256 _2FAID; // (optional) 2FA request ID
+    address requester;
+    uint256 responseFeeAmount;
+}
+struct UpdateRequest {
+    string encryptedRequest; // AES encrypted request
+    string encryptedKey; // AES key encrypted with RSA public encryption key of recipient
+    uint256 timeLimit; // Time limit in seconds for response
+    address _2FAProvider; // (optional) Address of 2FA provider
+    uint256 _2FAID; // (optional) 2FA request ID
+    address requester;
+    uint256 responseFeeAmount;
+    string dataHash;
+    uint256 saltHash;
+}
+
+mapping(uint256 => Response) public responses;
+struct Response {
+    string dataHash;
+}
+```
+
+### `Data` Structure
+The `Data` struct is essential for storing the SHA256 hash of sensitive fields, such as medical records. It includes:
+- `dataHash`: The SHA256 hash of the associated data.
+- `saltHash`: A Poseidon hash of the obfuscation salt.
+
+The purpose of `saltHash` is to obfuscate the data's location within the smart contract, allowing data to be recorded in the public `obfuscatedData` mapping without revealing its actual content. This obfuscation is achieved using the Poseidon hash function, known for its efficiency in Zero-Knowledge Proofs (ZKPs). The detailed methodology for obfuscating field names with this function will be elaborated in the ZKP circuits section of this guide.
+
+### Request Structures: `DataRequest` and `UpdateRequest`
+The `DataRequest` and `UpdateRequest` structs facilitate operations for either updating existing data or making a temporary request to access it. Common features of these requests include:
+- `encryptedRequest`: The AES-encrypted request.
+- `encryptedKey`: An AES key encrypted with the RSA public key of the recipient.
+- `timeLimit`: The response's time limit, in seconds.
+- `requester`: The address of the requesting party.
+- `responseFeeAmount`: The fee (in ZKP tokens) transferred from the respondent to the requester upon successful completion.
+
+Additionally, these structs incorporate optional fields for enhanced security:
+- `_2FAProvider`: The address of the Two-Factor Authentication (2FA) provider.
+- `_2FAID`: A unique 2FA request ID.
+
+Unique to `UpdateRequest`, this struct also includes a `dataHash` and a `saltHash` to ensure the legitimacy of the updated data's storage location. This is critical for verifying the authenticity of updates in the smart contract.
+
+### Security Measures and Ephemeral IDs
+To mitigate abuse and spam, both data and update requests employ ephemeral IDs that expire after use. The time limit and optional 2FA requirements act as additional safeguards.
+
+### `Response` Structure
+The `Response` struct is straightforward, containing only a `dataHash`, which is essential for verifying the response's authenticity.
+
+### Verification Processes
+The smart contract employs specific conditions and verifications, particularly for update requests. These include ensuring the validity of the obfuscation and the congruence of the data with its associated request ID. This is crucial for maintaining the integrity of the data updates in the smart contract.
+
+In the following sections, we will explore the request and response methods in detail, alongside their associated ZKP circuits.
+
+---
+
+## Core Zero Knowledge Proof
+<div className="mt-4"></div>
+
+```json {{ title: 'Core Response ZKP Circuit' }}
+pragma circom 2.0.3;
+
+include "../circomlib/circuits/poseidon.circom";
+
+template ZKPServicesCoreResponse() {
+    /* Example input.json
+    {
+      "field_0": "115116032107105108100097032112104097114109097099121032114101099111114100115",
+      "field_1": "0",
+      "field_salt": "106102119048057056052051112104102119048057052051055103053104102106056113", 
+      "one_time_key_0": "82106053106070114070048121110089102049067088110083099105099089098106048087",
+      "one_time_key_1": "53104107119080067086122085051104104116098067122053085061061061061061",
+      "user_secret_0": "115109097114116032099111110116114097099116032112097115115119111114100",
+      "user_secret_1": "0",
+      "provided_field_and_key_hash": "14354910146573842848312385947217245548992540237954832377652817639022609046871",
+      "provided_field_and_salt_and_user_secret_hash": "10931149326158357723704937538455591874147566815322430603391219695221726864571",
+      "provided_salt_hash": "1387659474001589605887359808563316522820339430517223941727046779206566319823"
+    }*/
+
+    //field = field_0 ++ field_1 to facilitate up to 50 ASCII characters
+    signal input field_0;
+    signal input field_1;
+    //the field salt obfuscates storage location/key in smart contract in case user secret gets leaked
+    signal input field_salt;
+    //one_time_key = one_time_key_0 ++ one_time_key_1 
+    //one time key is used to ensure one time use of the ZKP in the smart contract
+    signal input one_time_key_0;
+    signal input one_time_key_1;
+    //user_secret = user_secret_0 ++ user_secret_1 to facilitate up to 50 ASCII characters
+    signal input user_secret_0;
+    signal input user_secret_1;
+
+    signal input provided_field_and_key_hash;
+    signal input provided_field_and_salt_and_user_secret_hash;
+    signal input provided_salt_hash;
+  
+    //verify field (and key, to verify it is a timely request)
+    component hash_field_and_key = Poseidon(4);
+    //verify valid storage location in smart contract
+    component hash_field_and_salt_and_secret = Poseidon(5);
+    //verify hashing salt above for additional obfuscation
+    component hash_salt = Poseidon(1);
+
+    hash_field_and_key.inputs[0] <== field_0;
+    hash_field_and_key.inputs[1] <== field_1;
+    hash_field_and_key.inputs[2] <== one_time_key_0;
+    hash_field_and_key.inputs[3] <== one_time_key_1;
+
+    hash_field_and_salt_and_secret.inputs[0] <== field_0;
+    hash_field_and_salt_and_secret.inputs[1] <== field_1;
+    hash_field_and_salt_and_secret.inputs[2] <== field_salt;
+    hash_field_and_salt_and_secret.inputs[3] <== user_secret_0;
+    hash_field_and_salt_and_secret.inputs[4] <== user_secret_1;
+  
+    hash_salt.inputs[0] <== field_salt;
+
+    hash_field_and_key.out === provided_field_and_key_hash;
+    hash_field_and_salt_and_secret.out === provided_field_and_salt_and_user_secret_hash;
+    hash_salt.out === provided_salt_hash;
+}
+
+component main { public [ provided_field_and_key_hash, provided_field_and_salt_and_user_secret_hash, provided_salt_hash ] } = ZKPServicesCoreResponse();
+```
+
+### Core Response ZKP Circuit
+
+The provided ZKP circuit is integral to ensuring that responses to update requests or data requests through the smart contract are both legitimate and correspond to the requested data references. This is achieved through several key components and processes.
+
+### Definitions and Processes
+
+- **Data Location Calculation**: The location for storing a field's root hash and obfuscation salt hash is determined by the Poseidon hash of the concatenation of the field, salt, and a user-set secret. This user secret ensures that only the user knows where their fields are located.
+- **Field Compatibility with ZKPs**: To make fields like 'medical records' compatible with ZKPs, they are split into two segments (each up to 24 characters) and then converted into BigIntegers. This split aids in processing within the ZKP framework.
+- **Request ID and One-Time Key**: The request ID is formed by hashing the field and a one-time request key together. The one-time key serves dual purposes: it ensures the uniqueness of the request ID and obfuscates communications.
+- **Field Salt**: Provided during an update request, the field salt is used to obscure the data's storage location.
+
+To fully understand how the above integrates with the other smart contract structs and operations, please continue reading.
+
+```solidity {{ title: 'Response Method' }}
+// request ID = poseidon(field + key)
+// storage location = poseidon(field + salt + user secret)
+// salt hash = poseidon(salt)
+function respond(
+    uint256 requestId,
+    uint256 dataLocation,
+    uint256 saltHash,
+    ProofParameters calldata params,
+    bool isUpdate
+) public {
+    require(
+        !usedResponseIds[requestId],
+        "This responseId has already been used."
+    );
+
+    uint256 requiredFee = isUpdate
+        ? updateRequests[requestId].responseFeeAmount
+        : dataRequests[requestId].responseFeeAmount;
+    require(
+        balanceOf(msg.sender) >= requiredFee,
+        "Not enough ZKP tokens for response fee."
+    );
+
+    uint256 requestTimeLimit = isUpdate
+        ? updateRequests[requestId].timeLimit
+        : dataRequests[requestId].timeLimit;
+    require(requestTimeLimit > block.timestamp, "Request has expired.");
+
+    address _2FAProvider = isUpdate
+        ? updateRequests[requestId]._2FAProvider
+        : dataRequests[requestId]._2FAProvider;
+    if (_2FAProvider != address(0)) {
+        uint256 _2FAID = isUpdate
+            ? updateRequests[requestId]._2FAID
+            : dataRequests[requestId]._2FAID;
+        ITwoFactor.TwoFactorData memory twoFactorData = ITwoFactor(
+            _2FAProvider
+        ).twoFactorData(_2FAID);
+        require(twoFactorData.success, "2FA failed.");
+    }
+
+    uint256[2] memory pA = [params.pA0, params.pA1];
+    uint256[2][2] memory pB = [
+        [params.pB00, params.pB01],
+        [params.pB10, params.pB11]
+    ];
+    uint256[2] memory pC = [params.pC0, params.pC1];
+    uint256[3] memory pubSignals = [
+        params.pubSignals0,
+        params.pubSignals1,
+        params.pubSignals2
+    ];
+
+    require(
+        pubSignals[0] == requestId &&
+            pubSignals[1] == dataLocation &&
+            pubSignals[2] == saltHash &&
+            responseVerifier.verifyProof(pA, pB, pC, pubSignals),
+        "ZKP verification failed."
+    );
+
+    if (isUpdate) {
+        require(
+            saltHash == updateRequests[requestId].saltHash,
+            "Salt hash does not match update request salt hash"
+        );
+        obfuscatedData[dataLocation].dataHash = updateRequests[requestId]
+            .dataHash;
+        obfuscatedData[dataLocation].saltHash = updateRequests[requestId]
+            .saltHash;
+    } else {
+        require(
+            saltHash == obfuscatedData[dataLocation].saltHash,
+            "Salt hash does not match stored salt hash"
+        );
+    }
+
+    address requester = isUpdate
+        ? updateRequests[requestId].requester
+        : dataRequests[requestId].requester;
+    _transfer(msg.sender, requester, requiredFee);
+
+    responses[requestId] = Response({
+        dataHash: obfuscatedData[dataLocation].dataHash
+    });
+
+    usedResponseIds[requestId] = true;
+}
+```
+
+### Significance in Smart Contract Operations
+
+The use of the ZKP circuit is pivotal for the `respond` method in the smart contract. It ensures the integrity and correctness of the data being interacted with, whether for updates or access requests. This method employs several checks and balances.
+
+### Key Checks in `respond` Method:
+- **Response ID Usage**: Ensures the response ID hasn't been previously used, preventing replay attacks.
+- **Fee Verification**: Confirms the responder has enough ZKP tokens to cover the response fee.
+- **Time Limit Check**: Verifies the request hasn't expired, maintaining the timeliness of the response.
+- **2FA Verification**: If applicable, checks the success of the Two-Factor Authentication process for additional security.
+- **ZKP Verification**: Central to the method, it validates the response using the provided public signals and the ZKP verifier. This step confirms the accuracy and legitimacy of the data location, salt hash, and request ID. Please note that none of the private sensitive signals that could deobfuscate the communication or reveal further details regarding it are revealed thanks to the ZKP.
+- **Update Specific Checks**: For update requests, additional validations are performed to match the salt hash with the requested salt hash and update the obfuscated data accordingly.
+- **Transferring Fees and Recording Responses**: Completes the transaction by transferring the required fee to the requester and updating the response record.
+
+### Attaching MFA Requirements
+
+Please consult the [MFA walkthrough](/mfa) for a more in-depth explanation of our customizable MFA methodology. By attaching the address of the MFA
+verifier that makes use of our interface and the associated MFA request ID, should the request have an associated MFA requirement, requesting parties
+are able to ensure that the smart contract calls the contract to ascertain that the associated MFA request has succeeded.
+
+---
+
+## CCIP
+<div className="mt-4"></div>
+
+```solidity {{ title: 'Core CCIP Send Message function' }}
+function sendMessage(string memory receiver, bytes memory dataBytes)
+    public
+    returns (bytes32 messageId)
+{
+    require(
+        senderRouter != IRouterClient(address(0)),
+        "Sender not registered"
+    );
+    require(receiverChainId[receiver] != 0, "Receiver not registered");
+
+    uint8 dataType = uint8(dataBytes[0]);
+    bytes memory data = sliceBytes(dataBytes, 1);
+
+    // verification that data being sent from this contract is not spurious
+    if (dataType == 0x01) {
+        (
+            address key,
+            RSAEncryptionKey memory rsaEncryptionKey
+        ) = decodeRSAEncryptionKey(data);
+        require(msg.sender == key, "Sender must be the RSA key owner");
+        require(
+            keccak256(abi.encode(rsaEncryptionKeys[key])) ==
+                keccak256(abi.encode(rsaEncryptionKey)),
+            "Mismatch between data at stored key and data provided"
+        );
+    } else if (dataType == 0x02) {
+        (
+            address key,
+            RSASigningKey memory rsaSigningKey
+        ) = decodeRSASigningKey(data);
+        require(msg.sender == key, "Sender must be the RSA key owner");
+        require(
+            keccak256(abi.encode(rsaSigningKeys[key])) ==
+                keccak256(abi.encode(rsaSigningKey)),
+            "Mismatch between data at stored key and data provided"
+        );
+    } else if (dataType == 0x03) {
+        (uint256 key, Data memory dataStruct) = decodeData(data);
+        require(
+            keccak256(abi.encode(obfuscatedData[key])) ==
+                keccak256(abi.encode(dataStruct)),
+            "Mismatch between data at stored key and data provided"
+        );
+    } else if (dataType == 0x04) {
+        (uint256 key, DataRequest memory request) = decodeDataRequest(data);
+        require(
+            keccak256(abi.encode(dataRequests[key])) ==
+                keccak256(abi.encode(request)),
+            "Mismatch between data at stored key and data provided"
+        );
+    } else if (dataType == 0x05) {
+        (uint256 key, UpdateRequest memory request) = decodeUpdateRequest(
+            data
+        );
+        require(
+            keccak256(abi.encode(updateRequests[key])) ==
+                keccak256(abi.encode(request)),
+            "Mismatch between data at stored key and data provided"
+        );
+    } else if (dataType == 0x06) {
+        (uint256 key, Response memory response) = decodeResponse(data);
+        require(
+            keccak256(abi.encode(responses[key])) ==
+                keccak256(abi.encode(response)),
+            "Mismatch between data at stored key and data provided"
+        );
+    } else if (dataType == 0x07) {
+        (
+            address key,
+            PublicUserInformation memory _publicUserInformation
+        ) = decodePublicUserInformation(data);
+        require(
+            msg.sender == key,
+            "Sender must be the public user information owner"
+        );
+        require(
+            keccak256(abi.encode(publicUserInformation[key])) ==
+                keccak256(abi.encode(_publicUserInformation)),
+            "Mismatch between data at stored key and data provided"
+        );
+    } else {
+        revert("Invalid dataType");
+    }
+
+    Client.EVM2AnyMessage memory evm2AnyMessage = Client.EVM2AnyMessage({
+        receiver: abi.encode(receiverAddress[receiver]),
+        data: dataBytes,
+        tokenAmounts: new Client.EVMTokenAmount[](0),
+        extraArgs: Client._argsToBytes(
+            Client.EVMExtraArgsV1({gasLimit: 2000000, strict: false})
+        ),
+        feeToken: address(senderToken)
+    });
+
+    uint256 linkFees = senderRouter.getFee(
+        receiverChainId[receiver],
+        evm2AnyMessage
+    );
+    require(
+        linkFees <= senderToken.balanceOf(address(this)),
+        "Insufficient LINK balance"
+    );
+
+    // Approve the router to spend the contract's tokens
+    senderToken.approve(address(senderRouter), linkFees);
+
+    require(
+        balanceOf(msg.sender) >= receiverCCIPFees[receiver],
+        "Insufficient ZKP balance"
+    );
+
+    if (receiverCCIPFees[receiver] > 0 && owner() != msg.sender) {
+        _transfer(msg.sender, owner(), receiverCCIPFees[receiver]);
+    }
+
+    messageId = senderRouter.ccipSend(
+        receiverChainId[receiver],
+        evm2AnyMessage
+    );
+
+    emit CCIPMessageID(messageId);
+    return messageId;
+}
+```
+
+The `sendMessage` function in the provided Solidity code is a robust and secure method for facilitating cross-chain interactions through Chainlink's Cross-Chain Interoperability Protocol (CCIP) to enable zkp.services' users to seamlessly leverage the protocol and the power of ZKPs across different chains. It enables users to sync any of the relevant smart contract data that they require to use the protocol on a different chain at any time.  It handles various types of data securely, ensuring the integrity and authenticity of the information being transmitted. Below, we detail how this function operates and its significance in cross-chain communication.
+
+### Function Breakdown
+- **Initial Checks**: The function begins by ensuring that the sender is registered with a valid `senderRouter` and that the receiver is also registered with a non-zero chain ID. These checks prevent unauthorized or malformed messages from being processed.
+- **Data Type Handling**: The function supports multiple data types, each represented by a unique identifier (e.g., 0x01 for RSA encryption keys). It decodes the received data based on its type and conducts various verifications to ensure data integrity and sender authenticity.
+
+### Data Type Verification Process
+
+1. **RSA Encryption and Signing Keys (0x01, 0x02)**:
+   - Decodes the RSA key data.
+   - Verifies that the sender is the owner of the RSA key.
+   - Ensures the provided key matches the stored key, preventing unauthorized key modifications.
+
+2. **Data Structure (0x03)**:
+   - Decodes the data structure.
+   - Confirms the match between the provided and stored data structures, safeguarding against data tampering.
+
+3. **Data Requests (0x04)** and **Update Requests (0x05)**:
+   - Decodes request data.
+   - Verifies the congruence between provided and stored requests, ensuring requests are genuine and unaltered.
+
+4. **Responses (0x06)**:
+   - Decodes response data.
+   - Checks the match between the provided and stored responses, validating the response's legitimacy.
+
+5. **Public User Information (0x07)**:
+   - Decodes public user information.
+   - Confirms that the sender owns the user information and checks its integrity against stored data.
+
+- **Data Transmission Setup**: Prepares the cross-chain message, including recipient data and token amounts. It sets up the Chainlink message with necessary arguments and fees.
+- **LINK Token Fee Handling**: Calculates the required LINK fees for the message transfer and ensures the contract has sufficient LINK balance. This step is crucial for the successful execution of the CCIP function.
+- **ZKP Token Fee Check**: Verifies that the sender has enough ZKP tokens to cover the cross-chain interaction fees. This adds an additional layer of security and value to the transaction.
+- **Token Transfer for Fees**: If required, transfers ZKP tokens to the contract owner, handling the transaction cost of the cross-chain interaction.
+- **Message Dispatch**: Finally, the function dispatches the message across chains using the `ccipSend` method of the Chainlink router and emits an event with the message ID.
+
+### Security and Robustness
+- **Comprehensive Data Checks**: The function meticulously verifies the integrity of different data types, ensuring that only correct and authorized data is transmitted.
+- **Sender Authentication**: By requiring that the sender be the owner of the data, the function adds a layer of security, preventing impersonation and unauthorized access.
+- **Fee Handling**: The careful management of LINK and ZKP token fees ensures that the network's resources are appropriately compensated, adding to the transaction's legitimacy.
+- **Cross-Chain Reliability**: Utilizing Chainlink's CCIP for cross-chain messaging leverages its reliable infrastructure, known for secure and trustworthy data transmission across blockchain networks.
+
+### CCIP Sender & Origin Policies
+
+```solidity {{ title: 'CCIP Sender & Origin Policies' }}
+function setReceiver(
+    string calldata receiver,
+    uint64 destinationChain,
+    uint256 CCIPFee,
+    address _receiverAddress
+) public onlyOwner {
+    receiverChainId[receiver] = destinationChain;
+    receiverCCIPFees[receiver] = CCIPFee;
+    receiverAddress[receiver] = _receiverAddress;
+}
+
+function setOriginPolicy(
+    uint64 _originChain,
+    address _originAddress,
+    bool policy
+) public onlyOwner {
+    originPolicy[
+        keccak256(abi.encodePacked(_originChain, _originAddress))
+    ] = policy;
+}
+```
+
+The `setReceiver` and `setOriginPolicy` functions in the provided Solidity code are critical for managing and securing cross-chain interactions within the Chainlink Cross-Chain Interoperability Protocol (CCIP). 
+
+- **`setReceiver` Function**: This function is used to define and update the details of a receiver on a specific destination chain. It allows the contract owner to set the destination chain ID, the associated CCIP fee for transactions, and the receiver's address. This level of control is crucial for managing cross-chain data flows and ensuring that transactions are directed to the correct endpoints with the appropriate fees applied.
+
+- **`setOriginPolicy` Function**: It enables the contract owner to establish security policies for incoming transactions based on their origin. By mapping a combination of an origin chain and address to a boolean policy value, this function effectively allows or denies transactions from specific origins. Such granular control over transaction origins enhances the security of the contract by preventing unauthorized access and ensuring that only transactions from trusted sources are processed.
+
+Together, these functions provide a robust framework for securing cross-chain data transmission, allowing for precise control over both the sending and receiving ends of CCIP transactions. They form an essential part of a secure and efficient cross-chain communication protocol.
+
+---
+
+## Future-Proofing the Protocol
+<div className="mt-4"></div>
+
+ From a technical lens, the current implementation uses a Merkle Tree-like data structure for scalability, as mentioned before, for computing a root-level hash. However, the protocol is exploring other methods, such as Cryptographic Accumulators, for future enhancements when it comes to scalability. Support for more data types and an SDK are also potentially planned. To ensure adaptability with technological advances, plans are in place to allow users to select their preferred ZKP algorithms, moving away from the default Poseidon hash function and Groth16 verifier that are currently part of the prototype. The latter would make the protocol almost entirely akin to a swiss-army knife solution as nearly every single facet of the protocol would be customizable, and as a result, future-proof.

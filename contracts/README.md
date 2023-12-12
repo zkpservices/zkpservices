@@ -1,7 +1,12 @@
 
 # ZKPServicesCore
 
-Please consult our protocol [overview](https://zkp.services/docs) as well as the other guides on our site and in this repository for a high level overview of this smart contract and its purpose. For a deeper technical overview, please consult our protocol [blueprint](https://zkp.services/blueprint).
+Please consult our protocol [overview](https://zkp.services/docs) as well as the other guides on our site and in this repository for a high level overview of this smart contract and its purpose. 
+
+
+## Deep Technical Overview
+
+For a deep technical overview and explanations, please consult our protocol [blueprint](https://zkp.services/blueprint). What follows is a higher level explanation of some contract features.
 
 ## Overview
 `ZKPServicesCore` is a robust smart contract built for EVM-compatible chains written in Solidity. The contract serves as an advanced data management system leveraging cryptographic proofs and two-factor authentication mechanisms. It blends the power of decentralized platforms with various encryption and obfuscation techniques, providing a secure medium to request, update, and validate obfuscated data in a privacy-preserving manner.
